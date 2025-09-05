@@ -25,11 +25,11 @@ class MarketstackShowDateFrom extends Command
             $csvLast = $this->csvLatest("{$csvDir}/{$sym}.csv");
 
             $dbLast = null;
-            if (Schema::hasTable('prices') && Schema::hasTable('assets')) {
-                $dbLast = DB::table('prices')
-                    ->join('assets', 'assets.id', '=', 'prices.asset_id')
+            if (Schema::hasTable('price_bars') && Schema::hasTable('assets')) {
+                $dbLast = DB::table('price_bars')
+                    ->join('assets', 'assets.id', '=', 'price_bars.asset_id')
                     ->where('assets.symbol', $sym)
-                    ->max('prices.date');
+                    ->max('price_bars.date');
             }
 
             if ($dbLast && $csvLast) {
