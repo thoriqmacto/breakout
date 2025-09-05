@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
+ * php artisan marketstack:fetch-jii --show-query
  */
 class MarketstackFetchJii extends Command
 {
@@ -15,7 +16,8 @@ class MarketstackFetchJii extends Command
         {--limit=1000 : Page size per API call}
         {--chunk= : DB upsert batch size (defaults to config/csv.php)}
         {--csv : Also update CSVs in storage/app/historical}
-        {--dry-run : Parse but don\'t write to DB/CSV}';
+        {--dry-run : Parse but don\'t write to DB/CSV}
+        {--show-query : Output the API URL and exit}';
 
     protected $description = 'Fetch EOD for all 30 JII symbols from Marketstack, upsert DB, and optionally update CSVs';
 
@@ -37,11 +39,12 @@ class MarketstackFetchJii extends Command
             return self::FAILURE;
         }
 
-        $limit    = (int) $this->option('limit');
-        $chunk    = (int) ($this->option('chunk') ?: config('csv.chunk_size'));
-        $dry      = (bool) $this->option('dry-run');
-        $wantCsv  = (bool) $this->option('csv');
-        $csvDir   = config('csv.seed_dir');
+        $limit     = (int) $this->option('limit');
+        $chunk     = (int) ($this->option('chunk') ?: config('csv.chunk_size'));
+        $dry       = (bool) $this->option('dry-run');
+        $wantCsv   = (bool) $this->option('csv');
+        $showQuery = (bool) $this->option('show-query');
+        $csvDir    = config('csv.seed_dir');
 
         $baseSymbols = config('csv.index_symbols', []);
         $symbols     = array_map(fn ($s) => $s . '.XIDX', $baseSymbols);
@@ -92,6 +95,11 @@ class MarketstackFetchJii extends Command
             ];
             $query['date_from'] = $dateFrom;
             $query['date_to']   = $dateTo;
+
+            if ($showQuery) {
+                $this->info($endpoint . '?' . http_build_query($query));
+                return self::SUCCESS;
+            }
 
             $resp = Http::timeout(60)->retry(3, 500)->get($endpoint, $query);
             if ($resp->failed()) {
