@@ -77,11 +77,6 @@ class MarketstackFetchJii extends Command
         $dateFrom = min($latestDates);
         $dateTo   = now()->toDateString();
 
-        if ($dateFrom > $dateTo) {
-            $this->info('All symbols up-to-date.');
-            return self::SUCCESS;
-        }
-
         if ($wantCsv && !is_dir($csvDir)) {
             mkdir($csvDir, 0755, true);
         }
@@ -96,16 +91,21 @@ class MarketstackFetchJii extends Command
                 'symbols'    => implode(',', $symbols),
                 'limit'      => $limit,
                 'offset'     => $offset,
+                'date_from'  => $dateFrom,
+                'date_to'    => $dateTo,
             ];
-            $query['date_from'] = $dateFrom;
-            $query['date_to']   = $dateTo;
+
+            $queryString = strtr(http_build_query($query), [
+                '%2C' => ',',
+                '%2D' => '-',
+            ]);
 
             if ($showQuery) {
-                $this->info($endpoint . '?' . http_build_query($query));
+                $this->info($endpoint . '?' . $queryString);
                 return self::SUCCESS;
             }
 
-            $resp = Http::timeout(60)->retry(3, 500)->get($endpoint, $query);
+            $resp = Http::timeout(60)->retry(3, 500)->get($endpoint . '?' . $queryString);
             if ($resp->failed()) {
                 $this->error("HTTP error: {$resp->status()} {$resp->body()}");
                 return self::FAILURE;
