@@ -15,7 +15,7 @@ class CsvBars
         if (!is_file($path)) return [];
         if (($h = fopen($path, 'r')) === false) return [];
         $header = null; $rows = [];
-        while (($r = fgetcsv($h)) !== false) {
+        while (($r = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
             if ($header === null) { $header = array_map(fn($x)=>strtolower(trim($x)), $r); continue; }
             $rec = array_combine($header, $r);
             if (!$rec) continue;
