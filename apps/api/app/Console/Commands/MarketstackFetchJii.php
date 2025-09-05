@@ -5,8 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Schema;
 use App\Services\CsvBars;
+use App\Services\SymbolDate;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
@@ -57,23 +57,8 @@ class MarketstackFetchJii extends Command
         foreach ($baseSymbols as $sym) {
             $path = "{$csvDir}/{$sym}.csv";
             $csvRows[$sym] = CsvBars::read($path);
-            $csvLast = $csvRows[$sym] ? max(array_keys($csvRows[$sym])) : null;
-
-            $dbLast = null;
-            if (Schema::hasTable('prices') && Schema::hasTable('assets')) {
-                $dbLast = DB::table('prices')
-                    ->join('assets', 'assets.id', '=', 'prices.asset_id')
-                    ->where('assets.symbol', $sym)
-                    ->max('prices.date');
-            }
-
-            if ($dbLast && $csvLast) {
-                $latest = max($dbLast, $csvLast);
-            } else {
-                $latest = $dbLast ?? $csvLast;
-            }
-
-            $latestDates[$sym] = $latest ?: '2000-01-01';
+            $dates = SymbolDate::latest($sym, $csvRows[$sym]);
+            $latestDates[$sym] = $dates['latest'];
         }
 
         $dateFrom = min($latestDates);
