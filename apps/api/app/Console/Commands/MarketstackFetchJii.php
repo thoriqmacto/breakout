@@ -51,7 +51,7 @@ class MarketstackFetchJii extends Command
         $symbols     = array_map(fn ($s) => $s . '.XIDX', $baseSymbols);
 
         $csvDates = [];
-        $startDates = [];
+        $latestDates = [];
 
         foreach ($baseSymbols as $sym) {
             [$dates, $csvLast] = $this->loadCsvDates("{$csvDir}/{$sym}.csv");
@@ -66,15 +66,15 @@ class MarketstackFetchJii extends Command
             }
 
             if ($dbLast && $csvLast) {
-                $latest = min($dbLast, $csvLast);
+                $latest = max($dbLast, $csvLast);
             } else {
                 $latest = $dbLast ?? $csvLast;
             }
 
-            $startDates[$sym] = $latest ? date('Y-m-d', strtotime($latest . ' +1 day')) : '2000-01-01';
+            $latestDates[$sym] = $latest ?: '2000-01-01';
         }
 
-        $dateFrom = min($startDates);
+        $dateFrom = min($latestDates);
         $dateTo   = now()->toDateString();
 
         if ($dateFrom > $dateTo) {
