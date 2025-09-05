@@ -62,7 +62,7 @@ class MarketstackShowDateFrom extends Command
         if (file_exists($path)) {
             if (($fh = fopen($path, 'r')) !== false) {
                 $first = true;
-                while (($row = fgetcsv($fh)) !== false) {
+                while (($row = fgetcsv($fh, 0, ',', '"', '\\')) !== false) {
                     if ($first) { $first = false; continue; }
                     $d = $row[0] ?? null;
                     if ($d && (!$latest || $d > $latest)) {
