@@ -15,7 +15,7 @@ class CsvBars
         if (!is_file($path)) return [];
         if (($h = fopen($path, 'r')) === false) return [];
         $header = null; $rows = [];
-        while (($r = fgetcsv($h)) !== false) {
+        while (($r = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
             if ($header === null) { $header = array_map(fn($x)=>strtolower(trim($x)), $r); continue; }
             $rec = array_combine($header, $r);
             if (!$rec) continue;
@@ -47,12 +47,12 @@ class CsvBars
         if (!is_dir($dir)) mkdir($dir, 0777, true);
         $tmp = $path.'.tmp';
         $h = fopen($tmp, 'w');
-        fputcsv($h, ['Date','Open','High','Low','Close','Volume']);
+        fputcsv($h, ['Date','Open','High','Low','Close','Volume'], ',', '"', '\\');
         ksort($rows);
         foreach ($rows as $d => $r) {
             $dt = DateTime::createFromFormat('Y-m-d', $d);
             $outDate = $dt ? $dt->format('d/m/Y') : $d;
-            fputcsv($h, [$outDate, $r['open'], $r['high'], $r['low'], $r['close'], $r['volume']]);
+            fputcsv($h, [$outDate, $r['open'], $r['high'], $r['low'], $r['close'], $r['volume']], ',', '"', '\\');
         }
         fclose($h);
         rename($tmp, $path);

@@ -19,7 +19,7 @@ class CsvUtilities
         $headers = null;
         $line = 0;
 
-        while (($data = fgetcsv($h)) !== false) {
+        while (($data = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
             if ($line === 0) {
                 if (isset($data[0])) {
                     $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]); // strip BOM
@@ -53,7 +53,7 @@ class CsvUtilities
         $rows = [];
         $line = 0;
 
-        while (($data = fgetcsv($h)) !== false) {
+        while (($data = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
             if ($line === 0 && isset($data[0])) {
                 // strip BOM if present
                 $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
