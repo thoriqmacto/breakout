@@ -98,6 +98,7 @@ class MarketstackFetchJii extends Command
             $queryString = strtr(http_build_query($query), [
                 '%2C' => ',',
                 '%2D' => '-',
+                '%2F' => '-',
             ]);
 
             if ($showQuery) {
