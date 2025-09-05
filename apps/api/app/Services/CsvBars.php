@@ -21,13 +21,14 @@ class CsvBars
             if (!$rec) continue;
             $date = self::dateFrom($rec);
             if (!$date) continue;
+
             $rows[$date] = [
                 'date'   => $date,
-                'open'   => (float)($rec['open']??0),
-                'high'   => (float)($rec['high']??0),
-                'low'    => (float)($rec['low']??0),
-                'close'  => (float)($rec['close']??0),
-                'volume' => (int)($rec['volume']??0),
+                'open'   => self::field($rec, 'open'),
+                'high'   => self::field($rec, 'high'),
+                'low'    => self::field($rec, 'low'),
+                'close'  => self::field($rec, 'close'),
+                'volume' => (int) self::field($rec, 'volume'),
             ];
         }
         fclose($h);
@@ -69,6 +70,22 @@ class CsvBars
         foreach ($add as $d => $row) { $base[$d] = $row; }
         ksort($base);
         return $base;
+    }
+
+    /**
+     * Extract a numeric field from a CSV record, supporting headers with suffixes
+     * like "Open_TICKER" or "Adj Close_TICKER". Comparison is case-insensitive
+     * and ignores spaces before the first underscore.
+     */
+    private static function field(array $rec, string $name): float {
+        foreach ($rec as $k => $v) {
+            $base = strtolower(trim(explode('_', $k, 2)[0]));
+            $base = str_replace(' ', '', $base);
+            if ($base === $name) {
+                return is_numeric($v) ? (float)$v : 0.0;
+            }
+        }
+        return 0.0;
     }
 
     /**
