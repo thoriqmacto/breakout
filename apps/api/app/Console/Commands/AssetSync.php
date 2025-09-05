@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Asset;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
+use App\Services\CsvBars;
+use App\Services\SymbolDate;
 
 class AssetSync extends Command
 {
@@ -54,69 +54,26 @@ class AssetSync extends Command
                 }
             }
 
-            return Command::FAILURE;
+            if (! $this->confirm('Continue checking latest data anyway?', true)) {
+                return Command::FAILURE;
+            }
         }
-
-        // When all symbols are aligned, check latest data from CSV and DB
+        // Check latest data from CSV and DB for each configured symbol
         $rows = [];
         foreach ($indexSymbols as $symbol) {
             $csvPath = $seedDir . '/' . $symbol . '.csv';
-            $csvDate = $this->latestDateFromCsv($csvPath);
-
-            $asset = Asset::where('symbol', $symbol)->first();
-            $dbDate = null;
-            if ($asset) {
-                $price = $asset->latestPrice();
-                $dbDate = $price?->date;
-            }
+            $csvRows = CsvBars::read($csvPath);
+            $dates   = SymbolDate::latest($symbol, $csvRows);
 
             $rows[] = [
                 $symbol,
-                $csvDate?->toDateString() ?? 'n/a',
-                $dbDate?->toDateString() ?? 'n/a',
+                $dates['csv'] ?? 'n/a',
+                $dates['db'] ?? 'n/a',
             ];
         }
 
         $this->table(['Symbol', 'CSV Latest', 'DB Latest'], $rows);
 
         return Command::SUCCESS;
-    }
-
-    /**
-     * Extract the latest date from a CSV file.
-     */
-    protected function latestDateFromCsv(string $path): ?Carbon
-    {
-        if (!is_file($path)) {
-            return null;
-        }
-
-        $file = new \SplFileObject($path, 'r');
-        // Move to last line
-        $file->seek(PHP_INT_MAX);
-        $line = trim($file->current());
-        while ($line === '' && $file->key() > 0) {
-            $file->seek($file->key() - 1);
-            $line = trim($file->current());
-        }
-        if ($file->key() === 0) {
-            return null; // Only header present
-        }
-
-        $data = str_getcsv($line);
-        $dateString = $data[0] ?? null;
-        if (!$dateString) {
-            return null;
-        }
-
-        // Try multiple possible formats
-        foreach (['Y-m-d', 'd/m/Y'] as $fmt) {
-            $dt = Carbon::createFromFormat($fmt, $dateString);
-            if ($dt !== false) {
-                return $dt;
-            }
-        }
-
-        return null;
     }
 }
