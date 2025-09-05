@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model {
     protected $fillable = ['symbol','name','lot_size','tick_size'];
+    public $timestamps = false;
 
     public function prices()
     {
