@@ -26,6 +26,7 @@ return new class extends Migration {
             $table->decimal('low', 16, 4)->nullable();
             $table->decimal('close', 16, 4)->nullable();
             $table->unsignedBigInteger('volume')->nullable();
+            $table->timestamps();
             $table->unique(['asset_id', 'date']);
         });
     }
