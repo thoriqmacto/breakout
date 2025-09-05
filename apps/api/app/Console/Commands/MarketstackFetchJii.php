@@ -135,7 +135,7 @@ class MarketstackFetchJii extends Command
 
                 if (count($dbBatch) >= $chunk) {
                     if (!$dry) {
-                        DB::table('prices')->upsert($dbBatch, ['asset_id', 'date'],
+                        DB::table('price_bars')->upsert($dbBatch, ['asset_id', 'date'],
                             ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
                     }
                     $insertCount += count($dbBatch);
@@ -156,7 +156,7 @@ class MarketstackFetchJii extends Command
 
             if (!empty($dbBatch)) {
                 if (!$dry) {
-                    DB::table('prices')->upsert($dbBatch, ['asset_id', 'date'],
+                    DB::table('price_bars')->upsert($dbBatch, ['asset_id', 'date'],
                         ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
                 }
                 $insertCount += count($dbBatch);
