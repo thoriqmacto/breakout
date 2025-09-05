@@ -3,7 +3,7 @@
 use App\Services\IdxTicks;
 
 return [
-    'seed_dir' => storage_path('app/historical'), // put your 30 CSVs here
+    'seed_dir' => database_path('seeders/data/historical'), // put your 30 CSVs here
     'index_symbols' => [
         'ADRO','AKRA','AMMN','ANTM','ASII','BRIS','BRMS','BRPT','CPIN','EXCL','ICBP','INCO',
         'INDF','INKP','ISAT','KLBF','MAPI','MBMA','MDKA','MEDC','PANI','PGAS','PGEO','PTBA',

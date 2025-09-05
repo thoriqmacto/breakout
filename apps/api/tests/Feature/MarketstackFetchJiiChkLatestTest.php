@@ -16,7 +16,7 @@ class MarketstackFetchJiiChkLatestTest extends TestCase
         $_ENV['MARKETSTACK_KEY'] = 'test-key';
 
         config(['csv.index_symbols' => ['AAA']]);
-        $csvDir = storage_path('app/test-historical');
+        $csvDir = database_path('seeders/data/test-historical');
         if (!is_dir($csvDir)) {
             mkdir($csvDir, 0755, true);
         }

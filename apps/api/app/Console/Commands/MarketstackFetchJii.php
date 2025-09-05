@@ -18,7 +18,7 @@ class MarketstackFetchJii extends Command
     protected $signature = 'marketstack:fetch-jii
         {--limit=1000 : Page size per API call}
         {--chunk= : DB upsert batch size (defaults to config/csv.php)}
-        {--csv : Also update CSVs in storage/app/historical}
+        {--csv : Also update CSVs in database/seeders/data/historical}
         {--dry-run : Parse but don\'t write to DB/CSV}
         {--show-query : Output the API URL and exit}
         {--chk-latest= : Skip symbols already up to date for the given date}';
