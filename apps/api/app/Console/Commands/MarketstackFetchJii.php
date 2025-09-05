@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use App\Services\CsvBars;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
@@ -50,12 +51,13 @@ class MarketstackFetchJii extends Command
         $baseSymbols = config('csv.index_symbols', []);
         $symbols     = array_map(fn ($s) => $s . '.XIDX', $baseSymbols);
 
-        $csvDates = [];
+        $csvRows = [];
         $latestDates = [];
 
         foreach ($baseSymbols as $sym) {
-            [$dates, $csvLast] = $this->loadCsvDates("{$csvDir}/{$sym}.csv");
-            $csvDates[$sym] = $dates;
+            $path = "{$csvDir}/{$sym}.csv";
+            $csvRows[$sym] = CsvBars::read($path);
+            $csvLast = $csvRows[$sym] ? max(array_keys($csvRows[$sym])) : null;
 
             $dbLast = null;
             if (Schema::hasTable('prices') && Schema::hasTable('assets')) {
@@ -119,7 +121,6 @@ class MarketstackFetchJii extends Command
             $this->info("Page {$page} | got {$count} rows (offset={$offset}/total≈{$total})");
 
             $dbBatch = [];
-            $csvBuffers = [];
 
             foreach ($json['data'] as $row) {
                 $symFull = $row['symbol'] ?? null;
@@ -156,13 +157,15 @@ class MarketstackFetchJii extends Command
                     $dbBatch = [];
                 }
 
-                if ($wantCsv && !$dry && !isset($csvDates[$baseSym][$ymd])) {
-                    $csvDates[$baseSym][$ymd] = true;
-                    $csvBuffers[$baseSym][] = "{$ymd},{$open},{$high},{$low},{$close},{$volume}\n";
-                    if (count($csvBuffers[$baseSym]) >= 500) {
-                        $this->appendCsv($csvDir, $baseSym, $csvBuffers[$baseSym]);
-                        $csvBuffers[$baseSym] = [];
-                    }
+                if ($wantCsv && !$dry) {
+                    $csvRows[$baseSym][$ymd] = [
+                        'date'   => $ymd,
+                        'open'   => $open,
+                        'high'   => $high,
+                        'low'    => $low,
+                        'close'  => $close,
+                        'volume' => $volume,
+                    ];
                 }
             }
 
@@ -174,16 +177,17 @@ class MarketstackFetchJii extends Command
                 $insertCount += count($dbBatch);
             }
 
-            if ($wantCsv && !$dry) {
-                foreach ($csvBuffers as $sym => $lines) {
-                    if (!empty($lines)) {
-                        $this->appendCsv($csvDir, $sym, $lines);
-                    }
-                }
-            }
+            // no CSV writing here; handled after loop
 
             $offset += $limit; $page++;
         } while ($offset < $total);
+
+        if ($wantCsv && !$dry) {
+            foreach ($csvRows as $sym => $rows) {
+                $path = "{$csvDir}/{$sym}.csv";
+                CsvBars::write($path, $rows);
+            }
+        }
 
         $this->info(($dry ? '[dry-run] ' : '')."Done. Upserted {$insertCount} rows.");
         if ($wantCsv && !$dry) $this->info("CSVs updated in {$csvDir}");
@@ -207,40 +211,4 @@ class MarketstackFetchJii extends Command
         ]);
     }
 
-    private function appendCsv(string $dir, string $baseSym, array $lines): void
-    {
-        $path = "{$dir}/{$baseSym}.csv";
-        if (!file_exists($path)) {
-            file_put_contents($path, "date,open,high,low,close,volume\n");
-        }
-        file_put_contents($path, implode('', $lines), FILE_APPEND);
-    }
-
-    /**
-     * Load existing CSV dates for a symbol and return [dateSet, latestDate].
-     *
-     * @param string $path
-     * @return array{array<string,bool>, string|null}
-     */
-    private function loadCsvDates(string $path): array
-    {
-        $dates = [];
-        $latest = null;
-        if (file_exists($path)) {
-            if (($fh = fopen($path, 'r')) !== false) {
-                $first = true;
-                while (($row = fgetcsv($fh, 0, ',', '"', '\\')) !== false) {
-                    if ($first) { $first = false; continue; }
-                    $d = $row[0] ?? null;
-                    if (!$d) continue;
-                    $dates[$d] = true;
-                    if (!$latest || $d > $latest) {
-                        $latest = $d;
-                    }
-                }
-                fclose($fh);
-            }
-        }
-        return [$dates, $latest];
-    }
 }
