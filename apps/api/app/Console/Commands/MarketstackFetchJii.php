@@ -7,29 +7,23 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 /**
- * php artisan marketstack:fetch-jii --date-from=2025-08-01 --date-to=2025-08-29 --limit=1000 --chunk=200 --csv
+ * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
  */
 class MarketstackFetchJii extends Command
 {
     protected $signature = 'marketstack:fetch-jii
-        {--date-from= : Start date, e.g. 2024-01-01}
-        {--date-to= : End date, e.g. 2025-08-15}
         {--limit=1000 : Page size per API call}
-        {--chunk=200 : DB upsert batch size}
+        {--chunk= : DB upsert batch size (defaults to config/csv.php)}
         {--csv : Also update CSVs in storage/app/historical}
         {--dry-run : Parse but don\'t write to DB/CSV}';
 
     protected $description = 'Fetch EOD for all 30 JII symbols from Marketstack, upsert DB, and optionally update CSVs';
 
-    /** full list of 30 JII symbols with .XIDX suffix */
-    private array $symbols = [
-        'ADRO.XIDX','AKRA.XIDX','AMMN.XIDX','ANTM.XIDX','ASII.XIDX',
-        'BRIS.XIDX','BRMS.XIDX','BRPT.XIDX','CPIN.XIDX','EXCL.XIDX',
-        'ICBP.XIDX','INCO.XIDX','INDF.XIDX','INKP.XIDX','ISAT.XIDX',
-        'KLBF.XIDX','MAPI.XIDX','MBMA.XIDX','MDKA.XIDX','MEDC.XIDX',
-        'PANI.XIDX','PGAS.XIDX','PGEO.XIDX','PTBA.XIDX','PTRO.XIDX',
-        'SMGR.XIDX','TLKM.XIDX','TPIA.XIDX','UNTR.XIDX','UNVR.XIDX',
-    ];
+    /**
+     * Cached list of asset IDs keyed by base symbol (without .XIDX).
+     * Used to avoid repetitive lookups when processing API results.
+     */
+    private array $assetIds = [];
 
     public function handle(): int
     {
@@ -43,13 +37,43 @@ class MarketstackFetchJii extends Command
             return self::FAILURE;
         }
 
-        $dateFrom = $this->option('date-from');
-        $dateTo   = $this->option('date-to');
         $limit    = (int) $this->option('limit');
-        $chunk    = (int) $this->option('chunk');
+        $chunk    = (int) ($this->option('chunk') ?: config('csv.chunk_size'));
         $dry      = (bool) $this->option('dry-run');
         $wantCsv  = (bool) $this->option('csv');
-        $csvDir   = storage_path('app/historical');
+        $csvDir   = config('csv.seed_dir');
+
+        $baseSymbols = config('csv.index_symbols', []);
+        $symbols     = array_map(fn ($s) => $s . '.XIDX', $baseSymbols);
+
+        $csvDates = [];
+        $startDates = [];
+
+        foreach ($baseSymbols as $sym) {
+            [$dates, $csvLast] = $this->loadCsvDates("{$csvDir}/{$sym}.csv");
+            $csvDates[$sym] = $dates;
+
+            $dbLast = DB::table('prices')
+                ->join('assets', 'assets.id', '=', 'prices.asset_id')
+                ->where('assets.symbol', $sym)
+                ->max('prices.date');
+
+            if ($dbLast && $csvLast) {
+                $latest = min($dbLast, $csvLast);
+            } else {
+                $latest = $dbLast ?? $csvLast;
+            }
+
+            $startDates[$sym] = $latest ? date('Y-m-d', strtotime($latest . ' +1 day')) : '2000-01-01';
+        }
+
+        $dateFrom = min($startDates);
+        $dateTo   = now()->toDateString();
+
+        if ($dateFrom > $dateTo) {
+            $this->info('All symbols up-to-date.');
+            return self::SUCCESS;
+        }
 
         if ($wantCsv && !is_dir($csvDir)) {
             mkdir($csvDir, 0755, true);
@@ -62,12 +86,12 @@ class MarketstackFetchJii extends Command
         do {
             $query = [
                 'access_key' => $key,
-                'symbols'    => implode(',', $this->symbols),
+                'symbols'    => implode(',', $symbols),
                 'limit'      => $limit,
                 'offset'     => $offset,
             ];
-            if ($dateFrom) $query['date_from'] = $dateFrom;
-            if ($dateTo)   $query['date_to']   = $dateTo;
+            $query['date_from'] = $dateFrom;
+            $query['date_to']   = $dateTo;
 
             $resp = Http::timeout(60)->retry(3, 500)->get($endpoint, $query);
             if ($resp->failed()) {
@@ -90,7 +114,7 @@ class MarketstackFetchJii extends Command
                 if (!$symFull || !$ymd) continue;
 
                 $baseSym = strtok($symFull, '.');
-                $assetId = $this->getOrCreateAssetId($baseSym);
+                $assetId = $this->assetIds[$baseSym] ??= $this->getOrCreateAssetId($baseSym);
 
                 $open   = $row['open'] ?? null;
                 $high   = $row['high'] ?? null;
@@ -111,13 +135,16 @@ class MarketstackFetchJii extends Command
                 ];
 
                 if (count($dbBatch) >= $chunk) {
-                    if (!$dry) DB::table('prices')->upsert($dbBatch, ['asset_id','date'],
-                        ['open','high','low','close','volume','updated_at']);
+                    if (!$dry) {
+                        DB::table('prices')->upsert($dbBatch, ['asset_id', 'date'],
+                            ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
+                    }
                     $insertCount += count($dbBatch);
                     $dbBatch = [];
                 }
 
-                if ($wantCsv && !$dry) {
+                if ($wantCsv && !$dry && !isset($csvDates[$baseSym][$ymd])) {
+                    $csvDates[$baseSym][$ymd] = true;
                     $csvBuffers[$baseSym][] = "{$ymd},{$open},{$high},{$low},{$close},{$volume}\n";
                     if (count($csvBuffers[$baseSym]) >= 500) {
                         $this->appendCsv($csvDir, $baseSym, $csvBuffers[$baseSym]);
@@ -127,14 +154,18 @@ class MarketstackFetchJii extends Command
             }
 
             if (!empty($dbBatch)) {
-                if (!$dry) DB::table('prices')->upsert($dbBatch, ['asset_id','date'],
-                    ['open','high','low','close','volume','updated_at']);
+                if (!$dry) {
+                    DB::table('prices')->upsert($dbBatch, ['asset_id', 'date'],
+                        ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
+                }
                 $insertCount += count($dbBatch);
             }
 
             if ($wantCsv && !$dry) {
                 foreach ($csvBuffers as $sym => $lines) {
-                    if (!empty($lines)) $this->appendCsv($csvDir, $sym, $lines);
+                    if (!empty($lines)) {
+                        $this->appendCsv($csvDir, $sym, $lines);
+                    }
                 }
             }
 
@@ -170,5 +201,33 @@ class MarketstackFetchJii extends Command
             file_put_contents($path, "date,open,high,low,close,volume\n");
         }
         file_put_contents($path, implode('', $lines), FILE_APPEND);
+    }
+
+    /**
+     * Load existing CSV dates for a symbol and return [dateSet, latestDate].
+     *
+     * @param string $path
+     * @return array{array<string,bool>, string|null}
+     */
+    private function loadCsvDates(string $path): array
+    {
+        $dates = [];
+        $latest = null;
+        if (file_exists($path)) {
+            if (($fh = fopen($path, 'r')) !== false) {
+                $first = true;
+                while (($row = fgetcsv($fh)) !== false) {
+                    if ($first) { $first = false; continue; }
+                    $d = $row[0] ?? null;
+                    if (!$d) continue;
+                    $dates[$d] = true;
+                    if (!$latest || $d > $latest) {
+                        $latest = $d;
+                    }
+                }
+                fclose($fh);
+            }
+        }
+        return [$dates, $latest];
     }
 }
