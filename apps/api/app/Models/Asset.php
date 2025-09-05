@@ -11,4 +11,17 @@ class Asset extends Model {
     {
         return $this->hasMany(Price::class);
     }
+
+    /**
+     * Fetch the latest price record associated with the asset.
+     *
+     * This leverages the relationship with the Price model to obtain
+     * the most recent OHLCV values and their corresponding date.
+     *
+     * @return \App\Models\Price|null
+     */
+    public function latestPrice()
+    {
+        return $this->prices()->orderByDesc('date')->first();
+    }
 }
