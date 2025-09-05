@@ -11,6 +11,7 @@ use App\Services\SymbolDate;
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
  * php artisan marketstack:fetch-jii --show-query
+ * php artisan marketstack:fetch-jii --chk-latest=2024-01-01
  */
 class MarketstackFetchJii extends Command
 {
@@ -19,7 +20,8 @@ class MarketstackFetchJii extends Command
         {--chunk= : DB upsert batch size (defaults to config/csv.php)}
         {--csv : Also update CSVs in storage/app/historical}
         {--dry-run : Parse but don\'t write to DB/CSV}
-        {--show-query : Output the API URL and exit}';
+        {--show-query : Output the API URL and exit}
+        {--chk-latest= : Skip symbols already up to date for the given date}';
 
     protected $description = 'Fetch EOD for all 30 JII symbols from Marketstack, upsert DB, and optionally update CSVs';
 
@@ -41,25 +43,35 @@ class MarketstackFetchJii extends Command
             return self::FAILURE;
         }
 
-        $limit     = (int) $this->option('limit');
-        $chunk     = (int) ($this->option('chunk') ?: config('csv.chunk_size'));
-        $dry       = (bool) $this->option('dry-run');
-        $wantCsv   = (bool) $this->option('csv');
-        $showQuery = (bool) $this->option('show-query');
-        $csvDir    = config('csv.seed_dir');
+        $limit      = (int) $this->option('limit');
+        $chunk      = (int) ($this->option('chunk') ?: config('csv.chunk_size'));
+        $dry        = (bool) $this->option('dry-run');
+        $wantCsv    = (bool) $this->option('csv');
+        $showQuery  = (bool) $this->option('show-query');
+        $chkLatest  = $this->option('chk-latest');
+        $csvDir     = config('csv.seed_dir');
 
-        $baseSymbols = config('csv.index_symbols', []);
-        $symbols     = array_map(fn ($s) => $s . '.XIDX', $baseSymbols);
-
-        $csvRows = [];
-        $latestDates = [];
+        $baseSymbols    = config('csv.index_symbols', []);
+        $symbolsToFetch = [];
+        $csvRows        = [];
+        $latestDates    = [];
 
         foreach ($baseSymbols as $sym) {
             $path = "{$csvDir}/{$sym}.csv";
             $csvRows[$sym] = CsvBars::read($path);
-            $dates = SymbolDate::latest($sym, $csvRows[$sym]);
-            $latestDates[$sym] = $dates['latest'];
+            $dates = SymbolDate::latest($sym, $csvRows[$sym], $chkLatest);
+            if (!$chkLatest || ($dates['is_latest'] ?? 'no') !== 'yes') {
+                $symbolsToFetch[] = $sym;
+                $latestDates[$sym] = $dates['latest'];
+            }
         }
+
+        if ($chkLatest && empty($symbolsToFetch)) {
+            $this->info('All symbols are up to date.');
+            return self::SUCCESS;
+        }
+
+        $symbols = array_map(fn ($s) => $s . '.XIDX', $symbolsToFetch);
 
         $dateFrom = min($latestDates);
         $dateTo   = now()->toDateString();
