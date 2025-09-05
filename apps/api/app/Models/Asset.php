@@ -22,6 +22,11 @@ class Asset extends Model {
      */
     public function latestPrice()
     {
-        return $this->prices()->orderByDesc('date')->first();
+        return $this->latestPriceRecord()->first();
+    }
+
+    public function latestPriceRecord()
+    {
+        return $this->hasOne(Price::class)->latestOfMany('date');
     }
 }
