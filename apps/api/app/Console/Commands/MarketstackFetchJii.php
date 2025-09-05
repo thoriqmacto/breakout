@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
@@ -56,10 +57,13 @@ class MarketstackFetchJii extends Command
             [$dates, $csvLast] = $this->loadCsvDates("{$csvDir}/{$sym}.csv");
             $csvDates[$sym] = $dates;
 
-            $dbLast = DB::table('prices')
-                ->join('assets', 'assets.id', '=', 'prices.asset_id')
-                ->where('assets.symbol', $sym)
-                ->max('prices.date');
+            $dbLast = null;
+            if (Schema::hasTable('prices') && Schema::hasTable('assets')) {
+                $dbLast = DB::table('prices')
+                    ->join('assets', 'assets.id', '=', 'prices.asset_id')
+                    ->where('assets.symbol', $sym)
+                    ->max('prices.date');
+            }
 
             if ($dbLast && $csvLast) {
                 $latest = min($dbLast, $csvLast);
