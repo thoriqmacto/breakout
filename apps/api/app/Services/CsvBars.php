@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use DateTime;
+
 class CsvBars
 {
     /**
@@ -48,7 +50,9 @@ class CsvBars
         fputcsv($h, ['Date','Open','High','Low','Close','Volume']);
         ksort($rows);
         foreach ($rows as $d => $r) {
-            fputcsv($h, [$d, $r['open'], $r['high'], $r['low'], $r['close'], $r['volume']]);
+            $dt = DateTime::createFromFormat('Y-m-d', $d);
+            $outDate = $dt ? $dt->format('d/m/Y') : $d;
+            fputcsv($h, [$outDate, $r['open'], $r['high'], $r['low'], $r['close'], $r['volume']]);
         }
         fclose($h);
         rename($tmp, $path);
@@ -76,7 +80,14 @@ class CsvBars
     private static function dateFrom(array $rec): ?string {
         // Support common header variants
         foreach (['date','timestamp','day'] as $k) {
-            if (!empty($rec[$k])) return substr((string)$rec[$k], 0, 10);
+            if (!empty($rec[$k])) {
+                $raw = substr((string)$rec[$k], 0, 10);
+                $dt = DateTime::createFromFormat('Y-m-d', $raw)
+                    ?: DateTime::createFromFormat('d/m/Y', $raw)
+                    ?: DateTime::createFromFormat('d-m-Y', $raw)
+                    ?: DateTime::createFromFormat('m-d-Y', $raw);
+                if ($dt) return $dt->format('Y-m-d');
+            }
         }
         return null;
     }
