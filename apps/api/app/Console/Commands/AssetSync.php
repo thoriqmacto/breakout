@@ -137,15 +137,23 @@ class AssetSync extends Command
 
         $dbBars->flush();
 
+        // Ask user for a custom date to check against latest data
+        $chkLatest = null;
+        $showIsLatest = false;
+        if ($this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
+            $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
+            $showIsLatest = true;
+        }
+
         // After syncing, display latest data from CSV and DB for each symbol
         $rows = [];
         $i = 1;
         foreach ($indexSymbols as $symbol) {
             $csvPath = $seedDir . '/' . $symbol . '.csv';
             $csvRows = CsvBars::read($csvPath);
-            $dates   = SymbolDate::latest($symbol, $csvRows);
+            $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
-            $rows[] = [
+            $row = [
                 $i,
                 $symbol,
                 $dates['csv'] ?? 'n/a',
@@ -153,10 +161,21 @@ class AssetSync extends Command
                 $dates['total'] ?? 'n/a',
             ];
 
+            if ($showIsLatest) {
+                $row[] = $dates['is_latest'] ?? 'no';
+            }
+
+            $rows[] = $row;
+
             $i++;
         }
 
-        $this->table(['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'], $rows);
+        $headers = ['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
+        if ($showIsLatest) {
+            $headers[] = 'Is Latest?';
+        }
+
+        $this->table($headers, $rows);
 
         $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
 
