@@ -67,7 +67,7 @@ class MarketstackFetchJii extends Command
         }
 
         if ($chkLatest && empty($symbolsToFetch)) {
-            $this->info('All symbols are up to date.');
+            $this->info('All symbols are up to date. No API call required.');
             return self::SUCCESS;
         }
 
