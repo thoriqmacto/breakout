@@ -1,6 +1,4 @@
 *
 !private/
 !public/
-!historical/
-!python/
 !.gitignore
