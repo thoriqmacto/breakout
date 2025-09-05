@@ -69,10 +69,11 @@ class AssetSync extends Command
                 $symbol,
                 $dates['csv'] ?? 'n/a',
                 $dates['db'] ?? 'n/a',
+                $dates['total'] ?? 'n/a',
             ];
         }
 
-        $this->table(['Symbol', 'CSV Latest', 'DB Latest'], $rows);
+        $this->table(['Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'], $rows);
 
         return Command::SUCCESS;
     }
