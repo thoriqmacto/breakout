@@ -22,6 +22,7 @@ class CsvFixDateFormat extends Command
      */
     public function handle()
     {
+        $this->info($this->description);
         $dir = $this->option('dir') ?: base_path();
         if (!is_dir($dir)) {
             $this->error("Directory not found: {$dir}");
