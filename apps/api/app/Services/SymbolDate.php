@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -13,7 +14,7 @@ class SymbolDate
      * @param array|null $csvRows  Optional CSV rows keyed by date
      * @return array{db:?string,csv:?string,latest:string,db_total:int,csv_total:int,total:int}
      */
-    public static function latest(string $symbol, ?array $csvRows = null): array
+    public static function latest(string $symbol, ?array $csvRows = null, string $chkLatest = null): array
     {
         $csvDir = config('csv.seed_dir');
         if ($csvRows === null) {
@@ -40,11 +41,24 @@ class SymbolDate
         $latest   = $allDates ? max($allDates) : null;
         $total    = count($allDates);
 
+        if ($chkLatest) {
+            $dateFromUser = Carbon::parse($chkLatest);
+            $dateFromSymbol = Carbon::parse($latest);
+            if ($dateFromUser->isSameDay($dateFromSymbol)) {
+                $chk_latest = "yes";
+            }else{
+                $chk_latest = "no";
+            }
+        }else{
+            $chk_latest = "no";
+        }
+
         return [
             'db'       => $dbLast,
             'csv'      => $csvLast,
             'latest'   => $latest ?: '2000-01-01',
             'db_total' => $dbTotal,
+            'is_latest' => $chk_latest,
             'csv_total' => $csvTotal,
             'total'    => $total,
         ];

@@ -21,22 +21,20 @@ class MarketstackShowDateFrom extends Command
         $chkLatest   = $this->option('chk-latest');
 
         foreach ($baseSymbols as $sym) {
-            $dates = SymbolDate::latest($sym);
+            $dates = SymbolDate::latest($sym, null, $chkLatest);
             $latestDates[$sym] = $dates['latest'];
-            $this->line(sprintf('%-6s db:%s csv:%s latest:%s total:%d',
+
+            $this->line(sprintf('%-6s db:%s csv:%s latest:%s total:%d is_latest:%s',
                 $sym,
                 $dates['db'] ?? '-',
                 $dates['csv'] ?? '-',
                 $dates['latest'],
-                $dates['total']));
+                $dates['total'],
+                $dates['is_latest'] ?? '-'));
         }
 
         if (!empty($latestDates)) {
             $this->info('date_from = '.min($latestDates));
-            if ($chkLatest) {
-                $allMatch = !array_diff($latestDates, [$chkLatest]);
-                $this->info('latest-compare = '.($allMatch ? 'yes' : 'no'));
-            }
         } else {
             $this->warn('No symbols configured.');
         }
