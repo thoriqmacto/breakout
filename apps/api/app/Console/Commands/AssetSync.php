@@ -60,20 +60,24 @@ class AssetSync extends Command
         }
         // Check latest data from CSV and DB for each configured symbol
         $rows = [];
+        $i = 1;
         foreach ($indexSymbols as $symbol) {
             $csvPath = $seedDir . '/' . $symbol . '.csv';
             $csvRows = CsvBars::read($csvPath);
             $dates   = SymbolDate::latest($symbol, $csvRows);
 
             $rows[] = [
+                $i,
                 $symbol,
                 $dates['csv'] ?? 'n/a',
                 $dates['db'] ?? 'n/a',
                 $dates['total'] ?? 'n/a',
             ];
+
+            $i++;
         }
 
-        $this->table(['Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'], $rows);
+        $this->table(['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'], $rows);
 
         return Command::SUCCESS;
     }
