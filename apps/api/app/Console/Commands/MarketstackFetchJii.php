@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use App\Services\CsvBars;
 use App\Services\SymbolDate;
+use App\Services\DbBars;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
@@ -82,7 +83,7 @@ class MarketstackFetchJii extends Command
 
         $endpoint = rtrim($base, '/') . '/eod';
         $offset = 0; $page = 1; $total = null;
-        $insertCount = 0;
+        $dbBars = new DbBars($chunk, $dry);
 
         do {
             $query = [
@@ -117,8 +118,6 @@ class MarketstackFetchJii extends Command
 
             $this->info("Page {$page} | got {$count} rows (offset={$offset}/total≈{$total})");
 
-            $dbBatch = [];
-
             foreach ($json['data'] as $row) {
                 $symFull = $row['symbol'] ?? null;
                 $ymd     = $this->ymdFromIso($row['date'] ?? null);
@@ -133,7 +132,7 @@ class MarketstackFetchJii extends Command
                 $close  = $row['close'] ?? null;
                 $volume = $row['volume'] ?? null;
 
-                $dbBatch[] = [
+                $dbBars->add([
                     'asset_id'   => $assetId,
                     'date'       => $ymd,
                     'open'       => $open,
@@ -143,16 +142,7 @@ class MarketstackFetchJii extends Command
                     'volume'     => $volume,
                     'created_at' => now(),
                     'updated_at' => now(),
-                ];
-
-                if (count($dbBatch) >= $chunk) {
-                    if (!$dry) {
-                        DB::table('price_bars')->upsert($dbBatch, ['asset_id', 'date'],
-                            ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
-                    }
-                    $insertCount += count($dbBatch);
-                    $dbBatch = [];
-                }
+                ]);
 
                 if ($wantCsv && !$dry) {
                     $csvRows[$baseSym][$ymd] = [
@@ -166,18 +156,12 @@ class MarketstackFetchJii extends Command
                 }
             }
 
-            if (!empty($dbBatch)) {
-                if (!$dry) {
-                    DB::table('price_bars')->upsert($dbBatch, ['asset_id', 'date'],
-                        ['open', 'high', 'low', 'close', 'volume', 'updated_at']);
-                }
-                $insertCount += count($dbBatch);
-            }
-
             // no CSV writing here; handled after loop
 
             $offset += $limit; $page++;
         } while ($offset < $total);
+
+        $dbBars->flush();
 
         if ($wantCsv && !$dry) {
             foreach ($csvRows as $sym => $rows) {
@@ -186,7 +170,7 @@ class MarketstackFetchJii extends Command
             }
         }
 
-        $this->info(($dry ? '[dry-run] ' : '')."Done. Upserted {$insertCount} rows.");
+        $this->info(($dry ? '[dry-run] ' : '') . 'Done. Upserted ' . $dbBars->inserted() . ' rows.');
         if ($wantCsv && !$dry) $this->info("CSVs updated in {$csvDir}");
         return self::SUCCESS;
     }
