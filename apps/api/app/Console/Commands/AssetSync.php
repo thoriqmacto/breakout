@@ -159,6 +159,7 @@ class AssetSync extends Command
                 $dates['csv'] ?? 'n/a',
                 $dates['db'] ?? 'n/a',
                 $dates['total'] ?? 'n/a',
+                $dates['is_latest'] ?? 'no',
             ];
 
             if ($showIsLatest) {
