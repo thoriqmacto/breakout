@@ -26,7 +26,7 @@ class MarketstackFetchJiiChkLatestTest extends TestCase
         Http::fake();
 
         $this->artisan('marketstack:fetch-jii', ['--chk-latest' => '2024-01-01'])
-            ->expectsOutput('All symbols are up to date.')
+            ->expectsOutput('All symbols are up to date. No API call required.')
             ->assertExitCode(0);
     }
 }
