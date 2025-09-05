@@ -3,7 +3,12 @@ namespace App\Services;
 
 class CsvBars
 {
-    /** Read CSV to rows keyed by YYYY-MM-DD (dedupe-friendly) */
+    /**
+     * Read a CSV file and return rows keyed by YYYY-MM-DD.
+     *
+     * @param string $path Path to the CSV file.
+     * @return array Rows indexed by date.
+     */
     public static function read(string $path): array {
         if (!is_file($path)) return [];
         if (($h = fopen($path, 'r')) === false) return [];
@@ -28,7 +33,13 @@ class CsvBars
         return $rows;
     }
 
-    /** Write rows (assoc keyed by date) back to CSV (stable header + sorted) */
+    /**
+     * Write rows keyed by date back to CSV with a stable header and sorting.
+     *
+     * @param string $path Destination CSV path.
+     * @param array  $rows Rows keyed by date.
+     * @return void
+     */
     public static function write(string $path, array $rows): void {
         $dir = dirname($path);
         if (!is_dir($dir)) mkdir($dir, 0777, true);
@@ -43,13 +54,25 @@ class CsvBars
         rename($tmp, $path);
     }
 
-    /** Merge arrays keyed by date; right side wins on conflicts */
+    /**
+     * Merge arrays keyed by date; right side wins on conflicts.
+     *
+     * @param array $base Base dataset keyed by date.
+     * @param array $add  Additional data keyed by date.
+     * @return array Merged result.
+     */
     public static function merge(array $base, array $add): array {
         foreach ($add as $d => $row) { $base[$d] = $row; }
         ksort($base);
         return $base;
     }
 
+    /**
+     * Extract a YYYY-MM-DD date string from a CSV record.
+     *
+     * @param array $rec CSV record.
+     * @return string|null Date string if found, otherwise null.
+     */
     private static function dateFrom(array $rec): ?string {
         // Support common header variants
         foreach (['date','timestamp','day'] as $k) {
