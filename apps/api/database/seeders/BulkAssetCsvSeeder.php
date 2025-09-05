@@ -10,17 +10,27 @@ use Illuminate\Support\Str;
 class BulkAssetCsvSeeder extends Seeder
 {
     /**
-     * Directory containing per-asset CSVs:
-     * storage/app/historical/ANTM.csv, ASII.csv, ...
+     * Path to directory containing per-asset CSVs.
      */
-    protected string $csvDir = 'storage/app/historical';
+    protected string $csvDir;
 
     /**
-     * Chunk size for batched inserts/upserts
-     * change the chunk size (smaller = lower memory)
+     * Number of rows to insert per batch.
      */
-    protected int $chunk = 200;
+    protected int $chunk;
 
+    /**
+     * Pull configuration values on construction.
+     */
+    public function __construct()
+    {
+        $this->csvDir = config('csv.seed_dir');
+        $this->chunk = (int) config('csv.chunk_size', 200);
+    }
+
+    /**
+     * Iterate over CSV files and seed price bars.
+     */
     public function run(): void
     {
         // Turn off query log to save memory
@@ -29,7 +39,7 @@ class BulkAssetCsvSeeder extends Seeder
         // optional: widen time limit to avoid timeouts on large imports
         @set_time_limit(0);
 
-        $dir = base_path($this->csvDir);
+        $dir = $this->csvDir;
         if (!is_dir($dir)) {
             $this->command?->warn("CSV dir not found: {$dir}");
             return;
@@ -50,11 +60,14 @@ class BulkAssetCsvSeeder extends Seeder
         }
     }
 
+    /**
+     * Seed price bars for a single symbol from a CSV file.
+     */
     private function seedOneSymbol(string $symbol, string $path): void
     {
         $assetId = $this->getOrCreateAssetId($symbol);
 
-        $rows = $this->streamCsv($path); // <— generator (no big arrays)
+        $rows = $this->streamCsv($path); // generator (no big arrays)
 
         $batch = [];
         $count = 0;
@@ -67,22 +80,20 @@ class BulkAssetCsvSeeder extends Seeder
             }
 
             $batch[] = [
-                'asset_id'   => $assetId,
-                'date'       => $date,
-                'open'       => $this->num($r, 'open'),
-                'high'       => $this->num($r, 'high'),
-                'low'        => $this->num($r, 'low'),
-                'close'      => $this->num($r, 'close'),
-                'volume'     => $this->vol($r, 'volume'),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'asset_id' => $assetId,
+                'date'     => $date,
+                'open'     => $this->num($r, 'open'),
+                'high'     => $this->num($r, 'high'),
+                'low'      => $this->num($r, 'low'),
+                'close'    => $this->num($r, 'close'),
+                'volume'   => $this->vol($r, 'volume'),
             ];
 
             if (count($batch) >= $this->chunk) {
-                DB::table('prices')->upsert(
+                DB::table('price_bars')->upsert(
                     $batch,
                     ['asset_id','date'],
-                    ['open','high','low','close','volume','updated_at']
+                    ['open','high','low','close','volume']
                 );
                 $count += count($batch);
                 $batch = [];               // free the batch
@@ -92,10 +103,10 @@ class BulkAssetCsvSeeder extends Seeder
 
         // flush tail
         if (!empty($batch)) {
-            DB::table('prices')->upsert(
+            DB::table('price_bars')->upsert(
                 $batch,
                 ['asset_id','date'],
-                ['open','high','low','close','volume','updated_at']
+                ['open','high','low','close','volume']
             );
             $count += count($batch);
         }
@@ -103,20 +114,25 @@ class BulkAssetCsvSeeder extends Seeder
         $this->command?->info("Seeded {$count} rows for {$symbol}");
     }
 
+    /**
+     * Retrieve existing asset id or create a new asset record.
+     */
     private function getOrCreateAssetId(string $symbol): int
     {
         $existing = DB::table('assets')->where('symbol', $symbol)->first();
-        if ($existing) return (int)$existing->id;
+        if ($existing) {
+            return (int) $existing->id;
+        }
 
         return (int) DB::table('assets')->insertGetId([
             'symbol' => $symbol,
-            'name' => $symbol,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'name'   => $symbol,
         ]);
     }
 
-    // replace parseCsv() with a streaming generator to avoid arrays
+    /**
+     * Stream CSV rows to avoid loading the entire file into memory.
+     */
     private function streamCsv(string $path): \Generator
     {
         $h = fopen($path, 'r');
@@ -132,14 +148,14 @@ class BulkAssetCsvSeeder extends Seeder
                 if (isset($data[0])) {
                     $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]); // strip BOM
                 }
-                $headers = array_map(fn($x) => \Illuminate\Support\Str::of($x)->lower()->trim()->value(), $data);
+                $headers = array_map(fn($x) => Str::of($x)->lower()->trim()->value(), $data);
             } else {
                 $row = [];
                 foreach ($headers as $i => $key) {
                     $row[$key] = $data[$i] ?? null;
                 }
                 if (!empty($row['date'])) {
-                    yield $row;     // <— yield one row at a time
+                    yield $row;     // yield one row at a time
                 }
             }
             $line++;
@@ -147,11 +163,15 @@ class BulkAssetCsvSeeder extends Seeder
         fclose($h);
     }
 
-
+    /**
+     * Legacy method kept for reference; parses entire CSV into memory.
+     */
     private function parseCsv(string $path): array
     {
         $h = fopen($path, 'r');
-        if (!$h) throw new \RuntimeException("Cannot open CSV: {$path}");
+        if (!$h) {
+            throw new \RuntimeException("Cannot open CSV: {$path}");
+        }
 
         $headers = [];
         $rows = [];
@@ -179,19 +199,27 @@ class BulkAssetCsvSeeder extends Seeder
         return [$headers, $rows];
     }
 
+    /**
+     * Return the first non-empty value from the provided keys.
+     */
     private function pick(array $row, array $keys): ?string
     {
         foreach ($keys as $k) {
             if (array_key_exists($k, $row) && $row[$k] !== null && $row[$k] !== '') {
-                return (string)$row[$k];
+                return (string) $row[$k];
             }
         }
         return null;
     }
 
+    /**
+     * Normalize various date formats to Y-m-d.
+     */
     private function normDate(?string $raw): ?string
     {
-        if ($raw === null) return null;
+        if ($raw === null) {
+            return null;
+        }
         $s = trim($raw);
         $s = preg_replace('/^\xEF\xBB\xBF/', '', $s);
 
@@ -215,23 +243,29 @@ class BulkAssetCsvSeeder extends Seeder
         return $t ? date('Y-m-d', $t) : null;
     }
 
+    /**
+     * Parse a numeric CSV column into a float.
+     */
     private function num(array $row, string $key): ?float
     {
         foreach ([$key, ucfirst($key), strtoupper($key)] as $k) {
             if (array_key_exists($k, $row) && $row[$k] !== '' && $row[$k] !== null) {
-                $val = str_replace([',',' '], '', (string)$row[$k]);
-                return is_numeric($val) ? (float)$val : null;
+                $val = str_replace([',',' '], '', (string) $row[$k]);
+                return is_numeric($val) ? (float) $val : null;
             }
         }
         return null;
     }
 
+    /**
+     * Parse a numeric CSV column into an integer volume.
+     */
     private function vol(array $row, string $key): ?int
     {
         foreach ([$key, ucfirst($key), strtoupper($key)] as $k) {
             if (array_key_exists($k, $row) && $row[$k] !== '' && $row[$k] !== null) {
-                $val = preg_replace('/[^\d]/', '', (string)$row[$k]);
-                return $val === '' ? null : (int)$val;
+                $val = preg_replace('/[^\d]/', '', (string) $row[$k]);
+                return $val === '' ? null : (int) $val;
             }
         }
         return null;

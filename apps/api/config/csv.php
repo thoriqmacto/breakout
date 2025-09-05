@@ -6,4 +6,5 @@ return [
         'TLKM','TPIA','UNTR','UNVR'],
     'default_lot_size' => 100,
     'tick_size' => 1.0,
+    'chunk_size' => 200, // number of rows to insert per batch
 ];
