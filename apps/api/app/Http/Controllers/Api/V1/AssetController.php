@@ -108,4 +108,24 @@ class AssetController extends ApiController
 
         return response()->json($price);
     }
+
+    /**
+     * Retrieve the latest OHLCV prices for all assets.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function latestPrices()
+    {
+        $assets = Asset::with('latestPriceRecord')->get();
+
+        $prices = $assets->map(function ($asset) {
+            $price = $asset->latestPriceRecord;
+            if ($price) {
+                $price->setRelation('asset', $asset);
+            }
+            return $price;
+        })->filter()->values();
+
+        return response()->json($prices);
+    }
 }

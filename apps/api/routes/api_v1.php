@@ -8,4 +8,5 @@ Route::prefix('v1')->group(function () {
     // Auto-register all standard REST API endpoints for templates:
     Route::apiResource('assets', AssetController::class);
     Route::get('assets/{asset}/latest-price', [AssetController::class, 'latestPrice']);
+    Route::get('assets/latest-prices', [AssetController::class, 'latestPrices']);
 });
