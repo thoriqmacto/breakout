@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use App\Models\Asset;
 use App\Services\CsvBars;
 use App\Services\SymbolDate;
+use App\Services\DbBars;
+use Illuminate\Support\Facades\DB;
 
 class AssetSync extends Command
 {
@@ -88,7 +90,54 @@ class AssetSync extends Command
                 return Command::FAILURE;
             }
         }
-        // Check latest data from CSV and DB for each configured symbol
+        // Upsert missing bars from CSV into DB for each symbol
+        $chunk = (int) config('csv.chunk_size', 200);
+        $dbBars = new DbBars($chunk, false);
+
+        foreach ($indexSymbols as $symbol) {
+            $csvPath = $seedDir . '/' . $symbol . '.csv';
+            if (!is_file($csvPath)) {
+                // skip symbols without seed CSV
+                continue;
+            }
+
+            // Ensure asset exists in DB
+            $asset = Asset::firstOrCreate(
+                ['symbol' => $symbol],
+                ['name' => $symbol]
+            );
+
+            $csvRows = CsvBars::read($csvPath);
+
+            // Existing DB dates for the asset
+            $existing = DB::table('price_bars')
+                ->where('asset_id', $asset->id)
+                ->pluck('date')
+                ->all();
+            $existing = array_flip($existing);
+
+            foreach ($csvRows as $ymd => $row) {
+                if (isset($existing[$ymd])) {
+                    continue; // already present
+                }
+
+                $dbBars->add([
+                    'asset_id'   => $asset->id,
+                    'date'       => $ymd,
+                    'open'       => $row['open'],
+                    'high'       => $row['high'],
+                    'low'        => $row['low'],
+                    'close'      => $row['close'],
+                    'volume'     => $row['volume'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        $dbBars->flush();
+
+        // After syncing, display latest data from CSV and DB for each symbol
         $rows = [];
         $i = 1;
         foreach ($indexSymbols as $symbol) {
@@ -108,6 +157,8 @@ class AssetSync extends Command
         }
 
         $this->table(['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'], $rows);
+
+        $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
 
         return Command::SUCCESS;
     }
