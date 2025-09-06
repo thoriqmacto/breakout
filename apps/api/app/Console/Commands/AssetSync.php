@@ -68,7 +68,12 @@ class AssetSync extends Command
                     file_put_contents($tickFile, implode(PHP_EOL, $tickers) . PHP_EOL);
 
                     $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
-                    $this->warn('Run `python resources/python/get_stocks.py` to fetch these tickers.');
+
+                    if ($this->confirm('Run python get_stocks.py now?', false)) {
+                        $this->call('python:run', ['script' => 'get_stocks.py']);
+                    } else {
+                        $this->warn('Run `php artisan python:run get_stocks.py` to fetch these tickers.');
+                    }
                 }
 
                 if (!empty($found)) {
