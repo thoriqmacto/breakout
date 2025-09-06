@@ -48,13 +48,31 @@ class AssetSync extends Command
             if ($this->confirm('Check python csv folder for these assets?', false)) {
                 $pyDir = resource_path('python/csv');
 
-                $found = [];
+                $found     = [];
+                $missingPy = [];
                 foreach ($missing as $sym) {
                     $pyFile = $pyDir . '/' . $sym . '_PY.csv';
                     if (is_file($pyFile)) {
                         $found[$sym] = $pyFile;
                     } else {
+                        $missingPy[] = $sym;
                         $this->warn("Python csv not found for {$sym}");
+                    }
+                }
+
+                if (!empty($missingPy)) {
+                    $tickFile = resource_path('python/tickers.txt');
+
+                    // Reset tickers file so it only contains the newly missing symbols
+                    $tickers = array_map(fn($sym) => $sym . '.JK', $missingPy);
+                    file_put_contents($tickFile, implode(PHP_EOL, $tickers) . PHP_EOL);
+
+                    $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
+
+                    if ($this->confirm('Run python get_stocks.py now?', false)) {
+                        $this->call('python:run', ['script' => 'get_stocks.py']);
+                    } else {
+                        $this->warn('Run `php artisan python:run get_stocks.py` to fetch these tickers.');
                     }
                 }
 
