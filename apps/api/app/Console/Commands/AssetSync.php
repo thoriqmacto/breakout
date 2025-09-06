@@ -72,7 +72,7 @@ class AssetSync extends Command
                     if ($this->confirm('Run python get_stocks.py now?', false)) {
                         $this->call('python:run', ['script' => 'get_stocks.py']);
                     } else {
-                        $this->warn('Run `php artisan python:run get_stocks.py` to fetch these tickers.');
+                        $this->warn('No python code to run.');
                     }
                 }
 
