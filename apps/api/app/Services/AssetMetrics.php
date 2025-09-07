@@ -49,15 +49,18 @@ class AssetMetrics
 
     /**
      * Extract a numeric field from a price bar.
+     *
+     * @param array|object $bar  The price bar to inspect.
+     * @param string       $name Field to retrieve.
      */
-    private function field(string $name): float
+    private function field(array|object $bar, string $name): float
     {
-        if (is_array($this->bars)) {
+        if (is_array($bar)) {
             $v = $bar[$name] ?? null;
         } else {
-            $v = $bar->$name ?? (method_exists($this->bars, 'getAttribute') ? $this->bars->getAttribute($name) : null);
+            $v = $bar->$name ?? (method_exists($bar, 'getAttribute') ? $bar->getAttribute($name) : null);
         }
-        return is_numeric($v) ? (float)$v : 0.0;
+        return is_numeric($v) ? (float) $v : 0.0;
     }
 
     /**
@@ -94,6 +97,9 @@ class AssetMetrics
     {
         $days = $weeks * 5;
         $slice = array_slice($this->bars, -$days);
+        if (empty($slice)) {
+            return 0.0;
+        }
         return max(array_map(fn($b) => $b['high'], $slice));
     }
 
@@ -106,6 +112,9 @@ class AssetMetrics
     public function movingAverage(int $days): float
     {
         $slice = array_slice($this->bars, -$days);
+        if (empty($slice)) {
+            return 0.0;
+        }
         $sum = array_sum(array_map(fn($b) => $b['close'], $slice));
         return $sum / count($slice);
     }
@@ -118,7 +127,7 @@ class AssetMetrics
      */
     public function movingAverageWeeks(int $weeks): float
     {
-        return self::movingAverage($weeks * 5);
+        return $this->movingAverage($weeks * 5);
     }
 
     /**
