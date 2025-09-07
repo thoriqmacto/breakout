@@ -1,7 +1,12 @@
 # Fetch 15y of daily OHLCV for IDX tickers and save ONE CSV per ticker.
 # Also saves a Summary.csv with metadata.
+#
+# Usage:
+#   python get_stocks.py [TICKER ...] [--start YYYY-MM-DD] [--end YYYY-MM-DD]
+#   php artisan python:run get_stocks.py \
+#       --arg=TICK1 --arg=TICK2 --arg=--start=2020-01-01 --arg=--end=2020-12-31
 
-import sys, subprocess, importlib, datetime, os, time, traceback
+import sys, subprocess, importlib, datetime, os, time, traceback, argparse
 
 # ---------- Helpers for package installs ----------
 def console_python():
@@ -38,8 +43,8 @@ def require(pkg):
         mod = importlib.import_module(pkg)
     return mod
 
-pd = require("pandas")
-yf = require("yfinance")
+pd = None
+yf = None
 
 # ---------- Utils ----------
 def start_15y_ago(today: datetime.date) -> datetime.date:
@@ -54,9 +59,9 @@ def flatten_columns(df):
                       for tup in df.columns.to_list()]
     return df
 
-def read_tickers(cli_args):
-    if len(cli_args) > 1:
-        return [t.strip() for t in cli_args[1:] if t.strip()]
+def read_tickers(cli_tickers):
+    if cli_tickers:
+        return [t.strip() for t in cli_tickers if t.strip()]
     fname = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tickers.txt")
     if os.path.exists(fname):
         with open(fname, "r", encoding="utf-8") as f:
@@ -65,6 +70,13 @@ def read_tickers(cli_args):
     print("[WARN] No tickers provided; using example list.")
     return ["ANTM.JK", "ISAT.JK", "BRIS.JK", "AKRA.JK", "TLKM.JK", "PTBA.JK",
             "BBRI.JK", "BBCA.JK", "ASII.JK", "ICBP.JK", "UNVR.JK", "PGAS.JK"]
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Fetch OHLCV for tickers")
+    parser.add_argument('tickers', nargs='*', help='Ticker symbols')
+    parser.add_argument('--start', help='Start date YYYY-MM-DD')
+    parser.add_argument('--end', help='End date YYYY-MM-DD')
+    return parser.parse_args(argv)
 
 # ---------- Downloader ----------
 def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3):
@@ -96,11 +108,16 @@ def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3):
     raise last_err
 
 # ---------- Main ----------
-def main():
-    tickers = read_tickers(sys.argv)
+def main(argv=None):
+    args = parse_args(argv)
+    tickers = read_tickers(args.tickers)
     today = datetime.date.today()
-    start_date = start_15y_ago(today)
-    end_date = today
+    start_date = datetime.datetime.strptime(args.start, '%Y-%m-%d').date() if args.start else start_15y_ago(today)
+    end_date = datetime.datetime.strptime(args.end, '%Y-%m-%d').date() if args.end else today
+
+    global pd, yf
+    pd = require("pandas")
+    yf = require("yfinance")
 
     outdir = os.path.abspath("resources/python/csv/")
     os.makedirs(outdir, exist_ok=True)
