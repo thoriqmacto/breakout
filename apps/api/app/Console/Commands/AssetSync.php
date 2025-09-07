@@ -23,7 +23,7 @@ class AssetSync extends Command
      *
      * @var string
      */
-    protected $description = 'Synchronize assets EOD price to db and csv from python runner. Config file always become symbols master.';
+    protected $description = '"asset:sync" -> synchronize historical price to DB and CSV from python API';
 
     /**
      * Execute the console command.
@@ -103,11 +103,14 @@ class AssetSync extends Command
                     }
                 }
             }
-
-            if (! $this->confirm('Continue checking latest data anyway?', true)) {
-                return Command::FAILURE;
-            }
+        } else{
+            $this->comment('Tickers in config and seed files aligned.');
         }
+
+        if (!$this->confirm('Continue checking latest data anyway?', false)) {
+            return Command::FAILURE;
+        }
+
         // Upsert missing bars from CSV into DB for each symbol
         $chunk = (int) config('csv.chunk_size', 200);
         $dbBars = new DbBars($chunk, false);
@@ -153,6 +156,8 @@ class AssetSync extends Command
             }
         }
 
+        $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
+
         $dbBars->flush();
 
         // Ask user for a custom date to check against latest data
@@ -194,8 +199,6 @@ class AssetSync extends Command
         }
 
         $this->table($headers, $rows);
-
-        $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
 
         return Command::SUCCESS;
     }
