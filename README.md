@@ -36,6 +36,25 @@ This repository contains the code for the **Breakout** API service. The project 
 ## API
 A simple health check endpoint is available at `GET /api/ping`, which responds with `{ "ok": true }`
 
+## Asset Metrics
+The API includes a service for computing basic metrics on asset price data, such as the
+average closing price and total traded volume. Metrics can be accessed through the
+`AssetMetrics` service or via the endpoint:
+
+```
+GET /api/v1/assets/{asset}/metrics
+```
+
+Example usage within code:
+
+```php
+use App\Models\Asset;
+use App\Services\AssetMetrics;
+
+$asset = Asset::first();
+$metrics = (new AssetMetrics())->forAsset($asset);
+```
+
 ## Repository Layout
 ```
 apps/
