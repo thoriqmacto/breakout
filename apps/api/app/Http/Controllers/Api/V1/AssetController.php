@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use App\Services\AssetMetrics;
 
 class AssetController extends ApiController
 {
@@ -127,5 +128,17 @@ class AssetController extends ApiController
         })->filter()->values();
 
         return response()->json($prices);
+    }
+
+    /**
+     * Compute simple metrics for the asset.
+     *
+     * @param  \App\Models\Asset  $asset
+     * @param  \App\Services\AssetMetrics  $metrics
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function metrics(Asset $asset, AssetMetrics $metrics)
+    {
+        return response()->json($metrics->forAsset($asset));
     }
 }
