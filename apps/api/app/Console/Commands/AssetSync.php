@@ -17,7 +17,12 @@ class AssetSync extends Command
      *
      * @var string
      */
-    protected $signature = 'asset:sync';
+    protected $signature = 'asset:sync
+        {--check-python : Search python/csv for missing assets}
+        {--run-python : Run python get_stocks.py when needed}
+        {--import-csv : Import found python csv files into seed folder}
+        {--continue : Skip confirmation before latest-data check}
+        {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}';
 
     /**
      * The console command description.
@@ -46,7 +51,9 @@ class AssetSync extends Command
             $this->warn('CSV seed files missing for: ' . implode(', ', $missing));
 
             // Offer to check python csv directory for missing files
-            if ($this->confirm('Check python csv folder for these assets?', false)) {
+            $checkPython = $this->option('check-python') ??
+                           $this->confirm('Check python csv folder for these assets?', false);
+            if ($checkPython) {
                 $pyDir = resource_path('python/csv');
 
                 $found     = [];
@@ -70,7 +77,9 @@ class AssetSync extends Command
 
                     $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
 
-                    if ($this->confirm('Run python get_stocks.py now?', false)) {
+                    $runPython = $this->option('run-python') ??
+                                 $this->confirm('Run python get_stocks.py now?', false);
+                    if ($runPython) {
                         $this->call('python:run', ['script' => 'get_stocks.py']);
                     } else {
                         $this->warn('No python code to run.');
@@ -83,7 +92,9 @@ class AssetSync extends Command
                         $this->line('- ' . $sym . ': ' . basename($file));
                     }
 
-                    if ($this->confirm('Import these csv files into the seed directory?', false)) {
+                    $importCsv = $this->option('import-csv') ??
+                                 $this->confirm('Import these csv files into the seed directory?', false);
+                    if ($importCsv) {
                         foreach ($found as $sym => $pyFile) {
                             $rows = CsvBars::read($pyFile);
                             if ($rows !== []) {
@@ -108,7 +119,8 @@ class AssetSync extends Command
             $this->comment('Tickers in config and seed files aligned.');
         }
 
-        if (!$this->confirm('Continue checking latest data anyway?', false)) {
+        if (!$this->option('continue') &&
+            !$this->confirm('Continue checking latest data anyway?', false)) {
             return Command::FAILURE;
         }
 
@@ -162,9 +174,9 @@ class AssetSync extends Command
         $dbBars->flush();
 
         // Ask user for a custom date to check against latest data
-        $chkLatest = null;
-        $showIsLatest = false;
-        if ($this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
+        $chkLatest = $this->option('chk-date');
+        $showIsLatest = (bool) $chkLatest;
+        if (!$chkLatest && $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
             $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
             $showIsLatest = true;
         }
