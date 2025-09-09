@@ -169,7 +169,9 @@ class AssetSync extends Command
             }
         }
 
-        $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
+        if ($dbBars->inserted()>0) {
+            $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
+        }
 
         $dbBars->flush();
 
