@@ -31,8 +31,8 @@ class AssetMetricsCommandTest extends TestCase
 
         $this->artisan('asset:metrics', ['--sym' => 'AAA'])
             ->expectsTable(
-                ['Symbol', 'ATR14', 'MA30', 'High20', 'ROC13', 'Uptrend'],
-                [['AAA', '2', '33.5', '67', '6500', 'Yes']]
+                ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'IsUptrend?'],
+                [['AAA', '66', '42', '34', '67', '67', '2', '6500', 'Yes']]
             )->assertExitCode(0);
     }
 }
