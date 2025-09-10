@@ -207,8 +207,8 @@ class AssetMetrics
         $lows = array_map(fn($b) => $b['low'], $slice);
 
         return [
-            'upper' => max($highs),
-            'lower' => min($lows),
+            'upper' => (float)max($highs),
+            'lower' => (float)min($lows),
         ];
     }
 
