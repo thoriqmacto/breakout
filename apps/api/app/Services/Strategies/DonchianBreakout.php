@@ -14,7 +14,11 @@ class DonchianBreakout
 
     public function signal(): string
     {
-        $channel = $this->metrics->donchianChannel($this->period);
+        if ($this->metrics->barCount() <= $this->period) {
+            return 'hold';
+        }
+
+        $channel = $this->metrics->donchianChannel($this->period, false);
         $close = $this->metrics->lastClose();
 
         if ($close > $channel['upper']) {

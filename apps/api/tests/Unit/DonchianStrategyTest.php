@@ -38,6 +38,21 @@ class DonchianStrategyTest extends TestCase
         $this->assertSame('buy', $strategy->signal());
     }
 
+    public function test_signal_requires_sufficient_bars(): void
+    {
+        $metrics = new AssetMetrics(array_slice($this->bars(), 0, 3));
+        $strategy = new DonchianBreakout($metrics, 3);
+        $this->assertSame('hold', $strategy->signal());
+    }
+
+    public function test_donchian_channel_excludes_current_when_requested(): void
+    {
+        $metrics = new AssetMetrics($this->bars());
+        $channel = $metrics->donchianChannel(3, false);
+        $this->assertSame(4.0, $channel['upper']);
+        $this->assertSame(2.0, $channel['lower']);
+    }
+
     public function test_backtest_final_equity(): void
     {
         $backtester = new DonchianBacktester();
