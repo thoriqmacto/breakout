@@ -23,6 +23,11 @@ class AssetMetrics
         return $this->bars[array_key_last($this->bars)]['close'];
     }
 
+    public function barCount(): int
+    {
+        return count($this->bars);
+    }
+
     /**
      * Calculate metrics for the given asset.
      *
@@ -193,12 +198,21 @@ class AssetMetrics
     /**
      * Highest high and lowest low over the given lookback.
      *
-     * @param int $period Number of recent bars to inspect.
+     * @param int  $period          Number of recent bars to inspect.
+     * @param bool $includeCurrent  When false, exclude the latest bar.
      * @return array{upper: float, lower: float}
      */
-    public function donchianChannel(int $period = 20): array
+    public function donchianChannel(int $period = 20, bool $includeCurrent = true): array
     {
-        $slice = array_slice($this->bars, -$period);
+        if ($includeCurrent) {
+            $slice = array_slice($this->bars, -$period);
+        } else {
+            if (count($this->bars) <= $period) {
+                return ['upper' => 0.0, 'lower' => 0.0];
+            }
+            $slice = array_slice($this->bars, -$period - 1, $period);
+        }
+
         if (empty($slice)) {
             return ['upper' => 0.0, 'lower' => 0.0];
         }
