@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\Price;
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -83,6 +84,33 @@ class LatestPricesTest extends TestCase
             ->expectsConfirmation('Continue checking latest data anyway?', 'yes')
             ->expectsConfirmation('Do you have your own chk-date to compare with latest-date data?', 'yes')
             ->expectsQuestion('Enter chk-date (YYYY-MM-DD)', '2024-01-03')
+            ->assertExitCode(0);
+
+        $this->assertDatabaseCount('price_bars', 3);
+        $this->assertDatabaseHas('price_bars', ['date' => '2024-01-03']);
+    }
+
+    public function test_asset_sync_eod_option_uses_today_date(): void
+    {
+        Carbon::setTestNow('2024-01-03');
+
+        config(['csv.index_symbols' => ['AAA']]);
+        $seedDir = database_path('seeders/data/test-eod');
+        if (!is_dir($seedDir)) {
+            mkdir($seedDir, 0755, true);
+        }
+        file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
+        config(['csv.seed_dir' => $seedDir]);
+
+        $pyDir = resource_path('python/csv');
+        if (!is_dir($pyDir)) {
+            mkdir($pyDir, 0755, true);
+        }
+        file_put_contents($pyDir . '/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
+
+        config(['python.bin' => '/bin/echo']);
+
+        $this->artisan('asset:sync', ['--eod' => true])
             ->assertExitCode(0);
 
         $this->assertDatabaseCount('price_bars', 3);

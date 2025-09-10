@@ -37,6 +37,10 @@ This repository contains the code for the **Breakout** API service. The project 
   ```bash
   php artisan asset:sync --check-python --run-python --import-csv --continue --chk-date=2025-08-01
   ```
+  Or run with all confirmations accepted using today's date:
+  ```bash
+  php artisan asset:sync --eod
+  ```
 
 ## API
 A simple health check endpoint is available at `GET /api/ping`, which responds with `{ "ok": true }`
