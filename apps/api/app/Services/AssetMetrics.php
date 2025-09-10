@@ -191,6 +191,28 @@ class AssetMetrics
     }
 
     /**
+     * Highest high and lowest low over the given lookback.
+     *
+     * @param int $period Number of recent bars to inspect.
+     * @return array{upper: float, lower: float}
+     */
+    public function donchianChannel(int $period = 20): array
+    {
+        $slice = array_slice($this->bars, -$period);
+        if (empty($slice)) {
+            return ['upper' => 0.0, 'lower' => 0.0];
+        }
+
+        $highs = array_map(fn($b) => $b['high'], $slice);
+        $lows = array_map(fn($b) => $b['low'], $slice);
+
+        return [
+            'upper' => max($highs),
+            'lower' => min($lows),
+        ];
+    }
+
+    /**
      * Determine if the latest close breaks above a supplied level.
      *
      * @param float            $level Price level to test.
