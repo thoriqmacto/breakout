@@ -22,7 +22,8 @@ class AssetSync extends Command
         {--run-python : Run python get_stocks.py when needed}
         {--import-csv : Import found python csv files into seed folder}
         {--continue : Skip confirmation before latest-data check}
-        {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}';
+        {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}
+        {--eod : Confirm all prompts and use today for chk-date}';
 
     /**
      * The console command description.
@@ -37,6 +38,15 @@ class AssetSync extends Command
     public function handle()
     {
         $this->info($this->description);
+
+        if ($this->option('eod')) {
+            $today = Carbon::now()->toDateString();
+            $this->input->setOption('check-python', true);
+            $this->input->setOption('run-python', true);
+            $this->input->setOption('import-csv', true);
+            $this->input->setOption('continue', true);
+            $this->input->setOption('chk-date', $today);
+        }
 
         $indexSymbols = config('csv.index_symbols', []);
         $seedDir = config('csv.seed_dir');
