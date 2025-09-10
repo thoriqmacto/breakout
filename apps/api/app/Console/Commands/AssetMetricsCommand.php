@@ -22,7 +22,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Symbol', 'ATR14', 'MA30', 'High20', 'ROC13', 'Uptrend'];
+        $headers = ['Symbol', 'Close', 'MA30', 'High20', 'ATR14', 'ROC13', 'Uptrend'];
         $rows = [];
 
         foreach ($symbols as $symbol) {
@@ -34,9 +34,10 @@ class AssetMetricsCommand extends Command
             $metrics = new AssetMetrics($bars);
             $rows[] = [
                 $symbol,
-                round($metrics->atr(14), 2),
-                round($metrics->movingAverage(30), 2),
-                round($metrics->periodHigh(20), 2),
+                $metrics->lastClose(),
+                round($metrics->movingAverage(30), 0),
+                round($metrics->periodHigh(20), 0),
+                round($metrics->atr(14), 0),
                 round($metrics->rocWeeks(13), 2),
                 $metrics->isUptrend() ? 'Yes' : 'No',
             ];

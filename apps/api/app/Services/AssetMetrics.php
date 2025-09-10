@@ -18,7 +18,7 @@ class AssetMetrics
      */
     public function __construct(private array $bars){}
 
-    private function lastClose(): float
+    public function lastClose(): float
     {
         return $this->bars[array_key_last($this->bars)]['close'];
     }
