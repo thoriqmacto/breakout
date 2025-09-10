@@ -7,6 +7,10 @@ use App\Services\Strategies\DonchianBreakout;
 
 class DonchianBacktester
 {
+    public function __construct(private int $period = 3)
+    {
+    }
+
     /**
      * @param array<int, array{date:string, open:float, high:float, low:float, close:float}> $bars
      * @param float $capital Starting capital supplied by user
@@ -20,7 +24,7 @@ class DonchianBacktester
 
         foreach ($bars as $i => $bar) {
             $metrics = new AssetMetrics(array_slice($bars, 0, $i + 1));
-            $strategy = new DonchianBreakout($metrics);
+            $strategy = new DonchianBreakout($metrics, $this->period);
             $signal = $strategy->signal();
 
             if ($signal === 'buy' && $position === 0) {
