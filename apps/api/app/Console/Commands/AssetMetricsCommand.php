@@ -32,18 +32,45 @@ class AssetMetricsCommand extends Command
             }
             $bars = $asset->prices()->orderBy('date')->get()->toArray();
             $metrics = new AssetMetrics($bars);
+
+            $close = $metrics->lastClose();
+            $ma50 = round($metrics->movingAverage(50), 0);
+            $ma100 = round($metrics->movingAverage(100), 0);
+            $roc13 = round($metrics->rocWeeks(13), 2);
+            $isUptrend = $metrics->isUptrend();
+
             $rows[] = [
-                $symbol,
-                $metrics->lastClose(),
-                round($metrics->movingAverage(50), 0),
-                round($metrics->movingAverage(100), 0),
-                round($metrics->periodHigh(20), 0),
-                round($metrics->periodHigh(55), 0),
-                round($metrics->atr(14), 0),
-                round($metrics->rocWeeks(13), 2),
-                $metrics->isUptrend() ? 'Yes' : 'No',
+                'symbol' => $symbol,
+                'close' => $close,
+                'ma50' => $ma50,
+                'ma100' => $ma100,
+                'high20' => round($metrics->periodHigh(20), 0),
+                'high55' => round($metrics->periodHigh(55), 0),
+                'atr14' => round($metrics->atr(14), 0),
+                'roc13' => $roc13,
+                'uptrend' => $isUptrend ? 'Yes' : 'No',
+                'sort_uptrend' => $isUptrend ? 1 : 0,
+                'sort_above_ma100' => $close > $ma100 ? 1 : 0,
+                'sort_above_ma50' => $close > $ma50 ? 1 : 0,
             ];
         }
+
+        usort($rows, function ($a, $b) {
+            return [$b['sort_uptrend'], $b['sort_above_ma100'], $b['sort_above_ma50'], $b['roc13']]
+                <=> [$a['sort_uptrend'], $a['sort_above_ma100'], $a['sort_above_ma50'], $a['roc13']];
+        });
+
+        $rows = array_map(fn($r) => [
+            $r['symbol'],
+            $r['close'],
+            $r['ma50'],
+            $r['ma100'],
+            $r['high20'],
+            $r['high55'],
+            $r['atr14'],
+            $r['roc13'],
+            $r['uptrend'],
+        ], $rows);
 
         $this->table($headers, $rows);
 
