@@ -10,9 +10,10 @@ class DonchianBacktester
     /**
      * @param array<int, array{date:string, open:float, high:float, low:float, close:float}> $bars
      * @param float $capital Starting capital supplied by user
+     * @param int $period Donchian channel lookback period
      * @return array{final_equity: float, equity_curve: array<int, array{date:string, equity:float}>}
      */
-    public function run(array $bars, float $capital): array
+    public function run(array $bars, float $capital, int $period = 3): array
     {
         $position = 0; // number of shares
         $equity = $capital;
@@ -20,7 +21,7 @@ class DonchianBacktester
 
         foreach ($bars as $i => $bar) {
             $metrics = new AssetMetrics(array_slice($bars, 0, $i + 1));
-            $strategy = new DonchianBreakout($metrics);
+            $strategy = new DonchianBreakout($metrics, $period);
             $signal = $strategy->signal();
 
             if ($signal === 'buy' && $position === 0) {
