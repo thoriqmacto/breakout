@@ -149,10 +149,11 @@ def main(argv=None):
             rows.append({"Ticker": t, "Rows": 0, "Start": "", "End": "", "FirstClose": "", "LastClose": ""})
 
     # Write summary
-    summary = pd.DataFrame(rows)
-    summary_csv = os.path.join(outdir, "summary.csv")
-    summary.to_csv(summary_csv, index=False)
-    print(f"[DONE] Summary saved to {summary_csv}")
+    # summary = pd.DataFrame(rows)
+    # summary_csv = os.path.join(outdir, "summary.csv")
+    # summary.to_csv(summary_csv, index=False)
+    # print(f"[DONE] Summary saved to {summary_csv}")
+    print(f"[DONE] Retrieved Data")
 
 if __name__ == "__main__":
     main()

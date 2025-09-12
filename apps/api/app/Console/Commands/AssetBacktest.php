@@ -14,7 +14,7 @@ class AssetBacktest extends Command
      *
      * @var string
      */
-    protected $signature = 'asset:backtest {--sym=} {--strategy=DonchianBreakout} {--capital=100000}';
+    protected $signature = 'asset:backtest {--sym=} {--strategy=DonchianBreakout} {--capital=3000000}';
 
     /**
      * The console command description.
