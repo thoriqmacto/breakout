@@ -23,6 +23,15 @@ class AssetMetrics
         return $this->bars[array_key_last($this->bars)]['close'];
     }
 
+    public function previousClose(): float
+    {
+        $count = count($this->bars);
+        if ($count < 2) {
+            return 0.0;
+        }
+        return $this->bars[$count - 2]['close'];
+    }
+
     public function barCount(): int
     {
         return count($this->bars);
