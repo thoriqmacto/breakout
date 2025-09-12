@@ -10,6 +10,8 @@ abstract class Strategy
     {
     }
 
+    private ?TrailingStop $trailingStop = null;
+
     /**
      * Clone the strategy with updated metrics.
      */
@@ -18,6 +20,16 @@ abstract class Strategy
         $clone = clone $this;
         $clone->metrics = $metrics;
         return $clone;
+    }
+
+    public function enableTrailingStop(TrailingStop $stop): void
+    {
+        $this->trailingStop = $stop;
+    }
+
+    public function trailingStop(): ?TrailingStop
+    {
+        return $this->trailingStop;
     }
 
     /**

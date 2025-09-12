@@ -4,6 +4,7 @@ namespace App\Services\Backtest;
 
 use App\Services\AssetMetrics;
 use App\Services\Strategies\Strategy;
+use App\Services\Strategies\TrailingStop;
 
 abstract class Backtester
 {
@@ -26,9 +27,62 @@ abstract class Backtester
         $trades = [];
         $entryPrice = 0.0;
         $entryDate = '';
+        $extremePrice = null;
+        $trailingStop = null;
 
         foreach ($bars as $i => $bar) {
             $metrics = new AssetMetrics(array_slice($bars, 0, $i + 1));
+
+            if ($position !== 0 && $trailingStop instanceof TrailingStop) {
+                if ($position > 0) {
+                    $extremePrice = max($extremePrice, $bar['high']);
+                    $stopLevel = $trailingStop->level($extremePrice, $metrics, 'long');
+                    if ($bar['low'] <= $stopLevel) {
+                        $exitPrice = $stopLevel;
+                        $equity += $position * $exitPrice;
+                        $trades[] = [
+                            'entry_date'  => $entryDate,
+                            'exit_date'   => $bar['date'],
+                            'entry_price' => $entryPrice,
+                            'exit_price'  => $exitPrice,
+                            'shares'      => $position,
+                            'pnl'         => (float)($exitPrice - $entryPrice) * $position,
+                        ];
+                        $position = 0;
+                        $trailingStop = null;
+                        $extremePrice = null;
+                        $curve[] = [
+                            'date' => $bar['date'],
+                            'equity' => $equity,
+                        ];
+                        continue;
+                    }
+                } elseif ($position < 0) {
+                    $extremePrice = min($extremePrice, $bar['low']);
+                    $stopLevel = $trailingStop->level($extremePrice, $metrics, 'short');
+                    if ($bar['high'] >= $stopLevel) {
+                        $exitPrice = $stopLevel;
+                        $equity += $position * ($entryPrice - $exitPrice);
+                        $trades[] = [
+                            'entry_date'  => $entryDate,
+                            'exit_date'   => $bar['date'],
+                            'entry_price' => $entryPrice,
+                            'exit_price'  => $exitPrice,
+                            'shares'      => $position,
+                            'pnl'         => (float)($entryPrice - $exitPrice) * abs($position),
+                        ];
+                        $position = 0;
+                        $trailingStop = null;
+                        $extremePrice = null;
+                        $curve[] = [
+                            'date' => $bar['date'],
+                            'equity' => $equity,
+                        ];
+                        continue;
+                    }
+                }
+            }
+
             $strategy = $this->createStrategy($metrics);
             $signal = $strategy->signal();
 
@@ -37,6 +91,8 @@ abstract class Backtester
                 $equity -= $position * $bar['close'];
                 $entryPrice = $bar['close'];
                 $entryDate  = $bar['date'];
+                $extremePrice = $bar['high'];
+                $trailingStop = $strategy->trailingStop();
             } elseif ($signal === 'sell' && $position > 0) {
                 $exitPrice = $bar['close'];
                 $equity += $position * $exitPrice;
@@ -49,6 +105,8 @@ abstract class Backtester
                     'pnl'         => (float)($exitPrice - $entryPrice) * $position,
                 ];
                 $position = 0;
+                $trailingStop = null;
+                $extremePrice = null;
             }
 
             $curve[] = [

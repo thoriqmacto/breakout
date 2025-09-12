@@ -11,8 +11,12 @@ class RsiReversal extends Strategy
         private int $period = 14,
         private float $overbought = 70.0,
         private float $oversold = 30.0,
+        ?TrailingStop $trailingStop = null,
     ) {
         parent::__construct($metrics);
+        if ($trailingStop) {
+            $this->enableTrailingStop($trailingStop);
+        }
     }
 
     public function signal(): string
