@@ -79,4 +79,10 @@ class AssetMetricsTest extends TestCase
         $level = $prevMetrics->periodHigh(20); // 299
         $this->assertTrue($metrics->isBreakout($level));
     }
+
+    public function test_previous_close(): void
+    {
+        $metrics = $this->metrics();
+        $this->assertSame(299.0, $metrics->previousClose());
+    }
 }
