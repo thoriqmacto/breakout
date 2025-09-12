@@ -3,6 +3,7 @@
 namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
+use App\Services\IdxTicks;
 
 class TrailingStop
 {
@@ -25,17 +26,18 @@ class TrailingStop
     public function level(float $extremePrice, AssetMetrics $metrics, string $direction = 'long'): float
     {
         if ($this->type === 'percent') {
-            if ($direction === 'long') {
-                return $extremePrice * (1 - $this->value);
-            }
-            return $extremePrice * (1 + $this->value);
+            $delta = $extremePrice * $this->value;
+        } else {
+            $delta = $this->value * $metrics->atr($this->period);
         }
 
-        $atr = $metrics->atr($this->period);
+        $ticks = IdxTicks::toTicks($delta, $extremePrice);
+        $offset = IdxTicks::fromTicks($ticks, $extremePrice);
+
         if ($direction === 'long') {
-            return $extremePrice - $this->value * $atr;
+            return $extremePrice - $offset;
         }
 
-        return $extremePrice + $this->value * $atr;
+        return $extremePrice + $offset;
     }
 }

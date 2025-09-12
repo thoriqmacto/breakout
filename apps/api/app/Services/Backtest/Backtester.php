@@ -3,6 +3,7 @@
 namespace App\Services\Backtest;
 
 use App\Services\AssetMetrics;
+use App\Services\IdxTicks;
 use App\Services\Strategies\Strategy;
 use App\Services\Strategies\TrailingStop;
 
@@ -36,7 +37,10 @@ abstract class Backtester
             if ($position !== 0 && $trailingStop instanceof TrailingStop) {
                 if ($position > 0) {
                     $extremePrice = max($extremePrice, $bar['high']);
-                    $stopLevel = $trailingStop->level($extremePrice, $metrics, 'long');
+                    $stopLevel = IdxTicks::floor(
+                        $trailingStop->level($extremePrice, $metrics, 'long'),
+                        $extremePrice
+                    );
                     if ($bar['low'] <= $stopLevel) {
                         $exitPrice = $stopLevel;
                         $equity += $position * $exitPrice;
@@ -59,7 +63,10 @@ abstract class Backtester
                     }
                 } elseif ($position < 0) {
                     $extremePrice = min($extremePrice, $bar['low']);
-                    $stopLevel = $trailingStop->level($extremePrice, $metrics, 'short');
+                    $stopLevel = IdxTicks::ceil(
+                        $trailingStop->level($extremePrice, $metrics, 'short'),
+                        $extremePrice
+                    );
                     if ($bar['high'] >= $stopLevel) {
                         $exitPrice = $stopLevel;
                         $equity += $position * ($entryPrice - $exitPrice);
@@ -87,14 +94,15 @@ abstract class Backtester
             $signal = $strategy->signal();
 
             if ($signal === 'buy' && $position === 0) {
-                $position = (int) floor($equity / $bar['close']);
-                $equity -= $position * $bar['close'];
-                $entryPrice = $bar['close'];
+                $price = IdxTicks::round($bar['close']);
+                $position = (int) floor($equity / $price);
+                $equity -= $position * $price;
+                $entryPrice = $price;
                 $entryDate  = $bar['date'];
                 $extremePrice = $bar['high'];
                 $trailingStop = $strategy->trailingStop();
             } elseif ($signal === 'sell' && $position > 0) {
-                $exitPrice = $bar['close'];
+                $exitPrice = IdxTicks::round($bar['close']);
                 $equity += $position * $exitPrice;
                 $trades[] = [
                     'entry_date'  => $entryDate,
@@ -111,20 +119,21 @@ abstract class Backtester
 
             $curve[] = [
                 'date' => $bar['date'],
-                'equity' => $equity + $position * $bar['close'],
+                'equity' => $equity + $position * IdxTicks::round($bar['close']),
             ];
         }
 
         if ($position > 0) {
             $last = end($bars);
-            $equity += $position * $last['close'];
+            $lastClose = IdxTicks::round($last['close']);
+            $equity += $position * $lastClose;
             $trades[] = [
                 'entry_date'  => $entryDate,
                 'exit_date'   => $last['date'],
                 'entry_price' => $entryPrice,
-                'exit_price'  => $last['close'],
+                'exit_price'  => $lastClose,
                 'shares'      => $position,
-                'pnl'         => (float)($last['close'] - $entryPrice) * $position,
+                'pnl'         => (float)($lastClose - $entryPrice) * $position,
             ];
         }
 

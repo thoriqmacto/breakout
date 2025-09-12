@@ -3,6 +3,7 @@
 namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
+use App\Services\IdxTicks;
 
 class AtrBreakout extends Strategy
 {
@@ -27,8 +28,10 @@ class AtrBreakout extends Strategy
         $close = $this->metrics->lastClose();
         $prevClose = $this->metrics->previousClose();
         $atr = $this->metrics->atr($this->period);
-        $upper = $prevClose + $this->multiplier * $atr;
-        $lower = $prevClose - $this->multiplier * $atr;
+        $ticks = IdxTicks::toTicks($this->multiplier * $atr, $prevClose);
+        $offset = IdxTicks::fromTicks($ticks, $prevClose);
+        $upper = $prevClose + $offset;
+        $lower = $prevClose - $offset;
 
         if ($close > $upper) {
             return 'buy';
