@@ -4,7 +4,11 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Asset;
-use App\Services\Backtest\DonchianBacktester;
+use App\Services\Backtest\GenericBacktester;
+use App\Services\Strategies\AtrBreakout;
+use App\Services\Strategies\DonchianBreakout;
+use App\Services\Strategies\RocMomentum;
+use App\Services\AssetMetrics;
 use Illuminate\Support\Carbon;
 
 class AssetBacktest extends Command
@@ -54,15 +58,20 @@ class AssetBacktest extends Command
             'close' => (float) $p->close,
         ])->all();
 
-        $strategy = (string) $this->option('strategy');
-        switch ($strategy) {
-            case 'DonchianBreakout':
-                $backtester = new DonchianBacktester();
-                break;
-            default:
-                $this->error("Unknown strategy: {$strategy}");
-                return Command::FAILURE;
+        $name = (string) $this->option('strategy');
+        $map = [
+            'DonchianBreakout' => DonchianBreakout::class,
+            'AtrBreakout' => AtrBreakout::class,
+            'RocMomentum' => RocMomentum::class,
+        ];
+        if (!array_key_exists($name, $map)) {
+            $this->error("Unknown strategy: {$name}");
+            return Command::FAILURE;
         }
+
+        $class = $map[$name];
+        $strategy = new $class(new AssetMetrics([$bars[0]]));
+        $backtester = new GenericBacktester($strategy);
 
         $capital = (float) $this->option('capital');
         $result = $backtester->run($bars, $capital);

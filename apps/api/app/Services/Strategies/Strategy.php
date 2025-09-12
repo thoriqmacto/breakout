@@ -11,6 +11,16 @@ abstract class Strategy
     }
 
     /**
+     * Clone the strategy with updated metrics.
+     */
+    public function withMetrics(AssetMetrics $metrics): static
+    {
+        $clone = clone $this;
+        $clone->metrics = $metrics;
+        return $clone;
+    }
+
+    /**
      * Determine the action to take based on current metrics.
      *
      * @return string One of 'buy', 'sell', or 'hold'
