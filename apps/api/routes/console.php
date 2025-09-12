@@ -8,6 +8,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('asset:sync --eod')
-    ->dailyAt('13:00')
+    ->dailyAt('15:00')
     ->timezone('Asia/Qatar')
     ->sendOutputTo(storage_path('logs/asset_sync.log'));

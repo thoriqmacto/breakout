@@ -30,7 +30,7 @@ class AssetSync extends Command
      *
      * @var string
      */
-    protected $description = '"asset:sync" -> synchronize historical price to DB and CSV from python API';
+    protected $description = 'Synchronize historical price to DB and CSV from python API';
 
     /**
      * Execute the console command.
