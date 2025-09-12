@@ -205,6 +205,43 @@ class AssetMetrics
     }
 
     /**
+     * Relative Strength Index based on closing prices.
+     *
+     * Calculates the average gain and loss over the supplied period using
+     * consecutive closing prices.  When there is insufficient data the value
+     * 0 is returned.
+     */
+    public function relativeStrengthIndex(int $period = 14): float
+    {
+        if ($this->barCount() <= $period) {
+            return 0.0;
+        }
+
+        $slice = array_slice($this->bars, -($period + 1));
+
+        $gain = 0.0;
+        $loss = 0.0;
+        for ($i = 1, $len = count($slice); $i < $len; $i++) {
+            $change = $slice[$i]['close'] - $slice[$i - 1]['close'];
+            if ($change > 0) {
+                $gain += $change;
+            } elseif ($change < 0) {
+                $loss -= $change; // make positive
+            }
+        }
+
+        $avgGain = $gain / $period;
+        $avgLoss = $loss / $period;
+
+        if ($avgLoss == 0.0) {
+            return $avgGain > 0 ? 100.0 : 0.0;
+        }
+
+        $rs = $avgGain / $avgLoss;
+        return 100 - (100 / (1 + $rs));
+    }
+
+    /**
      * Highest high and lowest low over the given lookback.
      *
      * @param int  $period          Number of recent bars to inspect.
