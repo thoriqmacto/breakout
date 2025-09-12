@@ -18,7 +18,7 @@ class AssetBacktest extends Command
      *
      * @var string
      */
-    protected $signature = 'asset:backtest {--sym=} {--strategy=DonchianBreakout} {--capital=3000000}';
+    protected $signature = 'asset:backtest {--sym=} {--strategy=DonchianBreakout} {--capital=3000000} {--compare} {--strategies=*}';
 
     /**
      * The console command description.
@@ -58,12 +58,64 @@ class AssetBacktest extends Command
             'close' => (float) $p->close,
         ])->all();
 
-        $name = (string) $this->option('strategy');
         $map = [
             'DonchianBreakout' => DonchianBreakout::class,
             'AtrBreakout' => AtrBreakout::class,
             'RocMomentum' => RocMomentum::class,
         ];
+
+        $capital = (float) $this->option('capital');
+
+        if ($this->option('compare')) {
+            $namesOpt = $this->option('strategies');
+            if (is_array($namesOpt)) {
+                $names = $namesOpt;
+            } elseif (is_string($namesOpt) && $namesOpt !== '') {
+                $names = array_map('trim', explode(',', $namesOpt));
+            } else {
+                $names = [];
+            }
+            if ($names === []) {
+                $names = array_keys($map);
+            }
+
+            $metricsByName = [];
+            foreach ($names as $name) {
+                if (!array_key_exists($name, $map)) {
+                    $this->error("Unknown strategy: {$name}");
+                    return Command::FAILURE;
+                }
+                $class = $map[$name];
+                $strategy = new $class(new AssetMetrics([$bars[0]]));
+                $backtester = new GenericBacktester($strategy);
+                $result = $backtester->run($bars, $capital);
+                $metricsByName[$name] = $this->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
+            }
+
+            $metricLabels = [
+                'cagr' => 'CAGR',
+                'maxdd' => 'MaxDD',
+                'sharpe' => 'Sharpe',
+                'winrate' => 'Win-rate',
+                'profit_factor' => 'Profit Factor',
+                'trades' => 'Trades',
+            ];
+
+            $rows = [];
+            foreach ($metricLabels as $key => $label) {
+                $row = [$label];
+                foreach ($names as $name) {
+                    $row[] = (string) $metricsByName[$name][$key];
+                }
+                $rows[] = $row;
+            }
+
+            $headers = array_merge(['Metric'], $names);
+            $this->table($headers, $rows);
+            return Command::SUCCESS;
+        }
+
+        $name = (string) $this->option('strategy');
         if (!array_key_exists($name, $map)) {
             $this->error("Unknown strategy: {$name}");
             return Command::FAILURE;
@@ -73,7 +125,6 @@ class AssetBacktest extends Command
         $strategy = new $class(new AssetMetrics([$bars[0]]));
         $backtester = new GenericBacktester($strategy);
 
-        $capital = (float) $this->option('capital');
         $result = $backtester->run($bars, $capital);
 
         $metrics = $this->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
