@@ -10,8 +10,12 @@ class AtrBreakout extends Strategy
         AssetMetrics $metrics,
         private float $multiplier = 1.0,
         private int $period = 14,
+        ?TrailingStop $trailingStop = null,
     ) {
         parent::__construct($metrics);
+        if ($trailingStop) {
+            $this->enableTrailingStop($trailingStop);
+        }
     }
 
     public function signal(): string

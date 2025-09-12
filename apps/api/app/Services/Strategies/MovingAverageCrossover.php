@@ -10,8 +10,12 @@ class MovingAverageCrossover extends Strategy
         AssetMetrics $metrics,
         private int $shortPeriod = 50,
         private int $longPeriod = 200,
+        ?TrailingStop $trailingStop = null,
     ) {
         parent::__construct($metrics);
+        if ($trailingStop) {
+            $this->enableTrailingStop($trailingStop);
+        }
     }
 
     public function signal(): string

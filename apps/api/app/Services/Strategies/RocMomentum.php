@@ -10,8 +10,12 @@ class RocMomentum extends Strategy
         AssetMetrics $metrics,
         private int $lookback = 13,
         private float $threshold = 5.0,
+        ?TrailingStop $trailingStop = null,
     ) {
         parent::__construct($metrics);
+        if ($trailingStop) {
+            $this->enableTrailingStop($trailingStop);
+        }
     }
 
     public function signal(): string

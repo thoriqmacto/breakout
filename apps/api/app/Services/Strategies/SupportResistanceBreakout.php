@@ -9,8 +9,12 @@ class SupportResistanceBreakout extends Strategy
     public function __construct(
         AssetMetrics $metrics,
         private int $weeks = 55,
+        ?TrailingStop $trailingStop = null,
     ) {
         parent::__construct($metrics);
+        if ($trailingStop) {
+            $this->enableTrailingStop($trailingStop);
+        }
     }
 
     public function signal(): string
