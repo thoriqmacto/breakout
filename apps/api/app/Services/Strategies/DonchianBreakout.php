@@ -4,12 +4,13 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class DonchianBreakout
+class DonchianBreakout extends Strategy
 {
     public function __construct(
-        private AssetMetrics $metrics,
+        AssetMetrics $metrics,
         private int $period = 20
     ) {
+        parent::__construct($metrics);
     }
 
     public function signal(): string
