@@ -96,6 +96,8 @@ class AssetBacktest extends Command
                 $result = $backtester->run($bars, $capital);
                 $metricsByName[$name] = $this->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
             }
+            $this->info("Symbol: {$symbol}");
+            $this->info('Bars: ' . count($bars));
 
             $metricLabels = [
                 'cagr' => 'CAGR',
