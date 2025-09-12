@@ -59,5 +59,7 @@ class DonchianStrategyTest extends TestCase
         $result = $backtester->run($this->bars(), 100.0);
         $this->assertSame(125.0, $result['final_equity']);
         $this->assertCount(5, $result['equity_curve']);
+        $this->assertCount(1, $result['trades']);
+        $this->assertSame(25.0, $result['trades'][0]['pnl']);
     }
 }
