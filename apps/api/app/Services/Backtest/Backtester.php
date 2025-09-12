@@ -6,6 +6,7 @@ use App\Services\AssetMetrics;
 use App\Services\IdxTicks;
 use App\Services\Strategies\Strategy;
 use App\Services\Strategies\TrailingStop;
+use Illuminate\Support\Carbon;
 
 abstract class Backtester
 {
@@ -145,4 +146,63 @@ abstract class Backtester
     }
 
     abstract protected function createStrategy(AssetMetrics $metrics): Strategy;
+
+    /**
+     * Calculate performance metrics for a backtest.
+     *
+     * @param array<int, array{date:string, open:float, high:float, low:float, close:float}> $bars
+     * @param array<int, array{date:string, equity:float}> $curve
+     * @param array<int, array{entry_date:string, exit_date:string, entry_price:float, exit_price:float, shares:int, pnl:float}> $trades
+     * @return array{cagr:float, maxdd:float, sharpe:float, winrate:float, profit_factor:float, trades:int}
+     */
+     public function calculateMetrics(array $bars, array $curve, array $trades, float $capital, float $final): array
+    {
+        $start = Carbon::parse($bars[0]['date']);
+        $end   = Carbon::parse($bars[count($bars) - 1]['date']);
+        $years = max(1e-9, $start->diffInDays($end) / 365);
+        $cagr  = ($final / $capital) ** (1 / $years) - 1;
+
+        $peak = $curve[0]['equity'];
+        $maxDD = 0.0;
+        foreach ($curve as $pt) {
+            $peak = max($peak, $pt['equity']);
+            $dd = ($pt['equity'] - $peak) / $peak;
+            $maxDD = min($maxDD, $dd);
+        }
+        $maxDD = abs($maxDD);
+
+        $returns = [];
+        $prev = $curve[0]['equity'];
+        for ($i = 1; $i < count($curve); $i++) {
+            $eq = $curve[$i]['equity'];
+            $returns[] = ($eq - $prev) / $prev;
+            $prev = $eq;
+        }
+        $avg = $returns === [] ? 0.0 : array_sum($returns) / count($returns);
+        $std = 0.0;
+        if ($returns !== []) {
+            $variance = array_sum(array_map(fn($r) => ($r - $avg) ** 2, $returns)) / count($returns);
+            $std = sqrt($variance);
+        }
+        $sharpe = $std > 0 ? $avg / $std * sqrt(252) : 0.0;
+
+        $wins = 0; $gain = 0; $loss = 0;
+        foreach ($trades as $t) {
+            $pnl = $t['pnl'];
+            if ($pnl > 0) { $wins++; $gain += $pnl; }
+            else { $loss += abs($pnl); }
+        }
+        $tradeCount = count($trades);
+        $winRate = $tradeCount > 0 ? $wins / $tradeCount : 0.0;
+        $profitFactor = $loss > 0 ? $gain / $loss : ($gain > 0 ? INF : 0.0);
+
+        return [
+            'cagr' => $cagr,
+            'maxdd' => $maxDD,
+            'sharpe' => $sharpe,
+            'winrate' => $winRate,
+            'profit_factor' => $profitFactor,
+            'trades' => $tradeCount,
+        ];
+    }
 }
