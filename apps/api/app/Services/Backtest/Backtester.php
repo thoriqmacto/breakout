@@ -46,7 +46,7 @@ abstract class Backtester
                     'entry_price' => $entryPrice,
                     'exit_price'  => $exitPrice,
                     'shares'      => $position,
-                    'pnl'         => ($exitPrice - $entryPrice) * $position,
+                    'pnl'         => (float)($exitPrice - $entryPrice) * $position,
                 ];
                 $position = 0;
             }
@@ -66,7 +66,7 @@ abstract class Backtester
                 'entry_price' => $entryPrice,
                 'exit_price'  => $last['close'],
                 'shares'      => $position,
-                'pnl'         => ($last['close'] - $entryPrice) * $position,
+                'pnl'         => (float)($last['close'] - $entryPrice) * $position,
             ];
         }
 
