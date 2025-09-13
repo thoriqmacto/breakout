@@ -159,7 +159,21 @@ abstract class Backtester
     {
         $start = Carbon::parse($bars[0]['date']);
         $end   = Carbon::parse($bars[count($bars) - 1]['date']);
-        $years = max(1e-9, $start->diffInDays($end) / 365);
+
+        // Calculate the holding period using the Actual/Actual day-count
+        // convention.  This avoids treating leap years as longer than a
+        // calendar year which previously caused small inaccuracies when the
+        // backtest spanned a leap day (e.g. 2020-01-01 to 2021-01-01).
+        $years = 0.0;
+        $cursor = $start->copy();
+        while ($cursor->lt($end)) {
+            $nextYearStart = $cursor->copy()->addYear()->startOfYear();
+            $segmentEnd = $end->lt($nextYearStart) ? $end : $nextYearStart;
+            $days = $cursor->diffInDays($segmentEnd);
+            $years += $days / $cursor->daysInYear;
+            $cursor = $segmentEnd;
+        }
+        $years = max(1e-9, $years);
         $cagr  = ($final / $capital) ** (1 / $years) - 1;
 
         $peak = $curve[0]['equity'];
