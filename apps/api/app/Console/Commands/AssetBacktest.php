@@ -9,6 +9,9 @@ use App\Services\Strategies\AtrBreakout;
 use App\Services\Strategies\DonchianBreakout;
 use App\Services\Strategies\RocMomentum;
 use App\Services\Strategies\TrailingStop;
+use App\Services\Strategies\MovingAverageCrossover;
+use App\Services\Strategies\RsiReversal;
+use App\Services\Strategies\SupportResistanceBreakout;
 use App\Services\AssetMetrics;
 
 class AssetBacktest extends Command
@@ -69,6 +72,9 @@ class AssetBacktest extends Command
             'DonchianBreakout' => DonchianBreakout::class,
             'AtrBreakout' => AtrBreakout::class,
             'RocMomentum' => RocMomentum::class,
+            'MovingAverageCrossover' => MovingAverageCrossover::class,
+            'RsiReversal' => RsiReversal::class,
+            'SupportResistanceBreakout' => SupportResistanceBreakout::class,
         ];
 
         $capital = (float) $this->option('capital');
