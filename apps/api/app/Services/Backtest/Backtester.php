@@ -207,7 +207,7 @@ abstract class Backtester
             else { $loss += abs($pnl); }
         }
         $tradeCount = count($trades);
-        $winRate = $tradeCount > 0 ? $wins / $tradeCount : 0.0;
+        $winRate = $tradeCount > 0 ? $wins / (float) $tradeCount : 0.0;
         $profitFactor = $loss > 0 ? $gain / $loss : ($gain > 0 ? INF : 0.0);
 
         return [
