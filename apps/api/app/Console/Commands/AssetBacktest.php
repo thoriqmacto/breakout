@@ -8,6 +8,7 @@ use App\Services\Backtest\GenericBacktester;
 use App\Services\Strategies\AtrBreakout;
 use App\Services\Strategies\DonchianBreakout;
 use App\Services\Strategies\RocMomentum;
+use App\Services\Strategies\TrailingStop;
 use App\Services\Strategies\MovingAverageCrossover;
 use App\Services\Strategies\RsiReversal;
 use App\Services\Strategies\SupportResistanceBreakout;
@@ -25,7 +26,9 @@ class AssetBacktest extends Command
         {--strategy=DonchianBreakout : Strategy class name}
         {--capital=3000000 : Starting capital}
         {--compare : Compare multiple strategies}
-        {--strategies=* : Comma-separated list when using --compare}';
+        {--strategies=* : Comma-separated list when using --compare}
+        {--trailing= : Trailing stop definition (percent:0.05 or atr:3,14)}
+        {--trailing-strategies=* : Strategies to apply the trailing stop}';
 
     /**
      * The console command description.
@@ -76,6 +79,33 @@ class AssetBacktest extends Command
 
         $capital = (float) $this->option('capital');
 
+        $trailingOpt = (string) $this->option('trailing');
+        $trailingStop = null;
+        if ($trailingOpt !== '') {
+            [$type, $params] = explode(':', $trailingOpt, 2) + [null, null];
+            if ($type === 'percent' && $params !== null) {
+                $trailingStop = TrailingStop::percent((float) $params);
+            } elseif ($type === 'atr' && $params !== null) {
+                $parts = array_map('trim', explode(',', $params));
+                $multiple = (float) ($parts[0] ?? 0);
+                $period = isset($parts[1]) ? (int) $parts[1] : 14;
+                $trailingStop = TrailingStop::atr($multiple, $period);
+            } else {
+                $this->error('Invalid trailing stop format.');
+                return Command::FAILURE;
+            }
+        }
+
+        $targetsOpt = $this->option('trailing-strategies');
+        if (is_array($targetsOpt)) {
+            $trailingStrategies = $targetsOpt;
+        } elseif (is_string($targetsOpt) && $targetsOpt !== '') {
+            $trailingStrategies = array_map('trim', explode(',', $targetsOpt));
+        } else {
+            $trailingStrategies = [];
+        }
+        $applyTrailingToAll = $trailingStrategies === [] || in_array('*', $trailingStrategies, true);
+
         if ($this->option('compare')) {
             $namesOpt = $this->option('strategies');
             if (is_array($namesOpt)) {
@@ -96,7 +126,10 @@ class AssetBacktest extends Command
                     return Command::FAILURE;
                 }
                 $class = $map[$name];
-                $strategy = new $class(new AssetMetrics([$bars[0]]));
+                $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
+                $strategy = $useTrailing
+                    ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
+                    : new $class(new AssetMetrics([$bars[0]]));
                 $backtester = new GenericBacktester($strategy);
                 $result = $backtester->run($bars, $capital);
                 $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
@@ -135,7 +168,10 @@ class AssetBacktest extends Command
         }
 
         $class = $map[$name];
-        $strategy = new $class(new AssetMetrics([$bars[0]]));
+        $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
+        $strategy = $useTrailing
+            ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
+            : new $class(new AssetMetrics([$bars[0]]));
         $backtester = new GenericBacktester($strategy);
 
         $result = $backtester->run($bars, $capital);
