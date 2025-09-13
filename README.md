@@ -64,6 +64,32 @@ $asset = Asset::first();
 $metrics = (new AssetMetrics())->forAsset($asset);
 ```
 
+## Backtesting
+The `asset:backtest` Artisan command executes trading strategies over historical price data.
+
+Available strategies include:
+
+- AtrBreakout
+- DonchianBreakout
+- RocMomentum
+- MovingAverageCrossover
+- RsiReversal
+- SupportResistanceBreakout
+
+Trailing stops can be enabled with the `--trailing` option.  
+Syntax: `--trailing=<type>:<value>[@strategy1,strategy2,...]`
+
+- Apply a 10% trailing stop to every strategy:
+  ```bash
+  php artisan asset:backtest --sym=AAA --strategy=DonchianBreakout --trailing=percent:0.10
+  ```
+- Apply a 2×ATR trailing stop only to MovingAverageCrossover and RsiReversal:
+  ```bash
+  php artisan asset:backtest --sym=AAA --compare --strategies=MovingAverageCrossover,RsiReversal --trailing=atr:2@MovingAverageCrossover,RsiReversal
+  ```
+
+If `--trailing` is omitted, strategies run without a trailing stop.
+
 ## Repository Layout
 ```
 apps/
