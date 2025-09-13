@@ -66,5 +66,65 @@ class AssetBacktestCommandTest extends TestCase
         $this->assertStringContainsString('CAGR', $output);
         $this->assertStringContainsString('Trades', $output);
     }
+
+    public function test_runs_backtest_with_trailing_stop(): void
+    {
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $start = Carbon::parse('2024-01-01');
+        for ($i = 1; $i <= 40; $i++) {
+            Price::create([
+                'asset_id' => $asset->id,
+                'date' => $start->copy()->addDays($i - 1)->toDateString(),
+                'open' => $i,
+                'high' => $i + 1,
+                'low' => $i - 1,
+                'close' => $i,
+                'volume' => 1000 + $i,
+            ]);
+        }
+
+        $exit = Artisan::call('asset:backtest', [
+            '--sym' => 'AAA',
+            '--strategy' => 'AtrBreakout',
+            '--trailing' => 'percent:0.05',
+        ]);
+        $this->assertSame(0, $exit);
+        $output = Artisan::output();
+        $this->assertStringContainsString('CAGR', $output);
+        $this->assertStringContainsString('Trades', $output);
+    }
+
+    public function test_compares_multiple_strategies_with_trailing_stop(): void
+    {
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $start = Carbon::parse('2024-01-01');
+        for ($i = 1; $i <= 40; $i++) {
+            Price::create([
+                'asset_id' => $asset->id,
+                'date' => $start->copy()->addDays($i - 1)->toDateString(),
+                'open' => $i,
+                'high' => $i + 1,
+                'low' => $i - 1,
+                'close' => $i,
+                'volume' => 1000 + $i,
+            ]);
+        }
+
+        $exit = Artisan::call('asset:backtest', [
+            '--sym' => 'AAA',
+            '--compare' => true,
+            '--strategies' => ['AtrBreakout', 'DonchianBreakout'],
+            '--trailing' => 'percent:0.05',
+            '--trailing-strategies' => ['AtrBreakout'],
+        ]);
+        $this->assertSame(0, $exit);
+        $output = Artisan::output();
+        $this->assertStringContainsString('AtrBreakout', $output);
+        $this->assertStringContainsString('DonchianBreakout', $output);
+        $this->assertStringContainsString('CAGR', $output);
+        $this->assertStringContainsString('Trades', $output);
+    }
 }
 
