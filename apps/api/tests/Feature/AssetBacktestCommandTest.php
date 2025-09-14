@@ -151,5 +151,59 @@ class AssetBacktestCommandTest extends TestCase
         $this->assertStringContainsString('CAGR', $output);
         $this->assertStringContainsString('Trades', $output);
     }
+
+    public function test_prints_trades_when_option_set(): void
+    {
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $start = Carbon::parse('2024-01-01');
+        for ($i = 1; $i <= 40; $i++) {
+            Price::create([
+                'asset_id' => $asset->id,
+                'date' => $start->copy()->addDays($i - 1)->toDateString(),
+                'open' => $i,
+                'high' => $i + 1,
+                'low' => $i - 1,
+                'close' => $i,
+                'volume' => 1000 + $i,
+            ]);
+        }
+
+        $exit = Artisan::call('asset:backtest', [
+            '--sym' => 'AAA',
+            '--trades' => true,
+        ]);
+        $this->assertSame(0, $exit);
+        $output = Artisan::output();
+        $this->assertStringContainsString('Entry Date', $output);
+        $this->assertStringContainsString('Exit Date', $output);
+    }
+
+    public function test_trades_option_cannot_be_combined_with_compare(): void
+    {
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $start = Carbon::parse('2024-01-01');
+        for ($i = 1; $i <= 40; $i++) {
+            Price::create([
+                'asset_id' => $asset->id,
+                'date' => $start->copy()->addDays($i - 1)->toDateString(),
+                'open' => $i,
+                'high' => $i + 1,
+                'low' => $i - 1,
+                'close' => $i,
+                'volume' => 1000 + $i,
+            ]);
+        }
+
+        $exit = Artisan::call('asset:backtest', [
+            '--sym' => 'AAA',
+            '--compare' => true,
+            '--trades' => true,
+        ]);
+        $this->assertSame(1, $exit);
+        $output = Artisan::output();
+        $this->assertStringContainsString('The --trades option cannot be combined with --compare.', $output);
+    }
 }
 
