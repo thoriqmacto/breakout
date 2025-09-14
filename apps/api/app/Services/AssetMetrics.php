@@ -154,26 +154,30 @@ class AssetMetrics
     /**
      * Determine support and resistance levels within lookback weeks.
      *
-     * @param int               $weeks Number of recent bars to inspect.
+     * The returned levels are based solely on prior bars and exclude the most
+     * recent bar so that they represent established price levels.  This allows
+     * breakout strategies to compare the latest close against historical
+     * support and resistance and react when those levels are breached.
+     *
+     * @param int               $weeks Number of recent weeks to inspect.
      * @return array<float>     an array with keys `support` and `resistance`.
      */
     public function supportResistance(int $weeks): array
     {
         $days = $weeks * 5;
-        $slice = array_slice($this->bars, -$days);
-        $close = $this->lastClose();
-
-        $support = null;
-        $resistance = null;
-        foreach ($slice as $bar) {
-            if ($bar['low'] <= $close) {
-                $support = $support === null ? $bar['low'] : max($support, $bar['low']);
-            }
-            if ($bar['high'] >= $close) {
-                $resistance = $resistance === null ? $bar['high'] : min($resistance, $bar['high']);
-            }
+        // Exclude the most recent bar so levels come from prior history only
+        $slice = array_slice($this->bars, -$days - 1, $days);
+        if (empty($slice)) {
+            return ['support' => 0.0, 'resistance' => 0.0];
         }
-        return ['support' => (float)$support, 'resistance' => (float)$resistance];
+
+        // Support is the highest low from prior bars; resistance is the highest
+        // high.  These represent the key levels that the current close may
+        // break above or below.
+        $support = max(array_column($slice, 'low'));
+        $resistance = max(array_column($slice, 'high'));
+
+        return ['support' => (float) $support, 'resistance' => (float) $resistance];
     }
 
     /**

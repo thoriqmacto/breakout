@@ -58,8 +58,8 @@ class AssetMetricsTest extends TestCase
     {
         $metrics = $this->metrics();
         $levels = $metrics->supportResistance(55);
-        $this->assertSame(298.0, $levels['support']);
-        $this->assertSame(300.0, $levels['resistance']);
+        $this->assertSame(297.0, $levels['support']);
+        $this->assertSame(299.0, $levels['resistance']);
     }
 
     public function test_trend_detection_and_roc(): void
