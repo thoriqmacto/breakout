@@ -23,7 +23,7 @@ class AssetBacktest extends Command
      */
     protected $signature = 'asset:backtest
         {--sym= : Asset ticker symbol}
-        {--strategy=DonchianBreakout : Strategy class name}
+        {--strategy=DonchBO : Strategy class name}
         {--capital=3000000 : Starting capital}
         {--compare : Compare multiple strategies}
         {--strategies=* : Comma-separated list when using --compare}
