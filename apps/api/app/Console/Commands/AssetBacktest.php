@@ -28,7 +28,8 @@ class AssetBacktest extends Command
         {--compare : Compare multiple strategies}
         {--strategies=* : Comma-separated list when using --compare}
         {--trailing= : Trailing stop definition (percent:0.05 or atr:3,14)}
-        {--trailing-strategies=* : Strategies to apply the trailing stop}';
+        {--trailing-strategies=* : Strategies to apply the trailing stop}
+        {--trades : Print all trades during backtest}';
 
     /**
      * The console command description.
@@ -105,6 +106,11 @@ class AssetBacktest extends Command
             $trailingStrategies = [];
         }
         $applyTrailingToAll = $trailingStrategies === [] || in_array('*', $trailingStrategies, true);
+
+        if ($this->option('trades') && $this->option('compare')) {
+            $this->error('The --trades option cannot be combined with --compare.');
+            return Command::FAILURE;
+        }
 
         if ($this->option('compare')) {
             $namesOpt = $this->option('strategies');
@@ -189,6 +195,24 @@ class AssetBacktest extends Command
         ];
 
         $this->table(['Metric', 'Value'], $rows);
+
+        if ($this->option('trades')) {
+            $tradeRows = array_map(
+                fn($t) => [
+                    $t['entry_date'],
+                    $t['exit_date'],
+                    sprintf('%.2f', $t['entry_price']),
+                    sprintf('%.2f', $t['exit_price']),
+                    (string) $t['shares'],
+                    sprintf('%.2f', $t['pnl']),
+                ],
+                $result['trades']
+            );
+            $this->table(
+                ['Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
+                $tradeRows
+            );
+        }
 
         return Command::SUCCESS;
     }
