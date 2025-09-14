@@ -22,7 +22,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'IsUptrend?'];
+        $headers = ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'IsUptrend?', 'Bars'];
         $rows = [];
 
         foreach ($symbols as $symbol) {
@@ -32,6 +32,7 @@ class AssetMetricsCommand extends Command
             }
             $bars = $asset->prices()->orderBy('date')->get()->toArray();
             $metrics = new AssetMetrics($bars);
+            $totalBars = count($bars);
 
             $close = $metrics->lastClose();
             $ma50 = round($metrics->movingAverage(50), 0);
@@ -49,6 +50,7 @@ class AssetMetricsCommand extends Command
                 'atr14' => round($metrics->atr(14), 0),
                 'roc13' => $roc13,
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
+                'bars' => $totalBars,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
                 'sort_above_ma100' => $close > $ma100 ? 1 : 0,
                 'sort_above_ma50' => $close > $ma50 ? 1 : 0,
@@ -70,6 +72,7 @@ class AssetMetricsCommand extends Command
             $r['atr14'],
             $r['roc13'],
             $r['uptrend'],
+            $r['bars'],
         ], $rows);
 
         $this->table($headers, $rows);
