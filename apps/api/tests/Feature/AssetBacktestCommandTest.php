@@ -42,12 +42,12 @@ class AssetBacktestCommandTest extends TestCase
     public static function strategyProvider(): array
     {
         return [
-            ['AtrBreakout'],
-            ['DonchianBreakout'],
+            ['AtrBO'],
+            ['DonchBO'],
             ['RocMomentum'],
-            ['MovingAverageCrossover'],
+            ['MACross'],
             ['RsiReversal'],
-            ['SupportResistanceBreakout'],
+            ['SR_BO'],
         ];
     }
 
@@ -72,22 +72,22 @@ class AssetBacktestCommandTest extends TestCase
             '--sym' => 'AAA',
             '--compare' => true,
             '--strategies' => [
-                'AtrBreakout',
-                'DonchianBreakout',
+                'AtrBO',
+                'DonchBO',
                 'RocMomentum',
-                'MovingAverageCrossover',
+                'MACross',
                 'RsiReversal',
-                'SupportResistanceBreakout',
+                'SR_BO',
             ],
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
-        $this->assertStringContainsString('AtrBreakout', $output);
-        $this->assertStringContainsString('DonchianBreakout', $output);
+        $this->assertStringContainsString('AtrBO', $output);
+        $this->assertStringContainsString('DonchBO', $output);
         $this->assertStringContainsString('RocMomentum', $output);
-        $this->assertStringContainsString('MovingAverageCrossover', $output);
+        $this->assertStringContainsString('MACross', $output);
         $this->assertStringContainsString('RsiReversal', $output);
-        $this->assertStringContainsString('SupportResistanceBreakout', $output);
+        $this->assertStringContainsString('SR_BO', $output);
         $this->assertStringContainsString('CAGR', $output);
         $this->assertStringContainsString('Trades', $output);
     }
@@ -111,7 +111,7 @@ class AssetBacktestCommandTest extends TestCase
 
         $exit = Artisan::call('asset:backtest', [
             '--sym' => 'AAA',
-            '--strategy' => 'AtrBreakout',
+            '--strategy' => 'AtrBO',
             '--trailing' => 'percent:0.05',
         ]);
         $this->assertSame(0, $exit);
@@ -140,14 +140,14 @@ class AssetBacktestCommandTest extends TestCase
         $exit = Artisan::call('asset:backtest', [
             '--sym' => 'AAA',
             '--compare' => true,
-            '--strategies' => ['AtrBreakout', 'DonchianBreakout'],
+            '--strategies' => ['AtrBO', 'DonchBO'],
             '--trailing' => 'percent:0.05',
-            '--trailing-strategies' => ['AtrBreakout'],
+            '--trailing-strategies' => ['AtrBO'],
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
-        $this->assertStringContainsString('AtrBreakout', $output);
-        $this->assertStringContainsString('DonchianBreakout', $output);
+        $this->assertStringContainsString('AtrBO', $output);
+        $this->assertStringContainsString('DonchBO', $output);
         $this->assertStringContainsString('CAGR', $output);
         $this->assertStringContainsString('Trades', $output);
     }
@@ -175,7 +175,7 @@ class AssetBacktestCommandTest extends TestCase
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
-        $this->assertStringContainsString('Strategy: DonchianBreakout', $output);
+        $this->assertStringContainsString('Strategy: DonchBO', $output);
         $this->assertStringContainsString('| # | Entry Date', $output);
         $this->assertStringContainsString('Exit Date', $output);
     }
