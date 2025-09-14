@@ -197,19 +197,23 @@ class AssetBacktest extends Command
         $this->table(['Metric', 'Value'], $rows);
 
         if ($this->option('trades')) {
-            $tradeRows = array_map(
-                fn($t) => [
+            $this->info("Strategy: {$name}");
+
+            $tradeRows = [];
+            foreach ($result['trades'] as $i => $t) {
+                $tradeRows[] = [
+                    $i + 1,
                     $t['entry_date'],
                     $t['exit_date'],
                     sprintf('%.2f', $t['entry_price']),
                     sprintf('%.2f', $t['exit_price']),
                     (string) $t['shares'],
                     sprintf('%.2f', $t['pnl']),
-                ],
-                $result['trades']
-            );
+                ];
+            }
+
             $this->table(
-                ['Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
+                ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
                 $tradeRows
             );
         }
