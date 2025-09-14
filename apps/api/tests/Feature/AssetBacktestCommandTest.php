@@ -7,15 +7,14 @@ use App\Models\Price;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AssetBacktestCommandTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @dataProvider strategyProvider
-     */
+    #[DataProvider('strategyProvider')]
     public function test_runs_backtest_with_strategy(string $strategy): void
     {
         $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
