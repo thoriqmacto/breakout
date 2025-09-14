@@ -70,12 +70,12 @@ class AssetBacktest extends Command
         ])->all();
 
         $map = [
-            'DonchianBreakout' => DonchianBreakout::class,
-            'AtrBreakout' => AtrBreakout::class,
+            'DonchBO' => DonchianBreakout::class,
+            'AtrBO' => AtrBreakout::class,
             'RocMomentum' => RocMomentum::class,
-            'MovingAverageCrossover' => MovingAverageCrossover::class,
+            'MACross' => MovingAverageCrossover::class,
             'RsiReversal' => RsiReversal::class,
-            'SupportResistanceBreakout' => SupportResistanceBreakout::class,
+            'SR_BO' => SupportResistanceBreakout::class,
         ];
 
         $capital = (float) $this->option('capital');
