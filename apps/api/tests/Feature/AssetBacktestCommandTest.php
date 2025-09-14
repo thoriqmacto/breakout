@@ -175,7 +175,8 @@ class AssetBacktestCommandTest extends TestCase
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
-        $this->assertStringContainsString('Entry Date', $output);
+        $this->assertStringContainsString('Strategy: DonchianBreakout', $output);
+        $this->assertStringContainsString('| # | Entry Date', $output);
         $this->assertStringContainsString('Exit Date', $output);
     }
 
