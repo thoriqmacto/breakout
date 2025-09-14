@@ -48,8 +48,8 @@ class SupportResistanceBreakoutTest extends TestCase
             ['date' => '2020-01-02', 'open' => 2, 'high' => 2, 'low' => 2, 'close' => 2],
             ['date' => '2020-01-03', 'open' => 3, 'high' => 3, 'low' => 3, 'close' => 3],
             ['date' => '2020-01-04', 'open' => 4, 'high' => 4, 'low' => 4, 'close' => 4],
-            ['date' => '2020-01-05', 'open' => 4, 'high' => 4, 'low' => 3, 'close' => 4],
-            ['date' => '2020-01-06', 'open' => 5, 'high' => 6, 'low' => 4, 'close' => 5],
+            ['date' => '2020-01-05', 'open' => 4, 'high' => 6, 'low' => 3, 'close' => 4],
+            ['date' => '2020-01-06', 'open' => 5, 'high' => 5, 'low' => 4, 'close' => 5],
         ];
     }
 
