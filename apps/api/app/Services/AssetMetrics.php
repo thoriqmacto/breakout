@@ -23,6 +23,12 @@ class AssetMetrics
         return $this->bars[array_key_last($this->bars)]['close'];
     }
 
+    public function lastVolume(): float
+    {
+        $last = $this->bars[array_key_last($this->bars)] ?? null;
+        return $last ? $this->field($last, 'volume') : 0.0;
+    }
+
     public function previousClose(): float
     {
         $count = count($this->bars);

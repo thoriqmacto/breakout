@@ -91,4 +91,14 @@ class AssetMetricsTest extends TestCase
         $metrics = $this->metrics();
         $this->assertEqualsWithDelta(1289.5, $metrics->averageVolume(20), 0.0001);
     }
+
+    public function test_last_volume_and_close_to_high(): void
+    {
+        $metrics = $this->metrics();
+        $this->assertSame(1299.0, $metrics->lastVolume());
+        $close = $metrics->lastClose();
+        $this->assertSame(300.0, $close);
+        $this->assertSame(1.0, $close / $metrics->periodHigh(20));
+        $this->assertSame(1.0, $close / $metrics->periodHigh(55));
+    }
 }
