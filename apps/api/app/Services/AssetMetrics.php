@@ -52,12 +52,14 @@ class AssetMetrics
             return [
                 'average_price' => null,
                 'total_volume' => 0,
+                'average_volume_20d' => 0,
             ];
         }
 
         return [
             'average_price' => $prices->avg('close'),
             'total_volume' => (int) $prices->sum('volume'),
+            'average_volume_20d' => (int) round($prices->take(-20)->avg('volume')),
         ];
     }
 
@@ -137,6 +139,22 @@ class AssetMetrics
             return 0.0;
         }
         $sum = array_sum(array_map(fn($b) => $b['close'], $slice));
+        return $sum / count($slice);
+    }
+
+    /**
+     * Average volume over a number of days.
+     *
+     * @param int $days Number of days to average.
+     * @return float Average volume or 0 when no data.
+     */
+    public function averageVolume(int $days = 20): float
+    {
+        $slice = array_slice($this->bars, -$days);
+        if (empty($slice)) {
+            return 0.0;
+        }
+        $sum = array_sum(array_map(fn($b) => $this->field($b, 'volume'), $slice));
         return $sum / count($slice);
     }
 
