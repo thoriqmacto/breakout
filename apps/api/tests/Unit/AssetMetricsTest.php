@@ -85,4 +85,10 @@ class AssetMetricsTest extends TestCase
         $metrics = $this->metrics();
         $this->assertSame(299.0, $metrics->previousClose());
     }
+
+    public function test_average_volume_last_20_days(): void
+    {
+        $metrics = $this->metrics();
+        $this->assertEqualsWithDelta(1289.5, $metrics->averageVolume(20), 0.0001);
+    }
 }
