@@ -22,7 +22,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'IsUptrend?', 'Bars'];
+        $headers = ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'];
         $rows = [];
 
         foreach ($symbols as $symbol) {
@@ -38,7 +38,16 @@ class AssetMetricsCommand extends Command
             $ma50 = round($metrics->movingAverage(50), 0);
             $ma100 = round($metrics->movingAverage(100), 0);
             $roc13 = round($metrics->rocWeeks(13), 2);
-            $avgVol20 = round($metrics->averageVolume(20), 0);
+            $avgVol20 = $metrics->averageVolume(20);
+            $lastVolume = $metrics->lastVolume();
+            $volToAvg = $avgVol20 > 0 ? round($lastVolume / $avgVol20, 2) : 0;
+            $avgVol20 = round($avgVol20, 0);
+            $high20 = $metrics->periodHigh(20);
+            $high55 = $metrics->periodHigh(55);
+            $closeVsHigh20 = $high20 > 0 ? round($close / $high20, 2) : 0;
+            $closeVsHigh55 = $high55 > 0 ? round($close / $high55, 2) : 0;
+            $high20 = round($high20, 0);
+            $high55 = round($high55, 0);
             $isUptrend = $metrics->isUptrend();
 
             $rows[] = [
@@ -46,11 +55,14 @@ class AssetMetricsCommand extends Command
                 'close' => $close,
                 'ma50' => $ma50,
                 'ma100' => $ma100,
-                'high20' => round($metrics->periodHigh(20), 0),
-                'high55' => round($metrics->periodHigh(55), 0),
+                'high20' => $high20,
+                'high55' => $high55,
                 'atr14' => round($metrics->atr(14), 0),
                 'roc13' => $roc13,
                 'avg_vol20' => $avgVol20,
+                'vol_vs_avg20' => $volToAvg,
+                'close_vs_high20' => $closeVsHigh20,
+                'close_vs_high55' => $closeVsHigh55,
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
                 'bars' => $totalBars,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
@@ -74,6 +86,9 @@ class AssetMetricsCommand extends Command
             $r['atr14'],
             $r['roc13'],
             $r['avg_vol20'],
+            $r['vol_vs_avg20'],
+            $r['close_vs_high20'],
+            $r['close_vs_high55'],
             $r['uptrend'],
             $r['bars'],
         ], $rows);
