@@ -72,8 +72,9 @@ class AssetMetricsCommand extends Command
         }
 
         usort($rows, function ($a, $b) {
-            return [$b['sort_uptrend'], $b['sort_above_ma100'], $b['sort_above_ma50'], $b['roc13']]
-                <=> [$a['sort_uptrend'], $a['sort_above_ma100'], $a['sort_above_ma50'], $a['roc13']];
+            $A = [(int)($a['sort_uptrend'] ?? 0), (int)($a['sort_above_ma100'] ?? 0), (int)($a['sort_above_ma50'] ?? 0), (float)($a['roc13'] ?? 0)];
+            $B = [(int)($b['sort_uptrend'] ?? 0), (int)($b['sort_above_ma100'] ?? 0), (int)($b['sort_above_ma50'] ?? 0), (float)($b['roc13'] ?? 0)];
+            return $B <=> $A; // descending
         });
 
         $rows = array_map(fn($r) => [
