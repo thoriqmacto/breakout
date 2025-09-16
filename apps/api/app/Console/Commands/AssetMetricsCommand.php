@@ -22,7 +22,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'];
+        $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'];
         $rows = [];
 
         foreach ($symbols as $symbol) {
@@ -66,35 +66,57 @@ class AssetMetricsCommand extends Command
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
                 'bars' => $totalBars,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
-                'sort_above_ma100' => $close > $ma100 ? 1 : 0,
-                'sort_above_ma50' => $close > $ma50 ? 1 : 0,
+                'sort_close_vs_high55' => (float) $closeVsHigh55,
+                'sort_close_vs_high20' => (float) $closeVsHigh20,
+                'sort_vol_vs_avg20' => (float) $volToAvg,
             ];
         }
 
         usort($rows, function ($a, $b) {
-            $A = [(int)($a['sort_uptrend'] ?? 0), (int)($a['sort_above_ma100'] ?? 0), (int)($a['sort_above_ma50'] ?? 0), (float)($a['roc13'] ?? 0)];
-            $B = [(int)($b['sort_uptrend'] ?? 0), (int)($b['sort_above_ma100'] ?? 0), (int)($b['sort_above_ma50'] ?? 0), (float)($b['roc13'] ?? 0)];
-            return $B <=> $A; // descending
+            $A = [
+                (int)($a['sort_uptrend'] ?? 0),
+                (float)($a['sort_close_vs_high55'] ?? 0),
+                (float)($a['sort_close_vs_high20'] ?? 0),
+                (float)($a['sort_vol_vs_avg20'] ?? 0),
+            ];
+            $B = [
+                (int)($b['sort_uptrend'] ?? 0),
+                (float)($b['sort_close_vs_high55'] ?? 0),
+                (float)($b['sort_close_vs_high20'] ?? 0),
+                (float)($b['sort_vol_vs_avg20'] ?? 0),
+            ];
+            $result = $B <=> $A; // descending
+
+            if ($result === 0) {
+                return $a['symbol'] <=> $b['symbol'];
+            }
+
+            return $result;
         });
 
-        $rows = array_map(fn($r) => [
-            $r['symbol'],
-            $r['close'],
-            $r['ma50'],
-            $r['ma100'],
-            $r['high20'],
-            $r['high55'],
-            $r['atr14'],
-            $r['roc13'],
-            $r['avg_vol20'],
-            $r['vol_vs_avg20'],
-            $r['close_vs_high20'],
-            $r['close_vs_high55'],
-            $r['uptrend'],
-            $r['bars'],
-        ], $rows);
+        $rankedRows = [];
 
-        $this->table($headers, $rows);
+        foreach (array_values($rows) as $index => $r) {
+            $rankedRows[] = [
+                (string) ($index + 1),
+                $r['symbol'],
+                $r['close'],
+                $r['ma50'],
+                $r['ma100'],
+                $r['high20'],
+                $r['high55'],
+                $r['atr14'],
+                $r['roc13'],
+                $r['avg_vol20'],
+                $r['vol_vs_avg20'],
+                $r['close_vs_high20'],
+                $r['close_vs_high55'],
+                $r['uptrend'],
+                $r['bars'],
+            ];
+        }
+
+        $this->table($headers, $rankedRows);
 
         return Command::SUCCESS;
     }

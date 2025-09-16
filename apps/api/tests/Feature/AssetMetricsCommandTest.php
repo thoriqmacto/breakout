@@ -32,12 +32,12 @@ class AssetMetricsCommandTest extends TestCase
 
         $this->artisan('asset:metrics', ['--sym' => 'AAA'])
             ->expectsTable(
-                ['Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'],
-                [['AAA', '66', '42', '34', '67', '67', '2', '6500', '1057', '1.01', '0.99', '0.99', 'Yes', '66']]
+                ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'],
+                [['1', 'AAA', '66', '42', '34', '67', '67', '2', '6500', '1057', '1.01', '0.99', '0.99', 'Yes', '66']]
             )->assertExitCode(0);
     }
 
-    public function test_orders_rows_by_uptrend_ma_and_roc13(): void
+    public function test_orders_rows_by_uptrend_then_highs_and_volume(): void
     {
         $start = Carbon::parse('2024-01-01');
 
