@@ -2,21 +2,15 @@
 
 namespace App\Services\Backtest;
 
-use App\Services\AssetMetrics;
 use App\Services\IdxTicks;
 
 /**
  * Stateful breakout engine supporting multi-leg trailing stops.
  */
-class BreakoutPositionEngine
+class BreakoutPositionEngine extends PositionEngine
 {
     /** @var array{atr_low_pct:float, entry_mode:string, split_threshold:float, fast_trail_pct:float, slow_trail_pct:float} */
     private array $config;
-
-    /**
-     * @var array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}>
-     */
-    private array $history = [];
 
     private ?BreakoutPosition $position = null;
 
@@ -42,7 +36,7 @@ class BreakoutPositionEngine
      */
     public function onBar(array $bar): array
     {
-        $this->history[] = $bar;
+        $this->recordBar($bar);
         $events = [];
 
         if ($this->position) {
@@ -131,17 +125,18 @@ class BreakoutPositionEngine
      */
     private function detectBreakout(): ?array
     {
-        $count = count($this->history);
-        if ($count < 2) {
+        $last = $this->lastBar();
+        $previous = $this->previousBar();
+        if (! $last || ! $previous) {
             return null;
         }
 
-        $close = $this->history[$count - 1]['close'];
-        $prevClose = $this->history[$count - 2]['close'];
+        $close = $last['close'];
+        $prevClose = $previous['close'];
 
         $levels = [
-            '20wH' => $this->rollingHigh(20 * 5),
-            '55wH' => $this->rollingHigh(55 * 5),
+            '20wH' => $this->rollingHigh(20 * 5, requireFullPeriod: true),
+            '55wH' => $this->rollingHigh(55 * 5, requireFullPeriod: true),
         ];
 
         $breached = [];
@@ -185,37 +180,15 @@ class BreakoutPositionEngine
 
     private function atrRegime(): string
     {
-        $last = $this->history[array_key_last($this->history)] ?? null;
+        $last = $this->lastBar();
         if (! $last || $last['close'] <= 0) {
             return 'low';
         }
 
-        $metrics = new AssetMetrics($this->history);
-        $atr = $metrics->atr(14);
+        $atr = $this->metrics()->atr(14);
         $atrPct = $atr / $last['close'];
 
         return $atrPct <= $this->config['atr_low_pct'] ? 'low' : 'high';
-    }
-
-    private function rollingHigh(int $days): float
-    {
-        $count = count($this->history);
-        if ($count < 2) {
-            return 0.0;
-        }
-
-        $lookback = min($days, $count - 1);
-        if ($lookback <= 0) {
-            return 0.0;
-        }
-
-        $slice = array_slice($this->history, -($lookback + 1), $lookback);
-        if ($slice === []) {
-            return 0.0;
-        }
-
-        $highs = array_map(static fn (array $bar): float => $bar['high'], $slice);
-        return (float) max($highs);
     }
 }
 
