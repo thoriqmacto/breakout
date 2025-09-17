@@ -86,8 +86,8 @@ abstract class PositionEngine
             return 0.0;
         }
 
-        $highs = array_map(static fn (array $bar): float => $bar['high'], $slice);
+        $values = array_map(static fn (array $bar): float => $bar['close'], $slice);
 
-        return (float) max($highs);
+        return (float) max($values);
     }
 }
