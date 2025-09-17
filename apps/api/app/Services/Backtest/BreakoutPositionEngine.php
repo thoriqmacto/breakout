@@ -56,10 +56,10 @@ class BreakoutPositionEngine extends PositionEngine
         }
 
         if ($this->position === null) {
-            $signal = $this->detectBreakout();
+            $atrRegime = $this->atrRegime();
+            $signal = $this->detectBreakout($atrRegime);
             if ($signal !== null) {
                 $entryPrice = IdxTicks::round($bar['close']);
-                $atrRegime = $this->atrRegime();
                 $initialTrail = $atrRegime === 'low'
                     ? $this->config['fast_trail_pct']
                     : $this->config['slow_trail_pct'];
@@ -121,9 +121,10 @@ class BreakoutPositionEngine extends PositionEngine
     /**
      * Determine whether the latest close breaks above a weekly high level.
      *
+     * @param string $atrRegime
      * @return array{level:string, tag:string}|null
      */
-    private function detectBreakout(): ?array
+    private function detectBreakout(string $atrRegime): ?array
     {
         $last = $this->lastBar();
         $previous = $this->previousBar();
@@ -135,17 +136,24 @@ class BreakoutPositionEngine extends PositionEngine
         $prevClose = $previous['close'];
 
         $levels = [
-            '20wH' => $this->rollingHigh(20 * 5, requireFullPeriod: true),
-            '55wH' => $this->rollingHigh(55 * 5, requireFullPeriod: true),
+            '20wH' => [
+                'value' => $this->rollingHigh(20 * 5, requireFullPeriod: true),
+                'full' => $this->hasFullHistory(20 * 5),
+            ],
+            '55wH' => [
+                'value' => $this->rollingHigh(55 * 5),
+                'full' => $this->hasFullHistory(55 * 5),
+            ],
         ];
 
         $breached = [];
-        foreach ($levels as $label => $level) {
+        foreach ($levels as $label => $data) {
+            $level = $data['value'];
             if ($level <= 0.0) {
                 continue;
             }
             if ($prevClose <= $level && $close > $level) {
-                $breached[$label] = $level;
+                $breached[$label] = $data;
             }
         }
 
@@ -153,25 +161,29 @@ class BreakoutPositionEngine extends PositionEngine
             return null;
         }
 
+        $allow55Breakout = isset($breached['55wH'])
+            && ($breached['55wH']['full'] || $atrRegime === 'high');
+        $allow20Breakout = isset($breached['20wH']);
+
         $mode = $this->config['entry_mode'];
         if ($mode === '55w_only') {
-            return isset($breached['55wH']) ? ['level' => '55wH', 'tag' => 'primary'] : null;
+            return $allow55Breakout ? ['level' => '55wH', 'tag' => 'primary'] : null;
         }
 
         if ($mode === 'stacked') {
-            if (isset($breached['55wH'])) {
+            if ($allow55Breakout) {
                 return ['level' => '55wH', 'tag' => 'primary'];
             }
-            if (isset($breached['20wH'])) {
+            if ($allow20Breakout) {
                 return ['level' => '20wH', 'tag' => 'minor'];
             }
             return null;
         }
 
-        if (isset($breached['55wH'])) {
+        if ($allow55Breakout) {
             return ['level' => '55wH', 'tag' => 'primary'];
         }
-        if (isset($breached['20wH'])) {
+        if ($allow20Breakout) {
             return ['level' => '20wH', 'tag' => 'primary'];
         }
 
@@ -189,6 +201,14 @@ class BreakoutPositionEngine extends PositionEngine
         $atrPct = $atr / $last['close'];
 
         return $atrPct <= $this->config['atr_low_pct'] ? 'low' : 'high';
+    }
+
+    /**
+     * Check whether enough prior bars have been processed to cover the requested lookback.
+     */
+    private function hasFullHistory(int $days): bool
+    {
+        return count($this->history) - 1 >= $days;
     }
 }
 
