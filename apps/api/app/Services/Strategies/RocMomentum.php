@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class RocMomentum extends Strategy
+class RocMomentum extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,

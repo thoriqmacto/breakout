@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
-use App\Services\Strategies\Strategy;
+use App\Services\Strategies\BaseStrategy;
 use PHPUnit\Framework\TestCase;
 
 class TickRoundingBacktestTest extends TestCase
@@ -24,7 +24,7 @@ class TickRoundingBacktestTest extends TestCase
     {
         $bars = $this->bars();
         $metrics = new AssetMetrics($bars);
-        $strategy = new class($metrics) extends Strategy {
+        $strategy = new class($metrics) extends BaseStrategy {
             public function signal(): string
             {
                 return $this->metrics->barCount() === 1 ? 'buy' : 'sell';

@@ -7,7 +7,7 @@ use App\Services\IdxTicks;
 /**
  * Stateful breakout engine supporting multi-leg trailing stops.
  */
-class BreakoutPositionEngine extends PositionEngine
+class BreakoutPositionEngine extends BasePositionEngine
 {
     /** @var array{atr_low_pct:float, entry_mode:string, split_threshold:float, fast_trail_pct:float, slow_trail_pct:float} */
     private array $config;

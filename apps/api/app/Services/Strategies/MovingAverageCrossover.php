@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class MovingAverageCrossover extends Strategy
+class MovingAverageCrossover extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,

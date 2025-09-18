@@ -3,10 +3,10 @@
 namespace App\Services\Backtest;
 
 use App\Services\AssetMetrics;
+use App\Services\Strategies\BaseStrategy;
 use App\Services\Strategies\RocMomentum;
-use App\Services\Strategies\Strategy;
 
-class RocMomentumBacktester extends Backtester
+class RocMomentumBacktester extends BaseBacktester
 {
     public function __construct(
         private int $lookback = 13,
@@ -14,7 +14,7 @@ class RocMomentumBacktester extends Backtester
     ) {
     }
 
-    protected function createStrategy(AssetMetrics $metrics): Strategy
+    protected function createStrategy(AssetMetrics $metrics): BaseStrategy
     {
         return new RocMomentum($metrics, $this->lookback, $this->threshold);
     }

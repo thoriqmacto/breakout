@@ -7,7 +7,7 @@ use App\Services\AssetMetrics;
 /**
  * Shared functionality for stateful position engines.
  */
-abstract class PositionEngine
+abstract class BasePositionEngine
 {
     /**
      * @var array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}>

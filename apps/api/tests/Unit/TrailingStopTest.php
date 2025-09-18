@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
-use App\Services\Strategies\Strategy;
+use App\Services\Strategies\BaseStrategy;
 use App\Services\Strategies\TrailingStop;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +23,7 @@ class TrailingStopTest extends TestCase
     {
         $bars = $this->createBars();
         $metrics = new AssetMetrics($bars);
-        $strategy = new class($metrics) extends Strategy {
+        $strategy = new class($metrics) extends BaseStrategy {
             public function __construct(AssetMetrics $metrics)
             {
                 parent::__construct($metrics);

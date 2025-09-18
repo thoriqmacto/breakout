@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class RsiReversal extends Strategy
+class RsiReversal extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,
