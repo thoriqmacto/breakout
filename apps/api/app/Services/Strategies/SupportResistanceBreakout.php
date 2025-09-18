@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class SupportResistanceBreakout extends Strategy
+class SupportResistanceBreakout extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,

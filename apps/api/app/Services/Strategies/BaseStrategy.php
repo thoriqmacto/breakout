@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-abstract class Strategy
+abstract class BaseStrategy
 {
     public function __construct(protected AssetMetrics $metrics)
     {

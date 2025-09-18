@@ -4,7 +4,7 @@ namespace App\Services\Strategies;
 
 use App\Services\AssetMetrics;
 
-class DonchianBreakout extends Strategy
+class DonchianBreakout extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,

@@ -5,7 +5,7 @@ namespace App\Services\Strategies;
 use App\Services\AssetMetrics;
 use App\Services\IdxTicks;
 
-class AtrBreakout extends Strategy
+class AtrBreakout extends BaseStrategy
 {
     public function __construct(
         AssetMetrics $metrics,

@@ -4,11 +4,11 @@ namespace App\Services\Backtest;
 
 use App\Services\AssetMetrics;
 use App\Services\IdxTicks;
-use App\Services\Strategies\Strategy;
+use App\Services\Strategies\BaseStrategy;
 use App\Services\Strategies\TrailingStop;
 use Illuminate\Support\Carbon;
 
-abstract class Backtester
+abstract class BaseBacktester
 {
     /**
      * Run a backtest over the supplied OHLCV bars.
@@ -145,7 +145,7 @@ abstract class Backtester
         ];
     }
 
-    abstract protected function createStrategy(AssetMetrics $metrics): Strategy;
+    abstract protected function createStrategy(AssetMetrics $metrics): BaseStrategy;
 
     /**
      * Calculate performance metrics for a backtest.
