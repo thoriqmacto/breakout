@@ -161,6 +161,17 @@ class BreakoutPositionEngine extends PositionEngine
             return null;
         }
 
+        if (isset($breached['55wH']) && $this->hasFullHistory(55 * 5)) {
+            $majorHigh = $this->rollingHighIntraday(55 * 5, requireFullPeriod: true);
+            if ($majorHigh > 0.0 && $close <= $majorHigh) {
+                unset($breached['55wH']);
+
+                if ($breached === []) {
+                    return null;
+                }
+            }
+        }
+
         $allow55Breakout = isset($breached['55wH'])
             && ($breached['55wH']['full'] || $atrRegime === 'high');
         $allow20Breakout = isset($breached['20wH']);
@@ -201,6 +212,35 @@ class BreakoutPositionEngine extends PositionEngine
         $atrPct = $atr / $last['close'];
 
         return $atrPct <= $this->config['atr_low_pct'] ? 'low' : 'high';
+    }
+
+    /**
+     * Highest intraday high observed within the requested lookback window.
+     */
+    private function rollingHighIntraday(int $days, bool $requireFullPeriod = false): float
+    {
+        $count = count($this->history);
+        if ($count < 2) {
+            return 0.0;
+        }
+
+        if ($requireFullPeriod && $count - 1 < $days) {
+            return 0.0;
+        }
+
+        $lookback = min($days, $count - 1);
+        if ($lookback <= 0) {
+            return 0.0;
+        }
+
+        $slice = array_slice($this->history, -($lookback + 1), $lookback);
+        if ($slice === []) {
+            return 0.0;
+        }
+
+        $values = array_map(static fn (array $bar): float => $bar['high'], $slice);
+
+        return (float) max($values);
     }
 
     /**
