@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\Price;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class LatestPricesTest extends TestCase
@@ -14,6 +16,8 @@ class LatestPricesTest extends TestCase
 
     public function test_it_returns_latest_price_for_all_assets(): void
     {
+        Sanctum::actingAs(User::factory()->create(), ['*']);
+
         $asset1 = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
         $asset2 = Asset::create(['symbol' => 'BBB', 'name' => 'Asset BBB']);
 

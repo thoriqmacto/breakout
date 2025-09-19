@@ -1,61 +1,97 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Breakout API Authentication
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The Breakout API exposes two complementary authentication strategies:
 
-## About Laravel
+1. **Stateful sessions with Laravel Sanctum** for first-party browser and SPA clients.
+2. **Stateless JSON Web Tokens (JWTs)** for third-party integrations and server-to-server access.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This document summarizes the configuration that powers both paths and the HTTP flows available to consumers.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Sanctum SPA Authentication
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sanctum is configured for first-party requests that originate from the `apps/web` frontend. Stateful domains can be controlled through the `SANCTUM_STATEFUL_DOMAINS` environment variable (see `.env.example`). Requests from those origins receive encrypted cookies and CSRF protection.
 
-## Learning Laravel
+The SPA flow mirrors the official Sanctum guidance:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Request the CSRF cookie: `GET /sanctum/csrf-cookie`.
+2. Submit credentials against `POST /api/auth/login` with the `X-XSRF-TOKEN` header.
+3. Subsequent API calls (for example `GET /api/v1/assets`) will authenticate via session cookies and the `auth:sanctum` guard.
+4. Call `POST /api/auth/logout` to end the session and revoke the associated refresh token.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## JWT Authentication for External Clients
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Programmatic consumers can request signed JWT bearer tokens and opt in to refresh-token rotation. Tokens are signed using HMAC (default `HS256`) and linked to Sanctum personal access tokens so that revocations take effect immediately.
 
-## Laravel Sponsors
+### Endpoints
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Create a user account, start a Sanctum session, and return an initial JWT + refresh token. |
+| `POST` | `/api/auth/login` | Exchange credentials for a JWT and refresh token. |
+| `POST` | `/api/auth/refresh` | Rotate the refresh token and issue a new JWT. |
+| `GET` | `/api/auth/me` | Retrieve the authenticated user's profile. Requires `Authorization: Bearer <token>` or Sanctum session cookies. |
+| `POST` | `/api/auth/logout` | Revoke the provided refresh token (and active session, if present). |
+| `GET` | `/api/v1/...` | Versioned API endpoints that require either a Sanctum session or a valid JWT. |
 
-### Premium Partners
+### Token Fields
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Every successful login and refresh returns:
 
-## Contributing
+```json
+{
+  "user": { "id": 1, "name": "Example", "email": "user@example.com" },
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "access_expires_at": "2025-01-01T12:00:00Z",
+  "expires_in": 3600,
+  "token_type": "Bearer",
+  "refresh_token": "1|PLAIN_TEXT_REFRESH_TOKEN",
+  "refresh_expires_at": "2025-01-15T12:00:00Z"
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `access_token` is the JWT used in the `Authorization` header.
+- `expires_in` equals the configured `JWT_TTL` (default 3600 seconds).
+- `refresh_token` is a Sanctum personal access token stored hashed in the database. Keep the plaintext value secure.
 
-## Code of Conduct
+Revoking a refresh token (either manually or by calling `/api/auth/logout`) prevents the associated JWT from authenticating future requests because each JWT embeds the refresh token identifier (`rtid`).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Example cURL Session
 
-## Security Vulnerabilities
+```bash
+# Log in with an API user
+curl -X POST https://api.localhost/api/auth/login \
+  -H "Accept: application/json" \
+  -d 'email=api@example.com' \
+  -d 'password=secret'
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Use the returned access token
+curl https://api.localhost/api/v1/assets/latest-prices \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}"
 
-## License
+# Rotate tokens when the JWT is nearing expiration
+curl -X POST https://api.localhost/api/auth/refresh \
+  -H "Accept: application/json" \
+  -d "refresh_token=${REFRESH_TOKEN}"
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Configuration
+
+Key environment variables (see `.env.example`):
+
+| Variable | Purpose |
+| --- | --- |
+| `SANCTUM_STATEFUL_DOMAINS` | Comma-delimited list of origins that should receive session cookies. |
+| `SANCTUM_TOKEN_PREFIX` | Optional prefix applied to issued personal access tokens. |
+| `JWT_SECRET` | Secret key used to sign JWTs (falls back to `APP_KEY` if unset). |
+| `JWT_TTL` | Access-token lifetime in seconds (default 3600). |
+| `JWT_REFRESH_TTL` | Refresh-token lifetime in seconds (default 14 days). |
+| `JWT_LEEWAY` | Clock skew tolerance in seconds when validating tokens. |
+
+## Running Tests
+
+```bash
+php artisan test --testsuite=Feature --filter=AuthenticationTest
+```
+
+Feature coverage includes registration, login, token refresh, logout, and guarded route access via both Sanctum and JWT.
