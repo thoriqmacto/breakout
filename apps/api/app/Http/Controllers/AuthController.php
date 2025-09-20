@@ -83,7 +83,6 @@ class AuthController extends Controller
             }
 
             /** @var User $user */
-            $guard->setUser($user);
         }
 
         $refreshToken = $this->createRefreshToken($user, $request);
