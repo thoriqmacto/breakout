@@ -36,9 +36,12 @@ class AuthController extends Controller
             'password' => $data['password'],
         ]);
 
-        Auth::guard('web')->login($user);
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            Auth::guard('web')->login($user);
+            $request->session()->regenerate();
+        }
 
+        /** @var User $user */
         $refreshToken = $this->createRefreshToken($user, $request);
         $jwt = $this->jwt->issue($user, $refreshToken->accessToken);
 
@@ -55,16 +58,33 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
-            throw ValidationException::withMessages([
-                'email' => [trans('auth.failed')],
-            ]);
+        $guard = Auth::guard('web');
+
+        if ($request->hasSession()) {
+            if (! $guard->attempt($credentials, $request->boolean('remember'))) {
+                throw ValidationException::withMessages([
+                    'email' => [trans('auth.failed')],
+                ]);
+            }
+
+            $request->session()->regenerate();
+
+            /** @var User $user */
+            $user = $guard->user();
+        } else {
+            $provider = $guard->getProvider();
+
+            $user = $provider?->retrieveByCredentials($credentials);
+
+            if (! $provider || ! $user || ! $provider->validateCredentials($user, $credentials)) {
+                throw ValidationException::withMessages([
+                    'email' => [trans('auth.failed')],
+                ]);
+            }
+
+            /** @var User $user */
+            $guard->setUser($user);
         }
-
-        $request->session()->regenerate();
-
-        /** @var User $user */
-        $user = Auth::guard('web')->user();
 
         $refreshToken = $this->createRefreshToken($user, $request);
         $jwt = $this->jwt->issue($user, $refreshToken->accessToken);
