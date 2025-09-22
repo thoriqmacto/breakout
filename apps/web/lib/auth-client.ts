@@ -56,6 +56,7 @@ export type LoginPayload = {
   email: string
   password: string
   remember?: boolean
+  _token?: string
 }
 
 function readXsrfCookie(): string | null {
@@ -110,6 +111,10 @@ async function ensureXsrfToken(): Promise<string | null> {
   return xsrfTokenPromise
 }
 
+export async function ensureCsrfToken(): Promise<string | null> {
+  return ensureXsrfToken()
+}
+
 export async function loginRequest(payload: LoginPayload): Promise<AuthResponse> {
   const xsrfToken = await ensureXsrfToken()
 
@@ -121,7 +126,10 @@ export async function loginRequest(payload: LoginPayload): Promise<AuthResponse>
       ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     },
     credentials: "include",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      ...payload,
+      ...(xsrfToken && !payload._token ? { _token: xsrfToken } : {}),
+    }),
   })
 
   const data = await parseJson(response)
