@@ -37,8 +37,8 @@ export default function LogoutPage() {
         <h1 className="text-3xl font-semibold">{status === "pending" ? "Signing you out" : "Signed out"}</h1>
         <p className="text-sm text-muted-foreground">
           {status === "pending"
-            ? "We are ending your current session."
-            : "You can close this tab or sign in again when you are ready."}
+            ? "We are revoking your stateless access and refresh tokens."
+            : "Your tokens have been revoked. You can close this tab or sign in again when you are ready."}
         </p>
       </div>
       <Button onClick={() => router.push("/login")} variant="outline">

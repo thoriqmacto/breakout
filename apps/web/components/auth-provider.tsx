@@ -14,9 +14,11 @@ import {
   fetchProfile,
   loginRequest,
   logoutRequest,
+  registerRequest,
   type AuthResponse,
   type AuthUser,
   type LoginPayload,
+  type RegisterPayload,
 } from "@/lib/auth-client"
 
 const STORAGE_KEY = "breakout.auth.session"
@@ -36,10 +38,22 @@ type AuthContextValue = {
   refreshToken: string | null
   loading: boolean
   login: (payload: LoginPayload) => Promise<void>
+  register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+
+function buildSession(response: AuthResponse): AuthSession {
+  return {
+    user: response.user,
+    accessToken: response.access_token,
+    refreshToken: response.refresh_token,
+    accessExpiresAt: response.access_expires_at,
+    refreshExpiresAt: response.refresh_expires_at,
+    tokenType: response.token_type,
+  }
+}
 
 function readStoredSession(): AuthSession | null {
   if (typeof window === "undefined") {
@@ -118,14 +132,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (payload: LoginPayload) => {
     const response: AuthResponse = await loginRequest(payload)
 
-    const newSession: AuthSession = {
-      user: response.user,
-      accessToken: response.access_token,
-      refreshToken: response.refresh_token,
-      accessExpiresAt: response.access_expires_at,
-      refreshExpiresAt: response.refresh_expires_at,
-      tokenType: response.token_type,
-    }
+    const newSession = buildSession(response)
+
+    persistSession(newSession)
+    setSession(newSession)
+  }, [persistSession])
+
+  const register = useCallback(async (payload: RegisterPayload) => {
+    const response: AuthResponse = await registerRequest(payload)
+
+    const newSession = buildSession(response)
 
     persistSession(newSession)
     setSession(newSession)
@@ -153,9 +169,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken: session?.refreshToken ?? null,
       loading,
       login,
+      register,
       logout,
     }),
-    [login, loading, logout, session]
+    [login, loading, logout, register, session]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
