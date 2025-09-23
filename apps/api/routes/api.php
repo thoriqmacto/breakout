@@ -14,7 +14,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
-    Route::middleware(['auth:sanctum,jwt'])->group(function () {
+    Route::middleware(['auth:jwt'])->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
     });

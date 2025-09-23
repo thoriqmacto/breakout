@@ -8,7 +8,7 @@ use App\Services\JwtService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -53,17 +53,13 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $provider = Auth::guard('web')->getProvider();
+        $user = User::query()->where('email', $credentials['email'])->first();
 
-        $user = $provider?->retrieveByCredentials($credentials);
-
-        if (! $provider || ! $user || ! $provider->validateCredentials($user, $credentials)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->getAuthPassword())) {
             throw ValidationException::withMessages([
                 'email' => [trans('auth.failed')],
             ]);
         }
-
-        /** @var User $user */
 
         $refreshToken = $this->createRefreshToken($user, $request);
         $jwt = $this->jwt->issue($user, $refreshToken->accessToken);

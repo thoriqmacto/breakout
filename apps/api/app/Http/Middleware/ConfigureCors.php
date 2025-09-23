@@ -58,7 +58,6 @@ class ConfigureCors
     private function addCorsHeaders(Request $request, Response $response, string $origin): void
     {
         $response->headers->set('Access-Control-Allow-Origin', $origin);
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
         $response->headers->set('Access-Control-Allow-Methods', $this->allowedMethods());
         $response->headers->set('Access-Control-Allow-Headers', $this->allowedHeaders($request));
         $response->headers->set('Access-Control-Max-Age', (string) config('cors.max_age', 86400));
