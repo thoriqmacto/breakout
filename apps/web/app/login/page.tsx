@@ -7,40 +7,18 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ensureCsrfToken } from "@/lib/auth-client"
 
 export default function LoginPage() {
   const router = useRouter()
   const { login, loading, user } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [csrfToken, setCsrfToken] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && user) {
       router.replace("/dashboard")
     }
   }, [loading, router, user])
-
-  useEffect(() => {
-    let active = true
-
-    ensureCsrfToken()
-      .then((token) => {
-        if (active) {
-          setCsrfToken(token)
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setCsrfToken(null)
-        }
-      })
-
-    return () => {
-      active = false
-    }
-  }, [])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,22 +27,15 @@ export default function LoginPage() {
     const email = String(formData.get("email") ?? "").trim()
     const password = String(formData.get("password") ?? "")
     const remember = formData.get("remember") === "on"
-    let token = String(formData.get("_token") ?? "").trim()
 
     setError(null)
     setSubmitting(true)
 
     try {
-      if (!token) {
-        token = (await ensureCsrfToken()) ?? ""
-        setCsrfToken(token || null)
-      }
-
       await login({
         email,
         password,
         remember,
-        _token: token || undefined,
       })
       router.replace("/dashboard")
     } catch (cause) {
@@ -89,8 +60,6 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <input type="hidden" name="_token" value={csrfToken ?? ""} />
-
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email address
