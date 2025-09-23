@@ -36,11 +36,6 @@ class AuthController extends Controller
             'password' => $data['password'],
         ]);
 
-        if ($request->hasSession()) {
-            Auth::guard('web')->login($user);
-            $request->session()->regenerate();
-        }
-
         /** @var User $user */
         $refreshToken = $this->createRefreshToken($user, $request);
         $jwt = $this->jwt->issue($user, $refreshToken->accessToken);
@@ -58,32 +53,17 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $guard = Auth::guard('web');
+        $provider = Auth::guard('web')->getProvider();
 
-        if ($request->hasSession()) {
-            if (! $guard->attempt($credentials, $request->boolean('remember'))) {
-                throw ValidationException::withMessages([
-                    'email' => [trans('auth.failed')],
-                ]);
-            }
+        $user = $provider?->retrieveByCredentials($credentials);
 
-            $request->session()->regenerate();
-
-            /** @var User $user */
-            $user = $guard->user();
-        } else {
-            $provider = $guard->getProvider();
-
-            $user = $provider?->retrieveByCredentials($credentials);
-
-            if (! $provider || ! $user || ! $provider->validateCredentials($user, $credentials)) {
-                throw ValidationException::withMessages([
-                    'email' => [trans('auth.failed')],
-                ]);
-            }
-
-            /** @var User $user */
+        if (! $provider || ! $user || ! $provider->validateCredentials($user, $credentials)) {
+            throw ValidationException::withMessages([
+                'email' => [trans('auth.failed')],
+            ]);
         }
+
+        /** @var User $user */
 
         $refreshToken = $this->createRefreshToken($user, $request);
         $jwt = $this->jwt->issue($user, $refreshToken->accessToken);
@@ -156,12 +136,6 @@ class AuthController extends Controller
             } catch (JwtException) {
                 // If the JWT is invalid we simply skip targeted revocation.
             }
-        }
-
-        if ($request->hasSession()) {
-            Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
         }
 
         return response()->json(['message' => 'Logged out']);

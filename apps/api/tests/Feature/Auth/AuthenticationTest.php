@@ -11,20 +11,6 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_csrf_cookie_endpoint_issues_token(): void
-    {
-        $response = $this->withHeader('Accept', 'application/json')
-            ->get('/sanctum/csrf-cookie');
-
-        $response->assertNoContent();
-        $response->assertCookie('XSRF-TOKEN');
-
-        $xsrfCookie = $response->getCookie('XSRF-TOKEN');
-
-        $this->assertNotNull($xsrfCookie);
-        $this->assertNotSame('', (string) $xsrfCookie?->getValue());
-    }
-
     public function test_user_can_register_and_receive_tokens(): void
     {
         $response = $this->postJson('/api/auth/register', [

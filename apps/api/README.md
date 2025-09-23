@@ -2,36 +2,35 @@
 
 The Breakout API exposes two complementary authentication strategies:
 
-1. **Stateful sessions with Laravel Sanctum** for first-party browser and SPA clients.
-2. **Stateless JSON Web Tokens (JWTs)** for third-party integrations and server-to-server access.
+1. **Stateless bearer tokens backed by Laravel Sanctum personal access tokens.**
+2. **Short-lived JSON Web Tokens (JWTs)** for primary API access, validated by a custom guard.
 
-This document summarizes the configuration that powers both paths and the HTTP flows available to consumers.
+This document summarizes the configuration that powers the stateless authentication flow now used across both the web client and external integrations.
 
-## Sanctum SPA Authentication
+## Token-Based Authentication
 
-Sanctum is configured for first-party requests that originate from the `apps/web` frontend. Stateful domains can be controlled through the `SANCTUM_STATEFUL_DOMAINS` environment variable (see `.env.example`). Requests from those origins receive encrypted cookies and CSRF protection.
+Rather than establishing browser sessions, the API issues bearer tokens that clients store and present on each request. Sanctum personal access tokens back both the refresh process and the custom JWT guard, allowing revocations to invalidate access immediately without relying on cookies or CSRF headers.
 
-The SPA flow mirrors the official Sanctum guidance:
+The high-level flow is:
 
-1. Request the CSRF cookie: `GET /sanctum/csrf-cookie`.
-2. Submit credentials against `POST /api/auth/login` with the `X-XSRF-TOKEN` header.
-3. Subsequent API calls (for example `GET /api/v1/assets`) will authenticate via session cookies and the `auth:sanctum` guard.
-4. Call `POST /api/auth/logout` to end the session and revoke the associated refresh token.
+1. Submit credentials against `POST /api/auth/login`.
+2. Read the returned access (JWT) and refresh (Sanctum PAT) tokens.
+3. Include `Authorization: Bearer <access_token>` on protected requests (for example `GET /api/v1/assets`).
+4. Rotate tokens by calling `POST /api/auth/refresh` with the current refresh token when the access token nears expiration.
+5. Call `POST /api/auth/logout` to revoke the refresh token (and therefore any JWT that references it).
 
-## JWT Authentication for External Clients
-
-Programmatic consumers can request signed JWT bearer tokens and opt in to refresh-token rotation. Tokens are signed using HMAC (default `HS256`) and linked to Sanctum personal access tokens so that revocations take effect immediately.
+No CSRF cookie or session negotiation is required for the login form or subsequent API requests.
 
 ### Endpoints
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `POST` | `/api/auth/register` | Create a user account, start a Sanctum session, and return an initial JWT + refresh token. |
+| `POST` | `/api/auth/register` | Create a user account and return an initial JWT + refresh token. |
 | `POST` | `/api/auth/login` | Exchange credentials for a JWT and refresh token. |
 | `POST` | `/api/auth/refresh` | Rotate the refresh token and issue a new JWT. |
-| `GET` | `/api/auth/me` | Retrieve the authenticated user's profile. Requires `Authorization: Bearer <token>` or Sanctum session cookies. |
-| `POST` | `/api/auth/logout` | Revoke the provided refresh token (and active session, if present). |
-| `GET` | `/api/v1/...` | Versioned API endpoints that require either a Sanctum session or a valid JWT. |
+| `GET` | `/api/auth/me` | Retrieve the authenticated user's profile. Requires `Authorization: Bearer <token>`. |
+| `POST` | `/api/auth/logout` | Revoke the provided refresh token (and invalidate linked JWTs). |
+| `GET` | `/api/v1/...` | Versioned API endpoints that require a valid bearer token. |
 
 ### Token Fields
 
