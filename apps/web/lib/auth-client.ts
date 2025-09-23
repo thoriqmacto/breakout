@@ -1,31 +1,8 @@
 const API_BASE =
   (process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000/api").replace(/\/$/, "")
 
-const API_BASE_ROOT = (() => {
-  try {
-    const url = new URL(API_BASE)
-    const segments = url.pathname.split("/").filter(Boolean)
-
-    if (segments[segments.length - 1] === "api") {
-      segments.pop()
-    }
-
-    url.pathname = segments.length ? `/${segments.join("/")}` : "/"
-    url.search = ""
-    url.hash = ""
-
-    return url.toString().replace(/\/$/, "")
-  } catch {
-    return API_BASE.replace(/\/api$/, "")
-  }
-})()
-
 function buildUrl(path: string) {
   return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`
-}
-
-function buildSanctumUrl(path: string) {
-  return `${API_BASE_ROOT}${path.startsWith("/") ? path : `/${path}`}`
 }
 
 async function parseJson(response: Response) {
@@ -56,82 +33,16 @@ export type LoginPayload = {
   email: string
   password: string
   remember?: boolean
-  _token?: string
-}
-
-function readXsrfCookie(): string | null {
-  if (typeof document === "undefined") {
-    return null
-  }
-
-  const cookies = document.cookie ? document.cookie.split("; ") : []
-
-  for (const cookie of cookies) {
-    if (cookie.startsWith("XSRF-TOKEN=")) {
-      const value = cookie.substring("XSRF-TOKEN=".length)
-
-      try {
-        return decodeURIComponent(value)
-      } catch {
-        return value
-      }
-    }
-  }
-
-  return null
-}
-
-let xsrfTokenPromise: Promise<string | null> | null = null
-
-async function ensureXsrfToken(): Promise<string | null> {
-  if (typeof document === "undefined") {
-    return null
-  }
-
-  const existing = readXsrfCookie()
-
-  if (existing) {
-    return existing
-  }
-
-  if (!xsrfTokenPromise) {
-    xsrfTokenPromise = fetch(buildSanctumUrl("/sanctum/csrf-cookie"), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      credentials: "include",
-    })
-      .then(() => readXsrfCookie())
-      .finally(() => {
-        xsrfTokenPromise = null
-      })
-  }
-
-  return xsrfTokenPromise
-}
-
-export async function ensureCsrfToken(): Promise<string | null> {
-  return ensureXsrfToken()
 }
 
 export async function loginRequest(payload: LoginPayload): Promise<AuthResponse> {
-  const xsrfToken = await ensureXsrfToken()
-
   const response = await fetch(buildUrl("/auth/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     },
-    credentials: "include",
-    body: JSON.stringify({
-      ...payload,
-      ...(xsrfToken && !payload._token ? { _token: xsrfToken } : {}),
-    }),
+    body: JSON.stringify(payload),
   })
 
   const data = await parseJson(response)
@@ -159,8 +70,6 @@ export async function logoutRequest({
   refreshToken?: string | null
   accessToken?: string | null
 }): Promise<void> {
-  const xsrfToken = await ensureXsrfToken()
-
   const body = refreshToken ? { refresh_token: refreshToken } : undefined
 
   const response = await fetch(buildUrl("/auth/logout"), {
@@ -168,11 +77,8 @@ export async function logoutRequest({
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "X-Requested-With": "XMLHttpRequest",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     },
-    credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   })
 
@@ -194,7 +100,6 @@ export async function fetchProfile(accessToken: string): Promise<AuthUser> {
       Accept: "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    credentials: "include",
   })
 
   if (!response.ok) {
