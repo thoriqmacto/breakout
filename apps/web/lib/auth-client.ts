@@ -32,7 +32,19 @@ export type AuthResponse = {
 export type LoginPayload = {
   email: string
   password: string
-  remember?: boolean
+  deviceName?: string
+}
+
+export type RegisterPayload = {
+  name: string
+  email: string
+  password: string
+  passwordConfirmation: string
+  deviceName?: string
+}
+
+function buildDeviceName<T extends { deviceName?: string }>(payload: T) {
+  return payload.deviceName ? { device_name: payload.deviceName } : {}
 }
 
 export async function loginRequest(payload: LoginPayload): Promise<AuthResponse> {
@@ -42,7 +54,11 @@ export async function loginRequest(payload: LoginPayload): Promise<AuthResponse>
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      email: payload.email,
+      password: payload.password,
+      ...buildDeviceName(payload),
+    }),
   })
 
   const data = await parseJson(response)
@@ -52,6 +68,40 @@ export async function loginRequest(payload: LoginPayload): Promise<AuthResponse>
       (data && typeof data === "object" && "message" in data && typeof data.message === "string"
         ? data.message
         : undefined) ?? "Unable to log in with the provided credentials."
+
+    throw new Error(message)
+  }
+
+  if (!data || typeof data !== "object") {
+    throw new Error("Unexpected response from the authentication service.")
+  }
+
+  return data as AuthResponse
+}
+
+export async function registerRequest(payload: RegisterPayload): Promise<AuthResponse> {
+  const response = await fetch(buildUrl("/auth/register"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      password_confirmation: payload.passwordConfirmation,
+      ...buildDeviceName(payload),
+    }),
+  })
+
+  const data = await parseJson(response)
+
+  if (!response.ok) {
+    const message =
+      (data && typeof data === "object" && "message" in data && typeof data.message === "string"
+        ? data.message
+        : undefined) ?? "Unable to register with the provided details."
 
     throw new Error(message)
   }

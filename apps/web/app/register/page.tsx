@@ -8,9 +8,9 @@ import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter()
-  const { login, loading, user } = useAuth()
+  const { register, loading, user } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -24,8 +24,10 @@ export default function LoginPage() {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
+    const name = String(formData.get("name") ?? "").trim()
     const email = String(formData.get("email") ?? "").trim()
     const password = String(formData.get("password") ?? "")
+    const passwordConfirmation = String(formData.get("password_confirmation") ?? "")
     const deviceName =
       typeof window !== "undefined" ? window.navigator.userAgent : undefined
 
@@ -33,9 +35,11 @@ export default function LoginPage() {
     setSubmitting(true)
 
     try {
-      await login({
+      await register({
+        name,
         email,
         password,
+        passwordConfirmation,
         deviceName,
       })
       router.replace("/dashboard")
@@ -43,7 +47,7 @@ export default function LoginPage() {
       setError(
         cause instanceof Error
           ? cause.message
-          : "We could not log you in with those credentials."
+          : "We could not create an account with those details."
       )
     } finally {
       setSubmitting(false)
@@ -52,15 +56,29 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-6 py-16">
-      <div className="w-full max-w-md rounded-xl border bg-background p-8 shadow-sm">
+      <div className="w-full max-w-xl rounded-xl border bg-background p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold">Welcome back</h1>
+          <h1 className="text-2xl font-semibold">Create your Breakout account</h1>
           <p className="text-sm text-muted-foreground">
-            Sign in with your Breakout credentials to continue.
+            Register to receive stateless access and refresh tokens for the API.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium text-foreground">
+              Full name
+            </label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Casey Breaker"
+              autoComplete="name"
+              required
+            />
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email address
@@ -75,27 +93,46 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-foreground">
-              Password
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Your password"
-              autoComplete="current-password"
-              required
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-foreground">
+                Password
+              </label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Create a password"
+                autoComplete="new-password"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="password_confirmation"
+                className="text-sm font-medium text-foreground"
+              >
+                Confirm password
+              </label>
+              <Input
+                id="password_confirmation"
+                name="password_confirmation"
+                type="password"
+                placeholder="Repeat your password"
+                autoComplete="new-password"
+                required
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>Use your Breakout API credentials.</span>
+            <span>Tokens are issued immediately after signup.</span>
             <Link
-              href="/register"
+              href="/login"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Create account
+              Already have an account?
             </Link>
           </div>
 
@@ -106,13 +143,8 @@ export default function LoginPage() {
           ) : null}
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Signing you in..." : "Log in"}
+            {submitting ? "Creating account..." : "Register"}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            <Link href="/" className="underline-offset-4 hover:underline">
-              Return home
-            </Link>
-          </p>
         </form>
       </div>
     </div>
