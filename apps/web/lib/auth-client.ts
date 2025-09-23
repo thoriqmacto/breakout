@@ -99,6 +99,7 @@ async function ensureXsrfToken(): Promise<string | null> {
       method: "GET",
       headers: {
         Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
       },
       credentials: "include",
     })
@@ -123,6 +124,7 @@ export async function loginRequest(payload: LoginPayload): Promise<AuthResponse>
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
       ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     },
     credentials: "include",
@@ -166,6 +168,7 @@ export async function logoutRequest({
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     },
