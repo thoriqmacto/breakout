@@ -443,7 +443,9 @@ class AssetForecastCommand extends Command
 
         $this->line("Generating {$strategyOption} backtest for {$symbol}...");
 
-        $result = $this->hlslBacktestService->run([$symbol => $dailyRows]);
+        $initialCapitalIdr = 10_000_000.0;
+
+        $result = $this->hlslBacktestService->run([$symbol => $dailyRows], $initialCapitalIdr);
         $stats = $result['stats'] ?? [];
         $trades = $result['trades'] ?? [];
 

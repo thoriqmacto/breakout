@@ -243,5 +243,6 @@ class AssetForecastCommandTest extends TestCase
         $backtest = Backtest::first();
         $this->assertSame(['AAA'], $backtest->params_json['symbols'] ?? []);
         $this->assertSame('HLSLBreakout', $backtest->params_json['strategy'] ?? null);
+        $this->assertSame(10_000_000.0, (float) ($backtest->stats_json['initial_capital'] ?? 0.0));
     }
 }
