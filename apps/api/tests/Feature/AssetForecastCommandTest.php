@@ -100,6 +100,67 @@ class AssetForecastCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_filter_option_requires_all(): void
+    {
+        $exitCode = Artisan::call('asset:forecast', ['--filter' => 'uptrend']);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString('The --filter option requires --all.', Artisan::output());
+    }
+
+    public function test_filter_uptrend_shows_only_uptrend_symbols(): void
+    {
+        $uptrend = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Uptrend Asset',
+        ]);
+
+        $downtrend = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Sideways Asset',
+        ]);
+
+        $uptrendRows = [
+            ['date' => '2024-01-01', 'open' => 10, 'high' => 11, 'low' => 9, 'close' => 10, 'volume' => 1_000],
+            ['date' => '2024-01-08', 'open' => 11, 'high' => 12, 'low' => 10, 'close' => 11, 'volume' => 1_200],
+            ['date' => '2024-01-15', 'open' => 12, 'high' => 13, 'low' => 11, 'close' => 12, 'volume' => 1_100],
+            ['date' => '2024-01-22', 'open' => 13, 'high' => 14, 'low' => 12, 'close' => 13, 'volume' => 1_050],
+            ['date' => '2024-01-29', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 1_000],
+            ['date' => '2024-02-05', 'open' => 15, 'high' => 16, 'low' => 14, 'close' => 15, 'volume' => 950],
+            ['date' => '2024-02-12', 'open' => 16, 'high' => 17, 'low' => 15, 'close' => 16, 'volume' => 900],
+            ['date' => '2024-02-19', 'open' => 17, 'high' => 18, 'low' => 16, 'close' => 17, 'volume' => 850],
+        ];
+
+        $downtrendRows = [
+            ['date' => '2024-01-01', 'open' => 20, 'high' => 21, 'low' => 19, 'close' => 20, 'volume' => 1_000],
+            ['date' => '2024-01-08', 'open' => 19, 'high' => 20, 'low' => 18, 'close' => 19, 'volume' => 1_000],
+            ['date' => '2024-01-15', 'open' => 18, 'high' => 19, 'low' => 17, 'close' => 18, 'volume' => 1_000],
+            ['date' => '2024-01-22', 'open' => 17, 'high' => 18, 'low' => 16, 'close' => 17, 'volume' => 1_000],
+            ['date' => '2024-01-29', 'open' => 16, 'high' => 17, 'low' => 15, 'close' => 16, 'volume' => 1_000],
+            ['date' => '2024-02-05', 'open' => 15, 'high' => 16, 'low' => 14, 'close' => 15, 'volume' => 1_000],
+            ['date' => '2024-02-12', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 1_000],
+            ['date' => '2024-02-19', 'open' => 13, 'high' => 14, 'low' => 12, 'close' => 13, 'volume' => 1_000],
+        ];
+
+        foreach ($uptrendRows as $row) {
+            Price::create($row + ['asset_id' => $uptrend->id]);
+        }
+
+        foreach ($downtrendRows as $row) {
+            Price::create($row + ['asset_id' => $downtrend->id]);
+        }
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--all' => true,
+            '--filter' => 'uptrend',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        $output = Artisan::output();
+        $this->assertStringContainsString('AAA', $output);
+        $this->assertStringNotContainsString('BBB', $output);
+    }
+
     public function test_includes_backtest_results_and_trades(): void
     {
         $asset = Asset::create([
