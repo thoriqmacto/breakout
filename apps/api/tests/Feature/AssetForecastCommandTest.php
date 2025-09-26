@@ -445,6 +445,108 @@ class AssetForecastCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_combines_trade_tables_for_multiple_symbols(): void
+    {
+        $assetA = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $assetB = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Asset BBB',
+        ]);
+
+        Price::create([
+            'asset_id' => $assetA->id,
+            'date' => '2024-01-01',
+            'open' => 10,
+            'high' => 11,
+            'low' => 9,
+            'close' => 10,
+            'volume' => 1_000,
+        ]);
+
+        Price::create([
+            'asset_id' => $assetB->id,
+            'date' => '2024-01-01',
+            'open' => 20,
+            'high' => 22,
+            'low' => 19,
+            'close' => 21,
+            'volume' => 2_000,
+        ]);
+
+        Backtest::create([
+            'run_id' => 'run-aaa',
+            'created_at' => now(),
+            'params_json' => ['symbols' => ['AAA']],
+        ]);
+
+        Backtest::create([
+            'run_id' => 'run-bbb',
+            'created_at' => now(),
+            'params_json' => ['symbols' => ['BBB']],
+        ]);
+
+        BacktestTrade::create([
+            'run_id' => 'run-aaa',
+            'asset_id' => $assetA->id,
+            'entry_date' => '2024-01-10',
+            'entry_px' => 10,
+            'exit_date' => '2024-01-20',
+            'exit_px' => 11,
+            'units' => 100,
+            'pnl' => 100,
+        ]);
+
+        BacktestTrade::create([
+            'run_id' => 'run-bbb',
+            'asset_id' => $assetB->id,
+            'entry_date' => '2024-02-10',
+            'entry_px' => 20,
+            'exit_date' => '2024-02-25',
+            'exit_px' => 23,
+            'units' => 50,
+            'pnl' => 150,
+        ]);
+
+        $this->artisan('asset:forecast', [
+            '--sym' => ['AAA', 'BBB'],
+            '--bt-result' => true,
+            '--trades' => true,
+        ])
+            ->expectsOutputToContain('Backtest Summary for AAA')
+            ->expectsOutputToContain('Backtest Summary for BBB')
+            ->expectsOutputToContain('Backtest Trades')
+            ->expectsTable(
+                ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
+                [
+                    [
+                        1,
+                        'AAA',
+                        '2024-01-10',
+                        '2024-01-20',
+                        '10',
+                        '11',
+                        '100',
+                        '100',
+                    ],
+                    [
+                        2,
+                        'BBB',
+                        '2024-02-10',
+                        '2024-02-25',
+                        '20',
+                        '23',
+                        '50',
+                        '150',
+                    ],
+                ]
+            )
+            ->assertExitCode(0);
+    }
+
     public function test_trades_option_requires_backtest_results(): void
     {
         $asset = Asset::create([
