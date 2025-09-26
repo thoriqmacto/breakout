@@ -26,20 +26,42 @@ class AssetMetrics
     private function parseDate(array $bar): ?\DateTimeImmutable
     {
         $raw = $bar['date'] ?? null;
-        if (!is_string($raw) || $raw === '') {
+        if (!is_string($raw)) {
             return null;
         }
 
-        $parsed = \DateTimeImmutable::createFromFormat('d/m/Y', $raw);
-        if ($parsed instanceof \DateTimeImmutable) {
-            return $parsed;
-        }
-
-        try {
-            return new \DateTimeImmutable($raw);
-        } catch (\Throwable) {
+        $raw = trim($raw);
+        if ($raw === '') {
             return null;
         }
+
+        $formats = [
+            '!Y-m-d',
+            '!d/m/Y',
+            '!m/d/Y',
+            '!Y/m/d',
+            \DateTimeInterface::ATOM,
+            \DateTimeInterface::RFC3339_EXTENDED,
+            \DateTimeInterface::RFC3339,
+            'Y-m-d H:i:s',
+        ];
+
+        foreach ($formats as $format) {
+            $parsed = \DateTimeImmutable::createFromFormat($format, $raw);
+            if (!$parsed instanceof \DateTimeImmutable) {
+                continue;
+            }
+
+            $errors = \DateTimeImmutable::getLastErrors();
+            $warnings = is_array($errors) ? ($errors['warning_count'] ?? 0) : 0;
+            $errorCount = is_array($errors) ? ($errors['error_count'] ?? 0) : 0;
+
+            if ($warnings === 0 && $errorCount === 0) {
+                return $parsed;
+            }
+        }
+
+        return null;
     }
 
     public function lastVolume(): float
