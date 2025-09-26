@@ -405,13 +405,17 @@ class AssetForecastCommand extends Command
                 }
 
                 $rows = [];
+                $formatPrice = static fn ($price) => $price !== null
+                    ? sprintf('%.0f', (float) $price)
+                    : '—';
+
                 foreach ($trades as $index => $trade) {
                     $rows[] = [
                         $index + 1,
                         $trade->entry_date?->toDateString() ?? '—',
                         $trade->exit_date?->toDateString() ?? '—',
-                        sprintf('%.0f', (float) $trade->entry_px),
-                        sprintf('%.0f', (float) ($trade->exit_px ?? 0.0)),
+                        $formatPrice($trade->entry_px),
+                        $formatPrice($trade->exit_px),
                         sprintf('%.0f', (float) $trade->units),
                         sprintf('%.2f', (float) ($trade->pnl ?? 0.0)),
                     ];
@@ -525,6 +529,18 @@ class AssetForecastCommand extends Command
             return number_format((float) $value, $decimals);
         };
 
+        $formatProfitFactor = static function (array $values) use ($formatNumber): string {
+            if (! array_key_exists('profit_factor', $values)) {
+                return '—';
+            }
+
+            if ($values['profit_factor'] === null) {
+                return '—';
+            }
+
+            return $formatNumber($values['profit_factor']);
+        };
+
         return [
             ['Initial Capital', $formatNumber($stats['initial_capital'] ?? null)],
             ['Final Equity', $formatNumber($stats['final_equity'] ?? null)],
@@ -535,9 +551,7 @@ class AssetForecastCommand extends Command
             ['Win Rate %', $formatNumber($stats['win_rate_pct'] ?? null)],
             ['Avg Win %', $formatNumber($stats['avg_win_pct'] ?? null)],
             ['Avg Loss %', $formatNumber($stats['avg_loss_pct'] ?? null)],
-            ['Profit Factor', $stats['profit_factor'] === null
-                ? '—'
-                : $formatNumber($stats['profit_factor'])],
+            ['Profit Factor', $formatProfitFactor($stats)],
         ];
     }
 
