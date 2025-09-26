@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\AssetMetrics;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class AssetMetricsTest extends TestCase
@@ -36,6 +37,52 @@ class AssetMetricsTest extends TestCase
         return new AssetMetrics($this->makeBars());
     }
 
+    /**
+     * @return array<int, array{date:string, open:float, high:float, low:float, close:float, volume:float}>
+     */
+    private function loadHistoricalBars(string $symbol): array
+    {
+        $path = dirname(__DIR__, 2) . "/database/seeders/data/historical/{$symbol}.csv";
+        if (!is_file($path)) {
+            $this->fail("Historical data for symbol {$symbol} not found at {$path}");
+        }
+
+        $handle = fopen($path, 'rb');
+        if ($handle === false) {
+            $this->fail("Unable to open historical data file: {$path}");
+        }
+
+        $header = fgetcsv($handle);
+        if ($header === false) {
+            fclose($handle);
+            $this->fail("Historical data file {$path} is empty");
+        }
+
+        $bars = [];
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) < 6) {
+                continue;
+            }
+
+            [$date, $open, $high, $low, $close, $volume] = $row;
+            $parsed = DateTimeImmutable::createFromFormat('d/m/Y', $date);
+            $bars[] = [
+                'date' => $parsed ? $parsed->format('Y-m-d') : $date,
+                'open' => (float) $open,
+                'high' => (float) $high,
+                'low' => (float) $low,
+                'close' => (float) $close,
+                'volume' => (float) $volume,
+            ];
+        }
+
+        fclose($handle);
+
+        usort($bars, static fn(array $a, array $b): int => strcmp($a['date'], $b['date']));
+
+        return $bars;
+    }
+
     public function test_atr_matches_manual_value(): void
     {
         $metrics = $this->metrics();
@@ -52,6 +99,15 @@ class AssetMetricsTest extends TestCase
         $this->assertEqualsWithDelta(250.5, $metrics->movingAverage(100), 0.0001);
         $this->assertEqualsWithDelta(275.5, $metrics->movingAverage(50), 0.0001);
         $this->assertEqualsWithDelta(225.5, $metrics->movingAverage(30), 0.0001);
+    }
+
+    public function test_moving_average_weeks_matches_historical_average(): void
+    {
+        $bars = $this->loadHistoricalBars('BUMI');
+        $metrics = new AssetMetrics($bars);
+
+        $this->assertEqualsWithDelta(115.06, $metrics->movingAverageWeeks(10), 0.0001);
+        $this->assertEqualsWithDelta(110.2, $metrics->movingAverageWeeks(30), 0.0001);
     }
 
     public function test_support_and_resistance_levels(): void
