@@ -23,7 +23,7 @@ class AssetBacktest extends Command
      * @var string
      */
     protected $signature = 'asset:backtest
-        {--sym= : Asset ticker symbol}
+        {--sym=* : Comma-separated or repeated tickers to backtest}
         {--strategy=DonchBO : Strategy class name}
         {--capital=3000000 : Starting capital}
         {--compare : Compare multiple strategies}
@@ -31,8 +31,7 @@ class AssetBacktest extends Command
         {--trailing= : Trailing stop definition (percent:0.05 or atr:3,14)}
         {--trailing-strategies=* : Strategies to apply the trailing stop}
         {--trades : Print all trades during backtest}
-        {--tickers= : Comma-separated tickers for the HLSL breakout scan}
-        {--board-lot=100 : Board lot size for the breakout scan}';
+';
 
     /**
      * The console command description.
@@ -51,43 +50,6 @@ class AssetBacktest extends Command
      */
     public function handle(): int
     {
-        $tickerOption = (string) ($this->option('tickers') ?? '');
-
-        if (trim($tickerOption) !== '') {
-            if ($this->option('compare')) {
-                $this->error('The --tickers option cannot be combined with --compare.');
-                return Command::FAILURE;
-            }
-
-            return $this->runHlslBreakout($tickerOption);
-        }
-
-        $symbol = strtoupper((string) $this->option('sym'));
-        if ($symbol === '') {
-            $this->error('Symbol must be provided via --sym option.');
-            return Command::FAILURE;
-        }
-
-        $asset = Asset::where('symbol', $symbol)->first();
-        if (!$asset) {
-            $this->error("Asset {$symbol} not found.");
-            return Command::FAILURE;
-        }
-
-        $prices = $asset->prices()->orderBy('date')->get(['date','open','high','low','close']);
-        if ($prices->isEmpty()) {
-            $this->error('No price data available for this asset.');
-            return Command::FAILURE;
-        }
-
-        $bars = $prices->map(fn($p) => [
-            'date'  => $p->date->toDateString(),
-            'open'  => (float) $p->open,
-            'high'  => (float) $p->high,
-            'low'   => (float) $p->low,
-            'close' => (float) $p->close,
-        ])->all();
-
         $map = [
             'DonchBO' => DonchianBreakout::class,
             'AtrBO' => AtrBreakout::class,
@@ -96,6 +58,31 @@ class AssetBacktest extends Command
             'RsiReversal' => RsiReversal::class,
             'SR_BO' => SupportResistanceBreakout::class,
         ];
+
+        $tickers = $this->resolveTickers();
+        if ($tickers === []) {
+            $this->error('At least one ticker must be provided via --sym.');
+            return Command::FAILURE;
+        }
+
+        $strategyOption = (string) $this->option('strategy');
+        if (strcasecmp($strategyOption, 'HLSL') === 0) {
+            $strategyOption = 'HLSLBreakout';
+        }
+
+        if ($strategyOption === 'HLSLBreakout') {
+            if ($this->option('compare')) {
+                $this->error('The HLSLBreakout strategy cannot be combined with --compare.');
+                return Command::FAILURE;
+            }
+
+            return $this->runHlslBreakout($tickers);
+        }
+
+        if (! array_key_exists($strategyOption, $map)) {
+            $this->error("Unknown strategy: {$strategyOption}");
+            return Command::FAILURE;
+        }
 
         $capital = (float) $this->option('capital');
 
@@ -144,113 +131,145 @@ class AssetBacktest extends Command
                 $names = array_keys($map);
             }
 
-            $metricsByName = [];
             foreach ($names as $name) {
-                if (!array_key_exists($name, $map)) {
+                if (! array_key_exists($name, $map)) {
                     $this->error("Unknown strategy: {$name}");
                     return Command::FAILURE;
                 }
-                $class = $map[$name];
-                $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
-                $strategy = $useTrailing
-                    ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
-                    : new $class(new AssetMetrics([$bars[0]]));
-                $backtester = new GenericBacktester($strategy);
-                $result = $backtester->run($bars, $capital);
-                $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
-                $metricsByName[$name] = $this->formatMetrics($metrics);
             }
-            $this->info("Symbol: {$symbol}");
-            $this->info('Bars: ' . count($bars));
 
-            $metricLabels = [
-                'cagr' => 'CAGR',
-                'maxdd' => 'MaxDD',
-                'sharpe' => 'Sharpe',
-                'winrate' => 'Win-rate',
-                'profit_factor' => 'Profit Factor',
-                'trades' => 'Trades',
-            ];
+            $this->info('Tickers: ' . implode(', ', $tickers));
 
-            $rows = [];
-            foreach ($metricLabels as $key => $label) {
-                $row = [$label];
-                foreach ($names as $name) {
-                    $row[] = (string) $metricsByName[$name][$key];
+            $processed = 0;
+            foreach ($tickers as $symbol) {
+                $bars = $this->loadBars($symbol);
+                if ($bars === null) {
+                    continue;
                 }
-                $rows[] = $row;
+
+                $processed++;
+
+                $this->line('');
+                $this->info("Ticker: {$symbol}");
+                $this->info('Bars: ' . count($bars));
+
+                $metricsByName = [];
+                foreach ($names as $name) {
+                    $class = $map[$name];
+                    $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
+                    $strategy = $useTrailing
+                        ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
+                        : new $class(new AssetMetrics([$bars[0]]));
+                    $backtester = new GenericBacktester($strategy);
+                    $result = $backtester->run($bars, $capital);
+                    $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
+                    $metricsByName[$name] = $this->formatMetrics($metrics);
+                }
+
+                $metricLabels = [
+                    'cagr' => 'CAGR',
+                    'maxdd' => 'MaxDD',
+                    'sharpe' => 'Sharpe',
+                    'winrate' => 'Win-rate',
+                    'profit_factor' => 'Profit Factor',
+                    'trades' => 'Trades',
+                ];
+
+                $rows = [];
+                foreach ($metricLabels as $key => $label) {
+                    $row = [$label];
+                    foreach ($names as $name) {
+                        $row[] = (string) $metricsByName[$name][$key];
+                    }
+                    $rows[] = $row;
+                }
+
+                $headers = array_merge(['Metric'], $names);
+                $this->table($headers, $rows);
             }
 
-            $headers = array_merge(['Metric'], $names);
-            $this->table($headers, $rows);
+            if ($processed === 0) {
+                $this->error('No price data available for the provided tickers.');
+                return Command::FAILURE;
+            }
+
             return Command::SUCCESS;
         }
 
-        $name = (string) $this->option('strategy');
-        if (!array_key_exists($name, $map)) {
-            $this->error("Unknown strategy: {$name}");
-            return Command::FAILURE;
-        }
+        $this->info('Tickers: ' . implode(', ', $tickers));
 
-        $class = $map[$name];
-        $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
-        $strategy = $useTrailing
-            ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
-            : new $class(new AssetMetrics([$bars[0]]));
-        $backtester = new GenericBacktester($strategy);
+        $class = $map[$strategyOption];
+        $processed = 0;
 
-        $result = $backtester->run($bars, $capital);
-
-        $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
-        $metrics = $this->formatMetrics($metrics);
-
-        $rows = [
-            ['CAGR', $metrics['cagr']],
-            ['MaxDD', $metrics['maxdd']],
-            ['Sharpe', $metrics['sharpe']],
-            ['Win-rate', $metrics['winrate']],
-            ['Profit Factor', $metrics['profit_factor']],
-            ['Trades', (string) $metrics['trades']],
-        ];
-
-        $this->table(['Metric', 'Value'], $rows);
-
-        if ($this->option('trades')) {
-            $this->info("Strategy: {$name}");
-
-            $tradeRows = [];
-            foreach ($result['trades'] as $i => $t) {
-                $tradeRows[] = [
-                    $i + 1,
-                    $t['entry_date'],
-                    $t['exit_date'],
-                    sprintf('%.2f', $t['entry_price']),
-                    sprintf('%.2f', $t['exit_price']),
-                    (string) $t['shares'],
-                    sprintf('%.2f', $t['pnl']),
-                ];
+        foreach ($tickers as $symbol) {
+            $bars = $this->loadBars($symbol);
+            if ($bars === null) {
+                continue;
             }
 
-            $this->table(
-                ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
-                $tradeRows
-            );
+            $processed++;
+
+            $this->line('');
+            $this->info("Ticker: {$symbol}");
+            $this->info('Bars: ' . count($bars));
+
+            $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($strategyOption, $trailingStrategies, true));
+            $strategy = $useTrailing
+                ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
+                : new $class(new AssetMetrics([$bars[0]]));
+            $backtester = new GenericBacktester($strategy);
+
+            $result = $backtester->run($bars, $capital);
+
+            $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
+            $metrics = $this->formatMetrics($metrics);
+
+            $rows = [
+                ['CAGR', $metrics['cagr']],
+                ['MaxDD', $metrics['maxdd']],
+                ['Sharpe', $metrics['sharpe']],
+                ['Win-rate', $metrics['winrate']],
+                ['Profit Factor', $metrics['profit_factor']],
+                ['Trades', (string) $metrics['trades']],
+            ];
+
+            $this->table(['Metric', 'Value'], $rows);
+
+            if ($this->option('trades')) {
+                $this->info("Strategy: {$strategyOption}");
+
+                $tradeRows = [];
+                foreach ($result['trades'] as $i => $t) {
+                    $tradeRows[] = [
+                        $i + 1,
+                        $t['entry_date'],
+                        $t['exit_date'],
+                        sprintf('%.2f', $t['entry_price']),
+                        sprintf('%.2f', $t['exit_price']),
+                        (string) $t['shares'],
+                        sprintf('%.2f', $t['pnl']),
+                    ];
+                }
+
+                $this->table(
+                    ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
+                    $tradeRows
+                );
+            }
+        }
+
+        if ($processed === 0) {
+            $this->error('No price data available for the provided tickers.');
+            return Command::FAILURE;
         }
 
         return Command::SUCCESS;
     }
 
-    private function runHlslBreakout(string $tickerOption): int
+    private function runHlslBreakout(array $tickers): int
     {
-        $tickers = array_filter(array_map('trim', explode(',', $tickerOption)));
-        $tickers = array_values(array_unique(array_map('strtoupper', $tickers)));
-
-        if ($tickers === []) {
-            $this->error('At least one ticker must be provided via --tickers.');
-            return Command::FAILURE;
-        }
-
         $dataByTicker = [];
+        $barCounts = [];
         foreach ($tickers as $ticker) {
             $asset = Asset::where('symbol', $ticker)->first();
             if (! $asset) {
@@ -278,6 +297,7 @@ class AssetBacktest extends Command
                     'volume' => (float) $price->volume,
                 ];
             })->all();
+            $barCounts[$ticker] = count($dataByTicker[$ticker]);
         }
 
         if ($dataByTicker === []) {
@@ -286,16 +306,15 @@ class AssetBacktest extends Command
         }
 
         $initialCapital = (float) $this->option('capital');
-        $boardLotOption = $this->option('board-lot');
-        $boardLot = is_numeric($boardLotOption) ? max((int) $boardLotOption, 1) : 100;
-
-        $result = $this->hlslBacktest->run($dataByTicker, $initialCapital, $boardLot);
+        $result = $this->hlslBacktest->run($dataByTicker, $initialCapital, 100);
         $stats = $result['stats'] ?? [];
 
         $this->line('');
         $this->info('HLSL Breakout Backtest');
         $this->line('Tickers: ' . implode(', ', array_keys($dataByTicker)));
-        $this->line('Board Lot: ' . $boardLot);
+        foreach ($barCounts as $ticker => $count) {
+            $this->line("{$ticker} Bars: {$count}");
+        }
 
         $statRows = [
             ['Initial Capital', number_format($stats['initial_capital'] ?? $initialCapital, 2)],
@@ -353,6 +372,63 @@ class AssetBacktest extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function resolveTickers(): array
+    {
+        $raw = $this->option('sym');
+        if (is_string($raw)) {
+            $raw = [$raw];
+        } elseif (! is_array($raw)) {
+            $raw = [];
+        }
+
+        $values = [];
+        foreach ($raw as $value) {
+            if (is_string($value) && trim($value) !== '') {
+                $values = array_merge($values, explode(',', $value));
+            }
+        }
+
+        $values = array_map(static fn ($ticker) => strtoupper(trim((string) $ticker)), $values);
+        $values = array_filter($values, static fn ($ticker) => $ticker !== '');
+
+        return array_values(array_unique($values));
+    }
+
+    /**
+     * @return array<int, array{date:string, open:float, high:float, low:float, close:float}>|null
+     */
+    private function loadBars(string $symbol): ?array
+    {
+        $asset = Asset::where('symbol', $symbol)->first();
+        if (! $asset) {
+            $this->warn("Asset {$symbol} not found. Skipping.");
+            return null;
+        }
+
+        $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close']);
+        if ($prices->isEmpty()) {
+            $this->warn("No price data available for {$symbol}. Skipping.");
+            return null;
+        }
+
+        return $prices->map(static function ($price) {
+            $date = $price->date instanceof \DateTimeInterface
+                ? $price->date->toDateString()
+                : (string) $price->date;
+
+            return [
+                'date' => $date,
+                'open' => (float) $price->open,
+                'high' => (float) $price->high,
+                'low' => (float) $price->low,
+                'close' => (float) $price->close,
+            ];
+        })->all();
     }
 
     /**

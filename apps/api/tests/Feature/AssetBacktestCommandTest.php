@@ -35,6 +35,9 @@ class AssetBacktestCommandTest extends TestCase
         $exit = Artisan::call('asset:backtest', ['--sym' => 'AAA', '--strategy' => $strategy]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
+        $this->assertStringContainsString('Tickers: AAA', $output);
+        $this->assertStringContainsString('Ticker: AAA', $output);
+        $this->assertStringContainsString('Bars: 40', $output);
         $this->assertStringContainsString('CAGR', $output);
         $this->assertStringContainsString('Trades', $output);
     }
@@ -82,6 +85,8 @@ class AssetBacktestCommandTest extends TestCase
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
+        $this->assertStringContainsString('Tickers: AAA', $output);
+        $this->assertStringContainsString('Ticker: AAA', $output);
         $this->assertStringContainsString('AtrBO', $output);
         $this->assertStringContainsString('DonchBO', $output);
         $this->assertStringContainsString('RocMomentum', $output);
@@ -146,6 +151,8 @@ class AssetBacktestCommandTest extends TestCase
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
+        $this->assertStringContainsString('Tickers: AAA', $output);
+        $this->assertStringContainsString('Ticker: AAA', $output);
         $this->assertStringContainsString('AtrBO', $output);
         $this->assertStringContainsString('DonchBO', $output);
         $this->assertStringContainsString('CAGR', $output);
@@ -175,12 +182,14 @@ class AssetBacktestCommandTest extends TestCase
         ]);
         $this->assertSame(0, $exit);
         $output = Artisan::output();
+        $this->assertStringContainsString('Tickers: AAA', $output);
+        $this->assertStringContainsString('Ticker: AAA', $output);
         $this->assertStringContainsString('Strategy: DonchBO', $output);
         $this->assertStringContainsString('| # | Entry Date', $output);
         $this->assertStringContainsString('Exit Date', $output);
     }
 
-    public function test_runs_hlsl_breakout_scan_with_tickers_option(): void
+    public function test_runs_hlsl_breakout_scan_with_sym_option(): void
     {
         $assetA = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
         $assetB = Asset::create(['symbol' => 'BBB', 'name' => 'Asset BBB']);
@@ -212,15 +221,17 @@ class AssetBacktestCommandTest extends TestCase
         }
 
         $exit = Artisan::call('asset:backtest', [
-            '--tickers' => 'AAA,BBB',
+            '--sym' => 'AAA,BBB',
             '--capital' => 100000,
-            '--board-lot' => 100,
+            '--strategy' => 'HLSLBreakout',
         ]);
 
         $this->assertSame(0, $exit);
         $output = Artisan::output();
         $this->assertStringContainsString('HLSL Breakout Backtest', $output);
         $this->assertStringContainsString('Tickers: AAA, BBB', $output);
+        $this->assertStringContainsString('AAA Bars: 40', $output);
+        $this->assertStringContainsString('BBB Bars: 40', $output);
         $this->assertStringContainsString('Final Equity', $output);
     }
 
