@@ -4,15 +4,16 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Asset;
+use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
+use App\Services\Backtest\HLSLBreakoutBacktestService;
 use App\Services\Strategies\AtrBreakout;
 use App\Services\Strategies\DonchianBreakout;
-use App\Services\Strategies\RocMomentum;
-use App\Services\Strategies\TrailingStop;
 use App\Services\Strategies\MovingAverageCrossover;
+use App\Services\Strategies\RocMomentum;
 use App\Services\Strategies\RsiReversal;
 use App\Services\Strategies\SupportResistanceBreakout;
-use App\Services\AssetMetrics;
+use App\Services\Strategies\TrailingStop;
 
 class AssetBacktest extends Command
 {
@@ -29,7 +30,9 @@ class AssetBacktest extends Command
         {--strategies=* : Comma-separated list when using --compare}
         {--trailing= : Trailing stop definition (percent:0.05 or atr:3,14)}
         {--trailing-strategies=* : Strategies to apply the trailing stop}
-        {--trades : Print all trades during backtest}';
+        {--trades : Print all trades during backtest}
+        {--tickers= : Comma-separated tickers for the HLSL breakout scan}
+        {--board-lot=100 : Board lot size for the breakout scan}';
 
     /**
      * The console command description.
@@ -38,11 +41,27 @@ class AssetBacktest extends Command
      */
     protected $description = 'Run a backtest for a given asset symbol and strategy';
 
+    public function __construct(private readonly HLSLBreakoutBacktestService $hlslBacktest)
+    {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
+        $tickerOption = (string) ($this->option('tickers') ?? '');
+
+        if (trim($tickerOption) !== '') {
+            if ($this->option('compare')) {
+                $this->error('The --tickers option cannot be combined with --compare.');
+                return Command::FAILURE;
+            }
+
+            return $this->runHlslBreakout($tickerOption);
+        }
+
         $symbol = strtoupper((string) $this->option('sym'));
         if ($symbol === '') {
             $this->error('Symbol must be provided via --sym option.');
@@ -216,6 +235,121 @@ class AssetBacktest extends Command
                 ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Shares', 'PnL'],
                 $tradeRows
             );
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function runHlslBreakout(string $tickerOption): int
+    {
+        $tickers = array_filter(array_map('trim', explode(',', $tickerOption)));
+        $tickers = array_values(array_unique(array_map('strtoupper', $tickers)));
+
+        if ($tickers === []) {
+            $this->error('At least one ticker must be provided via --tickers.');
+            return Command::FAILURE;
+        }
+
+        $dataByTicker = [];
+        foreach ($tickers as $ticker) {
+            $asset = Asset::where('symbol', $ticker)->first();
+            if (! $asset) {
+                $this->warn("Asset {$ticker} not found. Skipping.");
+                continue;
+            }
+
+            $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
+            if ($prices->isEmpty()) {
+                $this->warn("No OHLCV data available for {$ticker}. Skipping.");
+                continue;
+            }
+
+            $dataByTicker[$ticker] = $prices->map(function ($price) {
+                $date = $price->date instanceof \DateTimeInterface
+                    ? $price->date->toDateString()
+                    : (string) $price->date;
+
+                return [
+                    'date' => $date,
+                    'open' => (float) $price->open,
+                    'high' => (float) $price->high,
+                    'low' => (float) $price->low,
+                    'close' => (float) $price->close,
+                    'volume' => (float) $price->volume,
+                ];
+            })->all();
+        }
+
+        if ($dataByTicker === []) {
+            $this->error('No OHLCV data available for the provided tickers.');
+            return Command::FAILURE;
+        }
+
+        $initialCapital = (float) $this->option('capital');
+        $boardLotOption = $this->option('board-lot');
+        $boardLot = is_numeric($boardLotOption) ? max((int) $boardLotOption, 1) : 100;
+
+        $result = $this->hlslBacktest->run($dataByTicker, $initialCapital, $boardLot);
+        $stats = $result['stats'] ?? [];
+
+        $this->line('');
+        $this->info('HLSL Breakout Backtest');
+        $this->line('Tickers: ' . implode(', ', array_keys($dataByTicker)));
+        $this->line('Board Lot: ' . $boardLot);
+
+        $statRows = [
+            ['Initial Capital', number_format($stats['initial_capital'] ?? $initialCapital, 2)],
+            ['Final Equity', number_format($stats['final_equity'] ?? $initialCapital, 2)],
+            ['Total Return %', number_format($stats['total_return_pct'] ?? 0.0, 2)],
+            ['CAGR %', number_format($stats['CAGR_pct'] ?? 0.0, 2)],
+            ['Max Drawdown %', number_format($stats['max_drawdown_pct'] ?? 0.0, 2)],
+            ['Trades', (string) ($stats['num_trades'] ?? 0)],
+            ['Win Rate %', number_format($stats['win_rate_pct'] ?? 0.0, 2)],
+            ['Avg Win %', number_format($stats['avg_win_pct'] ?? 0.0, 2)],
+            ['Avg Loss %', number_format($stats['avg_loss_pct'] ?? 0.0, 2)],
+            ['Profit Factor', ($stats['profit_factor'] ?? null) === null
+                ? 'N/A'
+                : number_format((float) $stats['profit_factor'], 2)
+            ],
+        ];
+
+        $this->table(['Metric', 'Value'], $statRows);
+
+        if ($this->option('trades')) {
+            $this->line('');
+            $this->info('Trades');
+
+            $trades = $result['trades'] ?? [];
+            if ($trades === []) {
+                $this->info('No trades were executed.');
+            } else {
+                $tradeRows = [];
+                foreach ($trades as $index => $trade) {
+                    $tradeRows[] = [
+                        $index + 1,
+                        $trade['ticker'] ?? '',
+                        $trade['entry_date'] ?? '',
+                        number_format((float) ($trade['entry_price'] ?? 0.0), 4),
+                        (string) ($trade['shares'] ?? 0),
+                        $trade['exit_date'] ?? '',
+                        number_format((float) ($trade['exit_price'] ?? 0.0), 4),
+                        number_format((float) ($trade['return_pct'] ?? 0.0), 2),
+                        $trade['reason'] ?? '',
+                    ];
+                }
+
+                $this->table([
+                    '#',
+                    'Ticker',
+                    'Entry Date',
+                    'Entry Price',
+                    'Shares',
+                    'Exit Date',
+                    'Exit Price',
+                    'Return %',
+                    'Reason',
+                ], $tradeRows);
+            }
         }
 
         return Command::SUCCESS;
