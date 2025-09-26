@@ -66,9 +66,9 @@ class AssetForecastCommand extends Command
 
             $rows[] = [
                 'symbol' => $symbol,
-                'last_close' => sprintf('%.4f', $latestClose),
+                'last_close' => sprintf('%.0f', $latestClose),
                 'last_date' => $latestDate,
-                'entry_price' => $entryPrice !== null ? sprintf('%.4f', $entryPrice) : '—',
+                'entry_price' => $entryPrice !== null ? sprintf('%.0f', $entryPrice) : '—',
                 'distance_pct' => $distancePct !== null ? sprintf('%.2f%%', $distancePct) : '—',
                 'swing_week' => $forecast['week_end'] ?? '—',
                 'volume_ema' => $forecast['volume_ema'] !== null
@@ -88,13 +88,13 @@ class AssetForecastCommand extends Command
 
         $this->table([
             'Ticker',
-            'Last Close',
-            'Last Close Date',
-            'Trigger Price',
-            'Distance %',
-            'Swing Week End',
+            'Close',
+            'Close Date',
+            'Alert',
+            'Dist%',
+            'Swing Week',
             'Volume EMA',
-            'Volume Target (1.2x)',
+            'Volume Target',
             'Note',
         ], array_map(static function (array $row) {
             return [
