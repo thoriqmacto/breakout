@@ -24,7 +24,8 @@ class AssetForecastCommand extends Command
         {--bt-result : Include the latest backtest summary for the selected tickers}
         {--trades : Include detailed backtest trades for the selected tickers}
         {--rerun : Re-run backtests for the selected tickers}
-        {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}';
+        {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}
+        {--initial-cap= : Initial capital (IDR) for simulated backtests; defaults to 10,000,000}';
 
     protected $description = 'Forecast potential entry levels for assets using a breakout strategy.';
 
@@ -42,6 +43,11 @@ class AssetForecastCommand extends Command
 
         $sortConfig = $this->normalizeSortOption();
         if ($sortConfig === false) {
+            return Command::FAILURE;
+        }
+
+        $initialCapital = $this->resolveInitialCapital();
+        if ($initialCapital === false) {
             return Command::FAILURE;
         }
 
@@ -124,6 +130,8 @@ class AssetForecastCommand extends Command
                 continue;
             }
 
+            $finalEquity = $this->computeBacktestFinalEquity($symbol, $bars, $strategyOption, $initialCapital);
+
             $rows[] = [
                 'symbol' => $symbol,
                 'last_close' => sprintf('%.0f', $latestClose),
@@ -145,6 +153,10 @@ class AssetForecastCommand extends Command
                     ? number_format((float) $forecast['volume_target'], 0, '.', ',')
                     : '—',
                 'volume_target_value' => $forecast['volume_target'],
+                'final_equity' => $finalEquity !== null
+                    ? number_format($finalEquity, 0, '.', ',')
+                    : '—',
+                'final_equity_value' => $finalEquity,
                 'note' => $forecast['note'] ?? '',
             ];
         }
@@ -171,6 +183,7 @@ class AssetForecastCommand extends Command
                 $row['atr_weekly'],
                 $row['volume_ema'],
                 $row['volume_target'],
+                $row['final_equity'],
                 $row['note'],
             ];
         }
@@ -186,6 +199,7 @@ class AssetForecastCommand extends Command
             'ATR',
             'Volume EMA',
             'Volume Target',
+            'Final Equity',
             'Note',
         ], $tableRows);
 
@@ -193,7 +207,8 @@ class AssetForecastCommand extends Command
             $backtestSummarySymbols,
             $backtestTradeSymbols,
             $strategyOption,
-            $forceBacktestRerun
+            $forceBacktestRerun,
+            $initialCapital
         );
 
         return Command::SUCCESS;
@@ -456,6 +471,34 @@ class AssetForecastCommand extends Command
         ];
     }
 
+    private function resolveInitialCapital(): float|false
+    {
+        $option = $this->option('initial-cap');
+        if ($option === null || $option === '') {
+            return self::DEFAULT_INITIAL_CAPITAL_IDR;
+        }
+
+        if (is_array($option)) {
+            $option = end($option) ?: reset($option);
+        }
+
+        $raw = str_replace([',', '_', ' '], '', (string) $option);
+        if ($raw === '' || ! is_numeric($raw)) {
+            $this->error('The --initial-cap option must be a positive number.');
+
+            return false;
+        }
+
+        $value = (float) $raw;
+        if ($value <= 0.0) {
+            $this->error('The --initial-cap option must be a positive number.');
+
+            return false;
+        }
+
+        return $value;
+    }
+
     /**
      * @param array<int, array<string, mixed>> $rows
      * @param array{key:string, type:string, direction:string} $sortConfig
@@ -519,6 +562,8 @@ class AssetForecastCommand extends Command
             'atrweekly' => ['key' => 'atr_weekly_value', 'type' => 'numeric', 'label' => 'ATR Wk'],
             'volumeema' => ['key' => 'volume_ema_value', 'type' => 'numeric', 'label' => 'Volume EMA'],
             'volumetarget' => ['key' => 'volume_target_value', 'type' => 'numeric', 'label' => 'Volume Target'],
+            'equity' => ['key' => 'final_equity_value', 'type' => 'numeric', 'label' => 'Final Equity'],
+            'finalequity' => ['key' => 'final_equity_value', 'type' => 'numeric', 'label' => 'Final Equity'],
         ];
     }
 
@@ -583,11 +628,39 @@ class AssetForecastCommand extends Command
         })->all();
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $dailyBars
+     */
+    private function computeBacktestFinalEquity(
+        string $symbol,
+        array $dailyBars,
+        string $strategyOption,
+        float $initialCapital
+    ): ?float {
+        if ($strategyOption !== 'HLSLBreakout') {
+            return null;
+        }
+
+        $result = $this->hlslBacktestService->run([
+            $symbol => $dailyBars,
+        ], $initialCapital);
+
+        $stats = $result['stats'] ?? [];
+        if (! is_array($stats) || ! array_key_exists('final_equity', $stats)) {
+            return null;
+        }
+
+        $finalEquity = $stats['final_equity'];
+
+        return is_numeric($finalEquity) ? (float) $finalEquity : null;
+    }
+
     private function displayBacktestData(
         array $summarySymbols,
         array $tradeSymbols,
         string $strategyOption,
-        bool $forceRerun
+        bool $forceRerun,
+        float $initialCapital
     ): void
     {
         $requestedSymbols = array_values(array_unique(array_merge($summarySymbols, $tradeSymbols)));
@@ -601,7 +674,8 @@ class AssetForecastCommand extends Command
                 $tradeSymbols,
                 $requestedSymbols,
                 $strategyOption,
-                $forceRerun
+                $forceRerun,
+                $initialCapital
             );
 
             return;
@@ -609,10 +683,10 @@ class AssetForecastCommand extends Command
 
         $symbol = $requestedSymbols[0];
         if ($forceRerun) {
-            $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption);
+            $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption, $initialCapital);
         } else {
-            $backtest = $this->findLatestBacktestForSymbol($symbol)
-                ?? $this->runAndStoreBacktestForSymbol($symbol, $strategyOption);
+            $backtest = $this->findLatestBacktestForSymbol($symbol, $initialCapital, $strategyOption)
+                ?? $this->runAndStoreBacktestForSymbol($symbol, $strategyOption, $initialCapital);
         }
 
         if ($backtest === null) {
@@ -674,14 +748,15 @@ class AssetForecastCommand extends Command
         array $tradeSymbols,
         array $requestedSymbols,
         string $strategyOption,
-        bool $forceRerun
+        bool $forceRerun,
+        float $initialCapital
     ): void
     {
         if ($forceRerun) {
-            $backtest = $this->runAndStoreBacktestForSymbols($requestedSymbols, $strategyOption);
+            $backtest = $this->runAndStoreBacktestForSymbols($requestedSymbols, $strategyOption, $initialCapital);
         } else {
-            $backtest = $this->findLatestBacktestCoveringSymbols($requestedSymbols, $strategyOption)
-                ?? $this->runAndStoreBacktestForSymbols($requestedSymbols, $strategyOption);
+            $backtest = $this->findLatestBacktestCoveringSymbols($requestedSymbols, $strategyOption, $initialCapital)
+                ?? $this->runAndStoreBacktestForSymbols($requestedSymbols, $strategyOption, $initialCapital);
         }
 
         if ($backtest === null) {
@@ -778,7 +853,7 @@ class AssetForecastCommand extends Command
      *
      * @return array{run_id:string, model:Backtest}|null
      */
-    private function runAndStoreBacktestForSymbol(string $symbol, string $strategyOption): ?array
+    private function runAndStoreBacktestForSymbol(string $symbol, string $strategyOption, float $initialCapital): ?array
     {
         if ($strategyOption !== 'HLSLBreakout') {
             $this->warn("Automatic backtests are only available for the HLSLBreakout strategy.");
@@ -816,7 +891,7 @@ class AssetForecastCommand extends Command
 
         $result = $this->hlslBacktestService->run([
             $symbol => $dailyRows,
-        ], self::DEFAULT_INITIAL_CAPITAL_IDR);
+        ], $initialCapital);
         $stats = $result['stats'] ?? [];
         $trades = $result['trades'] ?? [];
 
@@ -824,7 +899,7 @@ class AssetForecastCommand extends Command
             $trades = $this->fallbackTradesFromLatestRun($symbol);
         }
 
-        return DB::transaction(function () use ($symbol, $asset, $stats, $trades, $strategyOption) {
+        return DB::transaction(function () use ($symbol, $asset, $stats, $trades, $strategyOption, $initialCapital) {
             $runId = 'auto-hlsl-' . Str::uuid()->toString();
 
             $backtest = Backtest::create([
@@ -834,6 +909,7 @@ class AssetForecastCommand extends Command
                     'symbols' => [$symbol],
                     'strategy' => $strategyOption,
                     'generated_by' => 'asset:forecast',
+                    'initial_capital' => $initialCapital,
                 ],
                 'stats_json' => $stats,
                 'notes' => 'Auto-generated via asset:forecast --bt-result',
@@ -870,7 +946,7 @@ class AssetForecastCommand extends Command
      * @param array<int, string> $symbols
      * @return array{run_id:string, model:Backtest}|null
      */
-    private function runAndStoreBacktestForSymbols(array $symbols, string $strategyOption): ?array
+    private function runAndStoreBacktestForSymbols(array $symbols, string $strategyOption, float $initialCapital): ?array
     {
         if ($strategyOption !== 'HLSLBreakout') {
             $this->warn('Automatic backtests are only available for the HLSLBreakout strategy.');
@@ -930,7 +1006,7 @@ class AssetForecastCommand extends Command
             'Generating ' . $strategyOption . ' backtest for ' . implode(', ', $includedSymbols) . '...'
         );
 
-        $result = $this->hlslBacktestService->run($dailyData, self::DEFAULT_INITIAL_CAPITAL_IDR);
+        $result = $this->hlslBacktestService->run($dailyData, $initialCapital);
         $stats = $result['stats'] ?? [];
         $trades = $result['trades'] ?? [];
 
@@ -949,7 +1025,7 @@ class AssetForecastCommand extends Command
 
         $assetMap = $assets->only($includedSymbols);
 
-        return DB::transaction(function () use ($stats, $trades, $strategyOption, $includedSymbols, $assetMap) {
+        return DB::transaction(function () use ($stats, $trades, $strategyOption, $includedSymbols, $assetMap, $initialCapital) {
             $runId = 'auto-hlsl-' . Str::uuid()->toString();
 
             $backtest = Backtest::create([
@@ -959,6 +1035,7 @@ class AssetForecastCommand extends Command
                     'symbols' => $includedSymbols,
                     'strategy' => $strategyOption,
                     'generated_by' => 'asset:forecast',
+                    'initial_capital' => $initialCapital,
                 ],
                 'stats_json' => $stats,
                 'notes' => 'Auto-generated via asset:forecast --bt-result',
@@ -1000,8 +1077,11 @@ class AssetForecastCommand extends Command
      * @param array<int, string> $symbols
      * @return array{run_id:string, model:Backtest}|null
      */
-    private function findLatestBacktestCoveringSymbols(array $symbols, string $strategyOption): ?array
-    {
+    private function findLatestBacktestCoveringSymbols(
+        array $symbols,
+        string $strategyOption,
+        ?float $initialCapital = null
+    ): ?array {
         $normalized = array_values(array_unique(array_map(static function ($symbol) {
             return strtoupper(trim((string) $symbol));
         }, $symbols)));
@@ -1023,6 +1103,10 @@ class AssetForecastCommand extends Command
             ->first();
 
         if (! $backtest) {
+            return null;
+        }
+
+        if (! $this->backtestMatchesCriteria($backtest, $initialCapital, $strategyOption)) {
             return null;
         }
 
@@ -1108,8 +1192,11 @@ class AssetForecastCommand extends Command
     /**
      * @return array{run_id:string, model:Backtest}|null
      */
-    private function findLatestBacktestForSymbol(string $symbol): ?array
-    {
+    private function findLatestBacktestForSymbol(
+        string $symbol,
+        ?float $initialCapital = null,
+        ?string $strategyOption = null
+    ): ?array {
         $backtest = Backtest::query()
             ->select('backtests.*')
             ->join('backtest_trades', 'backtest_trades.run_id', '=', 'backtests.run_id')
@@ -1119,11 +1206,28 @@ class AssetForecastCommand extends Command
             ->orderByDesc('backtest_trades.entry_date')
             ->first();
 
+        if ($backtest && ! $this->backtestMatchesCriteria($backtest, $initialCapital, $strategyOption)) {
+            $backtest = null;
+        }
+
         if (! $backtest) {
-            $backtest = Backtest::query()
+            $query = Backtest::query()
                 ->whereJsonContains('params_json->symbols', $symbol)
-                ->orderByDesc('created_at')
-                ->first();
+                ->orderByDesc('created_at');
+
+            if ($strategyOption !== null) {
+                $query->where(function ($inner) use ($strategyOption) {
+                    $inner->whereNull('params_json->strategy')
+                        ->orWhere('params_json->strategy', $strategyOption);
+                });
+            }
+
+            $candidate = $query->first();
+            if ($candidate && ! $this->backtestMatchesCriteria($candidate, $initialCapital, $strategyOption)) {
+                $candidate = null;
+            }
+
+            $backtest = $candidate;
         }
 
         if (! $backtest) {
@@ -1134,6 +1238,45 @@ class AssetForecastCommand extends Command
             'run_id' => $backtest->run_id,
             'model' => $backtest,
         ];
+    }
+
+    private function backtestMatchesCriteria(Backtest $backtest, ?float $initialCapital, ?string $strategyOption): bool
+    {
+        if ($initialCapital !== null && ! $this->initialCapitalMatches($initialCapital, $backtest)) {
+            return false;
+        }
+
+        if ($strategyOption !== null) {
+            $params = is_array($backtest->params_json) ? $backtest->params_json : [];
+            $storedStrategy = isset($params['strategy']) ? (string) $params['strategy'] : null;
+            if ($storedStrategy !== null && strcasecmp($storedStrategy, $strategyOption) !== 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function initialCapitalMatches(float $expected, Backtest $backtest): bool
+    {
+        $stored = $this->extractInitialCapitalFromBacktest($backtest);
+
+        return abs($stored - $expected) < 0.0001;
+    }
+
+    private function extractInitialCapitalFromBacktest(Backtest $backtest): float
+    {
+        $params = is_array($backtest->params_json) ? $backtest->params_json : [];
+        if (isset($params['initial_capital']) && is_numeric($params['initial_capital'])) {
+            return (float) $params['initial_capital'];
+        }
+
+        $stats = is_array($backtest->stats_json) ? $backtest->stats_json : [];
+        if (isset($stats['initial_capital']) && is_numeric($stats['initial_capital'])) {
+            return (float) $stats['initial_capital'];
+        }
+
+        return self::DEFAULT_INITIAL_CAPITAL_IDR;
     }
 
     /**
