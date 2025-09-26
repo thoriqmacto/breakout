@@ -180,6 +180,50 @@ class AssetBacktestCommandTest extends TestCase
         $this->assertStringContainsString('Exit Date', $output);
     }
 
+    public function test_runs_hlsl_breakout_scan_with_tickers_option(): void
+    {
+        $assetA = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+        $assetB = Asset::create(['symbol' => 'BBB', 'name' => 'Asset BBB']);
+
+        $start = Carbon::parse('2024-01-01');
+
+        for ($i = 0; $i < 40; $i++) {
+            Price::create([
+                'asset_id' => $assetA->id,
+                'date' => $start->copy()->addDays($i)->toDateString(),
+                'open' => 10 + $i * 0.1,
+                'high' => 10.5 + $i * 0.1,
+                'low' => 9.5 + $i * 0.1,
+                'close' => 10 + $i * 0.1,
+                'volume' => 1000 + $i * 10,
+            ]);
+        }
+
+        for ($i = 0; $i < 40; $i++) {
+            Price::create([
+                'asset_id' => $assetB->id,
+                'date' => $start->copy()->addDays($i)->toDateString(),
+                'open' => 5 + $i * 0.05,
+                'high' => 5.5 + $i * 0.05,
+                'low' => 4.5 + $i * 0.05,
+                'close' => 5 + $i * 0.05,
+                'volume' => 500 + $i * 8,
+            ]);
+        }
+
+        $exit = Artisan::call('asset:backtest', [
+            '--tickers' => 'AAA,BBB',
+            '--capital' => 100000,
+            '--board-lot' => 100,
+        ]);
+
+        $this->assertSame(0, $exit);
+        $output = Artisan::output();
+        $this->assertStringContainsString('HLSL Breakout Backtest', $output);
+        $this->assertStringContainsString('Tickers: AAA, BBB', $output);
+        $this->assertStringContainsString('Final Equity', $output);
+    }
+
     public function test_trades_option_cannot_be_combined_with_compare(): void
     {
         $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
