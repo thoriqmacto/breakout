@@ -207,4 +207,41 @@ class AssetForecastCommandTest extends TestCase
             ->expectsOutputToContain('The --trades option requires --bt-result to specify one or more tickers.')
             ->assertExitCode(1);
     }
+
+    public function test_auto_generates_backtest_when_missing(): void
+    {
+        $asset = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $rows = [
+            ['date' => '2024-01-01', 'open' => 9, 'high' => 10, 'low' => 9, 'close' => 9, 'volume' => 1000],
+            ['date' => '2024-01-08', 'open' => 10, 'high' => 11, 'low' => 10, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-15', 'open' => 11, 'high' => 12, 'low' => 11, 'close' => 11, 'volume' => 1000],
+            ['date' => '2024-01-22', 'open' => 10, 'high' => 11, 'low' => 9.5, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-29', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 400],
+            ['date' => '2024-01-31', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 600],
+            ['date' => '2024-02-05', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 1000],
+            ['date' => '2024-02-16', 'open' => 13, 'high' => 14, 'low' => 13, 'close' => 14, 'volume' => 1500],
+        ];
+
+        foreach ($rows as $row) {
+            Price::create($row + ['asset_id' => $asset->id]);
+        }
+
+        $this->artisan('asset:forecast', [
+            '--sym' => 'AAA',
+            '--bt-result' => 'AAA',
+        ])
+            ->expectsOutputToContain('Generating HLSLBreakout backtest for AAA...')
+            ->expectsOutputToContain('Backtest Summary for AAA')
+            ->expectsOutputToContain('Run ID: auto-hlsl-')
+            ->assertExitCode(0);
+
+        $this->assertSame(1, Backtest::count());
+        $backtest = Backtest::first();
+        $this->assertSame(['AAA'], $backtest->params_json['symbols'] ?? []);
+        $this->assertSame('HLSLBreakout', $backtest->params_json['strategy'] ?? null);
+    }
 }

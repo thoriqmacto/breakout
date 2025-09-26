@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use App\Models\Asset;
 use App\Models\Backtest;
 use App\Models\BacktestTrade;
+use App\Services\Backtest\HLSLBreakoutBacktestService;
 use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AssetForecastCommand extends Command
 {
@@ -18,6 +21,11 @@ class AssetForecastCommand extends Command
         {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}';
 
     protected $description = 'Forecast potential entry levels for assets using a breakout strategy.';
+
+    public function __construct(private readonly HLSLBreakoutBacktestService $hlslBacktestService)
+    {
+        parent::__construct();
+    }
 
     public function handle(): int
     {
@@ -133,7 +141,7 @@ class AssetForecastCommand extends Command
             ];
         }, $rows));
 
-        $this->displayBacktestData($backtestSummarySymbols, $backtestTradeSymbols);
+        $this->displayBacktestData($backtestSummarySymbols, $backtestTradeSymbols, $strategyOption);
 
         return Command::SUCCESS;
     }
@@ -319,7 +327,7 @@ class AssetForecastCommand extends Command
         })->all();
     }
 
-    private function displayBacktestData(array $summarySymbols, array $tradeSymbols): void
+    private function displayBacktestData(array $summarySymbols, array $tradeSymbols, string $strategyOption): void
     {
         $requestedSymbols = array_values(array_unique(array_merge($summarySymbols, $tradeSymbols)));
         if ($requestedSymbols === []) {
@@ -329,6 +337,9 @@ class AssetForecastCommand extends Command
         $dataBySymbol = [];
         foreach ($requestedSymbols as $symbol) {
             $backtest = $this->findLatestBacktestForSymbol($symbol);
+            if ($backtest === null) {
+                $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption);
+            }
             if ($backtest === null) {
                 $this->warn("No backtest data found for {$symbol}.");
                 continue;
@@ -389,6 +400,91 @@ class AssetForecastCommand extends Command
                 );
             }
         }
+    }
+
+    /**
+     * Attempt to run and persist a backtest for the provided symbol.
+     *
+     * @return array{run_id:string, model:Backtest}|null
+     */
+    private function runAndStoreBacktestForSymbol(string $symbol, string $strategyOption): ?array
+    {
+        if ($strategyOption !== 'HLSLBreakout') {
+            $this->warn("Automatic backtests are only available for the HLSLBreakout strategy.");
+            return null;
+        }
+
+        $asset = Asset::where('symbol', $symbol)->first();
+        if (! $asset) {
+            $this->warn("Asset {$symbol} not found. Skipping.");
+            return null;
+        }
+
+        $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
+        if ($prices->isEmpty()) {
+            $this->warn("No price data available for {$symbol}. Skipping.");
+            return null;
+        }
+
+        $dailyRows = $prices->map(static function ($price) {
+            $date = $price->date instanceof \DateTimeInterface
+                ? $price->date->toDateString()
+                : (string) $price->date;
+
+            return [
+                'date' => $date,
+                'open' => (float) $price->open,
+                'high' => (float) $price->high,
+                'low' => (float) $price->low,
+                'close' => (float) $price->close,
+                'volume' => (float) $price->volume,
+            ];
+        })->all();
+
+        $this->line("Generating {$strategyOption} backtest for {$symbol}...");
+
+        $result = $this->hlslBacktestService->run([$symbol => $dailyRows]);
+        $stats = $result['stats'] ?? [];
+        $trades = $result['trades'] ?? [];
+
+        return DB::transaction(function () use ($symbol, $asset, $stats, $trades, $strategyOption) {
+            $runId = 'auto-hlsl-' . Str::uuid()->toString();
+
+            $backtest = Backtest::create([
+                'run_id' => $runId,
+                'created_at' => now(),
+                'params_json' => [
+                    'symbols' => [$symbol],
+                    'strategy' => $strategyOption,
+                    'generated_by' => 'asset:forecast',
+                ],
+                'stats_json' => $stats,
+                'notes' => 'Auto-generated via asset:forecast --bt-result',
+            ]);
+
+            foreach ($trades as $trade) {
+                $shares = (float) ($trade['shares'] ?? 0.0);
+                $entryPrice = (float) ($trade['entry_price'] ?? 0.0);
+                $exitPrice = isset($trade['exit_price']) ? (float) $trade['exit_price'] : null;
+                $profit = $exitPrice !== null ? ($exitPrice - $entryPrice) * $shares : null;
+
+                BacktestTrade::create([
+                    'run_id' => $runId,
+                    'asset_id' => $asset->id,
+                    'entry_date' => $trade['entry_date'] ?? null,
+                    'entry_px' => $entryPrice,
+                    'exit_date' => $trade['exit_date'] ?? null,
+                    'exit_px' => $exitPrice,
+                    'units' => $shares,
+                    'pnl' => $profit,
+                ]);
+            }
+
+            return [
+                'run_id' => $runId,
+                'model' => $backtest,
+            ];
+        });
     }
 
     /**
