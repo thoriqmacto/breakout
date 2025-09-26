@@ -3,6 +3,8 @@ from types import SimpleNamespace
 import importlib.util
 import pathlib
 
+import json
+
 import pytest
 
 
@@ -42,3 +44,26 @@ def test_start_end_arguments_limit_range(monkeypatch, tmp_path):
 
     assert recorded['start'] == datetime.date(2020, 1, 1)
     assert recorded['end'] == datetime.date(2020, 1, 31)
+
+
+def test_check_latest_outputs_status(monkeypatch, capsys):
+    gs.pd = object()
+    gs.yf = object()
+
+    monkeypatch.setattr(gs, 'build_latest_status', lambda symbol, compare_date: {
+        'symbol': symbol,
+        'latest_date': '2024-05-10',
+        'requested_date': compare_date.isoformat() if compare_date else None,
+        'is_available': True,
+        'checked_at': '2024-05-10T00:00:00Z',
+    })
+
+    gs.main(['--check-latest', '--latest-date', '2024-05-10'])
+
+    out = capsys.readouterr().out.strip()
+    payload = json.loads(out)
+    assert payload['symbol'] == '^JKSE'
+    assert payload['is_available'] is True
+
+    gs.pd = None
+    gs.yf = None
