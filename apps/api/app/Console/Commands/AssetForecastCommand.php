@@ -976,6 +976,8 @@ class AssetForecastCommand extends Command
             return;
         }
 
+        $combinedRows = $this->sortTradeTableRows($combinedRows);
+
         $this->table(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
             $combinedRows,
@@ -1106,6 +1108,8 @@ class AssetForecastCommand extends Command
             return;
         }
 
+        $combinedRows = $this->sortTradeTableRows($combinedRows);
+
         $this->table(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
             $combinedRows,
@@ -1115,6 +1119,69 @@ class AssetForecastCommand extends Command
         foreach ($missingTradeSymbols as $missingSymbol) {
             $this->warn($missingSymbol . ': no trade data available in this backtest run.');
         }
+    }
+
+    /**
+     * @param array<int, array<int, int|string>> $rows
+     * @return array<int, array<int, int|string>>
+     */
+    private function sortTradeTableRows(array $rows): array
+    {
+        if ($rows === []) {
+            return [];
+        }
+
+        usort($rows, static function (array $left, array $right): int {
+            $symbolComparison = strcmp((string) ($left[1] ?? ''), (string) ($right[1] ?? ''));
+            if ($symbolComparison !== 0) {
+                return $symbolComparison;
+            }
+
+            $leftEntry = ($left[2] ?? null) !== '—' ? ($left[2] ?? null) : null;
+            $rightEntry = ($right[2] ?? null) !== '—' ? ($right[2] ?? null) : null;
+
+            if ($leftEntry !== $rightEntry) {
+                if ($leftEntry === null) {
+                    return 1;
+                }
+
+                if ($rightEntry === null) {
+                    return -1;
+                }
+
+                $entryComparison = strcmp((string) $leftEntry, (string) $rightEntry);
+                if ($entryComparison !== 0) {
+                    return $entryComparison;
+                }
+            }
+
+            $leftExit = ($left[3] ?? null) !== '—' ? ($left[3] ?? null) : null;
+            $rightExit = ($right[3] ?? null) !== '—' ? ($right[3] ?? null) : null;
+
+            if ($leftExit !== $rightExit) {
+                if ($leftExit === null) {
+                    return 1;
+                }
+
+                if ($rightExit === null) {
+                    return -1;
+                }
+
+                $exitComparison = strcmp((string) $leftExit, (string) $rightExit);
+                if ($exitComparison !== 0) {
+                    return $exitComparison;
+                }
+            }
+
+            return ((int) ($left[0] ?? 0)) <=> ((int) ($right[0] ?? 0));
+        });
+
+        foreach ($rows as $index => &$row) {
+            $row[0] = $index + 1;
+        }
+        unset($row);
+
+        return $rows;
     }
 
     /**
