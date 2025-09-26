@@ -17,7 +17,7 @@ class AssetForecastCommand extends Command
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
         {--all : Include every asset with price data}
-        {--filter= : Filter results when combined with --all (currently only "uptrend")}
+        {--filter= : Filter results when combined with --all (comma-separated; available: "uptrend", "withAlert")}
         {--bt-result : Include the latest backtest summary for the selected tickers}
         {--trades : Include detailed backtest trades for the selected tickers}
         {--rerun : Re-run backtests for the selected tickers}
@@ -32,8 +32,8 @@ class AssetForecastCommand extends Command
 
     public function handle(): int
     {
-        $filterOption = $this->normalizeFilterOption();
-        if ($filterOption === false) {
+        $filters = $this->normalizeFilters();
+        if ($filters === false) {
             return Command::FAILURE;
         }
 
@@ -92,10 +92,6 @@ class AssetForecastCommand extends Command
                 continue;
             }
 
-            if ($filterOption !== null && ! $this->passesFilter($filterOption, $bars)) {
-                continue;
-            }
-
             $analysis = $strategy->analyze($bars);
             $dailyData = $analysis['daily'];
             if ($dailyData === []) {
@@ -113,6 +109,10 @@ class AssetForecastCommand extends Command
             $distancePct = null;
             if ($entryPrice !== null && $latestClose > 0.0) {
                 $distancePct = (($entryPrice - $latestClose) / $latestClose) * 100.0;
+            }
+
+            if ($filters !== [] && ! $this->passesFilters($filters, $bars, $forecast)) {
+                continue;
             }
 
             $rows[] = [
@@ -137,18 +137,10 @@ class AssetForecastCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->table([
-            'Ticker',
-            'Close',
-            'Close Date',
-            'Alert',
-            'Dist%',
-            'Swing Week',
-            'Volume EMA',
-            'Volume Target',
-            'Note',
-        ], array_map(static function (array $row) {
-            return [
+        $tableRows = [];
+        foreach (array_values($rows) as $index => $row) {
+            $tableRows[] = [
+                (string) ($index + 1),
                 $row['symbol'],
                 $row['last_close'],
                 $row['last_date'],
@@ -159,7 +151,20 @@ class AssetForecastCommand extends Command
                 $row['volume_target'],
                 $row['note'],
             ];
-        }, $rows));
+        }
+
+        $this->table([
+            '#',
+            'Ticker',
+            'Close',
+            'Close Date',
+            'Alert',
+            'Dist%',
+            'Swing Week',
+            'Volume EMA',
+            'Volume Target',
+            'Note',
+        ], $tableRows);
 
         $this->displayBacktestData(
             $backtestSummarySymbols,
@@ -287,11 +292,14 @@ class AssetForecastCommand extends Command
             ->all();
     }
 
-    private function normalizeFilterOption(): string|null|false
+    /**
+     * @return array<int, string>|false
+     */
+    private function normalizeFilters(): array|false
     {
         $option = $this->option('filter');
         if ($option === null) {
-            return null;
+            return [];
         }
 
         if (! $this->option('all')) {
@@ -300,34 +308,68 @@ class AssetForecastCommand extends Command
             return false;
         }
 
-        $value = strtolower(trim((string) $option));
-        if ($value === '') {
-            return null;
+        $raw = trim((string) $option);
+        if ($raw === '') {
+            return [];
         }
 
-        $supported = ['uptrend'];
-        if (! in_array($value, $supported, true)) {
-            $this->error(sprintf(
-                'Unsupported filter: %s. Available filters: %s.',
-                $value,
-                implode(', ', $supported)
-            ));
+        $supported = [
+            'uptrend' => 'uptrend',
+            'withalert' => 'withalert',
+        ];
+        $displayNames = [
+            'uptrend' => 'uptrend',
+            'withalert' => 'withAlert',
+        ];
 
-            return false;
+        $values = array_filter(array_map(static function (string $value): string {
+            return strtolower(trim($value));
+        }, explode(',', $raw)), static fn ($value) => $value !== '');
+
+        $normalized = [];
+        foreach ($values as $value) {
+            if (! array_key_exists($value, $supported)) {
+                $this->error(sprintf(
+                    'Unsupported filter: %s. Available filters: %s.',
+                    $value,
+                    implode(', ', array_values($displayNames))
+                ));
+
+                return false;
+            }
+
+            $normalized[] = $supported[$value];
         }
 
-        return $value;
+        return array_values(array_unique($normalized));
     }
 
     /**
+     * @param array<int, string> $filters
      * @param array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}> $bars
+     * @param array<string, mixed> $forecast
      */
-    private function passesFilter(string $filter, array $bars): bool
+    private function passesFilters(array $filters, array $bars, array $forecast): bool
     {
-        return match ($filter) {
-            'uptrend' => (new AssetMetrics($bars))->isUptrend(),
-            default => true,
-        };
+        $metrics = null;
+
+        foreach ($filters as $filter) {
+            switch ($filter) {
+                case 'uptrend':
+                    $metrics ??= new AssetMetrics($bars);
+                    if (! $metrics->isUptrend()) {
+                        return false;
+                    }
+                    break;
+                case 'withalert':
+                    if (($forecast['entry_price'] ?? null) === null) {
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        return true;
     }
 
     /**
