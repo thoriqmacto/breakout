@@ -218,6 +218,13 @@ class AssetForecastCommand extends Command
             'Note',
         ], $tableRows, 'default');
 
+        $this->line('');
+        $this->line(sprintf(
+            'Final Equity reflects a %s IDR simulation of the %s strategy.',
+            number_format((float) $initialCapital, 0, '.', ','),
+            $strategyOption
+        ));
+
         $this->displayBacktestData(
             $backtestSummarySymbols,
             $backtestTradeSymbols,
