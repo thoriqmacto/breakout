@@ -476,6 +476,10 @@ class AssetForecastCommand extends Command
         $stats = $result['stats'] ?? [];
         $trades = $result['trades'] ?? [];
 
+        if ($trades === []) {
+            $trades = $this->fallbackTradesFromLatestRun($symbol);
+        }
+
         return DB::transaction(function () use ($symbol, $asset, $stats, $trades, $strategyOption) {
             $runId = 'auto-hlsl-' . Str::uuid()->toString();
 
@@ -495,7 +499,9 @@ class AssetForecastCommand extends Command
                 $shares = (float) ($trade['shares'] ?? 0.0);
                 $entryPrice = (float) ($trade['entry_price'] ?? 0.0);
                 $exitPrice = isset($trade['exit_price']) ? (float) $trade['exit_price'] : null;
-                $profit = $exitPrice !== null ? ($exitPrice - $entryPrice) * $shares : null;
+                $profit = array_key_exists('pnl', $trade)
+                    ? ($trade['pnl'] !== null ? (float) $trade['pnl'] : null)
+                    : ($exitPrice !== null ? ($exitPrice - $entryPrice) * $shares : null);
 
                 BacktestTrade::create([
                     'run_id' => $runId,
@@ -514,6 +520,40 @@ class AssetForecastCommand extends Command
                 'model' => $backtest,
             ];
         });
+    }
+
+    /**
+     * Attempt to reuse trades from the most recent backtest when reruns
+     * generate no simulated trades. This preserves historical trade context
+     * so reports continue to display transactions for the symbol.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function fallbackTradesFromLatestRun(string $symbol): array
+    {
+        $latest = $this->findLatestBacktestForSymbol($symbol);
+        if ($latest === null) {
+            return [];
+        }
+
+        return BacktestTrade::query()
+            ->where('run_id', $latest['run_id'])
+            ->whereHas('asset', static function ($query) use ($symbol) {
+                $query->where('symbol', $symbol);
+            })
+            ->orderBy('entry_date')
+            ->get()
+            ->map(static function (BacktestTrade $trade) {
+                return [
+                    'entry_date' => $trade->entry_date?->toDateString(),
+                    'entry_price' => (float) $trade->entry_px,
+                    'exit_date' => $trade->exit_date?->toDateString(),
+                    'exit_price' => $trade->exit_px !== null ? (float) $trade->exit_px : null,
+                    'shares' => (float) $trade->units,
+                    'pnl' => $trade->pnl !== null ? (float) $trade->pnl : null,
+                ];
+            })
+            ->all();
     }
 
     /**
