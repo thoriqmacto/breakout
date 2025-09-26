@@ -37,6 +37,14 @@ class AssetForecastCommandTest extends TestCase
             Price::create($row + ['asset_id' => $asset->id]);
         }
 
+        $backtestResult = app(HLSLBreakoutBacktestService::class)->run([
+            'AAA' => $rows,
+        ], 10_000_000.0);
+        $finalEquityValue = $backtestResult['stats']['final_equity'] ?? null;
+        $finalEquityDisplay = $finalEquityValue !== null
+            ? number_format((float) $finalEquityValue, 0, '.', ',')
+            : '—';
+
         $this->artisan('asset:forecast', ['--sym' => 'AAA'])
             ->expectsTable(
                 [
@@ -50,6 +58,7 @@ class AssetForecastCommandTest extends TestCase
                     'ATR',
                     'Volume EMA',
                     'Volume Target',
+                    'Final Equity',
                     'Note',
                 ],
                 [[
@@ -63,6 +72,7 @@ class AssetForecastCommandTest extends TestCase
                     '2',
                     '1,000',
                     '1,200',
+                    $finalEquityDisplay,
                     '',
                 ]]
             )
@@ -100,6 +110,7 @@ class AssetForecastCommandTest extends TestCase
 
         $this->artisan('asset:forecast', ['--all' => true])
             ->expectsOutputToContain('Ticker')
+            ->expectsOutputToContain('Final Equity')
             ->expectsOutputToContain('AAA')
             ->expectsOutputToContain('BBB')
             ->assertExitCode(0);
@@ -385,8 +396,8 @@ class AssetForecastCommandTest extends TestCase
             'created_at' => now(),
             'params_json' => ['symbols' => ['AAA']],
             'stats_json' => [
-                'initial_capital' => 100000,
-                'final_equity' => 105000,
+                'initial_capital' => 10_000_000.0,
+                'final_equity' => 10_500_000.0,
                 'total_return_pct' => 5,
                 'CAGR_pct' => 5,
                 'max_drawdown_pct' => 2,
@@ -418,8 +429,8 @@ class AssetForecastCommandTest extends TestCase
             ->expectsTable(
                 ['Metric', 'Value'],
                 [
-                    ['Initial Capital', '100,000.00'],
-                    ['Final Equity', '105,000.00'],
+                    ['Initial Capital', '10,000,000.00'],
+                    ['Final Equity', '10,500,000.00'],
                     ['Total Return %', '5.00'],
                     ['CAGR %', '5.00'],
                     ['Max Drawdown %', '2.00'],
@@ -564,11 +575,24 @@ class AssetForecastCommandTest extends TestCase
         $this->seedPrices($assetB, $this->examplePriceRows(12.0));
 
         $capturedRunArgs = null;
+        $runCallCount = 0;
 
-        $this->mock(HLSLBreakoutBacktestService::class, function ($mock) use (&$capturedRunArgs) {
+        $this->mock(HLSLBreakoutBacktestService::class, function ($mock) use (&$capturedRunArgs, &$runCallCount) {
             $mock->shouldReceive('run')
-                ->once()
-                ->andReturnUsing(function (array $dailyData, float $initialCapital, int $boardLot = 100) use (&$capturedRunArgs) {
+                ->times(3)
+                ->andReturnUsing(function (array $dailyData, float $initialCapital, int $boardLot = 100) use (&$capturedRunArgs, &$runCallCount) {
+                    $runCallCount++;
+
+                    if (count($dailyData) === 1) {
+                        return [
+                            'stats' => [
+                                'initial_capital' => $initialCapital,
+                                'final_equity' => $initialCapital,
+                            ],
+                            'trades' => [],
+                        ];
+                    }
+
                     $capturedRunArgs = [
                         'dailyData' => $dailyData,
                         'initialCapital' => $initialCapital,
@@ -663,12 +687,69 @@ class AssetForecastCommandTest extends TestCase
         $this->assertNotNull($capturedRunArgs);
         $this->assertSame(10_000_000.0, $capturedRunArgs['initialCapital']);
         $this->assertSameCanonicalizing(['AAA', 'BBB'], array_keys($capturedRunArgs['dailyData']));
+        $this->assertSame(3, $runCallCount);
 
         $backtest = Backtest::first();
         $this->assertNotNull($backtest);
         $this->assertSame(['AAA', 'BBB'], $backtest->params_json['symbols'] ?? []);
         $this->assertSame(10_000_000.0, (float) ($backtest->stats_json['initial_capital'] ?? 0.0));
         $this->assertSame(2, BacktestTrade::count());
+    }
+
+    public function test_initial_cap_option_overrides_default(): void
+    {
+        $asset = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $this->seedPrices($asset, $this->examplePriceRows(10.0));
+
+        $capturedInitialCaps = [];
+
+        $this->mock(HLSLBreakoutBacktestService::class, function ($mock) use (&$capturedInitialCaps) {
+            $mock->shouldReceive('run')
+                ->twice()
+                ->andReturnUsing(function (array $dailyData, float $initialCapital, int $boardLot = 100) use (&$capturedInitialCaps) {
+                    $capturedInitialCaps[] = $initialCapital;
+
+                    return [
+                        'stats' => [
+                            'initial_capital' => $initialCapital,
+                            'final_equity' => $initialCapital + 125_000.0,
+                            'total_return_pct' => 2.5,
+                        ],
+                        'trades' => [],
+                    ];
+                });
+        });
+
+        $this->artisan('asset:forecast', [
+            '--sym' => 'AAA',
+            '--bt-result' => true,
+            '--initial-cap' => '5_000_000',
+        ])
+            ->expectsOutputToContain('Backtest Summary for AAA')
+            ->expectsOutputToContain('5,000,000.00')
+            ->assertExitCode(0);
+
+        $this->assertSame([5_000_000.0, 5_000_000.0], $capturedInitialCaps);
+
+        $backtest = Backtest::first();
+        $this->assertNotNull($backtest);
+        $this->assertSame(5_000_000.0, (float) ($backtest->params_json['initial_capital'] ?? 0.0));
+        $this->assertSame(5_000_000.0, (float) ($backtest->stats_json['initial_capital'] ?? 0.0));
+    }
+
+    public function test_initial_cap_option_requires_numeric_value(): void
+    {
+        $exitCode = Artisan::call('asset:forecast', [
+            '--sym' => 'AAA',
+            '--initial-cap' => 'invalid',
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString('The --initial-cap option must be a positive number.', Artisan::output());
     }
 
     public function test_trades_option_requires_backtest_results(): void
@@ -786,8 +867,8 @@ class AssetForecastCommandTest extends TestCase
             'created_at' => now()->subDay(),
             'params_json' => ['symbols' => ['AAA']],
             'stats_json' => [
-                'initial_capital' => 100000,
-                'final_equity' => 105000,
+                'initial_capital' => 10_000_000.0,
+                'final_equity' => 10_500_000.0,
                 'total_return_pct' => 5,
             ],
         ]);
@@ -844,8 +925,8 @@ class AssetForecastCommandTest extends TestCase
             'created_at' => now()->subDay(),
             'params_json' => ['symbols' => ['AAA']],
             'stats_json' => [
-                'initial_capital' => 100000,
-                'final_equity' => 105000,
+                'initial_capital' => 10_000_000.0,
+                'final_equity' => 10_500_000.0,
                 'total_return_pct' => 5,
             ],
         ]);
