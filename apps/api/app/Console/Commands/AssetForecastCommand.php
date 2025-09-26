@@ -690,11 +690,11 @@ class AssetForecastCommand extends Command
             return;
         }
 
-        if (count($requestedSymbols) > 1) {
-            $this->displayCombinedBacktestData(
+        if (count($requestedSymbols) === 1) {
+            $this->displaySingleSymbolBacktest(
+                $requestedSymbols[0],
                 $summarySymbols,
                 $tradeSymbols,
-                $requestedSymbols,
                 $strategyOption,
                 $forceRerun,
                 $initialCapital
@@ -703,7 +703,68 @@ class AssetForecastCommand extends Command
             return;
         }
 
-        $symbol = $requestedSymbols[0];
+        if ($forceRerun) {
+            $this->displayCombinedBacktestData(
+                $summarySymbols,
+                $tradeSymbols,
+                $requestedSymbols,
+                $strategyOption,
+                true,
+                $initialCapital
+            );
+
+            return;
+        }
+
+        $combinedBacktest = $this->findLatestBacktestCoveringSymbols(
+            $requestedSymbols,
+            $strategyOption,
+            $initialCapital
+        );
+
+        if ($combinedBacktest !== null) {
+            $this->displayCombinedBacktestData(
+                $summarySymbols,
+                $tradeSymbols,
+                $requestedSymbols,
+                $strategyOption,
+                false,
+                $initialCapital
+            );
+
+            return;
+        }
+
+        $storedBacktests = $this->collectStoredBacktestsForSymbols(
+            $requestedSymbols,
+            $initialCapital,
+            $strategyOption
+        );
+
+        if ($storedBacktests !== [] && $this->contextsCoverSymbols($summarySymbols, $storedBacktests)) {
+            $this->displayStoredBacktests($storedBacktests, $summarySymbols, $tradeSymbols);
+
+            return;
+        }
+
+        $this->displayCombinedBacktestData(
+            $summarySymbols,
+            $tradeSymbols,
+            $requestedSymbols,
+            $strategyOption,
+            false,
+            $initialCapital
+        );
+    }
+
+    private function displaySingleSymbolBacktest(
+        string $symbol,
+        array $summarySymbols,
+        array $tradeSymbols,
+        string $strategyOption,
+        bool $forceRerun,
+        float $initialCapital
+    ): void {
         if ($forceRerun) {
             $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption, $initialCapital);
         } else {
@@ -847,6 +908,136 @@ class AssetForecastCommand extends Command
         }
 
         $missingTradeSymbols = array_values(array_diff($uniqueTradeSymbols, $symbolsForTrades));
+
+        $this->line('');
+        $this->info('Backtest Trades');
+
+        if ($combinedRows === []) {
+            $this->line('No trades recorded for this backtest run.');
+
+            foreach ($missingTradeSymbols as $missingSymbol) {
+                $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+            }
+
+            return;
+        }
+
+        $this->table(
+            ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
+            $combinedRows,
+            'default'
+        );
+
+        foreach ($missingTradeSymbols as $missingSymbol) {
+            $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+        }
+    }
+
+    /**
+     * @param array<int, string> $symbols
+     * @return array<string, array{run_id:string, model:Backtest}>
+     */
+    private function collectStoredBacktestsForSymbols(
+        array $symbols,
+        ?float $initialCapital,
+        ?string $strategyOption
+    ): array {
+        $contexts = [];
+
+        foreach ($symbols as $symbol) {
+            $backtest = $this->findLatestBacktestForSymbol($symbol, $initialCapital, $strategyOption);
+            if ($backtest === null) {
+                continue;
+            }
+
+            $contexts[$symbol] = $backtest;
+        }
+
+        return $contexts;
+    }
+
+    /**
+     * @param array<int, string> $symbols
+     * @param array<string, array{run_id:string, model:Backtest}> $contexts
+     */
+    private function contextsCoverSymbols(array $symbols, array $contexts): bool
+    {
+        foreach (array_values(array_unique($symbols)) as $symbol) {
+            if (! isset($contexts[$symbol])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string, array{run_id:string, model:Backtest, trades?:array<int, BacktestTrade>}> $contexts
+     * @param array<int, string> $summarySymbols
+     * @param array<int, string> $tradeSymbols
+     */
+    private function displayStoredBacktests(array &$contexts, array $summarySymbols, array $tradeSymbols): void
+    {
+        $uniqueSummarySymbols = array_values(array_unique($summarySymbols));
+
+        foreach ($uniqueSummarySymbols as $symbol) {
+            if (! isset($contexts[$symbol])) {
+                continue;
+            }
+
+            $model = $contexts[$symbol]['model'];
+
+            $this->line('');
+            $this->info("Backtest Summary for {$symbol}");
+            $this->line('Run ID: ' . $model->run_id);
+            if ($model->created_at) {
+                $this->line('Created: ' . $model->created_at->toDateTimeString());
+            }
+
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []), 'default');
+        }
+
+        $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
+        if ($uniqueTradeSymbols === []) {
+            return;
+        }
+
+        $formatPrice = static fn ($price) => $price !== null
+            ? sprintf('%.0f', (float) $price)
+            : '—';
+
+        $combinedRows = [];
+        $missingTradeSymbols = [];
+
+        foreach ($uniqueTradeSymbols as $symbol) {
+            if (! isset($contexts[$symbol])) {
+                $missingTradeSymbols[] = $symbol;
+                continue;
+            }
+
+            if (! array_key_exists('trades', $contexts[$symbol])) {
+                $contexts[$symbol]['trades'] = $this->loadBacktestTrades($contexts[$symbol]['run_id'], $symbol);
+            }
+
+            $trades = $contexts[$symbol]['trades'];
+            if ($trades === []) {
+                $missingTradeSymbols[] = $symbol;
+                continue;
+            }
+
+            foreach ($trades as $trade) {
+                $combinedRows[] = [
+                    count($combinedRows) + 1,
+                    $symbol,
+                    $trade->entry_date?->toDateString() ?? '—',
+                    $trade->exit_date?->toDateString() ?? '—',
+                    $formatPrice($trade->entry_px),
+                    $formatPrice($trade->exit_px),
+                    sprintf('%.0f', (float) $trade->units),
+                    sprintf('%.0f', (float) ($trade->pnl ?? 0)),
+                ];
+            }
+        }
 
         $this->line('');
         $this->info('Backtest Trades');
