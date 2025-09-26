@@ -181,7 +181,7 @@ class AssetForecastCommand extends Command
             'Alert',
             'Dist%',
             'Swing Week',
-            'ATR Wk',
+            'ATR',
             'Volume EMA',
             'Volume Target',
             'Note',
