@@ -18,6 +18,7 @@ class AssetForecastCommand extends Command
         {--all : Include every asset with price data}
         {--bt-result=* : Include the latest backtest summary for the provided tickers}
         {--trades : Include detailed backtest trades for the --bt-result tickers}
+        {--rerun : Re-run backtests for the tickers supplied to --bt-result}
         {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}';
 
     protected $description = 'Forecast potential entry levels for assets using a breakout strategy.';
@@ -42,6 +43,13 @@ class AssetForecastCommand extends Command
         $backtestSummarySymbols = $this->resolveSymbolListOption('bt-result');
         $includeBacktestTrades = (bool) $this->option('trades');
         $backtestTradeSymbols = [];
+        $forceBacktestRerun = (bool) $this->option('rerun');
+
+        if ($forceBacktestRerun && $backtestSummarySymbols === []) {
+            $this->error('The --rerun option requires --bt-result to specify one or more tickers.');
+
+            return Command::FAILURE;
+        }
 
         if ($includeBacktestTrades) {
             if ($backtestSummarySymbols === []) {
@@ -141,7 +149,12 @@ class AssetForecastCommand extends Command
             ];
         }, $rows));
 
-        $this->displayBacktestData($backtestSummarySymbols, $backtestTradeSymbols, $strategyOption);
+        $this->displayBacktestData(
+            $backtestSummarySymbols,
+            $backtestTradeSymbols,
+            $strategyOption,
+            $forceBacktestRerun
+        );
 
         return Command::SUCCESS;
     }
@@ -327,7 +340,12 @@ class AssetForecastCommand extends Command
         })->all();
     }
 
-    private function displayBacktestData(array $summarySymbols, array $tradeSymbols, string $strategyOption): void
+    private function displayBacktestData(
+        array $summarySymbols,
+        array $tradeSymbols,
+        string $strategyOption,
+        bool $forceRerun
+    ): void
     {
         $requestedSymbols = array_values(array_unique(array_merge($summarySymbols, $tradeSymbols)));
         if ($requestedSymbols === []) {
@@ -336,9 +354,14 @@ class AssetForecastCommand extends Command
 
         $dataBySymbol = [];
         foreach ($requestedSymbols as $symbol) {
-            $backtest = $this->findLatestBacktestForSymbol($symbol);
-            if ($backtest === null) {
+            $backtest = null;
+            if ($forceRerun) {
                 $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption);
+            } else {
+                $backtest = $this->findLatestBacktestForSymbol($symbol);
+                if ($backtest === null) {
+                    $backtest = $this->runAndStoreBacktestForSymbol($symbol, $strategyOption);
+                }
             }
             if ($backtest === null) {
                 $this->warn("No backtest data found for {$symbol}.");
