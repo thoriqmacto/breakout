@@ -914,16 +914,16 @@ class AssetForecastCommand extends Command
                 : ($trade['exit_date'] ?? null);
             $entryPrice = $trade instanceof BacktestTrade
                 ? $trade->entry_px
-                : ($trade['entry_px'] ?? null);
+                : ($trade['entry_px'] ?? $trade['entry_price'] ?? null);
             $exitPrice = $trade instanceof BacktestTrade
                 ? $trade->exit_px
-                : ($trade['exit_px'] ?? null);
+                : ($trade['exit_px'] ?? $trade['exit_price'] ?? null);
             $units = $trade instanceof BacktestTrade
                 ? $trade->units
-                : ($trade['units'] ?? 0);
+                : ($trade['units'] ?? $trade['shares'] ?? 0);
             $pnl = $trade instanceof BacktestTrade
                 ? ($trade->pnl ?? 0)
-                : ($trade['pnl'] ?? 0);
+                : ($trade['pnl'] ?? $trade['profit'] ?? 0);
 
             $combinedRows[] = [
                 count($combinedRows) + 1,
