@@ -201,7 +201,7 @@ class AssetForecastCommand extends Command
             'Volume Target',
             'Final Equity',
             'Note',
-        ], $tableRows);
+        ], $tableRows, 'default');
 
         $this->displayBacktestData(
             $backtestSummarySymbols,
@@ -708,7 +708,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtest['model']->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []));
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []), 'default');
         }
 
         if (! in_array($symbol, $tradeSymbols, true)) {
@@ -739,7 +739,8 @@ class AssetForecastCommand extends Command
 
         $this->table(
             ['#', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
-            $rows
+            $rows,
+            'default'
         );
     }
 
@@ -786,7 +787,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtestModel->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []));
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []), 'default');
         }
 
         $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
@@ -840,7 +841,8 @@ class AssetForecastCommand extends Command
 
         $this->table(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
-            $combinedRows
+            $combinedRows,
+            'default'
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
