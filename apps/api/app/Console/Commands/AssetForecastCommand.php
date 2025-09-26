@@ -11,10 +11,13 @@ use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Helper\TableStyle;
 
 class AssetForecastCommand extends Command
 {
     private const DEFAULT_INITIAL_CAPITAL_IDR = 10_000_000.0;
+
+    private ?TableStyle $asciiTableStyle = null;
 
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
@@ -216,7 +219,7 @@ class AssetForecastCommand extends Command
             'Volume Target',
             'Final Equity',
             'Note',
-        ], $tableRows, 'default');
+        ], $tableRows, $this->asciiTableStyle());
 
         $this->line('');
         $this->line(sprintf(
@@ -234,6 +237,32 @@ class AssetForecastCommand extends Command
         );
 
         return Command::SUCCESS;
+    }
+
+    private function asciiTableStyle(): TableStyle
+    {
+        if ($this->asciiTableStyle === null) {
+            $style = new TableStyle();
+            if (method_exists($style, 'setHorizontalBorderChars')) {
+                $style->setHorizontalBorderChars('-');
+            }
+
+            if (method_exists($style, 'setVerticalBorderChars')) {
+                $style->setVerticalBorderChars('|');
+            }
+
+            if (method_exists($style, 'setDefaultCrossingChar')) {
+                $style->setDefaultCrossingChar('+');
+            }
+
+            if (method_exists($style, 'setCrossingChars')) {
+                $style->setCrossingChars('+', '+', '+', '+', '+', '+', '+', '+', '+');
+            }
+
+            $this->asciiTableStyle = $style;
+        }
+
+        return clone $this->asciiTableStyle;
     }
 
     /**
@@ -791,7 +820,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtest['model']->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []), 'default');
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []), $this->asciiTableStyle());
         }
 
         if (! in_array($symbol, $tradeSymbols, true)) {
@@ -823,7 +852,7 @@ class AssetForecastCommand extends Command
         $this->table(
             ['#', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
             $rows,
-            'default'
+            $this->asciiTableStyle()
         );
     }
 
@@ -870,7 +899,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtestModel->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []), 'default');
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []), $this->asciiTableStyle());
         }
 
         $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
@@ -945,7 +974,7 @@ class AssetForecastCommand extends Command
         $this->table(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
             $combinedRows,
-            'default'
+            $this->asciiTableStyle()
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
@@ -1014,7 +1043,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $model->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []), 'default');
+            $this->table(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []), $this->asciiTableStyle());
         }
 
         $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
@@ -1066,7 +1095,7 @@ class AssetForecastCommand extends Command
         $this->table(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
             $combinedRows,
-            'default'
+            $this->asciiTableStyle()
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
