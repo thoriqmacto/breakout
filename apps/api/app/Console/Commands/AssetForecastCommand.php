@@ -18,6 +18,7 @@ class AssetForecastCommand extends Command
         {--sym=* : Comma-separated or repeated tickers to analyze}
         {--all : Include every asset with price data}
         {--filter= : Filter results when combined with --all (comma-separated; available: "uptrend", "withAlert")}
+        {--sort= : Sort results when combined with --all (format: column,direction)}
         {--bt-result : Include the latest backtest summary for the selected tickers}
         {--trades : Include detailed backtest trades for the selected tickers}
         {--rerun : Re-run backtests for the selected tickers}
@@ -34,6 +35,11 @@ class AssetForecastCommand extends Command
     {
         $filters = $this->normalizeFilters();
         if ($filters === false) {
+            return Command::FAILURE;
+        }
+
+        $sortConfig = $this->normalizeSortOption();
+        if ($sortConfig === false) {
             return Command::FAILURE;
         }
 
@@ -118,16 +124,22 @@ class AssetForecastCommand extends Command
             $rows[] = [
                 'symbol' => $symbol,
                 'last_close' => sprintf('%.0f', $latestClose),
+                'last_close_value' => $latestClose,
                 'last_date' => $latestDate,
                 'entry_price' => $entryPrice !== null ? sprintf('%.0f', $entryPrice) : '—',
+                'entry_price_value' => $entryPrice,
                 'distance_pct' => $distancePct !== null ? sprintf('%.2f%%', $distancePct) : '—',
+                'distance_pct_value' => $distancePct,
                 'swing_week' => $forecast['week_end'] ?? '—',
+                'swing_week_value' => $forecast['week_end'] ?? null,
                 'volume_ema' => $forecast['volume_ema'] !== null
                     ? number_format((float) $forecast['volume_ema'], 0, '.', ',')
                     : '—',
+                'volume_ema_value' => $forecast['volume_ema'],
                 'volume_target' => $forecast['volume_target'] !== null
                     ? number_format((float) $forecast['volume_target'], 0, '.', ',')
                     : '—',
+                'volume_target_value' => $forecast['volume_target'],
                 'note' => $forecast['note'] ?? '',
             ];
         }
@@ -135,6 +147,10 @@ class AssetForecastCommand extends Command
         if ($rows === []) {
             $this->warn('No rows to display.');
             return Command::FAILURE;
+        }
+
+        if ($sortConfig !== null) {
+            $rows = $this->sortRows($rows, $sortConfig);
         }
 
         $tableRows = [];
@@ -342,6 +358,127 @@ class AssetForecastCommand extends Command
         }
 
         return array_values(array_unique($normalized));
+    }
+
+    /**
+     * @return array{key:string, type:string, direction:string}|null|false
+     */
+    private function normalizeSortOption(): array|null|false
+    {
+        $option = $this->option('sort');
+        if ($option === null) {
+            return null;
+        }
+
+        if (! $this->option('all')) {
+            $this->error('The --sort option requires --all.');
+
+            return false;
+        }
+
+        $raw = trim((string) $option);
+        if ($raw === '') {
+            $this->error('Invalid --sort value. Expected format: column,direction.');
+
+            return false;
+        }
+
+        $parts = array_map(static fn ($value) => trim((string) $value), explode(',', $raw));
+        if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+            $this->error('Invalid --sort value. Expected format: column,direction.');
+
+            return false;
+        }
+
+        [$columnInput, $directionInput] = $parts;
+        $normalizedColumn = strtolower(preg_replace('/[^a-z0-9]/i', '', $columnInput));
+        $direction = strtolower($directionInput);
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $this->error('Invalid sort direction. Use "asc" or "desc".');
+
+            return false;
+        }
+
+        $columns = $this->getSortableColumns();
+        if (! array_key_exists($normalizedColumn, $columns)) {
+            $this->error(sprintf(
+                'Unsupported sort column: %s. Available columns: %s.',
+                $columnInput,
+                implode(', ', array_unique(array_column($columns, 'label')))
+            ));
+
+            return false;
+        }
+
+        return [
+            'key' => $columns[$normalizedColumn]['key'],
+            'type' => $columns[$normalizedColumn]['type'],
+            'direction' => $direction,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     * @param array{key:string, type:string, direction:string} $sortConfig
+     * @return array<int, array<string, mixed>>
+     */
+    private function sortRows(array $rows, array $sortConfig): array
+    {
+        $key = $sortConfig['key'];
+        $type = $sortConfig['type'];
+        $direction = $sortConfig['direction'];
+
+        usort($rows, function (array $a, array $b) use ($key, $type, $direction): int {
+            $aValue = $a[$key] ?? null;
+            $bValue = $b[$key] ?? null;
+
+            if ($aValue === $bValue) {
+                return 0;
+            }
+
+            if ($aValue === null) {
+                return 1;
+            }
+
+            if ($bValue === null) {
+                return -1;
+            }
+
+            if ($type === 'numeric') {
+                $comparison = (float) $aValue <=> (float) $bValue;
+            } else {
+                $comparison = strcmp((string) $aValue, (string) $bValue);
+            }
+
+            if ($direction === 'desc') {
+                $comparison *= -1;
+            }
+
+            return $comparison;
+        });
+
+        return $rows;
+    }
+
+    /**
+     * @return array<string, array{key:string, type:string, label:string}>
+     */
+    private function getSortableColumns(): array
+    {
+        return [
+            'ticker' => ['key' => 'symbol', 'type' => 'string', 'label' => 'Ticker'],
+            'symbol' => ['key' => 'symbol', 'type' => 'string', 'label' => 'Ticker'],
+            'close' => ['key' => 'last_close_value', 'type' => 'numeric', 'label' => 'Close'],
+            'closedate' => ['key' => 'last_date', 'type' => 'string', 'label' => 'Close Date'],
+            'alert' => ['key' => 'entry_price_value', 'type' => 'numeric', 'label' => 'Alert'],
+            'dist' => ['key' => 'distance_pct_value', 'type' => 'numeric', 'label' => 'Dist%'],
+            'distpct' => ['key' => 'distance_pct_value', 'type' => 'numeric', 'label' => 'Dist%'],
+            'distpercent' => ['key' => 'distance_pct_value', 'type' => 'numeric', 'label' => 'Dist%'],
+            'swingweek' => ['key' => 'swing_week_value', 'type' => 'string', 'label' => 'Swing Week'],
+            'volumeema' => ['key' => 'volume_ema_value', 'type' => 'numeric', 'label' => 'Volume EMA'],
+            'volumetarget' => ['key' => 'volume_target_value', 'type' => 'numeric', 'label' => 'Volume Target'],
+        ];
     }
 
     /**
