@@ -66,6 +66,7 @@ class AssetMetricsCommand extends Command
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
                 'bars' => $totalBars,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
+                'sort_roc13' => (float) $roc13,
                 'sort_close_vs_high55' => (float) $closeVsHigh55,
                 'sort_close_vs_high20' => (float) $closeVsHigh20,
                 'sort_vol_vs_avg20' => (float) $volToAvg,
@@ -75,12 +76,14 @@ class AssetMetricsCommand extends Command
         usort($rows, function ($a, $b) {
             $A = [
                 (int)($a['sort_uptrend'] ?? 0),
+                (float)($a['sort_roc13'] ?? 0),
                 (float)($a['sort_close_vs_high55'] ?? 0),
                 (float)($a['sort_close_vs_high20'] ?? 0),
                 (float)($a['sort_vol_vs_avg20'] ?? 0),
             ];
             $B = [
                 (int)($b['sort_uptrend'] ?? 0),
+                (float)($b['sort_roc13'] ?? 0),
                 (float)($b['sort_close_vs_high55'] ?? 0),
                 (float)($b['sort_close_vs_high20'] ?? 0),
                 (float)($b['sort_vol_vs_avg20'] ?? 0),
