@@ -52,14 +52,14 @@ class AssetMetricsTest extends TestCase
             $this->fail("Unable to open historical data file: {$path}");
         }
 
-        $header = fgetcsv($handle);
+        $header = fgetcsv($handle, 0, ',', '"', '\\');
         if ($header === false) {
             fclose($handle);
             $this->fail("Historical data file {$path} is empty");
         }
 
         $bars = [];
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
             if (count($row) < 6) {
                 continue;
             }
