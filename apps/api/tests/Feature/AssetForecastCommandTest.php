@@ -46,7 +46,7 @@ class AssetForecastCommandTest extends TestCase
                     'Alert',
                     'Dist%',
                     'Swing Week',
-                    'ATR Wk',
+                    'ATR',
                     'Volume EMA',
                     'Volume Target',
                     'Note',
