@@ -169,13 +169,13 @@ class AssetForecastCommandTest extends TestCase
             )
             ->expectsOutputToContain('Backtest Trades for AAA')
             ->expectsTable(
-                ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Units', 'PnL'],
+                ['#', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
                 [[
                     1,
                     '2024-01-10',
                     '2024-01-20',
-                    '10.0000',
-                    '11.0000',
+                    '10',
+                    '11',
                     '100',
                     '100.00',
                 ]]
