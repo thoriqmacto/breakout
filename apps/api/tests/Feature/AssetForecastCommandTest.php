@@ -177,7 +177,7 @@ class AssetForecastCommandTest extends TestCase
                     '10',
                     '11',
                     '100',
-                    '100.00',
+                    '100',
                 ]]
             )
             ->assertExitCode(0);

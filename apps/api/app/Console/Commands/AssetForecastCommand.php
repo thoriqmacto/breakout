@@ -417,7 +417,7 @@ class AssetForecastCommand extends Command
                         $formatPrice($trade->entry_px),
                         $formatPrice($trade->exit_px),
                         sprintf('%.0f', (float) $trade->units),
-                        sprintf('%.2f', (float) ($trade->pnl ?? 0.0)),
+                        sprintf('%.0f', (float) ($trade->pnl ?? 0)),
                     ];
                 }
 
