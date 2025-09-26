@@ -16,9 +16,9 @@ class AssetForecastCommand extends Command
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
         {--all : Include every asset with price data}
-        {--bt-result=* : Include the latest backtest summary for the provided tickers}
-        {--trades : Include detailed backtest trades for the --bt-result tickers}
-        {--rerun : Re-run backtests for the tickers supplied to --bt-result}
+        {--bt-result : Include the latest backtest summary for the selected tickers}
+        {--trades : Include detailed backtest trades for the selected tickers}
+        {--rerun : Re-run backtests for the selected tickers}
         {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}';
 
     protected $description = 'Forecast potential entry levels for assets using a breakout strategy.';
@@ -40,20 +40,21 @@ class AssetForecastCommand extends Command
             return Command::FAILURE;
         }
 
-        $backtestSummarySymbols = $this->resolveSymbolListOption('bt-result');
+        $includeBacktestSummary = (bool) $this->option('bt-result');
+        $backtestSummarySymbols = $includeBacktestSummary ? $tickers : [];
         $includeBacktestTrades = (bool) $this->option('trades');
         $backtestTradeSymbols = [];
         $forceBacktestRerun = (bool) $this->option('rerun');
 
-        if ($forceBacktestRerun && $backtestSummarySymbols === []) {
-            $this->error('The --rerun option requires --bt-result to specify one or more tickers.');
+        if ($forceBacktestRerun && ! $includeBacktestSummary) {
+            $this->error('The --rerun option requires --bt-result.');
 
             return Command::FAILURE;
         }
 
         if ($includeBacktestTrades) {
-            if ($backtestSummarySymbols === []) {
-                $this->error('The --trades option requires --bt-result to specify one or more tickers.');
+            if (! $includeBacktestSummary) {
+                $this->error('The --trades option requires --bt-result.');
 
                 return Command::FAILURE;
             }
@@ -273,38 +274,6 @@ class AssetForecastCommand extends Command
             ->unique()
             ->values()
             ->all();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function resolveSymbolListOption(string $name): array
-    {
-        $raw = $this->option($name);
-
-        if ($raw === null || $raw === false) {
-            return [];
-        }
-
-        if (is_string($raw)) {
-            $raw = [$raw];
-        } elseif ($raw === true) {
-            $raw = [];
-        } elseif (! is_array($raw)) {
-            $raw = [];
-        }
-
-        $values = [];
-        foreach ($raw as $value) {
-            if (is_string($value) && trim($value) !== '') {
-                $values = array_merge($values, explode(',', $value));
-            }
-        }
-
-        $values = array_map(static fn ($ticker) => strtoupper(trim((string) $ticker)), $values);
-        $values = array_filter($values, static fn ($ticker) => $ticker !== '');
-
-        return array_values(array_unique($values));
     }
 
     /**

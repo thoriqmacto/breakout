@@ -148,7 +148,7 @@ class AssetForecastCommandTest extends TestCase
 
         $this->artisan('asset:forecast', [
             '--sym' => 'AAA',
-            '--bt-result' => 'AAA',
+            '--bt-result' => true,
             '--trades' => true,
         ])
             ->expectsOutputToContain('Backtest Summary for AAA')
@@ -204,7 +204,7 @@ class AssetForecastCommandTest extends TestCase
             '--sym' => 'AAA',
             '--trades' => true,
         ])
-            ->expectsOutputToContain('The --trades option requires --bt-result to specify one or more tickers.')
+            ->expectsOutputToContain('The --trades option requires --bt-result.')
             ->assertExitCode(1);
     }
 
@@ -232,7 +232,7 @@ class AssetForecastCommandTest extends TestCase
 
         $this->artisan('asset:forecast', [
             '--sym' => 'AAA',
-            '--bt-result' => 'AAA',
+            '--bt-result' => true,
         ])
             ->expectsOutputToContain('Generating HLSLBreakout backtest for AAA...')
             ->expectsOutputToContain('Backtest Summary for AAA')
@@ -267,7 +267,7 @@ class AssetForecastCommandTest extends TestCase
             '--sym' => 'AAA',
             '--rerun' => true,
         ])
-            ->expectsOutputToContain('The --rerun option requires --bt-result to specify one or more tickers.')
+            ->expectsOutputToContain('The --rerun option requires --bt-result.')
             ->assertExitCode(1);
     }
 
@@ -317,7 +317,7 @@ class AssetForecastCommandTest extends TestCase
 
         $exitCode = Artisan::call('asset:forecast', [
             '--sym' => 'AAA',
-            '--bt-result' => 'AAA',
+            '--bt-result' => true,
         ]);
 
         $this->assertSame(0, $exitCode);
@@ -375,7 +375,7 @@ class AssetForecastCommandTest extends TestCase
 
         $exitCode = Artisan::call('asset:forecast', [
             '--sym' => 'AAA',
-            '--bt-result' => 'AAA',
+            '--bt-result' => true,
             '--rerun' => true,
         ]);
 
