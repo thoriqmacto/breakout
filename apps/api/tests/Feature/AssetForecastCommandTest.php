@@ -212,6 +212,103 @@ class AssetForecastCommandTest extends TestCase
         $this->assertStringNotContainsString('BBB', $output);
     }
 
+    public function test_sort_option_requires_all(): void
+    {
+        $exitCode = Artisan::call('asset:forecast', [
+            '--sort' => 'ticker,asc',
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString('The --sort option requires --all.', Artisan::output());
+    }
+
+    public function test_sort_option_rejects_unknown_column(): void
+    {
+        $exitCode = Artisan::call('asset:forecast', [
+            '--all' => true,
+            '--sort' => 'unknown,asc',
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString('Unsupported sort column: unknown.', Artisan::output());
+    }
+
+    public function test_sort_by_close_descending_orders_rows(): void
+    {
+        $first = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'First Asset',
+        ]);
+
+        $second = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Second Asset',
+        ]);
+
+        $this->seedPrices($first, $this->examplePriceRows(14.0));
+        $this->seedPrices($second, $this->examplePriceRows(10.0));
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--all' => true,
+            '--sort' => 'close,desc',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        $tickers = $this->extractTickersFromTable(Artisan::output());
+        $this->assertSame(['AAA', 'BBB'], $tickers);
+    }
+
+    public function test_sort_by_dist_percent_ascending_orders_rows(): void
+    {
+        $first = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'First Asset',
+        ]);
+
+        $second = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Second Asset',
+        ]);
+
+        $this->seedPrices($first, $this->examplePriceRows(14.0));
+        $this->seedPrices($second, $this->examplePriceRows(10.0));
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--all' => true,
+            '--sort' => 'distPercent,asc',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        $tickers = $this->extractTickersFromTable(Artisan::output());
+        $this->assertSame(['AAA', 'BBB'], $tickers);
+    }
+
+    public function test_sort_can_be_combined_with_filter(): void
+    {
+        $uptrend = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Uptrend Asset',
+        ]);
+
+        $downtrend = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Sideways Asset',
+        ]);
+
+        $this->seedPrices($uptrend, $this->examplePriceRows(14.0));
+        $this->seedPrices($downtrend, $this->examplePriceRows(10.0));
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--all' => true,
+            '--filter' => 'uptrend',
+            '--sort' => 'ticker,asc',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        $tickers = $this->extractTickersFromTable(Artisan::output());
+        $this->assertSame(['AAA'], $tickers);
+    }
+
     public function test_filter_combination_applies_all_filters(): void
     {
         $matching = Asset::create([
@@ -549,5 +646,42 @@ class AssetForecastCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/Run ID: auto-hlsl-[\w-]+/', $output);
         $this->assertSame(2, Backtest::count());
         $this->assertSame(2, BacktestTrade::query()->distinct('run_id')->count('run_id'));
+    }
+
+    /**
+     * @return array<int, array{date:string, open:float, high:float, low:float, close:float, volume:int}>
+     */
+    private function examplePriceRows(float $finalClose): array
+    {
+        return [
+            ['date' => '2024-01-01', 'open' => 9, 'high' => 10, 'low' => 9, 'close' => 9, 'volume' => 1_000],
+            ['date' => '2024-01-08', 'open' => 10, 'high' => 11, 'low' => 10, 'close' => 10, 'volume' => 1_000],
+            ['date' => '2024-01-15', 'open' => 11, 'high' => 12, 'low' => 11, 'close' => 11, 'volume' => 1_000],
+            ['date' => '2024-01-22', 'open' => 10, 'high' => 11, 'low' => 9.5, 'close' => 10, 'volume' => 1_000],
+            ['date' => '2024-01-29', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 400],
+            ['date' => '2024-01-31', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 600],
+            ['date' => '2024-02-05', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 1_000],
+            ['date' => '2024-02-16', 'open' => 13, 'high' => 14, 'low' => 13, 'close' => $finalClose, 'volume' => 1_000],
+        ];
+    }
+
+    /**
+     * @param array<int, array{date:string, open:float, high:float, low:float, close:float, volume:int}> $rows
+     */
+    private function seedPrices(Asset $asset, array $rows): void
+    {
+        foreach ($rows as $row) {
+            Price::create($row + ['asset_id' => $asset->id]);
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function extractTickersFromTable(string $output): array
+    {
+        preg_match_all('/\|\s*\d+\s*\|\s*([A-Z0-9._-]+)\s*\|/', $output, $matches);
+
+        return $matches[1] ?? [];
     }
 }
