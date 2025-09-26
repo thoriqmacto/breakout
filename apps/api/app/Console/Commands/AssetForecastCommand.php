@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
+use App\Models\Backtest;
+use App\Models\BacktestTrade;
 use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
 
@@ -10,16 +12,37 @@ class AssetForecastCommand extends Command
 {
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
+        {--all : Include every asset with price data}
+        {--bt-result=* : Include the latest backtest summary for the provided tickers}
+        {--trades : Include detailed backtest trades for the --bt-result tickers}
         {--strategy=HLSLBreakout : Strategy identifier (currently only HLSLBreakout)}';
 
     protected $description = 'Forecast potential entry levels for assets using a breakout strategy.';
 
     public function handle(): int
     {
-        $tickers = $this->resolveTickers();
+        $tickers = $this->option('all') ? $this->resolveAllTickers() : $this->resolveTickers();
         if ($tickers === []) {
-            $this->error('At least one ticker must be provided via --sym.');
+            if ($this->option('all')) {
+                $this->error('No assets with price data were found.');
+            } else {
+                $this->error('At least one ticker must be provided via --sym.');
+            }
             return Command::FAILURE;
+        }
+
+        $backtestSummarySymbols = $this->resolveSymbolListOption('bt-result');
+        $includeBacktestTrades = (bool) $this->option('trades');
+        $backtestTradeSymbols = [];
+
+        if ($includeBacktestTrades) {
+            if ($backtestSummarySymbols === []) {
+                $this->error('The --trades option requires --bt-result to specify one or more tickers.');
+
+                return Command::FAILURE;
+            }
+
+            $backtestTradeSymbols = $backtestSummarySymbols;
         }
 
         $strategyOption = (string) $this->option('strategy');
@@ -109,6 +132,8 @@ class AssetForecastCommand extends Command
                 $row['note'],
             ];
         }, $rows));
+
+        $this->displayBacktestData($backtestSummarySymbols, $backtestTradeSymbols);
 
         return Command::SUCCESS;
     }
@@ -215,6 +240,53 @@ class AssetForecastCommand extends Command
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function resolveAllTickers(): array
+    {
+        return Asset::query()
+            ->whereHas('prices')
+            ->orderBy('symbol')
+            ->pluck('symbol')
+            ->map(static fn ($symbol) => strtoupper((string) $symbol))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function resolveSymbolListOption(string $name): array
+    {
+        $raw = $this->option($name);
+
+        if ($raw === null || $raw === false) {
+            return [];
+        }
+
+        if (is_string($raw)) {
+            $raw = [$raw];
+        } elseif ($raw === true) {
+            $raw = [];
+        } elseif (! is_array($raw)) {
+            $raw = [];
+        }
+
+        $values = [];
+        foreach ($raw as $value) {
+            if (is_string($value) && trim($value) !== '') {
+                $values = array_merge($values, explode(',', $value));
+            }
+        }
+
+        $values = array_map(static fn ($ticker) => strtoupper(trim((string) $ticker)), $values);
+        $values = array_filter($values, static fn ($ticker) => $ticker !== '');
+
+        return array_values(array_unique($values));
+    }
+
+    /**
      * @return array<int, array<string, mixed>>|null
      */
     private function loadBars(string $symbol): ?array
@@ -245,5 +317,152 @@ class AssetForecastCommand extends Command
                 'volume' => (float) $price->volume,
             ];
         })->all();
+    }
+
+    private function displayBacktestData(array $summarySymbols, array $tradeSymbols): void
+    {
+        $requestedSymbols = array_values(array_unique(array_merge($summarySymbols, $tradeSymbols)));
+        if ($requestedSymbols === []) {
+            return;
+        }
+
+        $dataBySymbol = [];
+        foreach ($requestedSymbols as $symbol) {
+            $backtest = $this->findLatestBacktestForSymbol($symbol);
+            if ($backtest === null) {
+                $this->warn("No backtest data found for {$symbol}.");
+                continue;
+            }
+
+            $trades = $this->loadBacktestTrades($backtest['run_id'], $symbol);
+
+            $dataBySymbol[$symbol] = [
+                'backtest' => $backtest['model'],
+                'trades' => $trades,
+            ];
+        }
+
+        foreach ($requestedSymbols as $symbol) {
+            if (! isset($dataBySymbol[$symbol])) {
+                continue;
+            }
+
+            $backtest = $dataBySymbol[$symbol]['backtest'];
+            $trades = $dataBySymbol[$symbol]['trades'];
+
+            if (in_array($symbol, $summarySymbols, true)) {
+                $this->line('');
+                $this->info("Backtest Summary for {$symbol}");
+                $this->line('Run ID: ' . $backtest->run_id);
+                if ($backtest->created_at) {
+                    $this->line('Created: ' . $backtest->created_at->toDateTimeString());
+                }
+
+                $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest->stats_json ?? []));
+            }
+
+            if (in_array($symbol, $tradeSymbols, true)) {
+                $this->line('');
+                $this->info("Backtest Trades for {$symbol}");
+
+                if ($trades === []) {
+                    $this->line('No trades recorded for this backtest run.');
+                    continue;
+                }
+
+                $rows = [];
+                foreach ($trades as $index => $trade) {
+                    $rows[] = [
+                        $index + 1,
+                        $trade->entry_date?->toDateString() ?? '—',
+                        $trade->exit_date?->toDateString() ?? '—',
+                        sprintf('%.4f', (float) $trade->entry_px),
+                        sprintf('%.4f', (float) ($trade->exit_px ?? 0.0)),
+                        sprintf('%.0f', (float) $trade->units),
+                        sprintf('%.2f', (float) ($trade->pnl ?? 0.0)),
+                    ];
+                }
+
+                $this->table(
+                    ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Units', 'PnL'],
+                    $rows
+                );
+            }
+        }
+    }
+
+    /**
+     * @return array<int, array{0:string,1:string}>
+     */
+    private function formatBacktestStats(array $stats): array
+    {
+        $formatNumber = static function ($value, int $decimals = 2): string {
+            if ($value === null) {
+                return '—';
+            }
+
+            return number_format((float) $value, $decimals);
+        };
+
+        return [
+            ['Initial Capital', $formatNumber($stats['initial_capital'] ?? null)],
+            ['Final Equity', $formatNumber($stats['final_equity'] ?? null)],
+            ['Total Return %', $formatNumber($stats['total_return_pct'] ?? null)],
+            ['CAGR %', $formatNumber($stats['CAGR_pct'] ?? null)],
+            ['Max Drawdown %', $formatNumber($stats['max_drawdown_pct'] ?? null)],
+            ['Trades', isset($stats['num_trades']) ? (string) $stats['num_trades'] : '—'],
+            ['Win Rate %', $formatNumber($stats['win_rate_pct'] ?? null)],
+            ['Avg Win %', $formatNumber($stats['avg_win_pct'] ?? null)],
+            ['Avg Loss %', $formatNumber($stats['avg_loss_pct'] ?? null)],
+            ['Profit Factor', $stats['profit_factor'] === null
+                ? '—'
+                : $formatNumber($stats['profit_factor'])],
+        ];
+    }
+
+    /**
+     * @return array{run_id:string, model:Backtest}|null
+     */
+    private function findLatestBacktestForSymbol(string $symbol): ?array
+    {
+        $backtest = Backtest::query()
+            ->select('backtests.*')
+            ->join('backtest_trades', 'backtest_trades.run_id', '=', 'backtests.run_id')
+            ->join('assets', 'assets.id', '=', 'backtest_trades.asset_id')
+            ->where('assets.symbol', $symbol)
+            ->orderByDesc('backtests.created_at')
+            ->orderByDesc('backtest_trades.entry_date')
+            ->first();
+
+        if (! $backtest) {
+            $backtest = Backtest::query()
+                ->whereJsonContains('params_json->symbols', $symbol)
+                ->orderByDesc('created_at')
+                ->first();
+        }
+
+        if (! $backtest) {
+            return null;
+        }
+
+        return [
+            'run_id' => $backtest->run_id,
+            'model' => $backtest,
+        ];
+    }
+
+    /**
+     * @return array<int, BacktestTrade>
+     */
+    private function loadBacktestTrades(string $runId, string $symbol): array
+    {
+        return BacktestTrade::query()
+            ->where('run_id', $runId)
+            ->whereHas('asset', static function ($query) use ($symbol) {
+                $query->where('symbol', $symbol);
+            })
+            ->orderBy('entry_date')
+            ->get()
+            ->all();
     }
 }
