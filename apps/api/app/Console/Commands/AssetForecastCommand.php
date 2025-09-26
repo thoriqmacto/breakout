@@ -110,6 +110,7 @@ class AssetForecastCommand extends Command
             $latestDate = $latestDay['date']->toDateString();
 
             $forecast = $this->forecastNextEntry($analysis['weekly'], $analysis['signals']);
+            $weeklyAtr = $this->computeWeeklyAtr($analysis['weekly']);
 
             $entryPrice = $forecast['entry_price'];
             $distancePct = null;
@@ -132,6 +133,8 @@ class AssetForecastCommand extends Command
                 'distance_pct_value' => $distancePct,
                 'swing_week' => $forecast['week_end'] ?? '—',
                 'swing_week_value' => $forecast['week_end'] ?? null,
+                'atr_weekly' => $weeklyAtr !== null ? sprintf('%.0f', $weeklyAtr) : '—',
+                'atr_weekly_value' => $weeklyAtr,
                 'volume_ema' => $forecast['volume_ema'] !== null
                     ? number_format((float) $forecast['volume_ema'], 0, '.', ',')
                     : '—',
@@ -163,6 +166,7 @@ class AssetForecastCommand extends Command
                 $row['entry_price'],
                 $row['distance_pct'],
                 $row['swing_week'],
+                $row['atr_weekly'],
                 $row['volume_ema'],
                 $row['volume_target'],
                 $row['note'],
@@ -177,6 +181,7 @@ class AssetForecastCommand extends Command
             'Alert',
             'Dist%',
             'Swing Week',
+            'ATR Wk',
             'Volume EMA',
             'Volume Target',
             'Note',
@@ -266,6 +271,37 @@ class AssetForecastCommand extends Command
             'volume_target' => null,
             'note' => 'No swing highs detected.',
         ];
+    }
+
+    private function computeWeeklyAtr(array $weeklyData, int $period = 2): ?float
+    {
+        $count = count($weeklyData);
+        if ($count < $period) {
+            return null;
+        }
+
+        $start = max(0, $count - $period);
+        $trueRanges = [];
+
+        for ($i = $start; $i < $count; $i++) {
+            $week = $weeklyData[$i];
+            $high = (float) ($week['high'] ?? 0.0);
+            $low = (float) ($week['low'] ?? 0.0);
+            $trueRange = $high - $low;
+
+            if ($i > 0) {
+                $prevClose = (float) ($weeklyData[$i - 1]['close'] ?? 0.0);
+                $trueRange = max($trueRange, abs($high - $prevClose), abs($low - $prevClose));
+            }
+
+            $trueRanges[] = $trueRange;
+        }
+
+        if ($trueRanges === []) {
+            return null;
+        }
+
+        return array_sum($trueRanges) / count($trueRanges);
     }
 
     /**
@@ -476,6 +512,9 @@ class AssetForecastCommand extends Command
             'distpct' => ['key' => 'distance_pct_value', 'type' => 'numeric', 'label' => 'Dist%'],
             'distpercent' => ['key' => 'distance_pct_value', 'type' => 'numeric', 'label' => 'Dist%'],
             'swingweek' => ['key' => 'swing_week_value', 'type' => 'string', 'label' => 'Swing Week'],
+            'atrwk' => ['key' => 'atr_weekly_value', 'type' => 'numeric', 'label' => 'ATR Wk'],
+            'atrweek' => ['key' => 'atr_weekly_value', 'type' => 'numeric', 'label' => 'ATR Wk'],
+            'atrweekly' => ['key' => 'atr_weekly_value', 'type' => 'numeric', 'label' => 'ATR Wk'],
             'volumeema' => ['key' => 'volume_ema_value', 'type' => 'numeric', 'label' => 'Volume EMA'],
             'volumetarget' => ['key' => 'volume_target_value', 'type' => 'numeric', 'label' => 'Volume Target'],
         ];
