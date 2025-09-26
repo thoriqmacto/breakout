@@ -23,6 +23,25 @@ class AssetMetrics
         return $this->bars[array_key_last($this->bars)]['close'];
     }
 
+    private function parseDate(array $bar): ?\DateTimeImmutable
+    {
+        $raw = $bar['date'] ?? null;
+        if (!is_string($raw) || $raw === '') {
+            return null;
+        }
+
+        $parsed = \DateTimeImmutable::createFromFormat('d/m/Y', $raw);
+        if ($parsed instanceof \DateTimeImmutable) {
+            return $parsed;
+        }
+
+        try {
+            return new \DateTimeImmutable($raw);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     public function lastVolume(): float
     {
         $last = $this->bars[array_key_last($this->bars)] ?? null;
@@ -133,19 +152,46 @@ class AssetMetrics
      */
     public function movingAverage(int $days): float
     {
-        // Traders often refer to the "30-week" moving average which equates
-        // to 150 trading days.  The test suite expects this shorthand when a
-        // period of 30 is supplied, so transparently expand it here while
-        // keeping the behaviour for all other day-based averages unchanged.
-        if ($days === 30) {
-            $days *= 5; // convert 30 weeks to trading days
-        }
         $slice = array_slice($this->bars, -$days);
         if (empty($slice)) {
             return 0.0;
         }
         $sum = array_sum(array_map(fn($b) => $b['close'], $slice));
         return $sum / count($slice);
+    }
+
+    public function movingAverageTradingDays(int $days = 150): float
+    {
+        if (empty($this->bars)) {
+            return 0.0;
+        }
+
+        $rows = $this->bars;
+        usort($rows, function (array $a, array $b): int {
+            $da = $this->parseDate($a);
+            $db = $this->parseDate($b);
+            if ($da === null && $db === null) {
+                return 0;
+            }
+            if ($da === null) {
+                return 1;
+            }
+            if ($db === null) {
+                return -1;
+            }
+            return $da <=> $db;
+        });
+
+        $closes = [];
+        foreach ($rows as $bar) {
+            if ($this->parseDate($bar) === null) {
+                continue;
+            }
+            $closes[] = (float) $bar['close'];
+        }
+        $slice = array_slice($closes, -$days);
+        $count = count($slice);
+        return $count ? array_sum($slice) / $count : 0.0;
     }
 
     /**
@@ -170,9 +216,60 @@ class AssetMetrics
      * @param int              $weeks Number of weeks to average.
      * @return float Moving average or 0 when no data.
      */
-    public function movingAverageWeeks(int $weeks): float
+    public function movingAverageWeeks(int $weeks = 30): float
     {
-        return $this->movingAverage($weeks * 5);
+        if (empty($this->bars)) {
+            return 0.0;
+        }
+
+        $rows = $this->bars;
+        usort($rows, function (array $a, array $b): int {
+            $da = $this->parseDate($a);
+            $db = $this->parseDate($b);
+            if ($da === null && $db === null) {
+                return 0;
+            }
+            if ($da === null) {
+                return 1;
+            }
+            if ($db === null) {
+                return -1;
+            }
+            return $da <=> $db;
+        });
+
+        $weeklyLast = [];
+        foreach ($rows as $bar) {
+            $date = $this->parseDate($bar);
+            if ($date === null) {
+                continue;
+            }
+
+            $weekKey = $date->format('o-W');
+            $weeklyLast[$weekKey] = (float) $bar['close'];
+        }
+
+        if ($weeklyLast === []) {
+            return 0.0;
+        }
+
+        $currentWeekKey = (new \DateTimeImmutable('now'))->format('o-W');
+
+        $completed = [];
+        foreach ($weeklyLast as $key => $close) {
+            if ($key !== $currentWeekKey) {
+                $completed[$key] = $close;
+            }
+        }
+
+        if ($completed === []) {
+            return 0.0;
+        }
+
+        $window = array_slice($completed, -$weeks, null, true);
+        $values = array_values($window);
+        $count = count($values);
+        return $count ? array_sum($values) / $count : 0.0;
     }
 
     /**

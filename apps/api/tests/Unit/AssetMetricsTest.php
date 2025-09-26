@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\AssetMetrics;
+use DateInterval;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -98,7 +99,8 @@ class AssetMetricsTest extends TestCase
         $this->assertEqualsWithDelta(200.5, $metrics->movingAverage(200), 0.0001);
         $this->assertEqualsWithDelta(250.5, $metrics->movingAverage(100), 0.0001);
         $this->assertEqualsWithDelta(275.5, $metrics->movingAverage(50), 0.0001);
-        $this->assertEqualsWithDelta(225.5, $metrics->movingAverage(30), 0.0001);
+        $this->assertEqualsWithDelta(285.5, $metrics->movingAverage(30), 0.0001);
+        $this->assertEqualsWithDelta(225.5, $metrics->movingAverageTradingDays(150), 0.0001);
     }
 
     public function test_moving_average_weeks_matches_historical_average(): void
@@ -106,8 +108,8 @@ class AssetMetricsTest extends TestCase
         $bars = $this->loadHistoricalBars('BUMI');
         $metrics = new AssetMetrics($bars);
 
-        $this->assertEqualsWithDelta(115.06, $metrics->movingAverageWeeks(10), 0.0001);
-        $this->assertEqualsWithDelta(110.2, $metrics->movingAverageWeeks(30), 0.0001);
+        $this->assertEqualsWithDelta(111.5, $metrics->movingAverageWeeks(10), 0.0001);
+        $this->assertEqualsWithDelta(109.0, $metrics->movingAverageWeeks(30), 0.0001);
     }
 
     public function test_support_and_resistance_levels(): void
@@ -156,5 +158,171 @@ class AssetMetricsTest extends TestCase
         $this->assertSame(300.0, $close);
         $this->assertSame(1.0, $close / $metrics->periodHigh(20));
         $this->assertSame(1.0, $close / $metrics->periodHigh(55));
+    }
+
+    public function test_moving_average_weeks_excludes_partial_current_week(): void
+    {
+        $today = new DateTimeImmutable('now');
+        $currentMonday = $today->modify('monday this week');
+
+        $completedBars = [];
+        $completedCloses = [];
+        for ($i = 8; $i >= 1; $i--) {
+            $weekEnd = $currentMonday->sub(new DateInterval('P1D'))->sub(new DateInterval('P' . $i . 'W'));
+            $close = 100.0 + $i;
+            $completedBars[] = [
+                'date' => $weekEnd->format('Y-m-d'),
+                'open' => $close,
+                'high' => $close,
+                'low' => $close,
+                'close' => $close,
+            ];
+            $completedCloses[] = $close;
+        }
+
+        $partialBars = [
+            [
+                'date' => $currentMonday->format('Y-m-d'),
+                'open' => 1000.0,
+                'high' => 1000.0,
+                'low' => 1000.0,
+                'close' => 1000.0,
+            ],
+            [
+                'date' => $currentMonday->add(new DateInterval('P1D'))->format('Y-m-d'),
+                'open' => 1100.0,
+                'high' => 1100.0,
+                'low' => 1100.0,
+                'close' => 1100.0,
+            ],
+        ];
+
+        $expected = array_sum($completedCloses) / count($completedCloses);
+
+        $metricsCompleted = new AssetMetrics($completedBars);
+        $this->assertEqualsWithDelta($expected, $metricsCompleted->movingAverageWeeks(30), 0.0001);
+
+        $barsWithPartial = array_merge($completedBars, $partialBars);
+        shuffle($barsWithPartial);
+        $metricsWithPartial = new AssetMetrics($barsWithPartial);
+        $this->assertEqualsWithDelta($expected, $metricsWithPartial->movingAverageWeeks(30), 0.0001);
+    }
+
+    public function test_moving_average_weeks_handles_limited_history(): void
+    {
+        $start = new DateTimeImmutable('2024-01-07'); // Sunday
+        $bars = [];
+        $closes = [];
+        for ($i = 0; $i < 5; $i++) {
+            $date = $start->add(new DateInterval('P' . $i . 'W'));
+            $close = 10.0 + $i;
+            $bars[] = [
+                'date' => $date->format('Y-m-d'),
+                'open' => $close,
+                'high' => $close,
+                'low' => $close,
+                'close' => $close,
+            ];
+            $closes[] = $close;
+        }
+
+        $metrics = new AssetMetrics($bars);
+        $expected = array_sum($closes) / count($closes);
+        $this->assertEqualsWithDelta($expected, $metrics->movingAverageWeeks(30), 0.0001);
+    }
+
+    public function test_moving_average_trading_days_averages_available_bars(): void
+    {
+        $start = new DateTimeImmutable('2024-01-01');
+        $bars = [];
+        for ($i = 0; $i < 10; $i++) {
+            $date = $start->add(new DateInterval('P' . $i . 'D'));
+            $close = (float) ($i + 1);
+            $bars[] = [
+                'date' => $date->format('Y-m-d'),
+                'open' => $close,
+                'high' => $close,
+                'low' => $close,
+                'close' => $close,
+            ];
+        }
+
+        $bars = array_reverse($bars);
+        $metrics = new AssetMetrics($bars);
+        $this->assertEqualsWithDelta(5.5, $metrics->movingAverageTradingDays(150), 0.0001);
+    }
+
+    public function test_unparseable_dates_are_skipped(): void
+    {
+        $bars = [
+            [
+                'date' => '32/13/2024',
+                'open' => 0.0,
+                'high' => 0.0,
+                'low' => 0.0,
+                'close' => 9999.0,
+            ],
+            [
+                'date' => '01/07/2024',
+                'open' => 0.0,
+                'high' => 0.0,
+                'low' => 0.0,
+                'close' => 20.0,
+            ],
+            [
+                'date' => '08/07/2024',
+                'open' => 0.0,
+                'high' => 0.0,
+                'low' => 0.0,
+                'close' => 30.0,
+            ],
+        ];
+
+        $metrics = new AssetMetrics($bars);
+        $this->assertEqualsWithDelta(25.0, $metrics->movingAverageWeeks(30), 0.0001);
+        $this->assertEqualsWithDelta(25.0, $metrics->movingAverageTradingDays(150), 0.0001);
+    }
+
+    public function test_is_uptrend_uses_weekly_average(): void
+    {
+        $today = new DateTimeImmutable('now');
+        $currentMonday = $today->modify('monday this week');
+
+        $bars = [];
+        for ($week = 30; $week >= 1; $week--) {
+            $weekMonday = $currentMonday->sub(new DateInterval('P' . $week . 'W'));
+            for ($day = 0; $day < 7; $day++) {
+                $date = $weekMonday->add(new DateInterval('P' . $day . 'D'));
+                $close = $day === 6 ? 50.0 : 200.0;
+                $bars[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'open' => $close,
+                    'high' => $close,
+                    'low' => $close,
+                    'close' => $close,
+                ];
+            }
+        }
+
+        $bars[] = [
+            'date' => $currentMonday->format('Y-m-d'),
+            'open' => 120.0,
+            'high' => 120.0,
+            'low' => 120.0,
+            'close' => 120.0,
+        ];
+
+        $bars[] = [
+            'date' => $currentMonday->add(new DateInterval('P1D'))->format('Y-m-d'),
+            'open' => 125.0,
+            'high' => 125.0,
+            'low' => 125.0,
+            'close' => 125.0,
+        ];
+
+        $metrics = new AssetMetrics($bars);
+        $this->assertEqualsWithDelta(50.0, $metrics->movingAverageWeeks(30), 0.0001);
+        $this->assertTrue($metrics->isUptrend());
+        $this->assertGreaterThan($metrics->lastClose(), $metrics->movingAverageTradingDays(150));
     }
 }
