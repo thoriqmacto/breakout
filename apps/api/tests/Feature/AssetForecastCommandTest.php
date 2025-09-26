@@ -245,4 +245,146 @@ class AssetForecastCommandTest extends TestCase
         $this->assertSame('HLSLBreakout', $backtest->params_json['strategy'] ?? null);
         $this->assertSame(10_000_000.0, (float) ($backtest->stats_json['initial_capital'] ?? 0.0));
     }
+
+    public function test_rerun_option_requires_backtest_results(): void
+    {
+        $asset = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        Price::create([
+            'asset_id' => $asset->id,
+            'date' => '2024-01-01',
+            'open' => 10,
+            'high' => 11,
+            'low' => 9,
+            'close' => 10,
+            'volume' => 1_000,
+        ]);
+
+        $this->artisan('asset:forecast', [
+            '--sym' => 'AAA',
+            '--rerun' => true,
+        ])
+            ->expectsOutputToContain('The --rerun option requires --bt-result to specify one or more tickers.')
+            ->assertExitCode(1);
+    }
+
+    public function test_uses_existing_backtest_when_available(): void
+    {
+        $asset = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $rows = [
+            ['date' => '2024-01-01', 'open' => 9, 'high' => 10, 'low' => 9, 'close' => 9, 'volume' => 1000],
+            ['date' => '2024-01-08', 'open' => 10, 'high' => 11, 'low' => 10, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-15', 'open' => 11, 'high' => 12, 'low' => 11, 'close' => 11, 'volume' => 1000],
+            ['date' => '2024-01-22', 'open' => 10, 'high' => 11, 'low' => 9.5, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-29', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 400],
+            ['date' => '2024-01-31', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 600],
+            ['date' => '2024-02-05', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 1000],
+            ['date' => '2024-02-16', 'open' => 13, 'high' => 14, 'low' => 13, 'close' => 14, 'volume' => 1500],
+        ];
+
+        foreach ($rows as $row) {
+            Price::create($row + ['asset_id' => $asset->id]);
+        }
+
+        Backtest::create([
+            'run_id' => 'run-1',
+            'created_at' => now()->subDay(),
+            'params_json' => ['symbols' => ['AAA']],
+            'stats_json' => [
+                'initial_capital' => 100000,
+                'final_equity' => 105000,
+                'total_return_pct' => 5,
+            ],
+        ]);
+
+        BacktestTrade::create([
+            'run_id' => 'run-1',
+            'asset_id' => $asset->id,
+            'entry_date' => '2024-01-10',
+            'entry_px' => 10,
+            'exit_date' => '2024-01-20',
+            'exit_px' => 11,
+            'units' => 100,
+            'pnl' => 100,
+        ]);
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--sym' => 'AAA',
+            '--bt-result' => 'AAA',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+
+        $output = Artisan::output();
+        $this->assertStringContainsString('Backtest Summary for AAA', $output);
+        $this->assertStringContainsString('Run ID: run-1', $output);
+        $this->assertStringNotContainsString('Generating HLSLBreakout backtest for AAA...', $output);
+        $this->assertSame(1, Backtest::count());
+    }
+
+    public function test_rerun_option_generates_new_backtest(): void
+    {
+        $asset = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $rows = [
+            ['date' => '2024-01-01', 'open' => 9, 'high' => 10, 'low' => 9, 'close' => 9, 'volume' => 1000],
+            ['date' => '2024-01-08', 'open' => 10, 'high' => 11, 'low' => 10, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-15', 'open' => 11, 'high' => 12, 'low' => 11, 'close' => 11, 'volume' => 1000],
+            ['date' => '2024-01-22', 'open' => 10, 'high' => 11, 'low' => 9.5, 'close' => 10, 'volume' => 1000],
+            ['date' => '2024-01-29', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 400],
+            ['date' => '2024-01-31', 'open' => 14, 'high' => 15, 'low' => 13, 'close' => 14, 'volume' => 600],
+            ['date' => '2024-02-05', 'open' => 12, 'high' => 13, 'low' => 12, 'close' => 12, 'volume' => 1000],
+            ['date' => '2024-02-16', 'open' => 13, 'high' => 14, 'low' => 13, 'close' => 14, 'volume' => 1500],
+        ];
+
+        foreach ($rows as $row) {
+            Price::create($row + ['asset_id' => $asset->id]);
+        }
+
+        Backtest::create([
+            'run_id' => 'run-1',
+            'created_at' => now()->subDay(),
+            'params_json' => ['symbols' => ['AAA']],
+            'stats_json' => [
+                'initial_capital' => 100000,
+                'final_equity' => 105000,
+                'total_return_pct' => 5,
+            ],
+        ]);
+
+        BacktestTrade::create([
+            'run_id' => 'run-1',
+            'asset_id' => $asset->id,
+            'entry_date' => '2024-01-10',
+            'entry_px' => 10,
+            'exit_date' => '2024-01-20',
+            'exit_px' => 11,
+            'units' => 100,
+            'pnl' => 100,
+        ]);
+
+        $exitCode = Artisan::call('asset:forecast', [
+            '--sym' => 'AAA',
+            '--bt-result' => 'AAA',
+            '--rerun' => true,
+        ]);
+
+        $this->assertSame(0, $exitCode);
+
+        $output = Artisan::output();
+        $this->assertStringContainsString('Generating HLSLBreakout backtest for AAA...', $output);
+        $this->assertMatchesRegularExpression('/Run ID: auto-hlsl-[\w-]+/', $output);
+        $this->assertSame(2, Backtest::count());
+        $this->assertSame(2, BacktestTrade::query()->distinct('run_id')->count('run_id'));
+    }
 }
