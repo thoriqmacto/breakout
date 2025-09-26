@@ -108,14 +108,24 @@ class AssetForecastCommand extends Command
 
             $analysis = $strategy->analyze($bars);
             $dailyData = $analysis['daily'];
+
+            $noteOverride = null;
             if ($dailyData === []) {
                 $this->warn("{$symbol}: insufficient price history.");
-                continue;
+
+                $lastBar = $bars[array_key_last($bars)];
+                $latestClose = (float) $lastBar['close'];
+                $latestDateValue = $lastBar['date'];
+                $noteOverride = 'Insufficient price history.';
+            } else {
+                $latestDay = $dailyData[array_key_last($dailyData)];
+                $latestClose = (float) $latestDay['close'];
+                $latestDateValue = $latestDay['date'];
             }
 
-            $latestDay = $dailyData[array_key_last($dailyData)];
-            $latestClose = (float) $latestDay['close'];
-            $latestDate = $latestDay['date']->toDateString();
+            $latestDate = $latestDateValue instanceof \DateTimeInterface
+                ? $latestDateValue->format('Y-m-d')
+                : (string) $latestDateValue;
 
             $forecast = $this->forecastNextEntry($analysis['weekly'], $analysis['signals']);
             $weeklyAtr = $this->computeWeeklyAtr($analysis['weekly']);
@@ -131,6 +141,11 @@ class AssetForecastCommand extends Command
             }
 
             $finalEquity = $this->computeBacktestFinalEquity($symbol, $bars, $strategyOption, $initialCapital);
+
+            $noteParts = array_filter([
+                $noteOverride,
+                $forecast['note'] ?? null,
+            ], static fn ($value) => is_string($value) && $value !== '');
 
             $rows[] = [
                 'symbol' => $symbol,
@@ -157,7 +172,7 @@ class AssetForecastCommand extends Command
                     ? number_format($finalEquity, 0, '.', ',')
                     : '—',
                 'final_equity_value' => $finalEquity,
-                'note' => $forecast['note'] ?? '',
+                'note' => $noteParts !== [] ? implode(' ', $noteParts) : '',
             ];
         }
 
@@ -202,6 +217,13 @@ class AssetForecastCommand extends Command
             'Final Equity',
             'Note',
         ], $tableRows, 'default');
+
+        $this->line('');
+        $this->line(sprintf(
+            'Final Equity reflects a %s IDR simulation of the %s strategy.',
+            number_format((float) $initialCapital, 0, '.', ','),
+            $strategyOption
+        ));
 
         $this->displayBacktestData(
             $backtestSummarySymbols,
