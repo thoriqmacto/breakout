@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\Backtest;
 use App\Models\BacktestTrade;
 use App\Models\Price;
+use App\Services\Backtest\HLSLBreakoutBacktestService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
@@ -545,6 +546,129 @@ class AssetForecastCommandTest extends TestCase
                 ]
             )
             ->assertExitCode(0);
+    }
+
+    public function test_combined_backtest_uses_shared_capital_and_stores_trades(): void
+    {
+        $assetA = Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+        ]);
+
+        $assetB = Asset::create([
+            'symbol' => 'BBB',
+            'name' => 'Asset BBB',
+        ]);
+
+        $this->seedPrices($assetA, $this->examplePriceRows(14.0));
+        $this->seedPrices($assetB, $this->examplePriceRows(12.0));
+
+        $capturedRunArgs = null;
+
+        $this->mock(HLSLBreakoutBacktestService::class, function ($mock) use (&$capturedRunArgs) {
+            $mock->shouldReceive('run')
+                ->once()
+                ->andReturnUsing(function (array $dailyData, float $initialCapital, int $boardLot = 100) use (&$capturedRunArgs) {
+                    $capturedRunArgs = [
+                        'dailyData' => $dailyData,
+                        'initialCapital' => $initialCapital,
+                    ];
+
+                    return [
+                        'stats' => [
+                            'initial_capital' => $initialCapital,
+                            'final_equity' => 10_750_000.0,
+                            'total_return_pct' => 7.5,
+                            'CAGR_pct' => 6.0,
+                            'max_drawdown_pct' => 2.0,
+                            'num_trades' => 2,
+                            'win_rate_pct' => 50.0,
+                            'avg_win_pct' => 10.0,
+                            'avg_loss_pct' => -3.0,
+                            'profit_factor' => 1.5,
+                        ],
+                        'trades' => [
+                            [
+                                'ticker' => 'AAA',
+                                'entry_date' => '2024-01-10',
+                                'entry_price' => 10.0,
+                                'exit_date' => '2024-01-20',
+                                'exit_price' => 11.0,
+                                'shares' => 100,
+                                'pnl' => 100.0,
+                            ],
+                            [
+                                'ticker' => 'BBB',
+                                'entry_date' => '2024-02-10',
+                                'entry_price' => 20.0,
+                                'exit_date' => '2024-02-25',
+                                'exit_price' => 21.0,
+                                'shares' => 50,
+                                'pnl' => 50.0,
+                            ],
+                        ],
+                    ];
+                });
+        });
+
+        $this->artisan('asset:forecast', [
+            '--sym' => ['AAA', 'BBB'],
+            '--bt-result' => true,
+            '--trades' => true,
+        ])
+            ->expectsOutputToContain('Backtest Summary (Combined)')
+            ->expectsOutputToContain('Tickers: AAA, BBB')
+            ->expectsTable(
+                ['Metric', 'Value'],
+                [
+                    ['Initial Capital', '10,000,000.00'],
+                    ['Final Equity', '10,750,000.00'],
+                    ['Total Return %', '7.50'],
+                    ['CAGR %', '6.00'],
+                    ['Max Drawdown %', '2.00'],
+                    ['Trades', '2'],
+                    ['Win Rate %', '50.00'],
+                    ['Avg Win %', '10.00'],
+                    ['Avg Loss %', '-3.00'],
+                    ['Profit Factor', '1.50'],
+                ]
+            )
+            ->expectsTable(
+                ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
+                [
+                    [
+                        1,
+                        'AAA',
+                        '2024-01-10',
+                        '2024-01-20',
+                        '10',
+                        '11',
+                        '100',
+                        '100',
+                    ],
+                    [
+                        2,
+                        'BBB',
+                        '2024-02-10',
+                        '2024-02-25',
+                        '20',
+                        '21',
+                        '50',
+                        '50',
+                    ],
+                ]
+            )
+            ->assertExitCode(0);
+
+        $this->assertNotNull($capturedRunArgs);
+        $this->assertSame(10_000_000.0, $capturedRunArgs['initialCapital']);
+        $this->assertSameCanonicalizing(['AAA', 'BBB'], array_keys($capturedRunArgs['dailyData']));
+
+        $backtest = Backtest::first();
+        $this->assertNotNull($backtest);
+        $this->assertSame(['AAA', 'BBB'], $backtest->params_json['symbols'] ?? []);
+        $this->assertSame(10_000_000.0, (float) ($backtest->stats_json['initial_capital'] ?? 0.0));
+        $this->assertSame(2, BacktestTrade::count());
     }
 
     public function test_trades_option_requires_backtest_results(): void
