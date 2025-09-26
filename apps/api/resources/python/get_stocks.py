@@ -6,7 +6,8 @@
 #   php artisan python:run get_stocks.py \
 #       --arg=TICK1 --arg=TICK2 --arg=--start=2020-01-01 --arg=--end=2020-12-31
 
-import sys, subprocess, importlib, datetime, os, time, traceback, argparse
+import sys, subprocess, importlib, datetime, os, time, traceback, argparse, json
+from typing import Optional
 
 # ---------- Helpers for package installs ----------
 def console_python():
@@ -76,6 +77,11 @@ def parse_args(argv=None):
     parser.add_argument('tickers', nargs='*', help='Ticker symbols')
     parser.add_argument('--start', help='Start date YYYY-MM-DD')
     parser.add_argument('--end', help='End date YYYY-MM-DD')
+    parser.add_argument('--check-latest', action='store_true',
+                        help='Check availability of latest IDX data on yfinance')
+    parser.add_argument('--latest-symbol', default='^JKSE',
+                        help='Symbol used to probe latest IDX data availability')
+    parser.add_argument('--latest-date', help='Date to compare with latest available data YYYY-MM-DD')
     return parser.parse_args(argv)
 
 # ---------- Downloader ----------
@@ -107,9 +113,91 @@ def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3):
         time.sleep(pause_sec)
     raise last_err
 
+
+def latest_available_date(symbol: str, lookback_days: int = 10):
+    global pd, yf
+    if pd is None:
+        pd = require("pandas")
+    if yf is None:
+        yf = require("yfinance")
+
+    try:
+        hist = yf.download(
+            symbol,
+            period=f"{max(lookback_days, 1)}d",
+            interval="1d",
+            auto_adjust=False,
+            progress=False,
+            group_by="column",
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to probe latest data for {symbol}: {exc}") from exc
+
+    if hist is None or hist.empty:
+        return None
+
+    hist = flatten_columns(hist)
+
+    # Drop rows where we do not have any numeric value (all NaN)
+    if hasattr(hist, "dropna"):
+        if "Close" in hist:
+            hist = hist.dropna(subset=["Close"], how="all")
+        else:
+            hist = hist.dropna(how="all")
+
+    if hist is None or getattr(hist, "empty", False):
+        return None
+
+    index = getattr(hist, "index", None)
+    if index is None or len(index) == 0:
+        return None
+
+    # Pandas indexes can be tz-aware; normalise to naive dates
+    try:
+        idx = pd.to_datetime(index)
+        if getattr(idx, "tz", None) is not None:
+            idx = idx.tz_localize(None)
+    except Exception:
+        idx = [pd.to_datetime(v) for v in index]
+
+    if len(idx) == 0:
+        return None
+
+    try:
+        latest_ts = idx.max()
+    except Exception:
+        latest_ts = idx[-1]
+    if hasattr(latest_ts, "date"):
+        return latest_ts.date()
+    return datetime.date.fromisoformat(str(latest_ts)[:10])
+
+
+def build_latest_status(symbol: str, compare_date: Optional[datetime.date]):
+    latest = latest_available_date(symbol)
+    result = {
+        "symbol": symbol,
+        "latest_date": latest.isoformat() if latest else None,
+        "requested_date": compare_date.isoformat() if compare_date else None,
+        "is_available": bool(latest and compare_date and latest >= compare_date),
+        "checked_at": datetime.datetime.utcnow().isoformat() + "Z",
+    }
+    return result
+
 # ---------- Main ----------
 def main(argv=None):
     args = parse_args(argv)
+
+    if args.check_latest:
+        compare_date = None
+        if args.latest_date:
+            compare_date = datetime.datetime.strptime(args.latest_date, '%Y-%m-%d').date()
+        else:
+            compare_date = datetime.date.today()
+
+        result = build_latest_status(args.latest_symbol, compare_date)
+        print(json.dumps(result))
+        return
+
     tickers = read_tickers(args.tickers)
     today = datetime.date.today()
     start_date = datetime.datetime.strptime(args.start, '%Y-%m-%d').date() if args.start else start_15y_ago(today)

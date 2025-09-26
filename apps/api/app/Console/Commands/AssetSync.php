@@ -9,6 +9,7 @@ use App\Services\SymbolDate;
 use App\Services\DbBars;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use App\Services\PythonRunner;
 
 class AssetSync extends Command
 {
@@ -39,6 +40,9 @@ class AssetSync extends Command
     {
         $this->info($this->description);
 
+        $yfinanceReady = null;
+        $yfinanceLatestDate = null;
+
         if ($this->option('eod')) {
             $today = Carbon::now()->toDateString();
             $this->input->setOption('check-python', true);
@@ -46,6 +50,43 @@ class AssetSync extends Command
             $this->input->setOption('import-csv', true);
             $this->input->setOption('continue', true);
             $this->input->setOption('chk-date', $today);
+
+            $this->info('Checking latest IDX data availability from yfinance ...');
+
+            try {
+                /** @var PythonRunner $runner */
+                $runner = app(PythonRunner::class);
+                $response = $runner->run('get_stocks.py', null, [
+                    '--check-latest',
+                    '--latest-symbol=^JKSE',
+                    "--latest-date={$today}",
+                ]);
+
+                if ($response['ok'] && is_array($response['json'])) {
+                    $yfinanceLatestDate = $response['json']['latest_date'] ?? null;
+                    $yfinanceReady = (bool) ($response['json']['is_available'] ?? false);
+
+                    if ($yfinanceReady) {
+                        $this->info('Latest IDX data on yfinance is available.');
+                    } else {
+                        $message = 'Latest IDX data on yfinance is not available yet.';
+                        if ($yfinanceLatestDate) {
+                            $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                        }
+                        $this->warn($message);
+                    }
+                } else {
+                    $yfinanceReady = null;
+                    $this->warn('Unable to determine latest IDX data availability from yfinance.');
+                }
+            } catch (\Throwable $e) {
+                $yfinanceReady = null;
+                $this->warn('Failed to check yfinance latest data: ' . $e->getMessage());
+            }
+
+            if ($yfinanceReady === false) {
+                $this->input->setOption('run-python', false);
+            }
         }
 
         $indexSymbols = config('csv.index_symbols', []);
@@ -90,7 +131,11 @@ class AssetSync extends Command
                     $runPython = $this->option('run-python') ??
                                  $this->confirm('Run python get_stocks.py now?', false);
                     if ($runPython) {
-                        $this->call('python:run', ['script' => 'get_stocks.py']);
+                        if ($this->option('eod') && $yfinanceReady === false) {
+                            $this->warn('Skipping python download because latest IDX data is not available yet.');
+                        } else {
+                            $this->call('python:run', ['script' => 'get_stocks.py']);
+                        }
                     } else {
                         $this->warn('No python code to run.');
                     }
@@ -202,6 +247,14 @@ class AssetSync extends Command
             $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
             if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
+                if ($this->option('eod') && $yfinanceReady === false) {
+                    $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
+                    if ($yfinanceLatestDate) {
+                        $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                    }
+                    $this->warn($message);
+                    continue;
+                }
                 $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
                 $end    = $chkLatest ?: now()->toDateString();
                 $ticker = $symbol . '.JK';
