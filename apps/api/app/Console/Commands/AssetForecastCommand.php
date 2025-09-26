@@ -387,15 +387,15 @@ class AssetForecastCommand extends Command
                         $index + 1,
                         $trade->entry_date?->toDateString() ?? '—',
                         $trade->exit_date?->toDateString() ?? '—',
-                        sprintf('%.4f', (float) $trade->entry_px),
-                        sprintf('%.4f', (float) ($trade->exit_px ?? 0.0)),
+                        sprintf('%.0f', (float) $trade->entry_px),
+                        sprintf('%.0f', (float) ($trade->exit_px ?? 0.0)),
                         sprintf('%.0f', (float) $trade->units),
                         sprintf('%.2f', (float) ($trade->pnl ?? 0.0)),
                     ];
                 }
 
                 $this->table(
-                    ['#', 'Entry Date', 'Exit Date', 'Entry Price', 'Exit Price', 'Units', 'PnL'],
+                    ['#', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
                     $rows
                 );
             }
