@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Asset;
 use App\Models\Backtest;
 use App\Models\BacktestTrade;
+use App\Services\AssetMetrics;
 use App\Services\Backtest\HLSLBreakoutBacktestService;
 use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
@@ -16,6 +17,7 @@ class AssetForecastCommand extends Command
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
         {--all : Include every asset with price data}
+        {--filter= : Filter results when combined with --all (currently only "uptrend")}
         {--bt-result : Include the latest backtest summary for the selected tickers}
         {--trades : Include detailed backtest trades for the selected tickers}
         {--rerun : Re-run backtests for the selected tickers}
@@ -30,6 +32,11 @@ class AssetForecastCommand extends Command
 
     public function handle(): int
     {
+        $filterOption = $this->normalizeFilterOption();
+        if ($filterOption === false) {
+            return Command::FAILURE;
+        }
+
         $tickers = $this->option('all') ? $this->resolveAllTickers() : $this->resolveTickers();
         if ($tickers === []) {
             if ($this->option('all')) {
@@ -82,6 +89,10 @@ class AssetForecastCommand extends Command
         foreach ($tickers as $symbol) {
             $bars = $this->loadBars($symbol);
             if ($bars === null) {
+                continue;
+            }
+
+            if ($filterOption !== null && ! $this->passesFilter($filterOption, $bars)) {
                 continue;
             }
 
@@ -274,6 +285,49 @@ class AssetForecastCommand extends Command
             ->unique()
             ->values()
             ->all();
+    }
+
+    private function normalizeFilterOption(): string|null|false
+    {
+        $option = $this->option('filter');
+        if ($option === null) {
+            return null;
+        }
+
+        if (! $this->option('all')) {
+            $this->error('The --filter option requires --all.');
+
+            return false;
+        }
+
+        $value = strtolower(trim((string) $option));
+        if ($value === '') {
+            return null;
+        }
+
+        $supported = ['uptrend'];
+        if (! in_array($value, $supported, true)) {
+            $this->error(sprintf(
+                'Unsupported filter: %s. Available filters: %s.',
+                $value,
+                implode(', ', $supported)
+            ));
+
+            return false;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}> $bars
+     */
+    private function passesFilter(string $filter, array $bars): bool
+    {
+        return match ($filter) {
+            'uptrend' => (new AssetMetrics($bars))->isUptrend(),
+            default => true,
+        };
     }
 
     /**
