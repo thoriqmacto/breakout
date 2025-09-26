@@ -617,6 +617,10 @@ class AssetForecastCommand extends Command
             ];
         }
 
+        $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
+        $combineTradeOutput = count($uniqueTradeSymbols) > 1;
+        $combinedTradeRows = [];
+
         foreach ($requestedSymbols as $symbol) {
             if (! isset($dataBySymbol[$symbol])) {
                 continue;
@@ -637,6 +641,32 @@ class AssetForecastCommand extends Command
             }
 
             if (in_array($symbol, $tradeSymbols, true)) {
+                if ($combineTradeOutput) {
+                    if ($trades === []) {
+                        $this->line('No trades recorded for this backtest run.');
+                        continue;
+                    }
+
+                    $formatPrice = static fn ($price) => $price !== null
+                        ? sprintf('%.0f', (float) $price)
+                        : '—';
+
+                    foreach ($trades as $trade) {
+                        $combinedTradeRows[] = [
+                            count($combinedTradeRows) + 1,
+                            $symbol,
+                            $trade->entry_date?->toDateString() ?? '—',
+                            $trade->exit_date?->toDateString() ?? '—',
+                            $formatPrice($trade->entry_px),
+                            $formatPrice($trade->exit_px),
+                            sprintf('%.0f', (float) $trade->units),
+                            sprintf('%.0f', (float) ($trade->pnl ?? 0)),
+                        ];
+                    }
+
+                    continue;
+                }
+
                 $this->line('');
                 $this->info("Backtest Trades for {$symbol}");
 
@@ -667,6 +697,15 @@ class AssetForecastCommand extends Command
                     $rows
                 );
             }
+        }
+
+        if ($combineTradeOutput && $combinedTradeRows !== []) {
+            $this->line('');
+            $this->info('Backtest Trades');
+            $this->table(
+                ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
+                $combinedTradeRows
+            );
         }
     }
 
