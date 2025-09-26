@@ -878,10 +878,6 @@ class AssetForecastCommand extends Command
             return;
         }
 
-        $formatPrice = static fn ($price) => $price !== null
-            ? sprintf('%.0f', (float) $price)
-            : '—';
-
         $preloadedTrades = [];
         if (isset($backtest['trades']) && is_array($backtest['trades'])) {
             foreach ($backtest['trades'] as $symbol => $trades) {
@@ -905,38 +901,6 @@ class AssetForecastCommand extends Command
             $symbolsForTrades = $uniqueTradeSymbols;
         }
 
-        $appendRow = function (string $symbol, BacktestTrade|array $trade) use (&$combinedRows, $formatPrice): void {
-            $entryDate = $trade instanceof BacktestTrade
-                ? $trade->entry_date?->toDateString()
-                : ($trade['entry_date'] ?? null);
-            $exitDate = $trade instanceof BacktestTrade
-                ? $trade->exit_date?->toDateString()
-                : ($trade['exit_date'] ?? null);
-            $entryPrice = $trade instanceof BacktestTrade
-                ? $trade->entry_px
-                : ($trade['entry_px'] ?? $trade['entry_price'] ?? null);
-            $exitPrice = $trade instanceof BacktestTrade
-                ? $trade->exit_px
-                : ($trade['exit_px'] ?? $trade['exit_price'] ?? null);
-            $units = $trade instanceof BacktestTrade
-                ? $trade->units
-                : ($trade['units'] ?? $trade['shares'] ?? 0);
-            $pnl = $trade instanceof BacktestTrade
-                ? ($trade->pnl ?? 0)
-                : ($trade['pnl'] ?? $trade['profit'] ?? 0);
-
-            $combinedRows[] = [
-                count($combinedRows) + 1,
-                $symbol,
-                $entryDate !== null ? (string) $entryDate : '—',
-                $exitDate !== null ? (string) $exitDate : '—',
-                $formatPrice($entryPrice),
-                $formatPrice($exitPrice),
-                sprintf('%.0f', (float) $units),
-                sprintf('%.0f', (float) $pnl),
-            ];
-        };
-
         $missingTradeSymbols = [];
 
         foreach ($symbolsForTrades as $symbol) {
@@ -953,7 +917,7 @@ class AssetForecastCommand extends Command
 
             foreach ($trades as $trade) {
                 if ($trade instanceof BacktestTrade || is_array($trade)) {
-                    $appendRow($symbol, $trade);
+                    $combinedRows[] = $this->formatTradeTableRow($symbol, $trade);
                 }
             }
         }
@@ -1058,10 +1022,6 @@ class AssetForecastCommand extends Command
             return;
         }
 
-        $formatPrice = static fn ($price) => $price !== null
-            ? sprintf('%.0f', (float) $price)
-            : '—';
-
         $combinedRows = [];
         $missingTradeSymbols = [];
 
@@ -1082,16 +1042,9 @@ class AssetForecastCommand extends Command
             }
 
             foreach ($trades as $trade) {
-                $combinedRows[] = [
-                    count($combinedRows) + 1,
-                    $symbol,
-                    $trade->entry_date?->toDateString() ?? '—',
-                    $trade->exit_date?->toDateString() ?? '—',
-                    $formatPrice($trade->entry_px),
-                    $formatPrice($trade->exit_px),
-                    sprintf('%.0f', (float) $trade->units),
-                    sprintf('%.0f', (float) ($trade->pnl ?? 0)),
-                ];
+                if ($trade instanceof BacktestTrade || is_array($trade)) {
+                    $combinedRows[] = $this->formatTradeTableRow($symbol, $trade);
+                }
             }
         }
 
@@ -1119,6 +1072,57 @@ class AssetForecastCommand extends Command
         foreach ($missingTradeSymbols as $missingSymbol) {
             $this->warn($missingSymbol . ': no trade data available in this backtest run.');
         }
+    }
+
+    /**
+     * @param BacktestTrade|array<string, mixed> $trade
+     * @return array<int, string|int>
+     */
+    private function formatTradeTableRow(string $symbol, BacktestTrade|array $trade): array
+    {
+        $entryDate = $trade instanceof BacktestTrade
+            ? $trade->entry_date?->toDateString()
+            : ($trade['entry_date'] ?? null);
+        $exitDate = $trade instanceof BacktestTrade
+            ? $trade->exit_date?->toDateString()
+            : ($trade['exit_date'] ?? null);
+        $entryPrice = $trade instanceof BacktestTrade
+            ? $trade->entry_px
+            : ($trade['entry_px'] ?? $trade['entry_price'] ?? null);
+        $exitPrice = $trade instanceof BacktestTrade
+            ? $trade->exit_px
+            : ($trade['exit_px'] ?? $trade['exit_price'] ?? null);
+        $units = $trade instanceof BacktestTrade
+            ? $trade->units
+            : ($trade['units'] ?? $trade['shares'] ?? 0);
+        $pnl = $trade instanceof BacktestTrade
+            ? ($trade->pnl ?? 0)
+            : ($trade['pnl'] ?? $trade['profit'] ?? 0);
+
+        return [
+            0,
+            $symbol,
+            $entryDate !== null ? (string) $entryDate : '—',
+            $exitDate !== null ? (string) $exitDate : '—',
+            $this->formatTradePrice($entryPrice),
+            $this->formatTradePrice($exitPrice),
+            $this->formatTradeQuantity($units),
+            $this->formatTradeQuantity($pnl),
+        ];
+    }
+
+    private function formatTradePrice(mixed $price): string
+    {
+        if ($price === null) {
+            return '—';
+        }
+
+        return sprintf('%.0f', (float) $price);
+    }
+
+    private function formatTradeQuantity(mixed $value): string
+    {
+        return sprintf('%.0f', (float) $value);
     }
 
     /**
