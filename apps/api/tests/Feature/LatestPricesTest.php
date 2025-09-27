@@ -61,7 +61,8 @@ class LatestPricesTest extends TestCase
         $response = $this->getJson('/api/v1/assets/latest-prices');
 
         $response->assertStatus(200)
-            ->assertJsonCount(2)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonCount(2, 'data')
             ->assertJsonFragment(['asset_id' => $asset1->id, 'close' => 12])
             ->assertJsonFragment(['asset_id' => $asset2->id, 'close' => 22]);
     }
