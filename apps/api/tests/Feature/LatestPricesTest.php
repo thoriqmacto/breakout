@@ -14,6 +14,11 @@ class LatestPricesTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_it_requires_authentication(): void
+    {
+        $this->getJson('/api/v1/assets/latest-prices')->assertUnauthorized();
+    }
+
     public function test_it_returns_latest_price_for_all_assets(): void
     {
         Sanctum::actingAs(User::factory()->create(), ['*']);
