@@ -11,6 +11,7 @@ use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 
 class AssetForecastCommand extends Command
@@ -206,7 +207,7 @@ class AssetForecastCommand extends Command
             ];
         }
 
-        $this->table([
+        $this->renderTable([
             '#',
             'Ticker',
             'Close',
@@ -219,7 +220,7 @@ class AssetForecastCommand extends Command
             'Volume Target',
             'Final Equity',
             'Note',
-        ], $tableRows, $this->asciiTableStyle());
+        ], $tableRows);
 
         $this->line('');
         $this->line(sprintf(
@@ -237,6 +238,23 @@ class AssetForecastCommand extends Command
         );
 
         return Command::SUCCESS;
+    }
+
+    private function renderTable(array $headers, array $rows): void
+    {
+        $table = new Table($this->getOutput());
+        $table->setHeaders($headers);
+        $table->setRows($rows);
+
+        $style = $this->asciiTableStyle();
+
+        if ($style instanceof TableStyle) {
+            $table->setStyle($style);
+        } else {
+            $table->setStyle('default');
+        }
+
+        $table->render();
     }
 
     private function asciiTableStyle(): TableStyle
@@ -820,7 +838,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtest['model']->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []), $this->asciiTableStyle());
+            $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []));
         }
 
         if (! in_array($symbol, $tradeSymbols, true)) {
@@ -849,10 +867,9 @@ class AssetForecastCommand extends Command
             ];
         }
 
-        $this->table(
+        $this->renderTable(
             ['#', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
-            $rows,
-            $this->asciiTableStyle()
+            $rows
         );
     }
 
@@ -899,7 +916,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $backtestModel->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []), $this->asciiTableStyle());
+            $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []));
         }
 
         $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
@@ -971,10 +988,9 @@ class AssetForecastCommand extends Command
 
         $combinedRows = $this->sortTradeTableRows($combinedRows);
 
-        $this->table(
+        $this->renderTable(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
-            $combinedRows,
-            $this->asciiTableStyle()
+            $combinedRows
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
@@ -1043,7 +1059,7 @@ class AssetForecastCommand extends Command
                 $this->line('Created: ' . $model->created_at->toDateTimeString());
             }
 
-            $this->table(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []), $this->asciiTableStyle());
+            $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []));
         }
 
         $uniqueTradeSymbols = array_values(array_unique($tradeSymbols));
@@ -1092,10 +1108,9 @@ class AssetForecastCommand extends Command
 
         $combinedRows = $this->sortTradeTableRows($combinedRows);
 
-        $this->table(
+        $this->renderTable(
             ['#', 'Symbol', 'Entry Date', 'Exit Date', 'Entry', 'Exit', 'Units', 'PnL'],
-            $combinedRows,
-            $this->asciiTableStyle()
+            $combinedRows
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
