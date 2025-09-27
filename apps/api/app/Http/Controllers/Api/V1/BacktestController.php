@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Services\Backtest\HLSLBreakoutBacktestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class BacktestController extends Controller
+class BacktestController extends ApiController
 {
     public function __construct(private readonly HLSLBreakoutBacktestService $service)
     {
@@ -36,7 +36,7 @@ class BacktestController extends Controller
 
         $grouped = [];
         foreach ($dataRows as $row) {
-            if (!is_array($row) || empty($row['ticker'])) {
+            if (! is_array($row) || empty($row['ticker'])) {
                 continue;
             }
 
