@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use App\Http\Resources\ApiResponse;
+use App\Http\Resources\AssetResource;
+use App\Http\Resources\PriceResource;
 use App\Services\AssetMetrics;
 
 class AssetController extends ApiController
@@ -21,7 +24,11 @@ class AssetController extends ApiController
             $query->with('prices');
         }
 
-        return response()->json($query->get());
+        if ($this->include('latest_price')) {
+            $query->with('latestPriceRecord');
+        }
+
+        return ApiResponse::success(AssetResource::collection($query->get()));
     }
 
     /**
@@ -41,7 +48,11 @@ class AssetController extends ApiController
 
         $asset = Asset::create($data);
 
-        return response()->json($asset, 201);
+        return ApiResponse::success(
+            AssetResource::make($asset),
+            'Asset created successfully',
+            201
+        );
     }
 
     /**
@@ -56,7 +67,11 @@ class AssetController extends ApiController
             $asset->load('prices');
         }
 
-        return response()->json($asset);
+        if ($this->include('latest_price')) {
+            $asset->load('latestPriceRecord');
+        }
+
+        return ApiResponse::success(AssetResource::make($asset));
     }
 
     /**
@@ -77,7 +92,18 @@ class AssetController extends ApiController
 
         $asset->update($data);
 
-        return response()->json($asset);
+        if ($this->include('prices')) {
+            $asset->load('prices');
+        }
+
+        if ($this->include('latest_price')) {
+            $asset->load('latestPriceRecord');
+        }
+
+        return ApiResponse::success(
+            AssetResource::make($asset),
+            'Asset updated successfully'
+        );
     }
 
     /**
@@ -90,7 +116,7 @@ class AssetController extends ApiController
     {
         $asset->delete();
 
-        return response()->json(null, 204);
+        return ApiResponse::success(null, 'Asset deleted successfully');
     }
 
     /**
@@ -104,10 +130,10 @@ class AssetController extends ApiController
         $price = $asset->latestPrice();
 
         if (!$price) {
-            return response()->json(['message' => 'Price data not found'], 404);
+            return ApiResponse::error('Price data not found', 404);
         }
 
-        return response()->json($price);
+        return ApiResponse::success(PriceResource::make($price));
     }
 
     /**
@@ -127,7 +153,7 @@ class AssetController extends ApiController
             return $price;
         })->filter()->values();
 
-        return response()->json($prices);
+        return ApiResponse::success(PriceResource::collection($prices));
     }
 
     /**
@@ -139,6 +165,6 @@ class AssetController extends ApiController
      */
     public function metrics(Asset $asset, AssetMetrics $metrics)
     {
-        return response()->json($metrics->forAsset($asset));
+        return ApiResponse::success($metrics->forAsset($asset));
     }
 }
