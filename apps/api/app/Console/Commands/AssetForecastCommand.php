@@ -11,14 +11,10 @@ use App\Services\Strategies\HLSLBreakoutStrategy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableStyle;
 
 class AssetForecastCommand extends Command
 {
     private const DEFAULT_INITIAL_CAPITAL_IDR = 10_000_000.0;
-
-    private ?TableStyle $asciiTableStyle = null;
 
     protected $signature = 'asset:forecast
         {--sym=* : Comma-separated or repeated tickers to analyze}
@@ -242,45 +238,89 @@ class AssetForecastCommand extends Command
 
     private function renderTable(array $headers, array $rows): void
     {
-        $table = new Table($this->getOutput());
-        $table->setHeaders($headers);
-        $table->setRows($rows);
-
-        $style = $this->asciiTableStyle();
-
-        if ($style instanceof TableStyle) {
-            $table->setStyle($style);
-        } else {
-            $table->setStyle('default');
+        if ($headers === []) {
+            return;
         }
 
-        $table->render();
+        $normalizedHeaders = array_map([$this, 'stringifyTableCell'], array_values($headers));
+        $columnCount = count($normalizedHeaders);
+
+        $normalizedRows = array_map(function (array $row) use ($columnCount) {
+            $values = array_values($row);
+            $values = count($values) < $columnCount
+                ? array_pad($values, $columnCount, '')
+                : array_slice($values, 0, $columnCount);
+
+            return array_map([$this, 'stringifyTableCell'], $values);
+        }, $rows);
+
+        $widths = [];
+        for ($index = 0; $index < $columnCount; $index++) {
+            $widths[$index] = strlen($normalizedHeaders[$index]);
+            foreach ($normalizedRows as $row) {
+                $widths[$index] = max($widths[$index], strlen($row[$index]));
+            }
+        }
+
+        $border = $this->buildTableBorder($widths);
+        $output = $this->getOutput();
+
+        $output->writeln($border);
+        $output->writeln($this->buildTableRow($normalizedHeaders, $widths));
+        $output->writeln($border);
+
+        foreach ($normalizedRows as $row) {
+            $output->writeln($this->buildTableRow($row, $widths));
+        }
+
+        $output->writeln($border);
     }
 
-    private function asciiTableStyle(): TableStyle
+    private function stringifyTableCell(mixed $value): string
     {
-        if ($this->asciiTableStyle === null) {
-            $style = new TableStyle();
-            if (method_exists($style, 'setHorizontalBorderChars')) {
-                $style->setHorizontalBorderChars('-');
-            }
-
-            if (method_exists($style, 'setVerticalBorderChars')) {
-                $style->setVerticalBorderChars('|');
-            }
-
-            if (method_exists($style, 'setDefaultCrossingChar')) {
-                $style->setDefaultCrossingChar('+');
-            }
-
-            if (method_exists($style, 'setCrossingChars')) {
-                $style->setCrossingChars('+', '+', '+', '+', '+', '+', '+', '+', '+');
-            }
-
-            $this->asciiTableStyle = $style;
+        if ($value === null) {
+            return '';
         }
 
-        return clone $this->asciiTableStyle;
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+    }
+
+    /**
+     * @param array<int, int> $widths
+     */
+    private function buildTableBorder(array $widths): string
+    {
+        $segments = array_map(static fn (int $width): string => str_repeat('-', $width + 2), $widths);
+
+        return '+' . implode('+', $segments) . '+';
+    }
+
+    /**
+     * @param array<int, string> $row
+     * @param array<int, int> $widths
+     */
+    private function buildTableRow(array $row, array $widths): string
+    {
+        $cells = [];
+
+        foreach ($row as $index => $cell) {
+            $width = $widths[$index] ?? 0;
+            $cells[] = ' ' . str_pad($cell, $width) . ' ';
+        }
+
+        return '|' . implode('|', $cells) . '|';
     }
 
     /**
