@@ -16,10 +16,12 @@ class LatestPricesTest extends TestCase
 
     public function test_it_requires_authentication(): void
     {
-        $this->getJson('/api/v1/assets/latest-prices')->assertUnauthorized();
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $this->getJson("/api/v1/assets/{$asset->id}/latest-price")->assertUnauthorized();
     }
 
-    public function test_it_returns_latest_price_for_all_assets(): void
+    public function test_it_returns_latest_price_for_requested_asset(): void
     {
         Sanctum::actingAs(User::factory()->create(), ['*']);
 
@@ -63,13 +65,13 @@ class LatestPricesTest extends TestCase
             'volume' => 2100,
         ]);
 
-        $response = $this->getJson('/api/v1/assets/latest-prices');
+        $response = $this->getJson("/api/v1/assets/{$asset1->id}/latest-price");
 
         $response->assertStatus(200)
             ->assertJsonPath('status', 'success')
-            ->assertJsonCount(2, 'data')
-            ->assertJsonFragment(['asset_id' => $asset1->id, 'close' => 12])
-            ->assertJsonFragment(['asset_id' => $asset2->id, 'close' => 22]);
+            ->assertJsonPath('data.asset_id', $asset1->id)
+            ->assertJsonPath('data.close', 12)
+            ->assertJsonMissing(['asset_id' => $asset2->id]);
     }
 
     public function test_asset_sync_fetches_missing_data_when_outdated(): void
