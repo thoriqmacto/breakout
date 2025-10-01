@@ -69,7 +69,7 @@ The `asset:backtest` Artisan command executes trading strategies over historical
 
 Available strategies include:
 
-- AtrBreakout
+- BreakoutAtr
 - DonchianBreakout
 - RocMomentum
 - MovingAverageCrossover

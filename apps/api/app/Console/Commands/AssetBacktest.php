@@ -7,7 +7,7 @@ use App\Models\Asset;
 use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
 use App\Services\Backtest\HLSLBreakoutBacktestService;
-use App\Services\Strategies\AtrBreakout;
+use App\Services\Strategies\BreakoutAtr;
 use App\Services\Strategies\DonchianBreakout;
 use App\Services\Strategies\MovingAverageCrossover;
 use App\Services\Strategies\RocMomentum;
@@ -52,7 +52,7 @@ class AssetBacktest extends Command
     {
         $map = [
             'DonchBO' => DonchianBreakout::class,
-            'AtrBO' => AtrBreakout::class,
+            'AtrBO' => BreakoutAtr::class,
             'RocMomentum' => RocMomentum::class,
             'MACross' => MovingAverageCrossover::class,
             'RsiReversal' => RsiReversal::class,
