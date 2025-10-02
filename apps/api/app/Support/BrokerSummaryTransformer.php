@@ -68,8 +68,18 @@ final class BrokerSummaryTransformer
     private static function firstNonEmpty(array $entry, array $keys): mixed
     {
         foreach ($keys as $key) {
-            if (array_key_exists($key, $entry) && $entry[$key] !== null && $entry[$key] !== '') {
-                return $entry[$key];
+            if (!array_key_exists($key, $entry)) {
+                continue;
+            }
+
+            $value = $entry[$key];
+
+            if (is_array($value)) {
+                continue;
+            }
+
+            if ($value !== null && $value !== '') {
+                return $value;
             }
         }
 
