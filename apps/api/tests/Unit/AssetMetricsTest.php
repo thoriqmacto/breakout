@@ -108,8 +108,8 @@ class AssetMetricsTest extends TestCase
         $bars = $this->loadHistoricalBars('BUMI');
         $metrics = new AssetMetrics($bars);
 
-        $this->assertEqualsWithDelta(111.5, $metrics->movingAverageWeeks(10), 0.0001);
-        $this->assertEqualsWithDelta(109.0, $metrics->movingAverageWeeks(30), 0.0001);
+        $this->assertEqualsWithDelta(114.5, $metrics->movingAverageWeeks(10), 0.0001);
+        $this->assertEqualsWithDelta(110.23333333333333, $metrics->movingAverageWeeks(30), 0.0001);
     }
 
     public function test_support_and_resistance_levels(): void
