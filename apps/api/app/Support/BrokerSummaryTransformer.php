@@ -32,12 +32,15 @@ final class BrokerSummaryTransformer
 
             $buy   = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy']));
             $sell  = self::num(self::firstNonEmpty($entry, ['sell_value', 'sellValue', 'total_sell', 'sell']));
-            $net   = self::num(self::firstNonEmpty($entry, ['net_value', 'netValue', 'net'])) ?? (($buy ?? 0) - ($sell ?? 0));
+            $net   = self::num(self::firstNonEmpty($entry, ['net_value', 'netValue', 'net']));
 
             if (($buy === null || $sell === null) && isset($entry['values']) && is_array($entry['values'])) {
                 $buy  = $buy  ?? self::num($entry['values']['buy']  ?? $entry['values']['buy_value']  ?? null);
                 $sell = $sell ?? self::num($entry['values']['sell'] ?? $entry['values']['sell_value'] ?? null);
-                $net  = $net  ?? (($buy ?? 0) - ($sell ?? 0));
+            }
+
+            if ($net === null) {
+                $net = ($buy ?? 0) - ($sell ?? 0);
             }
 
             if (($broker === '' || $date === '') && isset($entry['broker']) && is_array($entry['broker'])) {
