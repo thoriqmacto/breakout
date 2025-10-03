@@ -65,7 +65,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
         ]);
 
         $jsonPath = 'broker_summary/BBCA_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
-        $historicalPath = 'broker_summary/historical_summary/BBCA_2024-01-01_2024-01-05_HS_PERIOD_DAILY_page3.json';
+        $historicalPath = 'historical_summary/BBCA_2024-01-01_2024-01-05_HS_PERIOD_DAILY_page3.json';
         $csvPath = 'broker_summary_csv/BBCA_2024-01-01_2024-01-05.csv';
 
         Storage::disk('local')->assertExists($jsonPath);
