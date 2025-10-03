@@ -87,4 +87,45 @@ class StockbitExodusClient
 
         return (new \DateTimeImmutable())->setTimestamp((int) $payload['exp']);
     }
+
+    public function historicalSummary(
+        string $symbol,
+        string $period,
+        string $startDate,
+        string $endDate,
+        ?int $limit = null,
+        ?int $page = null
+    ): array {
+        $q = array_filter([
+            'period'     => $period,
+            'start_date' => $startDate,
+            'end_date'   => $endDate,
+            'limit'      => $limit,
+            'page'       => $page,
+        ], static fn ($value) => $value !== null && $value !== '');
+
+        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+
+        try {
+            $res = $this->http->get("company-price-feed/historical/summary/{$symbol}", [
+                'headers' => $headers,
+                'query'   => $q,
+            ]);
+        } catch (RequestException $e) {
+            return ['error' => 'network_error', 'message' => $e->getMessage()];
+        }
+
+        $status = $res->getStatusCode();
+        $body   = (string) $res->getBody();
+        $json   = json_decode($body, true);
+
+        if ($status === 401) {
+            return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
+        }
+        if ($status >= 400) {
+            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+        }
+
+        return is_array($json) ? $json : ['raw' => $body];
+    }
 }
