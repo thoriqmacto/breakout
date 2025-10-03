@@ -7,6 +7,7 @@ use App\Services\AssetProfileUpdater;
 use App\Services\StockbitExodusClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class AssetProfileUpdaterTest extends TestCase
@@ -111,6 +112,11 @@ class AssetProfileUpdaterTest extends TestCase
             'name' => 'BUMI',
         ]);
 
+        $profilePath = database_path('seeders/data/profiles/BUMI_profile.json');
+        if (File::exists($profilePath)) {
+            File::delete($profilePath);
+        }
+
         $client = $this->createMock(StockbitExodusClient::class);
         $client->expects($this->once())
             ->method('tickerProfile')
@@ -129,6 +135,15 @@ class AssetProfileUpdaterTest extends TestCase
         $this->assertEquals(4500.0, $fresh->ipo_price);
         $this->assertEquals(28.88, $fresh->float);
         $this->assertTrue($fresh->profile_synced_at->eq(Carbon::now()));
+
+        $this->assertFileExists($profilePath);
+        $payload = json_decode(File::get($profilePath), true);
+        $this->assertSame('BUMI', $payload['symbol']);
+        $this->assertSame('BUMI', $payload['name']);
+        $this->assertSame(Carbon::now()->toIso8601String(), $payload['profile_synced_at']);
+        $this->assertEquals($this->sampleProfile, $payload['ticker_profile_payload']);
+
+        File::delete($profilePath);
 
         Carbon::setTestNow();
     }
