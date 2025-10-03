@@ -321,7 +321,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <Card className="mx-auto max-w-3xl">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <Card>
         <CardHeader>
           <CardTitle>Trailing stop calculator</CardTitle>
           <CardDescription>
@@ -329,7 +330,7 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-3 rounded-lg border border-dashed p-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="symbol">
                 Symbol
@@ -539,6 +540,7 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }
