@@ -36,9 +36,9 @@ class ScrapeBrokerSummary extends Command
         $csvDir  = 'broker_summary_csv';
 
         $historicalDefaults = config('stockbit.historical', []);
-        $historicalPeriod = $this->option('historical_period') ?: ($historicalDefaults['period'] ?? 'HS_PERIOD_DAILY');
+        $historicalPeriod = $this->option('historical-period') ?: ($historicalDefaults['period'] ?? 'HS_PERIOD_DAILY');
 
-        $historicalLimitOption = $this->option('historical_limit');
+        $historicalLimitOption = $this->option('historical-limit');
         $historicalLimit = $historicalLimitOption !== null && $historicalLimitOption !== ''
             ? (int) $historicalLimitOption
             : null;
@@ -46,7 +46,7 @@ class ScrapeBrokerSummary extends Command
             $historicalLimit = (int) $historicalDefaults['limit'];
         }
 
-        $historicalPageOption = $this->option('historical_page');
+        $historicalPageOption = $this->option('historical-page');
         $historicalPage = $historicalPageOption !== null && $historicalPageOption !== ''
             ? (int) $historicalPageOption
             : null;
