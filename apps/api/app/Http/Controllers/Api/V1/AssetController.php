@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ApiResponse;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\PriceResource;
@@ -127,6 +128,41 @@ class AssetController extends ApiController
      */
     public function latestPrice(Asset $asset)
     {
+        $price = $asset->latestPrice();
+
+        if (!$price) {
+            return ApiResponse::error('Price data not found', 404);
+        }
+
+        return ApiResponse::success(PriceResource::make($price));
+    }
+
+    /**
+     * Retrieve the latest OHLCV price for the given asset symbol.
+     *
+     * @param  string  $symbol
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function latestPriceBySymbol(string $symbol)
+    {
+        $validator = Validator::make([
+            'symbol' => $symbol,
+        ], [
+            'symbol' => 'required|string|max:10',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error($validator->errors()->first(), 422);
+        }
+
+        $normalizedSymbol = strtolower($symbol);
+
+        $asset = Asset::whereRaw('LOWER(symbol) = ?', [$normalizedSymbol])->first();
+
+        if (!$asset) {
+            return ApiResponse::error('Asset not found', 404);
+        }
+
         $price = $asset->latestPrice();
 
         if (!$price) {
