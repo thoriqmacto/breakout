@@ -146,4 +146,34 @@ class CsvUtilities
         }
         return null;
     }
+
+    /**
+     * Convert an iterable of associative rows into a CSV string using the provided column order.
+     *
+     * @param iterable<array<string, mixed>> $rows
+     * @param array<int, string> $columns
+     */
+    public static function rowsToCsv(iterable $rows, array $columns): string
+    {
+        $stream = fopen('php://temp', 'w+');
+        if ($stream === false) {
+            throw new \RuntimeException('Unable to open temporary memory stream for CSV conversion.');
+        }
+
+        fputcsv($stream, $columns);
+
+        foreach ($rows as $row) {
+            $line = [];
+            foreach ($columns as $column) {
+                $line[] = $row[$column] ?? null;
+            }
+            fputcsv($stream, $line);
+        }
+
+        rewind($stream);
+        $contents = stream_get_contents($stream) ?: '';
+        fclose($stream);
+
+        return $contents;
+    }
 }
