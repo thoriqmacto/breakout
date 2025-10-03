@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('sector')->nullable();
             $table->decimal('float', 20, 4)->nullable();
             $table->decimal('ipo_price', 20, 4)->nullable();
+            $table->date('ipo_date')->nullable();
             $table->decimal('marketcap', 20, 4)->nullable();
         });
 

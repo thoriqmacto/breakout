@@ -32,7 +32,7 @@ class ScrapeBrokerSummary extends Command
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
-        $historicalDir = trim($jsonDir . '/historical_summary', '/');
+        $historicalDir = trim('historical_summary', '/');
         $csvDir  = 'broker_summary_csv';
 
         $historicalDefaults = config('stockbit.historical', []);
