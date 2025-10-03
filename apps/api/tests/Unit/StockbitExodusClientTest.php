@@ -103,6 +103,31 @@ class StockbitExodusClientTest extends TestCase
         $this->assertStringContainsString('boom', $result['message']);
     }
 
+    public function test_ticker_profile_returns_decoded_json(): void
+    {
+        $capturedRequest = null;
+        $mock = new MockHandler([
+            function ($request) use (&$capturedRequest) {
+                $capturedRequest = $request;
+
+                return new Response(200, [], json_encode([
+                    'code' => 'BBCA',
+                    'name' => 'Bank Central Asia Tbk',
+                ]));
+            },
+        ]);
+
+        $client = $this->makeClientWith($mock);
+
+        $result = $client->tickerProfile('BBCA');
+
+        $this->assertIsArray($result);
+        $this->assertSame('BBCA', $result['code']);
+        $this->assertNotNull($capturedRequest);
+        $this->assertSame('Bearer test-bearer-token', $capturedRequest->getHeaderLine('authorization'));
+        $this->assertSame('/emitten/BBCA/profile', $capturedRequest->getUri()->getPath());
+    }
+
     public function test_jwt_expires_at_handles_valid_and_invalid_tokens(): void
     {
         $future = time() + 3600;

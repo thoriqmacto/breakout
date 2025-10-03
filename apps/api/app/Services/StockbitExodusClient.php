@@ -23,7 +23,7 @@ class StockbitExodusClient
                 'accept' => 'application/json',
                 'origin' => 'https://stockbit.com',
                 'referer' => 'https://stockbit.com/',
-                'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari',
+                'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
             ],
             'http_errors' => false,
             'timeout' => 30,
@@ -110,6 +110,32 @@ class StockbitExodusClient
             $res = $this->http->get("company-price-feed/historical/summary/{$symbol}", [
                 'headers' => $headers,
                 'query'   => $q,
+            ]);
+        } catch (RequestException $e) {
+            return ['error' => 'network_error', 'message' => $e->getMessage()];
+        }
+
+        $status = $res->getStatusCode();
+        $body   = (string) $res->getBody();
+        $json   = json_decode($body, true);
+
+        if ($status === 401) {
+            return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
+        }
+        if ($status >= 400) {
+            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+        }
+
+        return is_array($json) ? $json : ['raw' => $body];
+    }
+
+    public function tickerProfile(string $symbol): array
+    {
+        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+
+        try {
+            $res = $this->http->get("emitten/{$symbol}/profile", [
+                'headers' => $headers,
             ]);
         } catch (RequestException $e) {
             return ['error' => 'network_error', 'message' => $e->getMessage()];
