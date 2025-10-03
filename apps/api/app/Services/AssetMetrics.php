@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Asset;
+use App\Models\Price;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -436,5 +439,87 @@ class AssetMetrics
     public function isUptrend(): bool
     {
         return $this->lastClose() > $this->movingAverageWeeks(30);
+    }
+
+    /**
+     * Build normalized daily bars from a collection of price models.
+     *
+     * @param  Collection<int, Price>  $prices
+     * @return array<int, array{date:string, open:float, high:float, low:float, close:float, volume:float}>
+     */
+    public static function buildDailyBars(Collection $prices): array
+    {
+        return $prices->map(function (Price $price): array {
+            $date = self::normalizePriceDate($price);
+
+            return [
+                'date' => $date?->format('Y-m-d') ?? (string) $price->date,
+                'open' => (float) $price->open,
+                'high' => (float) $price->high,
+                'low' => (float) $price->low,
+                'close' => (float) $price->close,
+                'volume' => (float) $price->volume,
+            ];
+        })->all();
+    }
+
+    /**
+     * Build normalized weekly bars by aggregating a collection of price models.
+     *
+     * @param  Collection<int, Price>  $prices
+     * @return array<int, array{date:string, open:float, high:float, low:float, close:float, volume:float}>
+     */
+    public static function buildWeeklyBars(Collection $prices): array
+    {
+        $bars = [];
+
+        foreach ($prices as $price) {
+            $date = self::normalizePriceDate($price);
+
+            if (!$date instanceof CarbonImmutable) {
+                continue;
+            }
+
+            $key = $date->format('o-W');
+
+            if (!isset($bars[$key])) {
+                $bars[$key] = [
+                    'date' => $date->format('Y-m-d'),
+                    'open' => (float) $price->open,
+                    'high' => (float) $price->high,
+                    'low' => (float) $price->low,
+                    'close' => (float) $price->close,
+                    'volume' => (float) $price->volume,
+                ];
+
+                continue;
+            }
+
+            $bars[$key]['high'] = max($bars[$key]['high'], (float) $price->high);
+            $bars[$key]['low'] = min($bars[$key]['low'], (float) $price->low);
+            $bars[$key]['close'] = (float) $price->close;
+            $bars[$key]['volume'] += (float) $price->volume;
+            $bars[$key]['date'] = $date->format('Y-m-d');
+        }
+
+        return array_values($bars);
+    }
+
+    /**
+     * Normalize various price date representations to an immutable Carbon instance.
+     */
+    public static function normalizePriceDate(Price $price): ?CarbonImmutable
+    {
+        $value = $price->date;
+
+        if ($value instanceof CarbonInterface) {
+            return CarbonImmutable::instance($value);
+        }
+
+        if (is_string($value) && trim($value) !== '') {
+            return CarbonImmutable::make($value);
+        }
+
+        return null;
     }
 }

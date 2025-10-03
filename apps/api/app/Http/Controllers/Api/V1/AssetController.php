@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ApiResponse;
 use App\Http\Resources\AssetResource;
+use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
 use App\Services\AssetMetrics;
 
@@ -192,6 +193,34 @@ class AssetController extends ApiController
         return ApiResponse::success(PriceResource::collection($prices));
     }
 
+    public function atr(Request $request, Asset $asset)
+    {
+        return $this->atrResponse($request, $asset);
+    }
+
+    public function atrBySymbol(Request $request, string $symbol)
+    {
+        $validator = Validator::make([
+            'symbol' => $symbol,
+        ], [
+            'symbol' => 'required|string|max:10',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error($validator->errors()->first(), 422);
+        }
+
+        $normalizedSymbol = strtolower($symbol);
+
+        $asset = Asset::whereRaw('LOWER(symbol) = ?', [$normalizedSymbol])->first();
+
+        if (!$asset) {
+            return ApiResponse::error('Asset not found', 404);
+        }
+
+        return $this->atrResponse($request, $asset);
+    }
+
     /**
      * Compute simple metrics for the asset.
      *
@@ -203,4 +232,46 @@ class AssetController extends ApiController
     {
         return ApiResponse::success($metrics->forAsset($asset));
     }
+
+    private function atrResponse(Request $request, Asset $asset)
+    {
+        $period = (int) $request->query('period', 14);
+        if ($period < 1) {
+            return ApiResponse::error('Period must be at least 1.', 422);
+        }
+
+        $interval = strtolower((string) $request->query('interval', 'daily'));
+        if (!in_array($interval, ['daily', 'weekly'], true)) {
+            return ApiResponse::error('Interval must be one of daily or weekly.', 422);
+        }
+
+        $prices = $asset->prices()->orderBy('date')->get();
+
+        if ($prices->isEmpty()) {
+            return ApiResponse::error('Price data not found', 404);
+        }
+
+        $bars = $interval === 'weekly'
+            ? AssetMetrics::buildWeeklyBars($prices)
+            : AssetMetrics::buildDailyBars($prices);
+
+        if ($bars === [] || count($bars) < $period) {
+            return ApiResponse::error('Insufficient price history to compute ATR.', 422);
+        }
+
+        $metrics = new AssetMetrics($bars);
+        $atr = $metrics->atr($period);
+
+        $lastBar = $bars[array_key_last($bars)] ?? null;
+
+        return ApiResponse::success(AtrResource::make([
+            'asset' => $asset,
+            'interval' => $interval,
+            'period' => $period,
+            'atr' => $atr,
+            'last_bar' => $lastBar,
+            'bar_count' => count($bars),
+        ]));
+    }
+
 }

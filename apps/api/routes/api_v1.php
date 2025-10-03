@@ -14,6 +14,14 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->whereAlphaNumeric('symbol')
         ->name('assets.latest-price.by-symbol');
 
+    Route::get('assets/{asset}/atr', [AssetController::class, 'atr'])
+        ->whereNumber('asset')
+        ->name('assets.atr');
+
+    Route::get('assets/{symbol}/atr', [AssetController::class, 'atrBySymbol'])
+        ->whereAlphaNumeric('symbol')
+        ->name('assets.atr.by-symbol');
+
     Route::apiResource('assets', AssetController::class);
 
     // Backtest

@@ -107,6 +107,17 @@ type LatestPriceRecord = {
   } | null
 }
 
+type AtrApiResponse = {
+  asset_id: number
+  symbol: string
+  interval: "daily" | "weekly"
+  period: number
+  atr: number | string
+  last_close: number | string | null
+  last_date: string | null
+  bar_count: number | string
+}
+
 export default function DashboardPage() {
   const { user, accessToken } = useAuth()
   const [symbol, setSymbol] = useState("")
@@ -121,6 +132,23 @@ export default function DashboardPage() {
   const [latestPriceDate, setLatestPriceDate] = useState<string | null>(null)
   const [lastFetchedSymbol, setLastFetchedSymbol] = useState<string | null>(null)
   const [priceRefreshCounter, setPriceRefreshCounter] = useState(0)
+  const [atrSymbol, setAtrSymbol] = useState("")
+  const [atrPeriodInput, setAtrPeriodInput] = useState("14")
+  const [atrInterval, setAtrInterval] = useState<"daily" | "weekly">("daily")
+  const [atrLoading, setAtrLoading] = useState(false)
+  const [atrError, setAtrError] = useState<string | null>(null)
+  const [atrResult, setAtrResult] = useState<
+    | {
+        symbol: string
+        interval: "daily" | "weekly"
+        period: number
+        atr: number
+        lastClose: number | null
+        lastDate: string | null
+        barCount: number
+      }
+    | null
+  >(null)
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -300,6 +328,130 @@ export default function DashboardPage() {
       ? closePrice - trailingPriceFromPercent
       : null
 
+  const handleAtrCalculation = async () => {
+    const trimmedSymbol = atrSymbol.trim().toUpperCase()
+
+    if (!trimmedSymbol) {
+      setAtrError("Enter a symbol to compute ATR.")
+      setAtrResult(null)
+      return
+    }
+
+    const parsedPeriod = Number.parseInt(atrPeriodInput, 10)
+    if (!Number.isFinite(parsedPeriod) || parsedPeriod <= 0) {
+      setAtrError("Provide a valid ATR period greater than zero.")
+      setAtrResult(null)
+      return
+    }
+
+    if (!accessToken) {
+      setAtrError("Sign in to compute ATR values.")
+      setAtrResult(null)
+      return
+    }
+
+    setAtrLoading(true)
+    setAtrError(null)
+    setAtrResult(null)
+
+    const params = new URLSearchParams({
+      interval: atrInterval,
+      period: parsedPeriod.toString(),
+    })
+
+    try {
+      const response = await fetch(
+        buildApiUrl(`/v1/assets/${encodeURIComponent(trimmedSymbol)}/atr?${params.toString()}`),
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      )
+
+      const payload = await parseJson<ApiResponse<AtrApiResponse>>(response)
+
+      if (response.status === 404) {
+        setAtrError(`No price history found for ${trimmedSymbol}.`)
+        return
+      }
+
+      if (!response.ok) {
+        const message =
+          (payload && "message" in payload && typeof payload.message === "string" && payload.message) ||
+          "Unable to compute ATR."
+
+        throw new Error(message)
+      }
+
+      if (!payload || payload.status !== "success" || !payload.data) {
+        throw new Error("Unexpected response from the ATR API.")
+      }
+
+      const data = payload.data
+
+      const atrValue =
+        typeof data.atr === "number" ? data.atr : Number.parseFloat(data.atr ? String(data.atr) : "")
+
+      if (!Number.isFinite(atrValue)) {
+        throw new Error("ATR value was not numeric.")
+      }
+
+      const parsedPeriodFromResponse =
+        typeof data.period === "number"
+          ? data.period
+          : Number.parseInt(data.period ? String(data.period) : "", 10)
+
+      const normalizedPeriod =
+        Number.isFinite(parsedPeriodFromResponse) && parsedPeriodFromResponse > 0
+          ? parsedPeriodFromResponse
+          : parsedPeriod
+
+      const parsedBarCount =
+        typeof data.bar_count === "number"
+          ? data.bar_count
+          : Number.parseInt(data.bar_count ? String(data.bar_count) : "", 10)
+
+      const normalizedBarCount =
+        Number.isFinite(parsedBarCount) && parsedBarCount > 0 ? parsedBarCount : normalizedPeriod
+
+      const lastCloseValue =
+        typeof data.last_close === "number"
+          ? data.last_close
+          : data.last_close !== null && data.last_close !== undefined
+            ? Number.parseFloat(String(data.last_close))
+            : null
+
+      const normalizedLastClose =
+        typeof lastCloseValue === "number" && Number.isFinite(lastCloseValue) ? lastCloseValue : null
+
+      setAtrResult({
+        symbol: typeof data.symbol === "string" && data.symbol ? data.symbol : trimmedSymbol,
+        interval: data.interval === "weekly" ? "weekly" : "daily",
+        period: normalizedPeriod,
+        atr: atrValue,
+        lastClose: normalizedLastClose,
+        lastDate: data.last_date ?? null,
+        barCount: normalizedBarCount,
+      })
+      setAtrSymbol(trimmedSymbol)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to compute ATR."
+      setAtrError(message)
+    } finally {
+      setAtrLoading(false)
+    }
+  }
+
+  const atrPercent =
+    atrResult && atrResult.lastClose && atrResult.lastClose > 0
+      ? (atrResult.atr / atrResult.lastClose) * 100
+      : null
+
+  const atrSummarySymbol = atrResult?.symbol ?? atrSymbol.trim().toUpperCase()
+
   return (
     <div className="space-y-8">
       <div>
@@ -325,224 +477,339 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <Card>
-        <CardHeader>
-          <CardTitle>Trailing stop calculator</CardTitle>
-          <CardDescription>
-            Convert trailing stop percentages to IDX-compliant prices and back using the official tick size rule.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3 rounded-lg border border-dashed p-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground" htmlFor="symbol">
-                Symbol
-              </label>
-              <Input
-                id="symbol"
-                placeholder="e.g. BBCA"
-                value={symbol}
-                onChange={(event) => {
-                  const value = event.target.value.toUpperCase()
-                  setSymbol(value)
-                  closePriceTouchedRef.current = false
-                  setLatestPriceError(null)
-                  setLatestPriceClose(null)
-                  setLatestPriceDate(null)
-                  setLastFetchedSymbol(null)
-                }}
-                autoComplete="off"
-              />
+        <Card>
+          <CardHeader>
+            <CardTitle>Trailing stop calculator</CardTitle>
+            <CardDescription>
+              Convert trailing stop percentages to IDX-compliant prices and back using the official tick size rule.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="symbol">
+                  Symbol
+                </label>
+                <Input
+                  id="symbol"
+                  placeholder="e.g. BBCA"
+                  value={symbol}
+                  onChange={(event) => {
+                    const value = event.target.value.toUpperCase()
+                    setSymbol(value)
+                    closePriceTouchedRef.current = false
+                    setLatestPriceError(null)
+                    setLatestPriceClose(null)
+                    setLatestPriceDate(null)
+                    setLastFetchedSymbol(null)
+                  }}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-end gap-2">
+                  <div className="flex-1 space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="close-price">
+                      Latest close price (IDR)
+                    </label>
+                    <Input
+                      id="close-price"
+                      inputMode="decimal"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="Enter the latest close"
+                      value={closePriceInput}
+                      onChange={(event) => {
+                        setClosePriceInput(event.target.value)
+                        closePriceTouchedRef.current = true
+                      }}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      closePriceTouchedRef.current = false
+                      setPriceRefreshCounter((count) => count + 1)
+                    }}
+                    disabled={!symbol.trim() || latestPriceLoading || !accessToken}
+                  >
+                    {latestPriceLoading ? "Loading..." : "Refresh"}
+                  </Button>
+                </div>
+                <p className="min-h-[1.25rem] text-xs text-muted-foreground">
+                  {latestPriceLoading ? (
+                    "Fetching the latest close price..."
+                  ) : latestPriceError ? (
+                    <span className="text-destructive">{latestPriceError}</span>
+                  ) : latestPriceClose !== null ? (
+                    <span>
+                      Latest close for {" "}
+                      <span className="font-medium text-foreground">
+                        {lastFetchedSymbol ?? (debouncedSymbol || symbol)}
+                      </span>
+                      {latestPriceDate ? ` (${latestPriceDate})` : ""}: {" "}
+                      <span className="font-medium text-foreground">{formatIdr(latestPriceClose)}</span>
+                    </span>
+                  ) : symbol ? (
+                    "Enter a manual close price if automatic lookup is unavailable."
+                  ) : (
+                    "Enter a symbol to fetch the latest close price automatically."
+                  )}
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-end gap-2">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="close-price">
-                    Latest close price (IDR)
+
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="mb-3 text-sm font-medium text-foreground">Percentage → Price</p>
+                  <p className="text-xs text-muted-foreground">
+                    Enter a trailing stop percentage to see the corresponding price rounded down by the IDX tick rule.
+                  </p>
+                </div>
+                {tickSizeFromPercent ? (
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Tick size: {tickSizeFromPercent.toLocaleString()} IDR
+                  </p>
+                ) : null}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-percent">
+                    Trailing stop (%)
                   </label>
                   <Input
-                    id="close-price"
+                    id="stop-percent"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="e.g. 5"
+                    value={percentInput}
+                    onChange={(event) => setPercentInput(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-result">
+                    Price (IDR)
+                  </label>
+                  <Input
+                    id="stop-price-result"
+                    readOnly
+                    tabIndex={-1}
+                    value={
+                      trailingPriceFromPercent !== null && Number.isFinite(trailingPriceFromPercent)
+                        ? trailingPriceFromPercent.toString()
+                        : ""
+                    }
+                    placeholder="Calculated from percentage"
+                  />
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                {trailingPriceFromPercent !== null && Number.isFinite(trailingPriceFromPercent) && stopDistance !== null ? (
+                  <div className="space-y-1">
+                    <p>
+                      Trailing stop for <span className="font-medium text-foreground">{symbol || "your symbol"}</span> is set at
+                      <span className="font-medium text-foreground"> {formatIdr(trailingPriceFromPercent)}</span>.
+                    </p>
+                    <p>
+                      Stop distance: {formatIdr(stopDistance)} ({
+                        Number.isFinite(trailingPercent) ? trailingPercent.toFixed(2) : "0.00"
+                      }
+                      %).
+                    </p>
+                  </div>
+                ) : (
+                  <p>Provide the close price and a trailing stop percentage to generate an IDX-compliant stop price.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Price → Percentage</p>
+                  <p className="text-xs text-muted-foreground">
+                    Convert an IDX-compliant stop price back into a trailing stop percentage for validation.
+                  </p>
+                </div>
+                {tickSizeFromPrice ? (
+                  <p className="text-xs font-medium text-muted-foreground">Tick size: {tickSizeFromPrice.toLocaleString()} IDR</p>
+                ) : null}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-input">
+                    TS price (IDR)
+                  </label>
+                  <Input
+                    id="stop-price-input"
                     inputMode="decimal"
                     type="number"
                     min="0"
                     step="0.01"
-                    placeholder="Enter the latest close"
-                    value={closePriceInput}
+                    placeholder="e.g. 7500"
+                    value={priceInput}
+                    onChange={(event) => setPriceInput(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-percent-result">
+                    Equivalent TS (%)
+                  </label>
+                  <Input
+                    id="stop-percent-result"
+                    readOnly
+                    tabIndex={-1}
+                    value={
+                      percentFromPrice !== null && Number.isFinite(percentFromPrice)
+                        ? percentFromPrice.toFixed(2)
+                        : ""
+                    }
+                    placeholder="Calculated from price"
+                  />
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                {adjustedPriceFromInput !== null && Number.isFinite(closePrice) && closePrice > 0 ? (
+                  <div className="space-y-1">
+                    <p>
+                      Using the IDX tick rule, the provided price is interpreted as
+                      <span className="font-medium text-foreground"> {formatIdr(adjustedPriceFromInput)}</span>.
+                    </p>
+                    {percentFromPrice !== null && Number.isFinite(percentFromPrice) ? (
+                      <p>
+                        This is a <span className="font-medium text-foreground">{percentFromPrice.toFixed(2)}%</span> trailing
+                        stop from {formatIdr(closePrice)}.
+                      </p>
+                    ) : (
+                      <p>Provide a latest close price to translate the stop level into a percentage.</p>
+                    )}
+                  </div>
+                ) : (
+                  <p>Enter a target stop price to evaluate its percentage distance from the latest close.</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>ATR calculator</CardTitle>
+            <CardDescription>
+              Compute Average True Range (ATR) from AssetMetrics using daily or weekly price bars.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="atr-symbol">
+                    Symbol
+                  </label>
+                  <Input
+                    id="atr-symbol"
+                    placeholder="e.g. BBCA"
+                    value={atrSymbol}
                     onChange={(event) => {
-                      setClosePriceInput(event.target.value)
-                      closePriceTouchedRef.current = true
+                      setAtrSymbol(event.target.value.toUpperCase())
+                      setAtrError(null)
+                    }}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="atr-period">
+                    Lookback period
+                  </label>
+                  <Input
+                    id="atr-period"
+                    inputMode="numeric"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={atrPeriodInput}
+                    onChange={(event) => {
+                      setAtrPeriodInput(event.target.value)
+                      setAtrError(null)
                     }}
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    closePriceTouchedRef.current = false
-                    setPriceRefreshCounter((count) => count + 1)
-                  }}
-                  disabled={!symbol.trim() || latestPriceLoading || !accessToken}
-                >
-                  {latestPriceLoading ? "Loading..." : "Refresh"}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="atr-interval">
+                    Interval
+                  </label>
+                  <select
+                    id="atr-interval"
+                    className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+                    value={atrInterval}
+                    onChange={(event) => {
+                      setAtrInterval(event.target.value === "weekly" ? "weekly" : "daily")
+                      setAtrError(null)
+                    }}
+                  >
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </div>
+                <Button type="button" onClick={handleAtrCalculation} disabled={atrLoading || !atrSymbol.trim()}>
+                  {atrLoading ? "Computing..." : "Compute ATR"}
                 </Button>
               </div>
-              <p className="min-h-[1.25rem] text-xs text-muted-foreground">
-                {latestPriceLoading ? (
-                  "Fetching the latest close price..."
-                ) : latestPriceError ? (
-                  <span className="text-destructive">{latestPriceError}</span>
-                ) : latestPriceClose !== null ? (
+              <div className="min-h-[3.25rem] rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                {atrLoading ? (
+                  "Computing ATR with the AssetMetrics service..."
+                ) : atrError ? (
+                  <span className="text-destructive">{atrError}</span>
+                ) : atrResult ? (
                   <span>
-                    Latest close for {" "}
-                    <span className="font-medium text-foreground">
-                      {lastFetchedSymbol ?? (debouncedSymbol || symbol)}
-                    </span>
-                    {latestPriceDate ? ` (${latestPriceDate})` : ""}: {" "}
-                    <span className="font-medium text-foreground">{formatIdr(latestPriceClose)}</span>
+                    ATR for <span className="font-medium text-foreground">{atrSummarySymbol}</span> ({" "}
+                    {atrResult.interval === "weekly" ? "weekly" : "daily"} {atrResult.period}) is {" "}
+                    <span className="font-medium text-foreground">{formatIdr(atrResult.atr)}</span>.
                   </span>
-                ) : symbol ? (
-                  "Enter a manual close price if automatic lookup is unavailable."
                 ) : (
-                  "Enter a symbol to fetch the latest close price automatically."
+                  "Enter a symbol, choose an interval, and click compute to retrieve ATR from AssetMetrics."
                 )}
-              </p>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-3 rounded-lg border border-dashed p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Percentage → Price</p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Enter a trailing stop percentage to see the corresponding price rounded down by the IDX tick rule.
-                </p>
-                  {tickSizeFromPercent ? (
-                      <p className="text-xs font-medium text-muted-foreground">Tick size: {tickSizeFromPercent.toLocaleString()} IDR</p>
-                  ) : null}
-              </div>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-percent">
-                  Trailing stop (%)
-                </label>
-                <Input
-                  id="stop-percent"
-                  inputMode="decimal"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  placeholder="e.g. 5"
-                  value={percentInput}
-                  onChange={(event) => setPercentInput(event.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-result">
-                  Price (IDR)
-                </label>
-                <Input
-                  id="stop-price-result"
-                  readOnly
-                  tabIndex={-1}
-                  value={
-                    trailingPriceFromPercent !== null && Number.isFinite(trailingPriceFromPercent)
-                      ? trailingPriceFromPercent.toString()
-                      : ""
-                  }
-                  placeholder="Calculated from percentage"
-                />
-              </div>
-            </div>
-            <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
-              {trailingPriceFromPercent !== null && Number.isFinite(trailingPriceFromPercent) && stopDistance !== null ? (
-                <div className="space-y-1">
-                  <p>
-                    Trailing stop for <span className="font-medium text-foreground">{symbol || "your symbol"}</span> is
-                    set at <span className="font-medium text-foreground">{formatIdr(trailingPriceFromPercent)}</span>.
-                  </p>
-                  <p>
-                    Stop distance: {formatIdr(stopDistance)} ({
-                      Number.isFinite(trailingPercent) ? trailingPercent.toFixed(2) : "0.00"
-                    }
-                    %).
-                  </p>
-                </div>
-              ) : (
-                <p>Provide the close price and a trailing stop percentage to generate an IDX-compliant stop price.</p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-dashed p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Price → Percentage</p>
-                <p className="text-xs text-muted-foreground">
-                  Convert an IDX-compliant stop price back into a trailing stop percentage for validation.
-                </p>
-              </div>
-              {tickSizeFromPrice ? (
-                <p className="text-xs font-medium text-muted-foreground">Tick size: {tickSizeFromPrice.toLocaleString()} IDR</p>
-              ) : null}
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-input">
-                  TS price (IDR)
-                </label>
-                <Input
-                  id="stop-price-input"
-                  inputMode="decimal"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="e.g. 7500"
-                  value={priceInput}
-                  onChange={(event) => setPriceInput(event.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-percent-result">
-                  Equivalent TS (%)
-                </label>
-                <Input
-                  id="stop-percent-result"
-                  readOnly
-                  tabIndex={-1}
-                  value={
-                    percentFromPrice !== null && Number.isFinite(percentFromPrice)
-                      ? percentFromPrice.toFixed(2)
-                      : ""
-                  }
-                  placeholder="Calculated from price"
-                />
-              </div>
-            </div>
-            <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
-              {adjustedPriceFromInput !== null && Number.isFinite(closePrice) && closePrice > 0 ? (
-                <div className="space-y-1">
-                  <p>
-                    Using the IDX tick rule, the provided price is interpreted as
-                    <span className="font-medium text-foreground"> {formatIdr(adjustedPriceFromInput)}</span>.
-                  </p>
-                  {percentFromPrice !== null && Number.isFinite(percentFromPrice) ? (
-                    <p>
-                      This is a <span className="font-medium text-foreground">{percentFromPrice.toFixed(2)}%</span> trailing
-                      stop from {formatIdr(closePrice)}.
+            {atrResult ? (
+              <div className="space-y-4 rounded-lg border border-dashed p-4 text-sm">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      ATR ({atrResult.interval === "weekly" ? "Weekly" : "Daily"})
                     </p>
-                  ) : (
-                    <p>Provide a latest close price to translate the stop level into a percentage.</p>
-                  )}
+                    <p className="text-lg font-semibold text-foreground">{formatIdr(atrResult.atr)}</p>
+                    {atrPercent !== null ? (
+                      <p className="text-xs text-muted-foreground">{atrPercent.toFixed(2)}% of the latest close.</p>
+                    ) : null}
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Latest close</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {atrResult.lastClose !== null ? formatIdr(atrResult.lastClose) : "—"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {atrResult.lastDate ? `As of ${atrResult.lastDate}` : "Close date unavailable."}
+                    </p>
+                  </div>
                 </div>
-              ) : (
-                <p>Enter a target stop price to evaluate its percentage distance from the latest close.</p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                <p className="text-xs text-muted-foreground">
+                  Computed over {atrResult.barCount.toLocaleString()} {atrResult.interval} bar
+                  {atrResult.barCount === 1 ? "" : "s"} using a {atrResult.period}-period lookback.
+                </p>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
