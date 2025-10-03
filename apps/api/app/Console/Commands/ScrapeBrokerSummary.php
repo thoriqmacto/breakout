@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\CsvUtilities;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
 use Illuminate\Console\Command;
@@ -84,22 +85,8 @@ class ScrapeBrokerSummary extends Command
                 $csvName = sprintf('%s_%s_%s.csv', $symbol, $from, $to);
                 $csvPath = "{$csvDir}/{$csvName}";
 
-                $stream = fopen('php://temp', 'w+');
-                fputcsv($stream, ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value']);
-                foreach ($rows as $row) {
-                    fputcsv($stream, [
-                        $row['symbol'],
-                        $row['date'],
-                        $row['broker'],
-                        $row['net_value'],
-                        $row['buy_value'],
-                        $row['sell_value'],
-                    ]);
-                }
-
-                rewind($stream);
-                $contents = stream_get_contents($stream) ?: '';
-                fclose($stream);
+                $columns = ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value'];
+                $contents = CsvUtilities::rowsToCsv($rows, $columns);
 
                 Storage::disk($disk)->put($csvPath, $contents);
 
