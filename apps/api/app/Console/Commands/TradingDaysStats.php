@@ -15,10 +15,26 @@ class TradingDaysStats extends Command
     {
         $year = $this->option('year');
 
-        $rows = TradingDay::query()
-            ->selectRaw('YEAR(date) as year, MONTH(date) as month, COUNT(*) as trading_days')
+        $query = TradingDay::query();
+
+        $connectionDriver = $query->getConnection()->getDriverName();
+
+        $yearExpression = match ($connectionDriver) {
+            'sqlite' => "strftime('%Y', date)",
+            'pgsql' => 'EXTRACT(YEAR FROM date)',
+            default => 'YEAR(date)',
+        };
+
+        $monthExpression = match ($connectionDriver) {
+            'sqlite' => "strftime('%m', date)",
+            'pgsql' => 'EXTRACT(MONTH FROM date)',
+            default => 'MONTH(date)',
+        };
+
+        $rows = $query
+            ->selectRaw("{$yearExpression} as year, {$monthExpression} as month, COUNT(*) as trading_days")
             ->when($year, static fn ($query) => $query->whereYear('date', (int) $year))
-            ->groupByRaw('YEAR(date), MONTH(date)')
+            ->groupByRaw("{$yearExpression}, {$monthExpression}")
             ->orderBy('year')
             ->orderBy('month')
             ->get();
