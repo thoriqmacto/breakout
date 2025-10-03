@@ -3,10 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Services\AssetProfileUpdater;
+use App\Services\CsvBars;
 use App\Services\CsvUtilities;
+use App\Services\DbBars;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ScrapeStockbit extends Command
@@ -20,6 +25,7 @@ class ScrapeStockbit extends Command
         {--investor_type=    : INVESTOR_TYPE_ALL|...}
         {--limit= : Max rows per API response (defaults to config(stockbit.defaults.limit))}
         {--no-csv : Do not write CSV (only JSON)}
+        {--no-persist : Skip persisting EOD OHLCV data to CSV/DB}
         {--no-profile-sync : Skip syncing asset profiles}
         {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
         {--historical-limit= : Historical summary limit override}
@@ -28,6 +34,11 @@ class ScrapeStockbit extends Command
         {--watchlist-id= : Override watchlist ID for --eod snapshot}';
 
     protected $description = 'Scrape Stockbit and persist to DB and Seeds data.';
+
+    /**
+     * @var array<string, int>
+     */
+    private array $assetIds = [];
 
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
@@ -262,5 +273,244 @@ class ScrapeStockbit extends Command
 
         Storage::disk($disk)->put($path, json_encode($watchlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $this->line('Saved watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
+
+        if ($this->option('no-persist')) {
+            $this->line('Skipping watchlist persistence (--no-persist).');
+            return;
+        }
+
+        $this->persistWatchlistBars($watchlist);
+    }
+
+    private function persistWatchlistBars(array $watchlist): void
+    {
+        $results = $watchlist['data']['result'] ?? [];
+
+        if (!is_array($results) || empty($results)) {
+            return;
+        }
+
+        $meta = $watchlist['meta'] ?? [];
+        $columnMetadata = $watchlist['column_metadata'] ?? [];
+
+        $fetchedAt = $meta['fetched_at'] ?? null;
+
+        try {
+            $date = $fetchedAt ? Carbon::parse($fetchedAt) : now();
+        } catch (\Throwable $exception) {
+            $date = now();
+        }
+
+        $ymd = $date->format('Y-m-d');
+        $dbBars = new DbBars(500, false);
+
+        foreach ($results as $row) {
+            $symbol = strtoupper((string) ($row['symbol'] ?? ''));
+
+            if ($symbol === '') {
+                continue;
+            }
+
+            $ohlcv = $this->resolveOhlcvValues($row['column'] ?? [], $columnMetadata, $row);
+
+            if ($ohlcv === null) {
+                $this->warn("Incomplete OHLCV data for {$symbol}, skipping update.");
+                continue;
+            }
+
+            $assetId = $this->getOrCreateAssetId($symbol);
+
+            if ($assetId === null) {
+                $this->warn("Unable to resolve asset ID for {$symbol}, skipping DB update.");
+            } else {
+                $dbBars->add([
+                    'asset_id' => $assetId,
+                    'date' => $ymd,
+                    'open' => $ohlcv['open'],
+                    'high' => $ohlcv['high'],
+                    'low' => $ohlcv['low'],
+                    'close' => $ohlcv['close'],
+                    'volume' => $ohlcv['volume'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $csvPath = database_path('seeders/data/historical/' . $symbol . '.csv');
+
+            if (!File::exists($csvPath)) {
+                $this->warn("Historical CSV missing for {$symbol}, skipping CSV update.");
+                continue;
+            }
+
+            $rows = CsvBars::read($csvPath);
+            $rows[$ymd] = [
+                'date' => $ymd,
+                'open' => $this->formatPrice($ohlcv['open']),
+                'high' => $this->formatPrice($ohlcv['high']),
+                'low' => $this->formatPrice($ohlcv['low']),
+                'close' => $this->formatPrice($ohlcv['close']),
+                'volume' => $ohlcv['volume'],
+            ];
+
+            CsvBars::write($csvPath, $rows);
+        }
+
+        $dbBars->flush();
+    }
+    }
+
+    /**
+     * @param array<string, mixed> $columns
+     * @param array<string, array<string, mixed>> $columnMetadata
+     * @param array<string, mixed> $row
+     * @return array{open: float, high: float, low: float, close: float, volume: int}|null
+     */
+    private function resolveOhlcvValues(array $columns, array $columnMetadata, array $row): ?array
+    {
+        $fields = [
+            'open' => ['open price', 'open'],
+            'high' => ['high price', 'high'],
+            'low' => ['low price', 'low'],
+            'close' => ['close price', 'close'],
+            'volume' => ['volume'],
+        ];
+
+        $resolved = [];
+
+        foreach ($fields as $field => $aliases) {
+            $raw = $this->resolveColumnValue($columns, $columnMetadata, $row, $aliases);
+
+            if ($raw === null) {
+                return null;
+            }
+
+            if ($field === 'volume') {
+                $value = $this->parseVolume($raw);
+                if ($value === null) {
+                    return null;
+                }
+                $resolved['volume'] = $value;
+            } else {
+                $value = $this->parsePrice($raw);
+                if ($value === null) {
+                    return null;
+                }
+                $resolved[$field] = $value;
+            }
+        }
+
+        return [
+            'open' => $resolved['open'],
+            'high' => $resolved['high'],
+            'low' => $resolved['low'],
+            'close' => $resolved['close'],
+            'volume' => $resolved['volume'],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $columns
+     * @param array<string, array<string, mixed>> $columnMetadata
+     * @param array<string, mixed> $row
+     * @param array<int, string> $aliases
+     */
+    private function resolveColumnValue(array $columns, array $columnMetadata, array $row, array $aliases): mixed
+    {
+        foreach ($columns as $itemId => $value) {
+            $metadata = $columnMetadata[$itemId] ?? [];
+            $itemName = strtolower((string) ($metadata['item_name'] ?? ''));
+
+            foreach ($aliases as $alias) {
+                $needle = strtolower($alias);
+                if ($needle !== '' && str_contains($itemName, $needle)) {
+                    return $value;
+                }
+            }
+        }
+
+        foreach ($aliases as $alias) {
+            $key = str_replace(' ', '_', $alias);
+            if (array_key_exists($key, $row)) {
+                return $row[$key];
+            }
+
+            $camelKey = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $alias))));
+            if (array_key_exists($camelKey, $row)) {
+                return $row[$camelKey];
+            }
+        }
+
+        return null;
+    }
+
+    private function parsePrice(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $parsed = CsvUtilities::num(['value' => $value], 'value');
+
+        return $parsed === null ? null : (float) $parsed;
+    }
+
+    private function parseVolume(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (int) round((float) $value);
+        }
+
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $parsed = CsvUtilities::vol(['value' => $value], 'value');
+
+        return $parsed === null ? null : (int) $parsed;
+    }
+
+    private function formatPrice(float $value): string
+    {
+        return number_format($value, 2, '.', '');
+    }
+
+    private function getOrCreateAssetId(string $symbol): ?int
+    {
+        if (isset($this->assetIds[$symbol])) {
+            return $this->assetIds[$symbol];
+        }
+
+        $id = DB::table('assets')->where('symbol', $symbol)->value('id');
+
+        if ($id) {
+            return $this->assetIds[$symbol] = (int) $id;
+        }
+
+        try {
+            $inserted = DB::table('assets')->insertGetId([
+                'symbol' => $symbol,
+                'name' => $symbol,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable $exception) {
+            $this->warn("Failed to create asset for {$symbol}: {$exception->getMessage()}");
+            return null;
+        }
+
+        return $this->assetIds[$symbol] = (int) $inserted;
     }
 }
