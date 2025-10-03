@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Services\StockbitExodusClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Tests\TestCase;
@@ -208,6 +210,10 @@ class ScrapeStockbitCommandTest extends TestCase
             'setfincol' => 1,
         ]);
 
+        $csvPath = database_path('seeders/data/historical/BBRI.csv');
+        $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
+        File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,100,110,90,105,1000\n");
+
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')->never();
         $mock->shouldReceive('historicalSummary')->never();
@@ -224,16 +230,18 @@ class ScrapeStockbitCommandTest extends TestCase
                 'data' => [
                     'header_custom' => [
                         ['item_id' => '20891', 'value' => 'Open Price'],
+                        ['item_id' => '20892', 'value' => 'High Price'],
+                        ['item_id' => '20893', 'value' => 'Low Price'],
+                        ['item_id' => '20894', 'value' => 'Close Price'],
+                        ['item_id' => '20895', 'value' => 'Volume'],
                     ],
                     'result' => [
                         ['symbol' => 'BBRI', 'column' => []],
                     ],
                 ],
             ]);
-        $mock->shouldReceive('watchlistColumn')
-            ->once()
-            ->with(808507, '20891')
-            ->andReturn([
+        $columnResponses = [
+            '20891' => [
                 'data' => [
                     'item_id' => '20891',
                     'item_name' => 'Open Price',
@@ -241,24 +249,243 @@ class ScrapeStockbitCommandTest extends TestCase
                         ['symbol' => 'BBRI', 'value' => '1,234.00'],
                     ],
                 ],
-            ]);
+            ],
+            '20892' => [
+                'data' => [
+                    'item_id' => '20892',
+                    'item_name' => 'High Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,300.00'],
+                    ],
+                ],
+            ],
+            '20893' => [
+                'data' => [
+                    'item_id' => '20893',
+                    'item_name' => 'Low Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,200.00'],
+                    ],
+                ],
+            ],
+            '20894' => [
+                'data' => [
+                    'item_id' => '20894',
+                    'item_name' => 'Close Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,250.00'],
+                    ],
+                ],
+            ],
+            '20895' => [
+                'data' => [
+                    'item_id' => '20895',
+                    'item_name' => 'Volume',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '5,678,900'],
+                    ],
+                ],
+            ],
+        ];
+        $mock->shouldReceive('watchlistColumn')
+            ->times(count($columnResponses))
+            ->withArgs(function ($watchlistId, $itemId) use ($columnResponses) {
+                return $watchlistId === 808507 && isset($columnResponses[$itemId]);
+            })
+            ->andReturnUsing(function ($watchlistId, $itemId) use ($columnResponses) {
+                return $columnResponses[$itemId];
+            });
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
-        Carbon::setTestNow('2024-02-03 13:00:00');
+        try {
+            $assetQuery = Mockery::mock();
+            $assetQuery->shouldReceive('where')->with('symbol', 'BBRI')->andReturnSelf();
+            $assetQuery->shouldReceive('value')->with('id')->andReturn(123);
+            DB::shouldReceive('table')->with('assets')->andReturn($assetQuery);
 
-        Artisan::call('stockbit:scrape', [
-            '--eod' => true,
+            $upsertPayload = [];
+            $priceBarsQuery = Mockery::mock();
+            $priceBarsQuery->shouldReceive('upsert')
+                ->once()
+                ->with(
+                    Mockery::on(function ($rows) use (&$upsertPayload) {
+                        $upsertPayload = $rows;
+                        return isset($rows[0]['asset_id'], $rows[0]['date']);
+                    }),
+                    ['asset_id', 'date'],
+                    ['open', 'high', 'low', 'close', 'volume', 'updated_at']
+                );
+            DB::shouldReceive('table')->with('price_bars')->andReturn($priceBarsQuery);
+
+            Carbon::setTestNow('2024-02-03 13:00:00');
+
+            Artisan::call('stockbit:scrape', [
+                '--eod' => true,
+            ]);
+
+            $path = 'watchlist_eod/808507_2024-02-03_13-00-00.json';
+            Storage::disk('local')->assertExists($path);
+
+            $json = json_decode(Storage::disk('local')->get($path), true);
+            $this->assertSame('1,234.00', $json['data']['result'][0]['column']['20891']);
+            $this->assertSame('Open Price', $json['column_metadata']['20891']['item_name']);
+            $this->assertSame(808507, $json['meta']['watchlist_id']);
+
+            $csv = explode("\n", trim(File::get($csvPath)));
+            $this->assertSame('Date,Open,High,Low,Close,Volume', $csv[0]);
+            $this->assertSame('01/02/2024,100,110,90,105,1000', $csv[1]);
+            $this->assertSame('03/02/2024,1234.00,1300.00,1200.00,1250.00,5678900', $csv[2]);
+
+            $this->assertCount(1, $upsertPayload);
+            $this->assertSame(123, $upsertPayload[0]['asset_id']);
+            $this->assertSame('2024-02-03', $upsertPayload[0]['date']);
+            $this->assertSame(1234.0, $upsertPayload[0]['open']);
+            $this->assertSame(1300.0, $upsertPayload[0]['high']);
+            $this->assertSame(1200.0, $upsertPayload[0]['low']);
+            $this->assertSame(1250.0, $upsertPayload[0]['close']);
+            $this->assertSame(5678900, $upsertPayload[0]['volume']);
+        } finally {
+            Carbon::setTestNow();
+
+            if ($originalCsv !== null) {
+                File::put($csvPath, $originalCsv);
+            } else {
+                File::delete($csvPath);
+            }
+        }
+    }
+
+    public function test_eod_watchlist_snapshot_respects_no_persist_option(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.watchlist.id', 808507);
+        config()->set('stockbit.watchlist.query', [
+            'page' => 1,
+            'limit' => 500,
+            'nochart' => 1,
+            'setfincol' => 1,
         ]);
 
-        Carbon::setTestNow();
+        $csvPath = database_path('seeders/data/historical/BBRI.csv');
+        $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
+        File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,100,110,90,105,1000\n");
 
-        $path = 'watchlist_eod/808507_2024-02-03_13-00-00.json';
-        Storage::disk('local')->assertExists($path);
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')->never();
+        $mock->shouldReceive('historicalSummary')->never();
+        $mock->shouldReceive('tickerProfile')->never();
+        $mock->shouldReceive('watchlist')
+            ->once()
+            ->with(808507, [
+                'page' => 1,
+                'limit' => 500,
+                'nochart' => 1,
+                'setfincol' => 1,
+            ])
+            ->andReturn([
+                'data' => [
+                    'header_custom' => [
+                        ['item_id' => '20891', 'value' => 'Open Price'],
+                        ['item_id' => '20892', 'value' => 'High Price'],
+                        ['item_id' => '20893', 'value' => 'Low Price'],
+                        ['item_id' => '20894', 'value' => 'Close Price'],
+                        ['item_id' => '20895', 'value' => 'Volume'],
+                    ],
+                    'result' => [
+                        ['symbol' => 'BBRI', 'column' => []],
+                    ],
+                ],
+            ]);
+        $columnResponses = [
+            '20891' => [
+                'data' => [
+                    'item_id' => '20891',
+                    'item_name' => 'Open Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,234.00'],
+                    ],
+                ],
+            ],
+            '20892' => [
+                'data' => [
+                    'item_id' => '20892',
+                    'item_name' => 'High Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,300.00'],
+                    ],
+                ],
+            ],
+            '20893' => [
+                'data' => [
+                    'item_id' => '20893',
+                    'item_name' => 'Low Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,200.00'],
+                    ],
+                ],
+            ],
+            '20894' => [
+                'data' => [
+                    'item_id' => '20894',
+                    'item_name' => 'Close Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,250.00'],
+                    ],
+                ],
+            ],
+            '20895' => [
+                'data' => [
+                    'item_id' => '20895',
+                    'item_name' => 'Volume',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '5,678,900'],
+                    ],
+                ],
+            ],
+        ];
+        $mock->shouldReceive('watchlistColumn')
+            ->times(count($columnResponses))
+            ->withArgs(function ($watchlistId, $itemId) use ($columnResponses) {
+                return $watchlistId === 808507 && isset($columnResponses[$itemId]);
+            })
+            ->andReturnUsing(function ($watchlistId, $itemId) use ($columnResponses) {
+                return $columnResponses[$itemId];
+            });
 
-        $json = json_decode(Storage::disk('local')->get($path), true);
-        $this->assertSame('1,234.00', $json['data']['result'][0]['column']['20891']);
-        $this->assertSame('Open Price', $json['column_metadata']['20891']['item_name']);
-        $this->assertSame(808507, $json['meta']['watchlist_id']);
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        try {
+            DB::shouldReceive('table')->never();
+            Carbon::setTestNow('2024-02-03 13:00:00');
+
+            Artisan::call('stockbit:scrape', [
+                '--eod' => true,
+                '--no-persist' => true,
+            ]);
+
+            $path = 'watchlist_eod/808507_2024-02-03_13-00-00.json';
+            Storage::disk('local')->assertExists($path);
+
+            $json = json_decode(Storage::disk('local')->get($path), true);
+            $this->assertSame('1,234.00', $json['data']['result'][0]['column']['20891']);
+            $this->assertSame('Open Price', $json['column_metadata']['20891']['item_name']);
+            $this->assertSame(808507, $json['meta']['watchlist_id']);
+
+            $csv = explode("\n", trim(File::get($csvPath)));
+            $this->assertSame('Date,Open,High,Low,Close,Volume', $csv[0]);
+            $this->assertSame('01/02/2024,100,110,90,105,1000', $csv[1]);
+            $this->assertCount(2, $csv); // no new row added
+        } finally {
+            Carbon::setTestNow();
+
+            if ($originalCsv !== null) {
+                File::put($csvPath, $originalCsv);
+            } else {
+                File::delete($csvPath);
+            }
+        }
     }
 }
