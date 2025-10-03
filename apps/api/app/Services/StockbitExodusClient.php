@@ -51,7 +51,7 @@ class StockbitExodusClient
         $headers = ['authorization' => 'Bearer ' . $this->bearer];
 
         try {
-            $res = $this->http->get("marketdetectors/{$symbol}", [
+            $res = $this->http->get("/marketdetectors/{$symbol}", [
                 'headers' => $headers,
                 'query'   => $q,
             ]);
@@ -107,7 +107,7 @@ class StockbitExodusClient
         $headers = ['authorization' => 'Bearer ' . $this->bearer];
 
         try {
-            $res = $this->http->get("company-price-feed/historical/summary/{$symbol}", [
+            $res = $this->http->get("/company-price-feed/historical/summary/{$symbol}", [
                 'headers' => $headers,
                 'query'   => $q,
             ]);
@@ -134,7 +134,7 @@ class StockbitExodusClient
         $headers = ['authorization' => 'Bearer ' . $this->bearer];
 
         try {
-            $res = $this->http->get("emitten/{$symbol}/profile", [
+            $res = $this->http->get("/emitten/{$symbol}/profile", [
                 'headers' => $headers,
             ]);
         } catch (RequestException $e) {
