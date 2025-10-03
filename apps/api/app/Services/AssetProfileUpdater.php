@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Asset;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class AssetProfileUpdater
 {
@@ -16,9 +18,19 @@ class AssetProfileUpdater
      */
     public function sync(Asset|string $asset): array
     {
-        $model = $this->resolveAsset($asset);
-
+        $model = $asset instanceof Asset ? $asset : $this->resolveAsset($asset);
         $response = $this->client->tickerProfile($model->symbol);
+
+        return $this->applyTickerProfileResponse($model, $response);
+    }
+
+    /**
+     * Apply a previously fetched ticker profile response to an asset record.
+     */
+    public function applyTickerProfileResponse(Asset|string $asset, array $response): array
+    {
+        $model = $asset instanceof Asset ? $asset : $this->resolveAsset($asset);
+
         if (isset($response['error'])) {
             return [
                 'ok' => false,
@@ -43,6 +55,8 @@ class AssetProfileUpdater
 
         $model->fill($updates);
         $model->save();
+
+        $this->writeProfileSeederCsv($model, $data, $updates);
 
         return [
             'ok' => true,
@@ -145,5 +159,46 @@ class AssetProfileUpdater
         }
 
         return (float) $normalized;
+    }
+
+    private function writeProfileSeederCsv(Asset $asset, array $profile, array $updates): void
+    {
+        $directory = database_path('seeders/data/profiles');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        $path = $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.csv';
+        if (File::exists($path)) {
+            return;
+        }
+
+        $row = array_merge(
+            [
+                'symbol' => Str::upper($asset->symbol),
+                'name' => $asset->name,
+            ],
+            $updates,
+            [
+                'profile_synced_at' => optional($asset->profile_synced_at)->toDateTimeString(),
+                'ticker_profile_payload' => $profile,
+            ]
+        );
+
+        foreach ($row as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $row[$key] = $value->format('c');
+                continue;
+            }
+
+            if (is_array($value) || is_object($value)) {
+                $row[$key] = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        }
+
+        $columns = array_keys($row);
+        $csv = CsvUtilities::rowsToCsv([$row], $columns);
+
+        File::put($path, $csv);
     }
 }
