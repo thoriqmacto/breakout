@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ScrapeStockbit extends Command
 {
@@ -456,8 +457,8 @@ class ScrapeStockbit extends Command
             'open' => ['open price', 'open'],
             'high' => ['high price', 'high'],
             'low' => ['low price', 'low'],
-            'close' => ['close price', 'close'],
-            'volume' => ['volume'],
+            'close' => ['close price', 'close', 'last', 'last price'],
+            'volume' => ['volume', 'total volume', 'vol'],
         ];
 
         $resolved = [];
@@ -501,28 +502,92 @@ class ScrapeStockbit extends Command
      */
     private function resolveColumnValue(array $columns, array $columnMetadata, array $row, array $aliases): mixed
     {
+        $normalize = static function (?string $value): ?string {
+            if ($value === null) {
+                return null;
+            }
+
+            $value = strtolower(trim($value));
+
+            if ($value === '') {
+                return null;
+            }
+
+            $value = preg_replace('/[^a-z0-9]+/', '', $value);
+
+            return $value === '' ? null : $value;
+        };
+
+        $aliasNeedles = [];
+        $candidateKeys = [];
+
+        foreach ($aliases as $alias) {
+            if (!is_string($alias) || trim($alias) === '') {
+                continue;
+            }
+
+            $aliasNeedle = $normalize($alias);
+            if ($aliasNeedle !== null) {
+                $aliasNeedles[] = $aliasNeedle;
+            }
+
+            $candidateKeys[] = $alias;
+            $candidateKeys[] = strtolower($alias);
+            $candidateKeys[] = Str::snake($alias);
+            $candidateKeys[] = Str::camel($alias);
+        }
+
+        $aliasNeedles = array_values(array_unique($aliasNeedles));
+        $candidateKeys = array_values(array_unique(array_filter($candidateKeys, static fn ($value) => is_string($value) && $value !== '')));
+
         foreach ($columns as $itemId => $value) {
             $metadata = $columnMetadata[$itemId] ?? [];
-            $itemName = strtolower((string) ($metadata['item_name'] ?? ''));
+            $names = [
+                $metadata['item_name'] ?? null,
+                $metadata['value'] ?? null,
+            ];
 
-            foreach ($aliases as $alias) {
-                $needle = strtolower($alias);
-                if ($needle !== '' && str_contains($itemName, $needle)) {
-                    return $value;
+            foreach ($names as $name) {
+                $normalizedName = $normalize(is_string($name) ? $name : null);
+
+                if ($normalizedName === null) {
+                    continue;
+                }
+
+                foreach ($aliasNeedles as $needle) {
+                    if ($needle !== '' && str_contains($normalizedName, $needle)) {
+                        return $value;
+                    }
                 }
             }
         }
 
-        foreach ($aliases as $alias) {
-            $key = str_replace(' ', '_', $alias);
+        foreach ($candidateKeys as $key) {
             if (array_key_exists($key, $row)) {
                 return $row[$key];
             }
+        }
 
-            $camelKey = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $alias))));
-            if (array_key_exists($camelKey, $row)) {
-                return $row[$camelKey];
+        $normalizedRow = [];
+
+        foreach ($row as $key => $value) {
+            if (!is_string($key) && !is_int($key)) {
+                continue;
             }
+
+            $normalizedKey = $normalize((string) $key);
+
+            if ($normalizedKey !== null && !array_key_exists($normalizedKey, $normalizedRow)) {
+                $normalizedRow[$normalizedKey] = $value;
+            }
+        }
+
+        foreach ($aliasNeedles as $needle) {
+            if ($needle === '' || !array_key_exists($needle, $normalizedRow)) {
+                continue;
+            }
+
+            return $normalizedRow[$needle];
         }
 
         return null;
