@@ -166,34 +166,21 @@ export default function DashboardPage() {
 
     const loadLatestPrice = async () => {
       try {
-        const response = await fetch(buildApiUrl("/v1/assets/latest-prices"), {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
+        const response = await fetch(
+          buildApiUrl(`/v1/assets/${encodeURIComponent(debouncedSymbol)}/latest-price`),
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            signal: controller.signal,
           },
-          signal: controller.signal,
-        })
-
-        const payload = await parseJson<ApiResponse<LatestPriceRecord[]>>(response)
-
-        if (!response.ok) {
-          const message =
-            (payload && "message" in payload && typeof payload.message === "string" && payload.message) ||
-            "Unable to fetch the latest close price."
-
-          throw new Error(message)
-        }
-
-        if (!payload || payload.status !== "success" || !Array.isArray(payload.data)) {
-          throw new Error("Unexpected response from the asset API.")
-        }
-
-        const match = payload.data.find(
-          (record) => record?.asset?.symbol?.toUpperCase() === debouncedSymbol,
         )
 
-        if (!match) {
+        const payload = await parseJson<ApiResponse<LatestPriceRecord>>(response)
+
+        if (response.status === 404) {
           if (isCancelled) {
             return
           }
@@ -205,10 +192,26 @@ export default function DashboardPage() {
           return
         }
 
+        if (!response.ok) {
+          const message =
+            (payload && "message" in payload && typeof payload.message === "string" && payload.message) ||
+            "Unable to fetch the latest close price."
+
+          throw new Error(message)
+        }
+
+        if (!payload || payload.status !== "success" || !payload.data) {
+          throw new Error("Unexpected response from the asset API.")
+        }
+
+        if (isCancelled) {
+          return
+        }
+
+        const match = payload.data
+
         const close =
-          typeof match.close === "number"
-            ? match.close
-            : Number.parseFloat(match.close ? String(match.close) : "")
+          typeof match.close === "number" ? match.close : Number.parseFloat(match.close ? String(match.close) : "")
 
         if (!Number.isFinite(close)) {
           if (isCancelled) {
