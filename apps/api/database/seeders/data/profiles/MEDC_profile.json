@@ -1,0 +1,635 @@
+{
+    "symbol": "MEDC",
+    "name": "MEDC",
+    "address": [
+        {
+            "id": "283",
+            "email": [
+                "corporate.secretary@medcoenergi.com"
+            ],
+            "fax": "(021) 2995-3001",
+            "npwp": "\t01.002.095.6-081.000",
+            "phone": "(021) 2995-3000",
+            "website": "www.medcoenergi.com ",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:35+07:00",
+            "value": "<td colspan='4'>Gedung The Energy, Lantai 52 SCBD Lot, 11A, Jl. Jend. Sudirman Kav. 52-53, Senayan, Kebayoran Baru, Jakarta Selatan\n\n        \t\t  \t\t\tPhone: (021) 2995-3000\n        \t\t  \t\t\tFax: (021) 2995-3001\n                            NPWP: \t01.002.095.6-081.000\n        \t\t  \t\t\tEmail: corporate.secretary@medcoenergi.com\n        \t\t  \t\t\tWebsite: www.medcoenergi.com \n\n        \t  \t\t\t</td>",
+            "office": "Gedung The Energy, Lantai 52 SCBD Lot, 11A, Jl. Jend. Sudirman Kav. 52-53, Senayan, Kebayoran Baru, Jakarta Selatan"
+        }
+    ],
+    "background": "PT. Medco Energi Internasional Tbk (MEDC) bergerak dalam bidang eksplorasi dan produksi minyak dan gas bumi dan kegiatan energi lainnya, pengeboran darat dan lepas pantai, dan investasi (langsung dan tidak langsung) pada anak perusahaan. Perusahaan mulai beroperasi secara komersial pada tanggal 13 Desember 1980.\r\n",
+    "history": {
+        "amount": "96 B",
+        "board": "Papan Utama",
+        "date": "12 Oct 1994",
+        "price": "4,350",
+        "registrar": "",
+        "shares": "22,000,000",
+        "underwriters": [
+            "PT. Bahana Securities",
+            "PT. Niaga Securities",
+            "PT. Multicor",
+            "PT. Ronie Wijata Dharma"
+        ],
+        "administrative_bureau": "PT. Sinartama Gunita",
+        "free_float": "23.52%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837873",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Yaser Raimi A. Panigoro"
+            }
+        ],
+        "director": [
+            {
+                "id": "13837868",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Roberto Lorato"
+            },
+            {
+                "id": "13837869",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Ronald Gunawan"
+            },
+            {
+                "id": "13837870",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Anthony R. Mathias"
+            },
+            {
+                "id": "13837871",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Amri Siahaan"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13837874",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Marsillam Simandjuntak"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13837872",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Yani Yuhani Panigoro"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13837867",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:35+07:00",
+                "value": "Hilmi Panigoro"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12531089",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:35+07:00",
+            "value": "{\"name\":\"Siendy K. Wisandana\",\"phone\":\"021 29953000\",\"email\":\"SiendyK.Wisandana@medcoenergi.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51.5%",
+            "name": "PT MEDCO DAYA ABADI LESTARI",
+            "value": "12.94 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "22.53%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.91 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "21.46%",
+            "name": "DIAMOND BRIDGE PTE. LTD",
+            "value": "5.40 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "1.8%",
+            "name": "SAHAM TREASURY",
+            "value": "453.11 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.33%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "84.10 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "37,521",
+            "change": -1039,
+            "change_formatted": "(-1,039)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "38,560",
+            "change": 887,
+            "change_formatted": "(+887)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "37,673",
+            "change": 2628,
+            "change_formatted": "(+2,628)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "35,045",
+            "change": -1896,
+            "change_formatted": "(-1,896)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "36,941",
+            "change": -467,
+            "change_formatted": "(-467)"
+        },
+        {
+            "shareholder_date": "31 Mar 2025",
+            "total_share": "37,408",
+            "change": 1241,
+            "change_formatted": "(+1,241)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "1.69%",
+            "name": "ROBERTO LORATO",
+            "value": "176.67 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.24%",
+            "name": "RONALD GUNAWAN",
+            "value": "60.15 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.15%",
+            "name": "AMRI SIAHAAN",
+            "value": "37.17 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.15%",
+            "name": "HILMI PANIGORO",
+            "value": "36.53 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.09%",
+            "name": "ANTHONY R. MATHIAS",
+            "value": "23.38 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.05%",
+            "name": "YANI Y. PANIGORO",
+            "value": "11.20 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "YASER RAIMI A.PANIGORO",
+            "value": "3.53 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_price": 4350,
+    "float": 23.52,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "283",
+                "email": [
+                    "corporate.secretary@medcoenergi.com"
+                ],
+                "fax": "(021) 2995-3001",
+                "npwp": "\t01.002.095.6-081.000",
+                "phone": "(021) 2995-3000",
+                "website": "www.medcoenergi.com ",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:35+07:00",
+                "value": "<td colspan='4'>Gedung The Energy, Lantai 52 SCBD Lot, 11A, Jl. Jend. Sudirman Kav. 52-53, Senayan, Kebayoran Baru, Jakarta Selatan\n\n        \t\t  \t\t\tPhone: (021) 2995-3000\n        \t\t  \t\t\tFax: (021) 2995-3001\n                            NPWP: \t01.002.095.6-081.000\n        \t\t  \t\t\tEmail: corporate.secretary@medcoenergi.com\n        \t\t  \t\t\tWebsite: www.medcoenergi.com \n\n        \t  \t\t\t</td>",
+                "office": "Gedung The Energy, Lantai 52 SCBD Lot, 11A, Jl. Jend. Sudirman Kav. 52-53, Senayan, Kebayoran Baru, Jakarta Selatan"
+            }
+        ],
+        "background": "PT. Medco Energi Internasional Tbk (MEDC) bergerak dalam bidang eksplorasi dan produksi minyak dan gas bumi dan kegiatan energi lainnya, pengeboran darat dan lepas pantai, dan investasi (langsung dan tidak langsung) pada anak perusahaan. Perusahaan mulai beroperasi secara komersial pada tanggal 13 Desember 1980.\r\n",
+        "history": {
+            "amount": "96 B",
+            "board": "Papan Utama",
+            "date": "12 Oct 1994",
+            "price": "4,350",
+            "registrar": "",
+            "shares": "22,000,000",
+            "underwriters": [
+                "PT. Bahana Securities",
+                "PT. Niaga Securities",
+                "PT. Multicor",
+                "PT. Ronie Wijata Dharma"
+            ],
+            "administrative_bureau": "PT. Sinartama Gunita",
+            "free_float": "23.52%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837873",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Yaser Raimi A. Panigoro"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837868",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Roberto Lorato"
+                },
+                {
+                    "id": "13837869",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Ronald Gunawan"
+                },
+                {
+                    "id": "13837870",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Anthony R. Mathias"
+                },
+                {
+                    "id": "13837871",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Amri Siahaan"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13837874",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Marsillam Simandjuntak"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13837872",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Yani Yuhani Panigoro"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13837867",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:35+07:00",
+                    "value": "Hilmi Panigoro"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12531089",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:35+07:00",
+                "value": "{\"name\":\"Siendy K. Wisandana\",\"phone\":\"021 29953000\",\"email\":\"SiendyK.Wisandana@medcoenergi.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51.5%",
+                "name": "PT MEDCO DAYA ABADI LESTARI",
+                "value": "12.94 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "22.53%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.91 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "21.46%",
+                "name": "DIAMOND BRIDGE PTE. LTD",
+                "value": "5.40 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "1.8%",
+                "name": "SAHAM TREASURY",
+                "value": "453.11 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.33%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "84.10 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "37,521",
+                "change": -1039,
+                "change_formatted": "(-1,039)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "38,560",
+                "change": 887,
+                "change_formatted": "(+887)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "37,673",
+                "change": 2628,
+                "change_formatted": "(+2,628)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "35,045",
+                "change": -1896,
+                "change_formatted": "(-1,896)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "36,941",
+                "change": -467,
+                "change_formatted": "(-467)"
+            },
+            {
+                "shareholder_date": "31 Mar 2025",
+                "total_share": "37,408",
+                "change": 1241,
+                "change_formatted": "(+1,241)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "1.69%",
+                "name": "ROBERTO LORATO",
+                "value": "176.67 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.24%",
+                "name": "RONALD GUNAWAN",
+                "value": "60.15 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.15%",
+                "name": "AMRI SIAHAAN",
+                "value": "37.17 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.15%",
+                "name": "HILMI PANIGORO",
+                "value": "36.53 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.09%",
+                "name": "ANTHONY R. MATHIAS",
+                "value": "23.38 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.05%",
+                "name": "YANI Y. PANIGORO",
+                "value": "11.20 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "YASER RAIMI A.PANIGORO",
+                "value": "3.53 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-03T09:13:15+00:00"
+}
