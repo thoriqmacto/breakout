@@ -27,7 +27,7 @@ class ScrapeBrokerSummary extends Command
 
     public function handle(StockbitExodusClient $api): int
     {
-        $from = $this->option('from') ?? now()->subDays(7)->toDateString();
+        $from = $this->option('from') ?? now()->subDays(14)->toDateString();
         $to   = $this->option('to')   ?? now()->toDateString();
 
         $disk = (string) config('stockbit.save_disk');
