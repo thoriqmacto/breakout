@@ -9,10 +9,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class AssetProfileCsvSeeder extends Seeder
+class AssetProfileJsonSeeder extends Seeder
 {
     /**
-     * Directory where profile CSVs are stored.
+     * Directory where profile JSON files are stored.
      */
     private string $profileDir;
 
@@ -47,40 +47,40 @@ class AssetProfileCsvSeeder extends Seeder
     public function run(): void
     {
         if (!is_dir($this->profileDir)) {
-            $this->command?->warn('Profile CSV dir not found: ' . $this->profileDir);
+            $this->command?->warn('Profile JSON dir not found: ' . $this->profileDir);
             return;
         }
 
         $files = collect(File::files($this->profileDir))
-            ->filter(fn($file) => Str::lower($file->getExtension()) === 'csv')
+            ->filter(fn($file) => Str::lower($file->getExtension()) === 'json')
             ->sortBy(fn($file) => $file->getFilename())
             ->values();
 
         if ($files->isEmpty()) {
-            $this->command?->warn('No profile CSV files found in ' . $this->profileDir);
+            $this->command?->warn('No profile JSON files found in ' . $this->profileDir);
             return;
         }
 
         foreach ($files as $file) {
-            $this->seedProfileFromCsv($file->getPathname());
+            $this->seedProfileFromJson($file->getPathname());
         }
     }
 
-    private function seedProfileFromCsv(string $path): void
+    private function seedProfileFromJson(string $path): void
     {
-        $row = $this->readFirstRow($path);
-        if ($row === null) {
-            $this->command?->warn('Profile CSV is empty: ' . $path);
+        $payload = $this->readJson($path);
+        if ($payload === null) {
+            $this->command?->warn('Profile JSON is empty or invalid: ' . $path);
             return;
         }
-        $symbol = $this->resolveSymbolFromRow($row, $path);
+        $symbol = $this->resolveSymbolFromPayload($payload, $path);
 
         $asset = Asset::firstOrCreate(
             ['symbol' => $symbol],
-            ['name' => $row['name'] ?? $symbol]
+            ['name' => $payload['name'] ?? $symbol]
         );
 
-        $updates = $this->normalizeRow($row);
+        $updates = $this->normalizePayload($payload);
 
         if (!isset($updates['name']) && empty($asset->name)) {
             $updates['name'] = $symbol;
@@ -104,10 +104,10 @@ class AssetProfileCsvSeeder extends Seeder
         $this->command?->info('Seeded profile for ' . $symbol);
     }
 
-    private function resolveSymbolFromRow(array $row, string $path): string
+    private function resolveSymbolFromPayload(array $payload, string $path): string
     {
-        if (!empty($row['symbol'])) {
-            return Str::upper(trim((string) $row['symbol']));
+        if (!empty($payload['symbol'])) {
+            return Str::upper(trim((string) $payload['symbol']));
         }
 
         $filename = pathinfo($path, PATHINFO_FILENAME);
@@ -116,11 +116,11 @@ class AssetProfileCsvSeeder extends Seeder
         return Str::upper($filename);
     }
 
-    private function normalizeRow(array $row): array
+    private function normalizePayload(array $payload): array
     {
         $updates = [];
 
-        foreach ($row as $key => $value) {
+        foreach ($payload as $key => $value) {
             if ($value === null || $value === '') {
                 continue;
             }
@@ -132,18 +132,36 @@ class AssetProfileCsvSeeder extends Seeder
             }
 
             if (in_array($key, $this->jsonColumns, true)) {
-                $decoded = json_decode((string) $value, true);
-                $updates[$key] = json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+                $updates[$key] = $value;
                 continue;
             }
 
             if (in_array($key, ['lot_size'], true)) {
-                $updates[$key] = (int) $value;
+                if (is_numeric($value)) {
+                    $updates[$key] = (int) $value;
+                }
                 continue;
             }
 
             if (in_array($key, ['tick_size', 'float', 'ipo_price', 'marketcap'], true)) {
-                $updates[$key] = (float) $value;
+                if (is_numeric($value)) {
+                    $updates[$key] = (float) $value;
+                    continue;
+                }
+
+                $normalized = preg_replace('/[^0-9.\-]/', '', (string) $value);
+                if ($normalized === null) {
+                    continue;
+                }
+
+                $normalized = trim($normalized);
+                if ($normalized === '' || $normalized === '-') {
+                    continue;
+                }
+
+                if (is_numeric($normalized)) {
+                    $updates[$key] = (float) $normalized;
+                }
                 continue;
             }
 
@@ -161,38 +179,20 @@ class AssetProfileCsvSeeder extends Seeder
         return $updates;
     }
 
-    private function readFirstRow(string $path): ?array
+    private function readJson(string $path): ?array
     {
-        $handle = fopen($path, 'r');
-        if ($handle === false) {
+        if (!File::exists($path)) {
             return null;
         }
 
-        $headers = null;
-        while (($data = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
-            if ($headers === null) {
-                if (isset($data[0])) {
-                    $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
-                }
-                $headers = array_map(fn($value) => Str::of($value)->lower()->trim()->value(), $data);
-                continue;
-            }
-
-            $row = [];
-            foreach ($headers as $index => $header) {
-                $row[$header] = $data[$index] ?? null;
-            }
-
-            $hasData = collect($row)->contains(fn($value) => $value !== null && $value !== '');
-            if ($hasData) {
-                fclose($handle);
-                return $row;
-            }
+        $contents = File::get($path);
+        if ($contents === false || $contents === '') {
+            return null;
         }
 
-        fclose($handle);
+        $decoded = json_decode($contents, true);
 
-        return null;
+        return is_array($decoded) ? $decoded : null;
     }
 }
 

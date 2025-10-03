@@ -51,6 +51,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
                     ],
                 ],
             ]);
+        $mock->shouldReceive('tickerProfile')->never();
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
@@ -62,6 +63,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             '--historical-period' => 'HS_PERIOD_DAILY',
             '--historical-limit' => 50,
             '--historical-page' => 3,
+            '--no-profile-sync' => true,
         ]);
 
         $jsonPath = 'broker_summary/BBCA_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
@@ -99,6 +101,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             ->once()
             ->andReturn(['error' => 'http_500', 'message' => 'Server Error']);
         $mock->shouldReceive('historicalSummary')->never();
+        $mock->shouldReceive('tickerProfile')->never();
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
@@ -107,6 +110,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
             '--no-csv' => true,
+            '--no-profile-sync' => true,
         ]);
 
         $this->assertSame([], Storage::disk('local')->files('broker_summary'));
@@ -139,6 +143,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             ->once()
             ->with('TLKM', 'HS_PERIOD_DAILY', '2024-01-01', '2024-01-05', null, null)
             ->andReturn(['error' => 'http_500', 'message' => 'Server Error']);
+        $mock->shouldReceive('tickerProfile')->never();
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
@@ -147,6 +152,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
             '--no-csv' => true,
+            '--no-profile-sync' => true,
         ]);
 
         $jsonPath = 'broker_summary/TLKM_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
@@ -154,5 +160,37 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
         Storage::disk('local')->assertMissing('broker_summary/historical_summary/TLKM_2024-01-01_2024-01-05_HS_PERIOD_DAILY.json');
 
         $this->assertStringContainsString('Historical summary error for TLKM', Artisan::output());
+    }
+
+    public function test_profile_sync_can_be_skipped(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.save_dir', 'broker_summary');
+        config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->with('BBRI', '2024-02-01', '2024-02-02', null, null, null, null)
+            ->andReturn(['items' => []]);
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBRI', 'HS_PERIOD_DAILY', '2024-02-01', '2024-02-02', null, null)
+            ->andReturn(['data' => []]);
+        $mock->shouldReceive('tickerProfile')->never();
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        Artisan::call('stockbit:scrape', [
+            'tickers' => ['BBRI'],
+            '--from' => '2024-02-01',
+            '--to' => '2024-02-02',
+            '--historical-period' => 'HS_PERIOD_DAILY',
+            '--no-profile-sync' => true,
+        ]);
+
+        $this->assertStringContainsString('Profile sync skipped for BBRI', Artisan::output());
     }
 }

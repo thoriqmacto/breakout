@@ -56,7 +56,7 @@ class AssetProfileUpdater
         $model->fill($updates);
         $model->save();
 
-        $this->writeProfileSeederCsv($model, $data, $updates);
+        $this->writeProfileSeederJson($model, $data, $updates);
 
         return [
             'ok' => true,
@@ -161,44 +161,35 @@ class AssetProfileUpdater
         return (float) $normalized;
     }
 
-    private function writeProfileSeederCsv(Asset $asset, array $profile, array $updates): void
+    private function writeProfileSeederJson(Asset $asset, array $profile, array $updates): void
     {
         $directory = database_path('seeders/data/profiles');
         if (!File::isDirectory($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
 
-        $path = $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.csv';
+        $path = $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.json';
         if (File::exists($path)) {
             return;
         }
 
-        $row = array_merge(
+        $payload = array_merge(
             [
                 'symbol' => Str::upper($asset->symbol),
                 'name' => $asset->name,
             ],
-            $updates,
-            [
-                'profile_synced_at' => optional($asset->profile_synced_at)->toDateTimeString(),
-                'ticker_profile_payload' => $profile,
-            ]
+            $updates
         );
 
-        foreach ($row as $key => $value) {
-            if ($value instanceof \DateTimeInterface) {
-                $row[$key] = $value->format('c');
-                continue;
-            }
+        $payload['profile_synced_at'] = optional($asset->profile_synced_at)->toIso8601String();
+        $payload['ticker_profile_payload'] = $profile;
 
-            if (is_array($value) || is_object($value)) {
-                $row[$key] = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        foreach ($payload as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $payload[$key] = $value->format(DATE_ATOM);
             }
         }
 
-        $columns = array_keys($row);
-        $csv = CsvUtilities::rowsToCsv([$row], $columns);
-
-        File::put($path, $csv);
+        File::put($path, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 }

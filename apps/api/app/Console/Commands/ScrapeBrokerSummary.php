@@ -20,6 +20,7 @@ class ScrapeBrokerSummary extends Command
         {--investor_type=    : INVESTOR_TYPE_ALL|...}
         {--limit=25 : Max rows per API response}
         {--no-csv : Do not write CSV (only JSON)}
+        {--no-profile-sync : Skip syncing asset profiles}
         {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
         {--historical-limit= : Historical summary limit override}
         {--historical-page= : Historical summary page override}';
@@ -80,14 +81,18 @@ class ScrapeBrokerSummary extends Command
                 continue;
             }
 
-            $profileResponse = $api->tickerProfile($symbol);
-            $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
-            if (!$profileResult['ok']) {
-                $message = $profileResult['message'] ?? 'Unknown error';
-                $this->warn("Profile sync failed for {$symbol}: {$profileResult['error']} — {$message}");
+            if (!$this->option('no-profile-sync')) {
+                $profileResponse = $api->tickerProfile($symbol);
+                $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
+                if (!$profileResult['ok']) {
+                    $message = $profileResult['message'] ?? 'Unknown error';
+                    $this->warn("Profile sync failed for {$symbol}: {$profileResult['error']} — {$message}");
+                } else {
+                    $syncedAt = optional($profileResult['asset']->profile_synced_at)->toDateTimeString();
+                    $this->line('Profile synced for ' . $symbol . ($syncedAt ? " at {$syncedAt}" : ''));
+                }
             } else {
-                $syncedAt = optional($profileResult['asset']->profile_synced_at)->toDateTimeString();
-                $this->line('Profile synced for ' . $symbol . ($syncedAt ? " at {$syncedAt}" : ''));
+                $this->line('Profile sync skipped for ' . $symbol);
             }
 
             $historical = $api->historicalSummary(
