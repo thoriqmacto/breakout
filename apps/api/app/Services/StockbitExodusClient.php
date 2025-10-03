@@ -154,4 +154,60 @@ class StockbitExodusClient
 
         return is_array($json) ? $json : ['raw' => $body];
     }
+
+    public function watchlist($watchlistId, array $query = []): array
+    {
+        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $q = array_filter($query, static fn ($value) => $value !== null && $value !== '');
+
+        try {
+            $res = $this->http->get("/watchlist/{$watchlistId}", [
+                'headers' => $headers,
+                'query' => $q,
+            ]);
+        } catch (RequestException $e) {
+            return ['error' => 'network_error', 'message' => $e->getMessage()];
+        }
+
+        $status = $res->getStatusCode();
+        $body = (string) $res->getBody();
+        $json = json_decode($body, true);
+
+        if ($status === 401) {
+            return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
+        }
+        if ($status >= 400) {
+            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+        }
+
+        return is_array($json) ? $json : ['raw' => $body];
+    }
+
+    public function watchlistColumn($watchlistId, $itemId): array
+    {
+        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $q = ['fitemid' => $itemId];
+
+        try {
+            $res = $this->http->get("/watchlist/{$watchlistId}/column", [
+                'headers' => $headers,
+                'query' => $q,
+            ]);
+        } catch (RequestException $e) {
+            return ['error' => 'network_error', 'message' => $e->getMessage()];
+        }
+
+        $status = $res->getStatusCode();
+        $body = (string) $res->getBody();
+        $json = json_decode($body, true);
+
+        if ($status === 401) {
+            return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
+        }
+        if ($status >= 400) {
+            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+        }
+
+        return is_array($json) ? $json : ['raw' => $body];
+    }
 }
