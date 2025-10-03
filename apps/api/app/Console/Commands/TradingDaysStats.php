@@ -46,7 +46,7 @@ class TradingDaysStats extends Command
         }
 
         $this->table(
-            ['Year', 'Month', 'Trading Days'],
+            ['Year', 'Month', 'Days'],
             $rows->map(fn ($row) => [
                 $row->year,
                 str_pad((string) $row->month, 2, '0', STR_PAD_LEFT),
