@@ -3,12 +3,13 @@
 namespace Tests\Feature;
 
 use App\Services\StockbitExodusClient;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Tests\TestCase;
 
-class ScrapeBrokerSummaryCommandTest extends TestCase
+class ScrapeStockbitCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -192,5 +193,72 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
         ]);
 
         $this->assertStringContainsString('Profile sync skipped for BBRI', Artisan::output());
+    }
+
+    public function test_eod_watchlist_snapshot_is_saved(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.watchlist.id', 808507);
+        config()->set('stockbit.watchlist.query', [
+            'page' => 1,
+            'limit' => 500,
+            'nochart' => 1,
+            'setfincol' => 1,
+        ]);
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')->never();
+        $mock->shouldReceive('historicalSummary')->never();
+        $mock->shouldReceive('tickerProfile')->never();
+        $mock->shouldReceive('watchlist')
+            ->once()
+            ->with(808507, [
+                'page' => 1,
+                'limit' => 500,
+                'nochart' => 1,
+                'setfincol' => 1,
+            ])
+            ->andReturn([
+                'data' => [
+                    'header_custom' => [
+                        ['item_id' => '20891', 'value' => 'Open Price'],
+                    ],
+                    'result' => [
+                        ['symbol' => 'BBRI', 'column' => []],
+                    ],
+                ],
+            ]);
+        $mock->shouldReceive('watchlistColumn')
+            ->once()
+            ->with(808507, '20891')
+            ->andReturn([
+                'data' => [
+                    'item_id' => '20891',
+                    'item_name' => 'Open Price',
+                    'results' => [
+                        ['symbol' => 'BBRI', 'value' => '1,234.00'],
+                    ],
+                ],
+            ]);
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        Carbon::setTestNow('2024-02-03 13:00:00');
+
+        Artisan::call('stockbit:scrape', [
+            '--eod' => true,
+        ]);
+
+        Carbon::setTestNow();
+
+        $path = 'watchlist_eod/808507_2024-02-03_13-00-00.json';
+        Storage::disk('local')->assertExists($path);
+
+        $json = json_decode(Storage::disk('local')->get($path), true);
+        $this->assertSame('1,234.00', $json['data']['result'][0]['column']['20891']);
+        $this->assertSame('Open Price', $json['column_metadata']['20891']['item_name']);
+        $this->assertSame(808507, $json['meta']['watchlist_id']);
     }
 }

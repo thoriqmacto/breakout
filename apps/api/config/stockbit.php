@@ -19,4 +19,14 @@ return [
 
     'save_disk' => env('SB_SAVE_DISK', 'local'),
     'save_dir'  => env('SB_SAVE_DIR', 'broker_summary'),
+
+    'watchlist' => [
+        'id' => env('SB_WATCHLIST_ID', 808507),
+        'query' => [
+            'page' => env('SB_WATCHLIST_PAGE', 1),
+            'limit' => env('SB_WATCHLIST_LIMIT', 500),
+            'nochart' => env('SB_WATCHLIST_NOCHART', 1),
+            'setfincol' => env('SB_WATCHLIST_SETFINCOL', 1),
+        ],
+    ],
 ];

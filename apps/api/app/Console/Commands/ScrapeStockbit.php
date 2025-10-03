@@ -9,10 +9,10 @@ use App\Support\BrokerSummaryTransformer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
-class ScrapeBrokerSummary extends Command
+class ScrapeStockbit extends Command
 {
     protected $signature = 'stockbit:scrape
-        {tickers* : One or more tickers, e.g. INCO ANTM BRIS}
+        {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
         {--from= : YYYY-MM-DD (default: 7 days ago)}
         {--to=   : YYYY-MM-DD (default: today)}
         {--transaction_type= : TRANSACTION_TYPE_NET|TRANSACTION_TYPE_BUY|TRANSACTION_TYPE_SELL}
@@ -23,7 +23,9 @@ class ScrapeBrokerSummary extends Command
         {--no-profile-sync : Skip syncing asset profiles}
         {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
         {--historical-limit= : Historical summary limit override}
-        {--historical-page= : Historical summary page override}';
+        {--historical-page= : Historical summary page override}
+        {--eod : Capture EOD watchlist snapshot}
+        {--watchlist-id= : Override watchlist ID for --eod snapshot}';
 
     protected $description = 'Scrape Stockbit Exodus marketdetectors data and optionally emit a CSV summary';
 
@@ -63,7 +65,9 @@ class ScrapeBrokerSummary extends Command
             $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
         }
 
-        foreach ($this->argument('tickers') as $symbol) {
+        $tickers = $this->argument('tickers') ?? [];
+
+        foreach ($tickers as $symbol) {
             $this->info("Fetching {$symbol} {$from} → {$to}");
 
             $limitOption = $this->option('limit');
@@ -166,6 +170,97 @@ class ScrapeBrokerSummary extends Command
             usleep(200_000);
         }
 
+        if ($this->option('eod')) {
+            $this->captureWatchlistSnapshot($api, $disk);
+        }
+
         return self::SUCCESS;
+    }
+
+    private function captureWatchlistSnapshot(StockbitExodusClient $api, string $disk): void
+    {
+        $watchlistId = $this->option('watchlist-id') ?: config('stockbit.watchlist.id');
+
+        if (!$watchlistId) {
+            $this->warn('--eod requires a watchlist ID (configure stockbit.watchlist.id or pass --watchlist-id).');
+            return;
+        }
+
+        $query = config('stockbit.watchlist.query', []);
+
+        $watchlist = $api->watchlist($watchlistId, $query);
+
+        if (isset($watchlist['error'])) {
+            $code = $watchlist['error'] ?? 'error';
+            $message = $watchlist['message'] ?? 'Unknown error';
+            $this->error("Watchlist {$watchlistId} error: {$code} — {$message}");
+            return;
+        }
+
+        $columnLookups = [];
+        $headerCustom = $watchlist['data']['header_custom'] ?? [];
+
+        foreach ($headerCustom as $customColumn) {
+            $itemId = $customColumn['item_id'] ?? null;
+
+            if ($itemId === null || $itemId === '') {
+                continue;
+            }
+
+            $column = $api->watchlistColumn($watchlistId, $itemId);
+
+            if (isset($column['error'])) {
+                $code = $column['error'] ?? 'error';
+                $message = $column['message'] ?? 'Unknown error';
+                $this->warn("Watchlist column {$itemId} error: {$code} — {$message}");
+                continue;
+            }
+
+            $results = $column['data']['results'] ?? [];
+            foreach ($results as $row) {
+                if (!isset($row['symbol'])) {
+                    continue;
+                }
+
+                $symbol = $row['symbol'];
+                $columnLookups[$symbol][$itemId] = $row['value'] ?? null;
+            }
+
+            $columnLookups['__meta'][$itemId] = [
+                'item_id' => $itemId,
+                'item_name' => $column['data']['item_name'] ?? ($customColumn['value'] ?? null),
+            ];
+        }
+
+        if (!empty($columnLookups)) {
+            if (isset($columnLookups['__meta'])) {
+                $watchlist['column_metadata'] = $columnLookups['__meta'];
+                unset($columnLookups['__meta']);
+            }
+
+            if (isset($watchlist['data']['result']) && is_array($watchlist['data']['result'])) {
+                foreach ($watchlist['data']['result'] as &$row) {
+                    $symbol = $row['symbol'] ?? null;
+                    if ($symbol !== null && isset($columnLookups[$symbol])) {
+                        $row['column'] = $columnLookups[$symbol];
+                    }
+                }
+                unset($row);
+            }
+        }
+
+        $watchlist['meta'] = [
+            'watchlist_id' => $watchlistId,
+            'fetched_at' => now()->toIso8601String(),
+            'query' => $query,
+        ];
+
+        $timestamp = now()->format('Y-m-d_H-i-s');
+        $watchlistDir = 'watchlist_eod';
+        $filename = sprintf('%s_%s.json', $watchlistId, $timestamp);
+        $path = "{$watchlistDir}/{$filename}";
+
+        Storage::disk($disk)->put($path, json_encode($watchlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->line('Saved watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
     }
 }
