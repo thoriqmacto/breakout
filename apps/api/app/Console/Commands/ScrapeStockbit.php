@@ -358,7 +358,6 @@ class ScrapeStockbit extends Command
 
         $dbBars->flush();
     }
-    }
 
     /**
      * @param array<string, mixed> $columns
