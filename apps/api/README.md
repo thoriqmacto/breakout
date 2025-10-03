@@ -7,6 +7,21 @@ The Breakout API exposes two complementary authentication strategies:
 
 This document summarizes the configuration that powers the stateless authentication flow now used across both the web client and external integrations.
 
+## Getting Started
+
+Install dependencies, run the migrations, and backfill the new trading calendar artefacts:
+
+```bash
+composer install
+composer require guzzlehttp/guzzle:^7.9
+php artisan migrate
+php artisan trading-days:build --from=2015-01-01
+php artisan trading-days:stats
+php artisan trading-calendar:build --from=2015-01-01
+# Optional holiday overlay
+php artisan trading-calendar:build --from=2015-01-01 --holiday-file=storage/holidays.csv
+```
+
 ## Token-Based Authentication
 
 Rather than establishing browser sessions, the API issues bearer tokens that clients store and present on each request. Sanctum personal access tokens back both the refresh process and the custom JWT guard, allowing revocations to invalidate access immediately without relying on cookies or CSRF headers.
