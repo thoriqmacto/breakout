@@ -18,7 +18,7 @@ class ScrapeBrokerSummary extends Command
         {--transaction_type= : TRANSACTION_TYPE_NET|TRANSACTION_TYPE_BUY|TRANSACTION_TYPE_SELL}
         {--market_board=     : MARKET_BOARD_REGULER|MARKET_BOARD_TUNAI|...}
         {--investor_type=    : INVESTOR_TYPE_ALL|...}
-        {--limit=25 : Max rows per API response}
+        {--limit= : Max rows per API response (defaults to config(stockbit.defaults.limit))}
         {--no-csv : Do not write CSV (only JSON)}
         {--no-profile-sync : Skip syncing asset profiles}
         {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
@@ -66,6 +66,11 @@ class ScrapeBrokerSummary extends Command
         foreach ($this->argument('tickers') as $symbol) {
             $this->info("Fetching {$symbol} {$from} → {$to}");
 
+            $limitOption = $this->option('limit');
+            $limit = $this->input->hasParameterOption('--limit')
+                ? ($limitOption !== null && $limitOption !== '' ? (int) $limitOption : null)
+                : null;
+
             $json = $api->marketDetectors(
                 $symbol,
                 $from,
@@ -73,7 +78,7 @@ class ScrapeBrokerSummary extends Command
                 $this->option('transaction_type') ?: null,
                 $this->option('market_board') ?: null,
                 $this->option('investor_type') ?: null,
-                $this->option('limit') !== null ? (int) $this->option('limit') : null,
+                $limit,
             );
 
             if (isset($json['error'])) {
