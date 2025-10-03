@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Exceptions\JwtException;
 use App\Models\User;
 use App\Services\JwtService;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -17,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(ClientInterface::class, static fn (): ClientInterface => new Client([
+            'timeout' => 15,
+        ]));
+
         $this->app->singleton(JwtService::class, function ($app) {
             $config = $app['config']->get('jwt');
 
