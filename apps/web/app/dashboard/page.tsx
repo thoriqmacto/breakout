@@ -392,7 +392,7 @@ export default function DashboardPage() {
                   <span>
                     Latest close for {" "}
                     <span className="font-medium text-foreground">
-                      {lastFetchedSymbol ?? debouncedSymbol || symbol}
+                      {lastFetchedSymbol ?? (debouncedSymbol || symbol)}
                     </span>
                     {latestPriceDate ? ` (${latestPriceDate})` : ""}: {" "}
                     <span className="font-medium text-foreground">{formatIdr(latestPriceClose)}</span>
