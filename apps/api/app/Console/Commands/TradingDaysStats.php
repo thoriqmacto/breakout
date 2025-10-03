@@ -15,7 +15,8 @@ class TradingDaysStats extends Command
     {
         $year = $this->option('year');
 
-        $query = TradingDay::query();
+        $query = TradingDay::query()
+            ->when($year, static fn ($query) => $query->whereYear('date', (int) $year));
 
         $connectionDriver = $query->getConnection()->getDriverName();
 
@@ -31,9 +32,8 @@ class TradingDaysStats extends Command
             default => 'MONTH(date)',
         };
 
-        $rows = $query
+        $rows = (clone $query)
             ->selectRaw("{$yearExpression} as year, {$monthExpression} as month, COUNT(*) as trading_days")
-            ->when($year, static fn ($query) => $query->whereYear('date', (int) $year))
             ->groupByRaw("{$yearExpression}, {$monthExpression}")
             ->orderBy('year')
             ->orderBy('month')
@@ -44,6 +44,18 @@ class TradingDaysStats extends Command
 
             return self::SUCCESS;
         }
+
+        $fromDate = (clone $query)->min('date');
+        $toDate = (clone $query)->max('date');
+        $totalTradingDays = (clone $query)->count();
+
+        $this->info('Trading Day Statistics');
+        $this->line(sprintf(
+            'Total trading days: %d (%s to %s)',
+            $totalTradingDays,
+            $fromDate,
+            $toDate
+        ));
 
         $this->table(
             ['Year', 'Month', 'Days'],
