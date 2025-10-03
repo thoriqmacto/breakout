@@ -1,17 +1,4 @@
-const API_BASE =
-  (process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000/api").replace(/\/$/, "")
-
-function buildUrl(path: string) {
-  return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`
-}
-
-async function parseJson(response: Response) {
-  try {
-    return await response.json()
-  } catch {
-    return null
-  }
-}
+import { buildApiUrl as buildUrl, parseJson } from "@/lib/api-client"
 
 export type AuthUser = {
   id: number
