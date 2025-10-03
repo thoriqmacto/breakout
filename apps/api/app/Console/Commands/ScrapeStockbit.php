@@ -27,7 +27,7 @@ class ScrapeStockbit extends Command
         {--eod : Capture EOD watchlist snapshot}
         {--watchlist-id= : Override watchlist ID for --eod snapshot}';
 
-    protected $description = 'Scrape Stockbit Exodus marketdetectors data and optionally emit a CSV summary';
+    protected $description = 'Scrape Stockbit and persist to DB and Seeds data.';
 
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
