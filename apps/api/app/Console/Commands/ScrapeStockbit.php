@@ -432,10 +432,10 @@ class ScrapeStockbit extends Command
             $rows = CsvBars::read($csvPath);
             $rows[$ymd] = [
                 'date' => $ymd,
-                'open' => $this->formatPrice($ohlcv['open']),
-                'high' => $this->formatPrice($ohlcv['high']),
-                'low' => $this->formatPrice($ohlcv['low']),
-                'close' => $this->formatPrice($ohlcv['close']),
+                'open' => $this->formatPrice($ohlcv['open'],0),
+                'high' => $this->formatPrice($ohlcv['high'],0),
+                'low' => $this->formatPrice($ohlcv['low'],0),
+                'close' => $this->formatPrice($ohlcv['close'],0),
                 'volume' => $ohlcv['volume'],
             ];
 
@@ -631,9 +631,9 @@ class ScrapeStockbit extends Command
         return $parsed === null ? null : (int) $parsed;
     }
 
-    private function formatPrice(float $value): string
+    private function formatPrice(float $value, int $decimals): string
     {
-        return number_format($value, 2, '.', '');
+        return number_format($value, $decimals, '.', '');
     }
 
     private function getOrCreateAssetId(string $symbol): ?int
