@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\AssetProfileUpdater;
 use App\Services\CsvUtilities;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
@@ -25,7 +26,7 @@ class ScrapeBrokerSummary extends Command
 
     protected $description = 'Scrape Stockbit Exodus marketdetectors data and optionally emit a CSV summary';
 
-    public function handle(StockbitExodusClient $api): int
+    public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
         $from = $this->option('from') ?? now()->subDays(14)->toDateString();
         $to   = $this->option('to')   ?? now()->toDateString();
@@ -77,6 +78,16 @@ class ScrapeBrokerSummary extends Command
             if (isset($json['error'])) {
                 $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
                 continue;
+            }
+
+            $profileResponse = $api->tickerProfile($symbol);
+            $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
+            if (!$profileResult['ok']) {
+                $message = $profileResult['message'] ?? 'Unknown error';
+                $this->warn("Profile sync failed for {$symbol}: {$profileResult['error']} — {$message}");
+            } else {
+                $syncedAt = optional($profileResult['asset']->profile_synced_at)->toDateTimeString();
+                $this->line('Profile synced for ' . $symbol . ($syncedAt ? " at {$syncedAt}" : ''));
             }
 
             $historical = $api->historicalSummary(
