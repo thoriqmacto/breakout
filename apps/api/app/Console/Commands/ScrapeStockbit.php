@@ -31,7 +31,8 @@ class ScrapeStockbit extends Command
         {--historical-limit= : Historical summary limit override}
         {--historical-page= : Historical summary page override}
         {--eod : Capture EOD watchlist snapshot}
-        {--watchlist-id= : Override watchlist ID for --eod snapshot}';
+        {--watchlist-id= : Override watchlist ID for --eod snapshot}
+        {--overwrite : Force refreshing the --eod watchlist snapshot JSON}';
 
     protected $description = 'Scrape Stockbit and persist to DB and Seeds data.';
 
@@ -214,14 +215,78 @@ class ScrapeStockbit extends Command
         }
 
         $query = config('stockbit.watchlist.query', []);
+        $now = now();
+        $date = $now->format('Y-m-d');
+        $watchlistDir = 'watchlist_eod';
+        $filename = sprintf('%s_%s.json', $watchlistId, $date);
+        $path = "{$watchlistDir}/{$filename}";
+        $overwrite = (bool) $this->option('overwrite');
 
+        $watchlist = null;
+
+        if (!$overwrite) {
+            $watchlist = $this->loadWatchlistSnapshotFromDisk($disk, $path);
+        }
+
+        if ($watchlist === null) {
+            $watchlist = $this->fetchWatchlistSnapshot($api, $watchlistId, $query);
+
+            if ($watchlist === null) {
+                return;
+            }
+
+            $watchlist['meta'] = [
+                'watchlist_id' => $watchlistId,
+                'fetched_at' => $now->toIso8601String(),
+                'query' => $query,
+            ];
+
+            Storage::disk($disk)->put($path, json_encode($watchlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $this->line('Saved watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
+        } else {
+            $this->line('Loaded watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
+
+            $existingMeta = $watchlist['meta'] ?? [];
+            if (!is_array($existingMeta)) {
+                $existingMeta = [];
+            }
+
+            $watchlist['meta'] = array_replace(
+                [
+                    'watchlist_id' => $watchlistId,
+                    'query' => $query,
+                ],
+                $existingMeta
+            );
+
+            if (!isset($watchlist['meta']['fetched_at'])) {
+                $watchlist['meta']['fetched_at'] = Carbon::createFromFormat('Y-m-d', $date, $now->getTimezone())
+                    ->startOfDay()
+                    ->toIso8601String();
+            }
+        }
+
+        if ($this->option('no-persist')) {
+            $this->line('Skipping watchlist persistence (--no-persist).');
+            return;
+        }
+
+        $this->persistWatchlistBars($watchlist);
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     * @return array<string, mixed>|null
+     */
+    private function fetchWatchlistSnapshot(StockbitExodusClient $api, string $watchlistId, array $query): ?array
+    {
         $watchlist = $api->watchlist($watchlistId, $query);
 
         if (isset($watchlist['error'])) {
             $code = $watchlist['error'] ?? 'error';
             $message = $watchlist['message'] ?? 'Unknown error';
             $this->error("Watchlist {$watchlistId} error: {$code} — {$message}");
-            return;
+            return null;
         }
 
         $columnLookups = [];
@@ -276,26 +341,30 @@ class ScrapeStockbit extends Command
             }
         }
 
-        $watchlist['meta'] = [
-            'watchlist_id' => $watchlistId,
-            'fetched_at' => now()->toIso8601String(),
-            'query' => $query,
-        ];
+        return $watchlist;
+    }
 
-        $timestamp = now()->format('Y-m-d_H-i-s');
-        $watchlistDir = 'watchlist_eod';
-        $filename = sprintf('%s_%s.json', $watchlistId, $timestamp);
-        $path = "{$watchlistDir}/{$filename}";
-
-        Storage::disk($disk)->put($path, json_encode($watchlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-        $this->line('Saved watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
-
-        if ($this->option('no-persist')) {
-            $this->line('Skipping watchlist persistence (--no-persist).');
-            return;
+    private function loadWatchlistSnapshotFromDisk(string $disk, string $path): ?array
+    {
+        if (!Storage::disk($disk)->exists($path)) {
+            return null;
         }
 
-        $this->persistWatchlistBars($watchlist);
+        try {
+            $contents = Storage::disk($disk)->get($path);
+        } catch (\Throwable $exception) {
+            $this->warn('Failed to read existing watchlist snapshot: ' . $exception->getMessage());
+            return null;
+        }
+
+        $decoded = json_decode($contents, true);
+
+        if (!is_array($decoded)) {
+            $this->warn('Existing watchlist snapshot is invalid JSON.');
+            return null;
+        }
+
+        return $decoded;
     }
 
     private function persistWatchlistBars(array $watchlist): void
