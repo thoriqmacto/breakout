@@ -30,6 +30,11 @@ class StockbitExodusClient
         ]);
     }
 
+    public function setBearer(string $bearer): void
+    {
+        $this->bearer = $bearer;
+    }
+
     public function marketDetectors(
         string $symbol,
         string $from,

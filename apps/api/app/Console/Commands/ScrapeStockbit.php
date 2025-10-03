@@ -69,9 +69,25 @@ class ScrapeStockbit extends Command
             $historicalPage = (int) $historicalDefaults['page'];
         }
 
-        $exp = StockbitExodusClient::jwtExpiresAt(config('stockbit.bearer'));
+        $bearer = config('stockbit.bearer');
+        $exp = StockbitExodusClient::jwtExpiresAt($bearer);
         if ($exp && $exp < new \DateTimeImmutable('now')) {
-            $this->warn('Your STOCKBIT_BEARER seems expired. Replace it in .env.');
+            $this->warn('Your STOCKBIT_BEARER seems expired.');
+
+            $newBearer = trim((string) $this->ask('Please enter a new bearer token (leave blank to cancel)'));
+            if ($newBearer === '') {
+                $this->error('No bearer token supplied. Exiting.');
+
+                return self::FAILURE;
+            }
+
+            config(['stockbit.bearer' => $newBearer]);
+            $api->setBearer($newBearer);
+
+            $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
+            if ($exp) {
+                $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+            }
         } elseif ($exp) {
             $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
         }
