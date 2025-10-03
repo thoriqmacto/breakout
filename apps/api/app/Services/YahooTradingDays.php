@@ -4,19 +4,19 @@ namespace App\Services;
 
 use App\Models\TradingDay;
 use Carbon\Exceptions\InvalidFormatException;
-use GuzzleHttp\ClientInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use RuntimeException;
 
 class YahooTradingDays
 {
     private const SYMBOL = '^JKSE';
-    private const BASE_URL = 'https://query1.finance.yahoo.com/v7/finance/download/';
+    private const SCRIPT = 'get_stocks.py';
     private const CHUNK_SIZE = 1000;
 
     public function __construct(
-        private readonly ClientInterface $httpClient,
+        private readonly PythonRunner $pythonRunner,
         private readonly TradingDay $tradingDay,
     ) {
     }
@@ -30,58 +30,65 @@ class YahooTradingDays
             throw new InvalidArgumentException('The end date must be greater than or equal to the start date.');
         }
 
-        $period1 = $startDate->timestamp;
-        $period2 = $endDate->copy()->addDay()->startOfDay()->timestamp;
+        $args = [
+            self::SYMBOL,
+            sprintf('--start=%s', $startDate->toDateString()),
+            sprintf('--end=%s', $endDate->copy()->toDateString()),
+            '--emit-dates',
+        ];
 
-        $url = sprintf(
-            '%s%s?period1=%d&period2=%d&interval=1d&events=history&includeAdjustedClose=true',
-            self::BASE_URL,
-            rawurlencode(self::SYMBOL),
-            $period1,
-            $period2,
-        );
+        $result = $this->pythonRunner->run(self::SCRIPT, null, $args);
 
-        $response = $this->httpClient->request('GET', $url, [
-            'headers' => [
-                'Accept' => 'text/csv',
-            ],
-        ]);
+        if (!$result['ok']) {
+            $errorMessage = trim($result['stderr'] ?: $result['stdout']);
+            throw new RuntimeException($errorMessage !== '' ? $errorMessage : 'Failed to fetch trading days from Python script.');
+        }
 
-        $body = (string) $response->getBody();
-        $lines = preg_split("/\r\n|\r|\n/", trim($body));
+        $payload = $result['json'];
 
-        if ($lines === false || count($lines) <= 1) {
+        if (!is_array($payload)) {
             return 0;
         }
 
-        array_shift($lines); // remove header
+        $tickerData = Collection::make($payload['tickers'] ?? [])
+            ->first(function (mixed $item) {
+                return is_array($item) && ($item['ticker'] ?? null) === self::SYMBOL;
+            });
+
+        if (!is_array($tickerData)) {
+            return 0;
+        }
+
+        $dates = $tickerData['dates'] ?? [];
 
         $now = Carbon::now();
 
-        $records = Collection::make($lines)
+        $records = Collection::make($dates)
             ->filter()
-            ->map(function (string $line) use ($now) {
-                $columns = str_getcsv($line);
-                $date = $columns[0] ?? null;
-
-                if ($date === null) {
+            ->map(function (mixed $date) use ($now, $startDate, $endDate) {
+                if (!is_string($date)) {
                     return null;
                 }
 
                 try {
-                    Carbon::createFromFormat('Y-m-d', $date);
+                    $parsed = Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 } catch (InvalidFormatException) {
                     return null;
                 }
 
+                if ($parsed->lessThan($startDate) || $parsed->greaterThan($endDate)) {
+                    return null;
+                }
+
                 return [
-                    'date' => $date,
+                    'date' => $parsed->toDateString(),
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
             })
             ->filter()
             ->unique('date')
+            ->sortBy('date')
             ->values();
 
         if ($records->isEmpty()) {

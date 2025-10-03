@@ -82,14 +82,17 @@ def parse_args(argv=None):
     parser.add_argument('--latest-symbol', default='^JKSE',
                         help='Symbol used to probe latest IDX data availability')
     parser.add_argument('--latest-date', help='Date to compare with latest available data YYYY-MM-DD')
+    parser.add_argument('--emit-dates', action='store_true',
+                        help='Emit JSON with trading dates instead of writing CSV files')
     return parser.parse_args(argv)
 
 # ---------- Downloader ----------
-def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3):
+def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3, verbose=True):
     last_err = None
     for attempt in range(1, max_retries+1):
         try:
-            print(f"[INFO] ({attempt}/{max_retries}) Downloading {ticker} ...")
+            if verbose:
+                print(f"[INFO] ({attempt}/{max_retries}) Downloading {ticker} ...")
             df = yf.download(
                 ticker,
                 start=start_date.isoformat(),
@@ -108,8 +111,13 @@ def fetch_one(ticker, start_date, end_date, pause_sec=0.8, max_retries=3):
                 last_err = RuntimeError(f"No data returned for {ticker}.")
         except Exception as e:
             last_err = e
-            print(f"[WARN] {ticker} failed: {e}")
-            traceback.print_exc()
+            msg = f"[WARN] {ticker} failed: {e}"
+            if verbose:
+                print(msg)
+                traceback.print_exc()
+            else:
+                print(msg, file=sys.stderr)
+                traceback.print_exc(file=sys.stderr)
         time.sleep(pause_sec)
     raise last_err
 
@@ -211,30 +219,56 @@ def main(argv=None):
     os.makedirs(outdir, exist_ok=True)
 
     rows = []
-    print(f"[INFO] Fetching {len(tickers)} tickers from {start_date} to {end_date}")
+    emit_payload = []
+    if not args.emit_dates:
+        print(f"[INFO] Fetching {len(tickers)} tickers from {start_date} to {end_date}")
 
     for t in tickers:
         try:
-            df = fetch_one(t, start_date, end_date)
-            csv_path = os.path.join(outdir, f"{t.replace('.JK','_PY')}.csv")
-            df.to_csv(csv_path, index=False)
+            df = fetch_one(t, start_date, end_date, verbose=not args.emit_dates)
+            if args.emit_dates:
+                if "Date" in df:
+                    dates = [
+                        str(pd.to_datetime(val).date())
+                        for val in df["Date"].dropna().tolist()
+                    ]
+                else:
+                    dates = []
+                emit_payload.append({
+                    "ticker": t,
+                    "dates": sorted(set(dates)),
+                })
+            else:
+                csv_path = os.path.join(outdir, f"{t.replace('.JK','_PY')}.csv")
+                df.to_csv(csv_path, index=False)
 
-            start_str = str(pd.to_datetime(df["Date"].min()).date()) if not df.empty else ""
-            end_str   = str(pd.to_datetime(df["Date"].max()).date()) if not df.empty else ""
-            rows.append({
-                "Ticker": t,
-                "Rows": len(df),
-                "Start": start_str,
-                "End": end_str,
-                "FirstClose": df["Close"].iloc[0] if "Close" in df and len(df) else "",
-                "LastClose": df["Close"].iloc[-1] if "Close" in df and len(df) else "",
-            })
+                start_str = str(pd.to_datetime(df["Date"].min()).date()) if not df.empty else ""
+                end_str   = str(pd.to_datetime(df["Date"].max()).date()) if not df.empty else ""
+                rows.append({
+                    "Ticker": t,
+                    "Rows": len(df),
+                    "Start": start_str,
+                    "End": end_str,
+                    "FirstClose": df["Close"].iloc[0] if "Close" in df and len(df) else "",
+                    "LastClose": df["Close"].iloc[-1] if "Close" in df and len(df) else "",
+                })
 
-            print(f"[DONE] {t}: {len(df)} rows saved to {csv_path}")
-
+                print(f"[DONE] {t}: {len(df)} rows saved to {csv_path}")
         except Exception as e:
+            if args.emit_dates:
+                print(f"[ERROR] {t} failed: {e}", file=sys.stderr)
+                raise
             print(f"[ERROR] Skipping {t}: {e}")
             rows.append({"Ticker": t, "Rows": 0, "Start": "", "End": "", "FirstClose": "", "LastClose": ""})
+
+    if args.emit_dates:
+        payload = {
+            "tickers": emit_payload,
+            "start": start_date.isoformat(),
+            "end": end_date.isoformat(),
+        }
+        print(json.dumps(payload))
+        return
 
     # Write summary
     # summary = pd.DataFrame(rows)
