@@ -414,13 +414,13 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium text-foreground">Percentage → Price</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground mb-3">
                   Enter a trailing stop percentage to see the corresponding price rounded down by the IDX tick rule.
                 </p>
+                  {tickSizeFromPercent ? (
+                      <p className="text-xs font-medium text-muted-foreground">Tick size: {tickSizeFromPercent.toLocaleString()} IDR</p>
+                  ) : null}
               </div>
-              {tickSizeFromPercent ? (
-                <p className="text-xs font-medium text-muted-foreground">Tick size: {tickSizeFromPercent.toLocaleString()} IDR</p>
-              ) : null}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -440,7 +440,7 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-result">
-                  IDX adjusted price (IDR)
+                  Price (IDR)
                 </label>
                 <Input
                   id="stop-price-result"
@@ -490,7 +490,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground" htmlFor="stop-price-input">
-                  Trailing stop price (IDR)
+                  TS price (IDR)
                 </label>
                 <Input
                   id="stop-price-input"
