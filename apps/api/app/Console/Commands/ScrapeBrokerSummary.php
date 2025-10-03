@@ -18,7 +18,10 @@ class ScrapeBrokerSummary extends Command
         {--market_board=     : MARKET_BOARD_REGULER|MARKET_BOARD_TUNAI|...}
         {--investor_type=    : INVESTOR_TYPE_ALL|...}
         {--limit=25 : Max rows per API response}
-        {--no-csv : Do not write CSV (only JSON)}';
+        {--no-csv : Do not write CSV (only JSON)}
+        {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
+        {--historical-limit= : Historical summary limit override}
+        {--historical-page= : Historical summary page override}';
 
     protected $description = 'Scrape Stockbit Exodus marketdetectors data and optionally emit a CSV summary';
 
@@ -29,7 +32,27 @@ class ScrapeBrokerSummary extends Command
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
+        $historicalDir = trim($jsonDir . '/historical_summary', '/');
         $csvDir  = 'broker_summary_csv';
+
+        $historicalDefaults = config('stockbit.historical', []);
+        $historicalPeriod = $this->option('historical_period') ?: ($historicalDefaults['period'] ?? 'HS_PERIOD_DAILY');
+
+        $historicalLimitOption = $this->option('historical_limit');
+        $historicalLimit = $historicalLimitOption !== null && $historicalLimitOption !== ''
+            ? (int) $historicalLimitOption
+            : null;
+        if ($historicalLimit === null && !empty($historicalDefaults['limit'])) {
+            $historicalLimit = (int) $historicalDefaults['limit'];
+        }
+
+        $historicalPageOption = $this->option('historical_page');
+        $historicalPage = $historicalPageOption !== null && $historicalPageOption !== ''
+            ? (int) $historicalPageOption
+            : null;
+        if ($historicalPage === null && !empty($historicalDefaults['page'])) {
+            $historicalPage = (int) $historicalDefaults['page'];
+        }
 
         $exp = StockbitExodusClient::jwtExpiresAt(config('stockbit.bearer'));
         if ($exp && $exp < new \DateTimeImmutable('now')) {
@@ -56,6 +79,15 @@ class ScrapeBrokerSummary extends Command
                 continue;
             }
 
+            $historical = $api->historicalSummary(
+                $symbol,
+                $historicalPeriod,
+                $from,
+                $to,
+                $historicalLimit,
+                $historicalPage,
+            );
+
             $jsonName = sprintf(
                 '%s_%s_%s_%s.json',
                 $symbol,
@@ -67,6 +99,22 @@ class ScrapeBrokerSummary extends Command
 
             Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             $this->line('Saved JSON: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
+
+            if (isset($historical['error'])) {
+                $code = $historical['error'] ?? 'error';
+                $message = $historical['message'] ?? 'Unknown error';
+                $this->warn("Historical summary error for {$symbol}: {$code} — {$message}");
+            } else {
+                $historicalNameParts = [$symbol, $from, $to, $historicalPeriod];
+                if ($historicalPage !== null) {
+                    $historicalNameParts[] = 'page' . $historicalPage;
+                }
+                $historicalName = implode('_', $historicalNameParts) . '.json';
+                $historicalPath = "{$historicalDir}/{$historicalName}";
+
+                Storage::disk($disk)->put($historicalPath, json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->line('Saved historical JSON: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
+            }
 
             if (is_array($json)) {
                 $keys = array_keys($json);

@@ -23,6 +23,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
         config()->set('stockbit.save_disk', 'local');
         config()->set('stockbit.save_dir', 'broker_summary');
         config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
@@ -38,6 +39,18 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
                     ],
                 ],
             ]);
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2024-01-01', '2024-01-05', 50, 3)
+            ->andReturn([
+                'data' => [
+                    [
+                        'date' => '2024-01-02',
+                        'open' => 100,
+                        'close' => 110,
+                    ],
+                ],
+            ]);
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
@@ -46,22 +59,32 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
             '--limit' => 50,
+            '--historical-period' => 'HS_PERIOD_DAILY',
+            '--historical-limit' => 50,
+            '--historical-page' => 3,
         ]);
 
         $jsonPath = 'broker_summary/BBCA_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
+        $historicalPath = 'broker_summary/historical_summary/BBCA_2024-01-01_2024-01-05_HS_PERIOD_DAILY_page3.json';
         $csvPath = 'broker_summary_csv/BBCA_2024-01-01_2024-01-05.csv';
 
         Storage::disk('local')->assertExists($jsonPath);
+        Storage::disk('local')->assertExists($historicalPath);
         Storage::disk('local')->assertExists($csvPath);
 
         $json = json_decode(Storage::disk('local')->get($jsonPath), true);
         $this->assertSame('AB', $json['items'][0]['broker']);
 
+        $historical = json_decode(Storage::disk('local')->get($historicalPath), true);
+        $this->assertSame(110, $historical['data'][0]['close']);
+
         $csv = explode("\n", trim(Storage::disk('local')->get($csvPath)));
         $this->assertSame('symbol,date,broker,net_value,buy_value,sell_value', $csv[0]);
         $this->assertSame('BBCA,2024-01-02,AB,600,1000,400', $csv[1]);
 
-        $this->assertStringContainsString('Saved CSV', Artisan::output());
+        $output = Artisan::output();
+        $this->assertStringContainsString('Saved CSV', $output);
+        $this->assertStringContainsString('Saved historical JSON', $output);
     }
 
     public function test_stops_on_error_response(): void
@@ -75,6 +98,7 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->andReturn(['error' => 'http_500', 'message' => 'Server Error']);
+        $mock->shouldReceive('historicalSummary')->never();
 
         $this->app->instance(StockbitExodusClient::class, $mock);
 
@@ -87,5 +111,48 @@ class ScrapeBrokerSummaryCommandTest extends TestCase
 
         $this->assertSame([], Storage::disk('local')->files('broker_summary'));
         $this->assertStringContainsString('Error for BBRI', Artisan::output());
+    }
+
+    public function test_historical_summary_error_is_logged(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.save_dir', 'broker_summary');
+        config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->andReturn([
+                'items' => [
+                    [
+                        'date' => '2024-01-02',
+                        'broker' => 'CD',
+                        'buy_value' => 200,
+                        'sell_value' => 300,
+                    ],
+                ],
+            ]);
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('TLKM', 'HS_PERIOD_DAILY', '2024-01-01', '2024-01-05', null, null)
+            ->andReturn(['error' => 'http_500', 'message' => 'Server Error']);
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        Artisan::call('stockbit:scrape', [
+            'tickers' => ['TLKM'],
+            '--from' => '2024-01-01',
+            '--to' => '2024-01-05',
+            '--no-csv' => true,
+        ]);
+
+        $jsonPath = 'broker_summary/TLKM_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
+        Storage::disk('local')->assertExists($jsonPath);
+        Storage::disk('local')->assertMissing('broker_summary/historical_summary/TLKM_2024-01-01_2024-01-05_HS_PERIOD_DAILY.json');
+
+        $this->assertStringContainsString('Historical summary error for TLKM', Artisan::output());
     }
 }

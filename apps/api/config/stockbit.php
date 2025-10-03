@@ -11,6 +11,12 @@ return [
         'limit'            => (int) env('SB_LIMIT', 25),
     ],
 
+    'historical' => [
+        'period' => env('SB_HISTORICAL_PERIOD', 'HS_PERIOD_DAILY'),
+        'limit'  => env('SB_HISTORICAL_LIMIT'),
+        'page'   => env('SB_HISTORICAL_PAGE'),
+    ],
+
     'save_disk' => env('SB_SAVE_DISK', 'local'),
     'save_dir'  => env('SB_SAVE_DIR', 'broker_summary'),
 ];
