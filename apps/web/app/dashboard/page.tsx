@@ -321,7 +321,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <Card>
+      <Card className="mx-auto max-w-3xl">
         <CardHeader>
           <CardTitle>Trailing stop calculator</CardTitle>
           <CardDescription>
