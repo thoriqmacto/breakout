@@ -390,10 +390,16 @@ class ScrapeStockbit extends Command
         $ymd = $date->format('Y-m-d');
         $dbBars = new DbBars(500, false);
 
+        $allowedSymbols = $this->getAllowedWatchlistSymbols();
+
         foreach ($results as $row) {
             $symbol = strtoupper((string) ($row['symbol'] ?? ''));
 
             if ($symbol === '') {
+                continue;
+            }
+
+            if ($allowedSymbols !== [] && !isset($allowedSymbols[$symbol])) {
                 continue;
             }
 
@@ -652,8 +658,6 @@ class ScrapeStockbit extends Command
             $inserted = DB::table('assets')->insertGetId([
                 'symbol' => $symbol,
                 'name' => $symbol,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         } catch (\Throwable $exception) {
             $this->warn("Failed to create asset for {$symbol}: {$exception->getMessage()}");
@@ -661,5 +665,41 @@ class ScrapeStockbit extends Command
         }
 
         return $this->assetIds[$symbol] = (int) $inserted;
+    }
+
+    /**
+     * @return array<string, true>
+     */
+    private function getAllowedWatchlistSymbols(): array
+    {
+        static $allowed = null;
+
+        if ($allowed !== null) {
+            return $allowed;
+        }
+
+        $configured = config('csv.index_symbols', []);
+
+        if (!is_array($configured)) {
+            $configured = [];
+        }
+
+        $normalized = [];
+
+        foreach ($configured as $symbol) {
+            if (!is_string($symbol)) {
+                continue;
+            }
+
+            $normalizedSymbol = strtoupper(trim($symbol));
+
+            if ($normalizedSymbol === '') {
+                continue;
+            }
+
+            $normalized[$normalizedSymbol] = true;
+        }
+
+        return $allowed = $normalized;
     }
 }
