@@ -227,16 +227,40 @@ def main(argv=None):
         try:
             df = fetch_one(t, start_date, end_date, verbose=not args.emit_dates)
             if args.emit_dates:
+                entries = {}
                 if "Date" in df:
-                    dates = [
-                        str(pd.to_datetime(val).date())
-                        for val in df["Date"].dropna().tolist()
-                    ]
-                else:
-                    dates = []
+                    close_available = "Close" in df
+
+                    for row in df.itertuples(index=False):
+                        raw_date = getattr(row, "Date", None)
+
+                        if raw_date is None or pd.isna(raw_date):
+                            continue
+
+                        try:
+                            normalized_date = str(pd.to_datetime(raw_date).date())
+                        except Exception:
+                            continue
+
+                        close_value = None
+                        if close_available:
+                            raw_close = getattr(row, "Close", None)
+                            if raw_close is not None and not pd.isna(raw_close):
+                                try:
+                                    close_value = float(raw_close)
+                                except (TypeError, ValueError):
+                                    close_value = None
+
+                        entries[normalized_date] = close_value
+
+                sorted_dates = sorted(entries.keys())
                 emit_payload.append({
                     "ticker": t,
-                    "dates": sorted(set(dates)),
+                    "dates": sorted_dates,
+                    "entries": [
+                        {"date": date, "close": entries[date]}
+                        for date in sorted_dates
+                    ],
                 })
             else:
                 csv_path = os.path.join(outdir, f"{t.replace('.JK','_PY')}.csv")

@@ -19,9 +19,11 @@ class TradingDay extends Model
 
     protected $fillable = [
         'date',
+        'close',
     ];
 
     protected $casts = [
         'date' => 'date',
+        'close' => 'float',
     ];
 }
