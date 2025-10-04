@@ -59,13 +59,80 @@ class YahooTradingDays
             return 0;
         }
 
-        $dates = $tickerData['dates'] ?? [];
-
+        $entries = $tickerData['entries'] ?? null;
         $now = Carbon::now();
 
-        $records = Collection::make($dates)
+        $records = is_array($entries)
+            ? $this->mapEntriesToRecords($entries, $startDate, $endDate, $now)
+            : $this->mapDatesToRecords($tickerData['dates'] ?? [], $startDate, $endDate, $now);
+
+        if ($records->isEmpty()) {
+            return 0;
+        }
+
+        $records
+            ->chunk(self::CHUNK_SIZE)
+            ->each(function (Collection $chunk): void {
+                $this->tradingDay->newQuery()->upsert(
+                    $chunk->all(),
+                    ['date'],
+                    ['close', 'updated_at']
+                );
+            });
+
+        return $records->count();
+    }
+
+    /**
+     * @param array<int, mixed> $entries
+     */
+    private function mapEntriesToRecords(array $entries, Carbon $startDate, Carbon $endDate, Carbon $now): Collection
+    {
+        return Collection::make($entries)
+            ->map(function (mixed $entry) use ($startDate, $endDate, $now) {
+                if (!is_array($entry)) {
+                    return null;
+                }
+
+                $date = $entry['date'] ?? null;
+
+                if (!is_string($date)) {
+                    return null;
+                }
+
+                try {
+                    $parsed = Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                } catch (InvalidFormatException) {
+                    return null;
+                }
+
+                if ($parsed->lessThan($startDate) || $parsed->greaterThan($endDate)) {
+                    return null;
+                }
+
+                $close = $this->normalizeClose($entry['close'] ?? null);
+
+                return [
+                    'date' => $parsed->toDateString(),
+                    'close' => $close,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            })
             ->filter()
-            ->map(function (mixed $date) use ($now, $startDate, $endDate) {
+            ->unique('date')
+            ->sortBy('date')
+            ->values();
+    }
+
+    /**
+     * @param array<int, mixed> $dates
+     */
+    private function mapDatesToRecords(array $dates, Carbon $startDate, Carbon $endDate, Carbon $now): Collection
+    {
+        return Collection::make($dates)
+            ->filter()
+            ->map(function (mixed $date) use ($startDate, $endDate, $now) {
                 if (!is_string($date)) {
                     return null;
                 }
@@ -82,6 +149,7 @@ class YahooTradingDays
 
                 return [
                     'date' => $parsed->toDateString(),
+                    'close' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -90,21 +158,28 @@ class YahooTradingDays
             ->unique('date')
             ->sortBy('date')
             ->values();
+    }
 
-        if ($records->isEmpty()) {
-            return 0;
+    private function normalizeClose(mixed $value): ?float
+    {
+        if ($value === null) {
+            return null;
         }
 
-        $records
-            ->chunk(self::CHUNK_SIZE)
-            ->each(function (Collection $chunk): void {
-                $this->tradingDay->newQuery()->upsert(
-                    $chunk->all(),
-                    ['date'],
-                    ['updated_at']
-                );
-            });
+        if (is_string($value)) {
+            $value = trim($value);
 
-        return $records->count();
+            if ($value === '') {
+                return null;
+            }
+        }
+
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        $float = (float) $value;
+
+        return is_finite($float) ? $float : null;
     }
 }

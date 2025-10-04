@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('trading_days', function (Blueprint $table) {
             $table->date('date')->primary();
+            $table->double('close')->nullable();
             $table->timestamps();
         });
     }
