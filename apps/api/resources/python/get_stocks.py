@@ -60,6 +60,33 @@ def flatten_columns(df):
                       for tup in df.columns.to_list()]
     return df
 
+def resolve_close_column(df):
+    """Return the name of the column that stores close prices.
+
+    yfinance sometimes returns a MultiIndex where the top level is the OHLCV
+    field and the second level is the ticker symbol. After ``flatten_columns``
+    runs we end up with labels such as ``Close_^JKSE``.  When iterating with
+    ``itertuples`` these labels are mangled into invalid attribute names,
+    causing us to treat the close column as missing and emit ``None`` for every
+    value.  To avoid that we explicitly detect any column whose leading token
+    is ``Close`` and use that, falling back to an exact ``Close`` match when
+    available.
+    """
+
+    columns = getattr(df, "columns", [])
+
+    for column in columns:
+        name = str(column)
+        if name.strip().lower() == "close":
+            return column
+
+    for column in columns:
+        name = str(column)
+        if name.split("_", 1)[0].strip().lower() == "close":
+            return column
+
+    return None
+
 def read_tickers(cli_tickers):
     if cli_tickers:
         return [t.strip() for t in cli_tickers if t.strip()]
@@ -229,11 +256,15 @@ def main(argv=None):
             if args.emit_dates:
                 entries = {}
                 if "Date" in df:
-                    close_available = "Close" in df
+                    date_values = df["Date"].tolist()
+                    close_column = resolve_close_column(df)
 
-                    for row in df.itertuples(index=False):
-                        raw_date = getattr(row, "Date", None)
+                    if close_column is not None and close_column in df:
+                        close_series = df[close_column].tolist()
+                    else:
+                        close_series = [None] * len(date_values)
 
+                    for raw_date, raw_close in zip(date_values, close_series):
                         if raw_date is None or pd.isna(raw_date):
                             continue
 
@@ -243,13 +274,11 @@ def main(argv=None):
                             continue
 
                         close_value = None
-                        if close_available:
-                            raw_close = getattr(row, "Close", None)
-                            if raw_close is not None and not pd.isna(raw_close):
-                                try:
-                                    close_value = float(raw_close)
-                                except (TypeError, ValueError):
-                                    close_value = None
+                        if raw_close is not None and not pd.isna(raw_close):
+                            try:
+                                close_value = float(raw_close)
+                            except (TypeError, ValueError):
+                                close_value = None
 
                         entries[normalized_date] = close_value
 

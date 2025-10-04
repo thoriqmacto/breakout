@@ -67,3 +67,46 @@ def test_check_latest_outputs_status(monkeypatch, capsys):
 
     gs.pd = None
     gs.yf = None
+
+
+def test_emit_dates_uses_close_column_from_multiindex(monkeypatch, capsys):
+    class DummySeries(list):
+        def tolist(self):
+            return list(self)
+
+    class DummyDataFrame:
+        def __init__(self):
+            self.columns = ['Date', 'Close_^JKSE']
+            self._data = {
+                'Date': ['2024-01-02', '2024-01-03'],
+                'Close_^JKSE': [123.45, None],
+            }
+
+        def __contains__(self, item):
+            return item in self._data
+
+        def __getitem__(self, item):
+            return DummySeries(self._data[item])
+
+    dummy_pd = SimpleNamespace(
+        isna=lambda value: value is None,
+        to_datetime=lambda value: datetime.datetime.fromisoformat(str(value))
+    )
+
+    gs.pd = dummy_pd
+    gs.yf = object()
+
+    monkeypatch.setattr(gs, 'require', lambda pkg: dummy_pd)
+    monkeypatch.setattr(gs, 'fetch_one', lambda *args, **kwargs: DummyDataFrame())
+
+    gs.main(['^JKSE', '--emit-dates', '--start', '2024-01-01', '--end', '2024-01-31'])
+
+    payload = json.loads(capsys.readouterr().out.strip())
+
+    assert payload['tickers'][0]['entries'] == [
+        {'date': '2024-01-02', 'close': 123.45},
+        {'date': '2024-01-03', 'close': None},
+    ]
+
+    gs.pd = None
+    gs.yf = None
