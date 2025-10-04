@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
 
@@ -30,7 +31,9 @@ class ApiResponse extends JsonResource
             'meta' => empty($meta) ? null : $meta,
         ]);
 
-        return $resource->response()->setStatusCode($status);
+        $response = $resource->response()->setStatusCode($status);
+
+        return static::withFloatPreservation($response);
     }
 
     /**
@@ -50,7 +53,9 @@ class ApiResponse extends JsonResource
             'meta' => empty($meta) ? null : $meta,
         ]);
 
-        return $resource->response()->setStatusCode($status);
+        $response = $resource->response()->setStatusCode($status);
+
+        return static::withFloatPreservation($response);
     }
 
     /**
@@ -105,5 +110,15 @@ class ApiResponse extends JsonResource
         }
 
         return $value;
+    }
+
+    /**
+     * Ensure floating point numbers keep their trailing zeroes in JSON output.
+     */
+    private static function withFloatPreservation(JsonResponse $response): JsonResponse
+    {
+        $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRESERVE_ZERO_FRACTION);
+
+        return $response;
     }
 }
