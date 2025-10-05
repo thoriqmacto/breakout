@@ -133,24 +133,54 @@ class AssetMetrics
      * Average True Range using prior close.
      *
      * @param int              $period Number of periods to average.
+     * @param string           $mode   Calculation variant ("standard" or "weekly").
      * @return float Average true range or 0 when insufficient data.
      */
-    public function atr(int $period = 14): float
+    public function atr(int $period = 14, string $mode = 'standard'): float
     {
-        $slice = array_slice($this->bars, -$period);
-        $prevClose = null;
-        $trs = [];
-        foreach ($slice as $bar) {
-            $high = $bar['high'];
-            $low = $bar['low'];
-            $tr = $high - $low;
-            if ($prevClose !== null) {
-                $tr = max($tr, abs($high - $prevClose), abs($low - $prevClose));
-            }
-            $trs[] = $tr;
-            $prevClose = $bar['close'];
+        $totalBars = count($this->bars);
+        if ($period <= 0 || $totalBars === 0) {
+            return 0.0;
         }
-        return array_sum($trs) / count($trs);
+
+        $slice = $period >= $totalBars
+            ? $this->bars
+            : array_slice($this->bars, -$period);
+
+        $startIndex = $totalBars - count($slice);
+        $prevClose = null;
+        if ($mode === 'weekly' && $startIndex > 0) {
+            $previousBar = $this->bars[$startIndex - 1] ?? null;
+            if (is_array($previousBar) && isset($previousBar['close'])) {
+                $prevClose = (float) $previousBar['close'];
+            }
+        }
+
+        $trueRanges = [];
+        foreach ($slice as $bar) {
+            $high = (float) ($bar['high'] ?? 0.0);
+            $low = (float) ($bar['low'] ?? 0.0);
+            $close = (float) ($bar['close'] ?? 0.0);
+
+            if ($mode === 'weekly') {
+                if ($prevClose === null) {
+                    $tr = abs($close - $low);
+                } else {
+                    $tr = max(abs($high - $prevClose), abs($close - $low));
+                }
+            } else {
+                $tr = $high - $low;
+                if ($prevClose !== null) {
+                    $tr = max($tr, abs($high - $prevClose), abs($low - $prevClose));
+                }
+            }
+
+            $trueRanges[] = $tr;
+            $prevClose = $close;
+        }
+
+        $count = count($trueRanges);
+        return $count > 0 ? array_sum($trueRanges) / $count : 0.0;
     }
 
     /**
