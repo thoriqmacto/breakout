@@ -64,7 +64,7 @@ class AtrCalculatorTest extends TestCase
             ->assertJsonPath('data.symbol', 'AAA')
             ->assertJsonPath('data.interval', 'daily')
             ->assertJsonPath('data.period', 2)
-            ->assertJsonPath('data.atr', 4.0);
+            ->assertJsonPath('data.atr', 4);
     }
 
     public function test_it_computes_weekly_atr_by_symbol(): void
@@ -105,7 +105,7 @@ class AtrCalculatorTest extends TestCase
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('data.interval', 'weekly')
             ->assertJsonPath('data.period', 2)
-            ->assertJsonPath('data.atr', 7.0)
+            ->assertJsonPath('data.atr', 7)
             ->assertJsonPath('data.bar_count', 2);
     }
 }
