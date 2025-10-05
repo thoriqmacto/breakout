@@ -260,7 +260,8 @@ class AssetController extends ApiController
         }
 
         $metrics = new AssetMetrics($bars);
-        $atr = $metrics->atr($period);
+        $atrMode = $interval === 'weekly' ? 'weekly' : 'standard';
+        $atr = $metrics->atr($period, $atrMode);
 
         $lastBar = $bars[array_key_last($bars)] ?? null;
 
