@@ -232,16 +232,60 @@ class ScrapeStockbit extends Command
                     $this->warn("Detected repeated next_page={$nextPage} for {$symbol}; stopping pagination to prevent an infinite loop.");
                 }
 
-                $json = $this->mergeMarketDetectorResponses($chunkResponses);
+                $json = $this->mergePaginatedResponses($chunkResponses);
 
-                $historical = $api->historicalSummary(
-                    $symbol,
-                    $historicalPeriod,
-                    $fromString,
-                    $toString,
-                    $historicalLimit,
-                    $historicalPage,
-                );
+                $historicalResponses = [];
+                $historicalVisitedPages = [];
+                $historicalNextPage = $historicalPage;
+
+                while (true) {
+                    if ($historicalResponses !== [] && $historicalNextPage === null) {
+                        break;
+                    }
+
+                    $pageToFetch = $historicalResponses === [] ? $historicalPage : $historicalNextPage;
+
+                    if ($pageToFetch !== null && in_array($pageToFetch, $historicalVisitedPages, true)) {
+                        $this->warn("Detected repeated historical next_page={$pageToFetch} for {$symbol}; stopping pagination to prevent an infinite loop.");
+                        break;
+                    }
+
+                    if ($pageToFetch !== null) {
+                        $historicalVisitedPages[] = $pageToFetch;
+                    }
+
+                    $pageMessage = $pageToFetch !== null ? " (page {$pageToFetch})" : '';
+                    $this->line("Fetching historical summary {$symbol} {$fromString} → {$toString}{$pageMessage}");
+
+                    $historicalResponse = $api->historicalSummary(
+                        $symbol,
+                        $historicalPeriod,
+                        $fromString,
+                        $toString,
+                        $historicalLimit,
+                        $pageToFetch,
+                    );
+
+                    if (isset($historicalResponse['error'])) {
+                        $code = $historicalResponse['error'] ?? 'error';
+                        $message = $historicalResponse['message'] ?? 'Unknown error';
+                        $this->warn("Historical summary error for {$symbol}{$pageMessage}: {$code} — {$message}");
+
+                        break;
+                    }
+
+                    $historicalResponses[] = $historicalResponse;
+                    $historicalNextPage = $this->extractNextPage($historicalResponse);
+
+                    if ($historicalNextPage !== null) {
+                        usleep(200_000);
+                    }
+                }
+
+                $historical = null;
+                if ($historicalResponses !== []) {
+                    $historical = $this->mergePaginatedResponses($historicalResponses);
+                }
 
                 $jsonName = sprintf(
                     '%s_%s_%s_%s.json',
@@ -255,11 +299,7 @@ class ScrapeStockbit extends Command
                 Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 $this->line('Saved Broksum: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
 
-                if (isset($historical['error'])) {
-                    $code = $historical['error'] ?? 'error';
-                    $message = $historical['message'] ?? 'Unknown error';
-                    $this->warn("Historical summary error for {$symbol}: {$code} — {$message}");
-                } else {
+                if ($historical !== null) {
                     $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
                     if ($historicalPage !== null) {
                         $historicalNameParts[] = 'page' . $historicalPage;
@@ -295,7 +335,7 @@ class ScrapeStockbit extends Command
      * @param array<int, array<string, mixed>> $responses
      * @return array<string, mixed>
      */
-    private function mergeMarketDetectorResponses(array $responses): array
+    private function mergePaginatedResponses(array $responses): array
     {
         if ($responses === []) {
             return [];
