@@ -19,6 +19,7 @@ class ScrapeStockbit extends Command
 {
     protected $signature = 'stockbit:scrape
         {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
+        {--all : Process all tickers configured in csv.index_symbols}
         {--market-detector : Fetch market detector data for the provided tickers}
         {--from= : YYYY-MM-DD (default: 14 days ago)}
         {--to=   : YYYY-MM-DD (default: today)}
@@ -104,7 +105,29 @@ class ScrapeStockbit extends Command
             $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
         }
 
-        $tickers = $this->argument('tickers') ?? [];
+        $argumentTickers = array_filter(
+            $this->argument('tickers') ?? [],
+            static fn ($symbol) => is_string($symbol) && $symbol !== ''
+        );
+
+        $configuredTickers = [];
+
+        if ($this->option('all')) {
+            $configuredTickers = config('csv.index_symbols', []);
+
+            if (!is_array($configuredTickers)) {
+                $this->warn('The csv.index_symbols configuration is missing or invalid.');
+                $configuredTickers = [];
+            }
+
+            $configuredTickers = array_filter(
+                $configuredTickers,
+                static fn ($symbol) => is_string($symbol) && $symbol !== ''
+            );
+        }
+
+        $tickers = array_values(array_unique(array_merge($argumentTickers, $configuredTickers)));
+        $tickers = array_map(static fn (string $symbol): string => Str::upper($symbol), $tickers);
 
         foreach ($tickers as $symbol) {
             if (!$this->option('no-profile-sync')) {
