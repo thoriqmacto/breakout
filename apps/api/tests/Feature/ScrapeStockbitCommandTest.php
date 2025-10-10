@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Services\AssetProfileUpdater;
 use App\Services\StockbitExodusClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -26,12 +27,17 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.save_disk', 'local');
         config()->set('stockbit.save_dir', 'broker_summary');
         config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.defaults.market_board', 'MARKET_BOARD_REGULER');
+        config()->set('stockbit.defaults.investor_type', 'INVESTOR_TYPE_ALL');
+        config()->set('stockbit.defaults.limit', 50);
         config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
+        config()->set('stockbit.historical.limit', 50);
+        config()->set('stockbit.historical.page', 3);
 
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('BBCA', '2024-01-01', '2024-01-05', null, null, null, 50)
+            ->with('BBCA', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 50)
             ->andReturn([
                 'items' => [
                     [
@@ -62,10 +68,7 @@ class ScrapeStockbitCommandTest extends TestCase
             'tickers' => ['BBCA'],
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
-            '--limit' => 50,
-            '--historical-period' => 'HS_PERIOD_DAILY',
-            '--historical-limit' => 50,
-            '--historical-page' => 3,
+            '--market-detector' => true,
             '--no-profile-sync' => true,
         ]);
 
@@ -112,7 +115,7 @@ class ScrapeStockbitCommandTest extends TestCase
             'tickers' => ['BBRI'],
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
-            '--no-csv' => true,
+            '--market-detector' => true,
             '--no-profile-sync' => true,
         ]);
 
@@ -127,11 +130,15 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.save_disk', 'local');
         config()->set('stockbit.save_dir', 'broker_summary');
         config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.defaults.market_board', 'MARKET_BOARD_REGULER');
+        config()->set('stockbit.defaults.investor_type', 'INVESTOR_TYPE_ALL');
+        config()->set('stockbit.defaults.limit', 25);
         config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
+            ->with('TLKM', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25)
             ->andReturn([
                 'items' => [
                     [
@@ -154,13 +161,14 @@ class ScrapeStockbitCommandTest extends TestCase
             'tickers' => ['TLKM'],
             '--from' => '2024-01-01',
             '--to' => '2024-01-05',
-            '--no-csv' => true,
+            '--market-detector' => true,
             '--no-profile-sync' => true,
         ]);
 
         $jsonPath = 'broker_summary/TLKM_2024-01-01_2024-01-05_TRANSACTION_TYPE_NET.json';
         Storage::disk('local')->assertExists($jsonPath);
-        Storage::disk('local')->assertMissing('broker_summary/historical_summary/TLKM_2024-01-01_2024-01-05_HS_PERIOD_DAILY.json');
+        Storage::disk('local')->assertMissing('historical_summary/TLKM_2024-01-01_2024-01-05_HS_PERIOD_DAILY.json');
+        Storage::disk('local')->assertExists('broker_summary_csv/TLKM_2024-01-01_2024-01-05.csv');
 
         $this->assertStringContainsString('Historical summary error for TLKM', Artisan::output());
     }
@@ -172,11 +180,15 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.save_disk', 'local');
         config()->set('stockbit.save_dir', 'broker_summary');
         config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.defaults.market_board', 'MARKET_BOARD_REGULER');
+        config()->set('stockbit.defaults.investor_type', 'INVESTOR_TYPE_ALL');
+        config()->set('stockbit.defaults.limit', 25);
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('BBRI', '2024-02-01', '2024-02-02', null, null, null, null)
+            ->with('BBRI', '2024-02-01', '2024-02-02', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25)
             ->andReturn(['items' => []]);
         $mock->shouldReceive('historicalSummary')
             ->once()
@@ -190,11 +202,46 @@ class ScrapeStockbitCommandTest extends TestCase
             'tickers' => ['BBRI'],
             '--from' => '2024-02-01',
             '--to' => '2024-02-02',
-            '--historical-period' => 'HS_PERIOD_DAILY',
+            '--market-detector' => true,
             '--no-profile-sync' => true,
         ]);
 
         $this->assertStringContainsString('Profile sync skipped for BBRI', Artisan::output());
+    }
+
+    public function test_defaults_to_profile_only_when_market_detector_flag_not_set(): void
+    {
+        Storage::fake('local');
+
+        $profilePayload = ['data' => ['profile' => ['name' => 'Example']]];
+        $syncedAt = Carbon::parse('2024-02-01 12:00:00');
+
+        $api = Mockery::mock(StockbitExodusClient::class);
+        $api->shouldReceive('marketDetectors')->never();
+        $api->shouldReceive('historicalSummary')->never();
+        $api->shouldReceive('tickerProfile')
+            ->once()
+            ->with('BBRI')
+            ->andReturn($profilePayload);
+
+        $profileUpdater = Mockery::mock(AssetProfileUpdater::class);
+        $profileUpdater->shouldReceive('applyTickerProfileResponse')
+            ->once()
+            ->with('BBRI', $profilePayload)
+            ->andReturn([
+                'ok' => true,
+                'asset' => (object) ['profile_synced_at' => $syncedAt],
+                'profile' => $profilePayload['data'],
+            ]);
+
+        $this->app->instance(StockbitExodusClient::class, $api);
+        $this->app->instance(AssetProfileUpdater::class, $profileUpdater);
+
+        Artisan::call('stockbit:scrape', [
+            'tickers' => ['BBRI'],
+        ]);
+
+        $this->assertStringContainsString('Profile synced for BBRI', Artisan::output());
     }
 
     public function test_eod_watchlist_snapshot_is_saved(): void
