@@ -22,7 +22,7 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->whereAlphaNumeric('symbol')
         ->name('assets.atr.by-symbol');
 
-    Route::get('assets-metrics', [AssetController::class, 'metricsIndex'])
+    Route::get('assets/metrics', [AssetController::class, 'metricsIndex'])
         ->name('assets.metrics.index');
 
     Route::apiResource('assets', AssetController::class);

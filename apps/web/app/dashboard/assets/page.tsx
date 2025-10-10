@@ -165,7 +165,7 @@ export default function AssetsMetricsPage() {
     setLoading(true)
     setError(null)
 
-    fetch(buildApiUrl("/v1/assets-metrics"), {
+    fetch(buildApiUrl("/v1/assets/metrics"), {
       method: "GET",
       headers: {
         Accept: "application/json",
