@@ -19,18 +19,11 @@ class ScrapeStockbit extends Command
 {
     protected $signature = 'stockbit:scrape
         {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
-        {--from= : YYYY-MM-DD (default: 7 days ago)}
+        {--market-detector : Fetch market detector data for the provided tickers}
+        {--from= : YYYY-MM-DD (default: 14 days ago)}
         {--to=   : YYYY-MM-DD (default: today)}
-        {--transaction_type= : TRANSACTION_TYPE_NET|TRANSACTION_TYPE_BUY|TRANSACTION_TYPE_SELL}
-        {--market_board=     : MARKET_BOARD_REGULER|MARKET_BOARD_TUNAI|...}
-        {--investor_type=    : INVESTOR_TYPE_ALL|...}
-        {--limit= : Max rows per API response (defaults to config(stockbit.defaults.limit))}
-        {--no-csv : Do not write CSV (only JSON)}
         {--no-persist : Skip persisting EOD OHLCV data to CSV/DB}
         {--no-profile-sync : Skip syncing asset profiles}
-        {--historical-period= : Historical summary period (default: config(stockbit.historical.period))}
-        {--historical-limit= : Historical summary limit override}
-        {--historical-page= : Historical summary page override}
         {--eod : Capture EOD watchlist snapshot}
         {--watchlist-id= : Override watchlist ID for --eod snapshot}
         {--overwrite : Force refreshing the --eod watchlist snapshot JSON}';
@@ -44,31 +37,48 @@ class ScrapeStockbit extends Command
 
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
-        $from = $this->option('from') ?? now()->subDays(14)->toDateString();
-        $to   = $this->option('to')   ?? now()->toDateString();
+        $fetchMarketDetector = (bool) $this->option('market-detector');
+        $from = $fetchMarketDetector
+            ? ($this->option('from') ?? now()->subDays(14)->toDateString())
+            : null;
+        $to = $fetchMarketDetector
+            ? ($this->option('to') ?? now()->toDateString())
+            : null;
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
         $historicalDir = trim('historical_summary', '/');
         $csvDir  = 'broker_summary_csv';
 
-        $historicalDefaults = config('stockbit.historical', []);
-        $historicalPeriod = $this->option('historical-period') ?: ($historicalDefaults['period'] ?? 'HS_PERIOD_DAILY');
-
-        $historicalLimitOption = $this->option('historical-limit');
-        $historicalLimit = $historicalLimitOption !== null && $historicalLimitOption !== ''
-            ? (int) $historicalLimitOption
+        $defaults = config('stockbit.defaults', []);
+        $transactionType = is_string($defaults['transaction_type'] ?? null)
+            ? $defaults['transaction_type']
             : null;
-        if ($historicalLimit === null && !empty($historicalDefaults['limit'])) {
-            $historicalLimit = (int) $historicalDefaults['limit'];
+        $marketBoard = is_string($defaults['market_board'] ?? null)
+            ? $defaults['market_board']
+            : null;
+        $investorType = is_string($defaults['investor_type'] ?? null)
+            ? $defaults['investor_type']
+            : null;
+        $limitDefault = $defaults['limit'] ?? null;
+        $limit = is_numeric($limitDefault) ? (int) $limitDefault : null;
+        if ($limit !== null && $limit <= 0) {
+            $limit = null;
         }
 
-        $historicalPageOption = $this->option('historical-page');
-        $historicalPage = $historicalPageOption !== null && $historicalPageOption !== ''
-            ? (int) $historicalPageOption
-            : null;
-        if ($historicalPage === null && !empty($historicalDefaults['page'])) {
-            $historicalPage = (int) $historicalDefaults['page'];
+        $historicalDefaults = config('stockbit.historical', []);
+        $historicalPeriod = is_string($historicalDefaults['period'] ?? null)
+            ? $historicalDefaults['period']
+            : 'HS_PERIOD_DAILY';
+        $historicalLimitDefault = $historicalDefaults['limit'] ?? null;
+        $historicalLimit = is_numeric($historicalLimitDefault) ? (int) $historicalLimitDefault : null;
+        if ($historicalLimit !== null && $historicalLimit <= 0) {
+            $historicalLimit = null;
+        }
+        $historicalPageDefault = $historicalDefaults['page'] ?? null;
+        $historicalPage = is_numeric($historicalPageDefault) ? (int) $historicalPageDefault : null;
+        if ($historicalPage !== null && $historicalPage <= 0) {
+            $historicalPage = null;
         }
 
         $bearer = config('stockbit.bearer');
@@ -97,28 +107,6 @@ class ScrapeStockbit extends Command
         $tickers = $this->argument('tickers') ?? [];
 
         foreach ($tickers as $symbol) {
-            $this->info("Fetching {$symbol} {$from} → {$to}");
-
-            $limitOption = $this->option('limit');
-            $limit = $this->input->hasParameterOption('--limit')
-                ? ($limitOption !== null && $limitOption !== '' ? (int) $limitOption : null)
-                : null;
-
-            $json = $api->marketDetectors(
-                $symbol,
-                $from,
-                $to,
-                $this->option('transaction_type') ?: null,
-                $this->option('market_board') ?: null,
-                $this->option('investor_type') ?: null,
-                $limit,
-            );
-
-            if (isset($json['error'])) {
-                $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
-                continue;
-            }
-
             if (!$this->option('no-profile-sync')) {
                 $profileResponse = $api->tickerProfile($symbol);
                 $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
@@ -133,11 +121,35 @@ class ScrapeStockbit extends Command
                 $this->line('Profile sync skipped for ' . $symbol);
             }
 
+            if (!$fetchMarketDetector) {
+                continue;
+            }
+
+            $fromString = (string) $from;
+            $toString = (string) $to;
+
+            $this->info("Fetching {$symbol} {$fromString} → {$toString}");
+
+            $json = $api->marketDetectors(
+                $symbol,
+                $fromString,
+                $toString,
+                $transactionType,
+                $marketBoard,
+                $investorType,
+                $limit,
+            );
+
+            if (isset($json['error'])) {
+                $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
+                continue;
+            }
+
             $historical = $api->historicalSummary(
                 $symbol,
                 $historicalPeriod,
-                $from,
-                $to,
+                $fromString,
+                $toString,
                 $historicalLimit,
                 $historicalPage,
             );
@@ -145,9 +157,9 @@ class ScrapeStockbit extends Command
             $jsonName = sprintf(
                 '%s_%s_%s_%s.json',
                 $symbol,
-                $from,
-                $to,
-                ($this->option('transaction_type') ?: config('stockbit.defaults.transaction_type'))
+                $fromString,
+                $toString,
+                $transactionType ?? 'default'
             );
             $jsonPath = "{$jsonDir}/{$jsonName}";
 
@@ -159,7 +171,7 @@ class ScrapeStockbit extends Command
                 $message = $historical['message'] ?? 'Unknown error';
                 $this->warn("Historical summary error for {$symbol}: {$code} — {$message}");
             } else {
-                $historicalNameParts = [$symbol, $from, $to, $historicalPeriod];
+                $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
                 if ($historicalPage !== null) {
                     $historicalNameParts[] = 'page' . $historicalPage;
                 }
@@ -181,20 +193,18 @@ class ScrapeStockbit extends Command
                 }
             }
 
-            if (!$this->option('no-csv')) {
-                $rows = BrokerSummaryTransformer::toRows($symbol, $json);
+            $rows = BrokerSummaryTransformer::toRows($symbol, $json);
 
-                $csvName = sprintf('%s_%s_%s.csv', $symbol, $from, $to);
-                $csvPath = "{$csvDir}/{$csvName}";
+            $csvName = sprintf('%s_%s_%s.csv', $symbol, $fromString, $toString);
+            $csvPath = "{$csvDir}/{$csvName}";
 
-                $columns = ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value'];
-                $contents = CsvUtilities::rowsToCsv($rows, $columns);
+            $columns = ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value'];
+            $contents = CsvUtilities::rowsToCsv($rows, $columns);
 
-                Storage::disk($disk)->put($csvPath, $contents);
+            Storage::disk($disk)->put($csvPath, $contents);
 
-                $this->line('Saved CSV: ' . ($disk === 'local' ? storage_path("app/{$csvPath}") : $csvPath));
-                $this->line('CSV rows: ' . count($rows));
-            }
+            $this->line('Saved CSV: ' . ($disk === 'local' ? storage_path("app/{$csvPath}") : $csvPath));
+            $this->line('CSV rows: ' . count($rows));
 
             usleep(200_000);
         }
