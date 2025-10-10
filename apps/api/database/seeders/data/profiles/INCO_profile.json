@@ -1,0 +1,540 @@
+{
+    "symbol": "INCO",
+    "name": "INCO",
+    "address": [
+        {
+            "id": "207",
+            "email": [
+                "ptvi-corpsec@vale.com"
+            ],
+            "fax": "(62) 21 524-9020 ",
+            "npwp": "01.000.541.1-091.000 ",
+            "phone": "(62) 21 524-9000 ",
+            "website": "http://www.vale.com/indonesia ",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:17+07:00",
+            "value": "<td colspan='4'>The Energy Building 31st Floor SCBD Lot 11 A, Jl. Jend. Sudirman Kav. 52-53, Jakarta 12190 \n\n        \t\t  \t\t\tPhone: (62) 21 524-9000 \n        \t\t  \t\t\tFax: (62) 21 524-9020 \n                            NPWP: 01.000.541.1-091.000 \n        \t\t  \t\t\tEmail: ptvi-corpsec@vale.com\n        \t\t  \t\t\tWebsite: http://www.vale.com/indonesia \n\n        \t  \t\t\t</td>",
+            "office": "The Energy Building 31st Floor SCBD Lot 11 A, Jl. Jend. Sudirman Kav. 52-53, Jakarta 12190"
+        }
+    ],
+    "background": "PT Vale Indonesia menambang nikel laterit untuk menghasilkan produk akhir berupa nikel dalam matte. Rata-rata volume produksi nikel per tahun mencapai 75.000 metrik ton. Dalam memproduksi nikel di Blok Sorowako, kami menggunakan teknologi pyrometalurgi (meleburkan bijih nikel laterit). Nikel yang kami hasilkan diekspor seluruhnya kepada Sumitomo Metal Mining Co, Ltd (Jepang) dalam kontrak khusus jangka panjang yang dijalin kedua perusahaan tersebut.\n\nBeroperasi dalam naungan Kontrak Karya yang telah diamandemen pada 17 Oktober 2014 dan berlaku hingga 28 Desember 2025 dengan luas konsesi seluas 118.017 hektar meliputi Sulawesi Selatan (70.566 hektar), Sulawesi Tengah (22.699 hektar) dan Sulawesi Tenggara (24.752 hektar).",
+    "history": {
+        "amount": "487 B",
+        "board": "Papan Utama",
+        "date": "16 May 1990",
+        "price": "9,800",
+        "registrar": "",
+        "shares": "49,681,694",
+        "underwriters": [
+            "PT. Danareksa Sekuritas"
+        ],
+        "administrative_bureau": "PT. Vale Indonesia Tbk",
+        "free_float": "20.40%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "15992815",
+                "key": "Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "HERIYANTO AGUNG PUTRA"
+            },
+            {
+                "id": "15992816",
+                "key": "Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "BUDIAWANSYAH"
+            },
+            {
+                "id": "15992817",
+                "key": "Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "RIZKY ANDHIKA PUTRA"
+            },
+            {
+                "id": "15992818",
+                "key": "Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "MUHAMMAD ASRIL"
+            },
+            {
+                "id": "15992819",
+                "key": "Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "M. SLAMET SUGIHARTO  "
+            }
+        ],
+        "independent_commissioner": [],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "15992820",
+                "key": "President Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "BERNARDUS IRMANTO"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "15992814",
+                "key": "Vice President Director",
+                "lastupdate": "2025-09-25T15:18:47+07:00",
+                "value": "ABU ASHAR"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530153",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:17+07:00",
+            "value": "{\"name\":\"Cut Fika Lutfi\",\"phone\":\"524 9000\",\"email\":\"ptvi-corpsec@vale.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "34%",
+            "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+            "value": "3.58 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "33.88%",
+            "name": "VALE CANADA LIMITED",
+            "value": "3.57 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "20.4%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "2.15 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "11.48%",
+            "name": "SUMITOMO METAL MINING CO., LTD.",
+            "value": "121.04 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.24%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "25.24 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "-",
+            "percentage": "0.00%",
+            "types": "-",
+            "value": "0"
+        },
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "33,904",
+            "change": -4220,
+            "change_formatted": "(-4,220)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "38,124",
+            "change": -1865,
+            "change_formatted": "(-1,865)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "39,989",
+            "change": -219,
+            "change_formatted": "(-219)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "40,208",
+            "change": -391,
+            "change_formatted": "(-391)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "40,599",
+            "change": -1444,
+            "change_formatted": "(-1,444)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "42,043",
+            "change": 572,
+            "change_formatted": "(+572)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "BUDIAWANSYAH",
+            "value": "24.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ABU ASHAR",
+            "value": "22.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1990-05-16T00:00:00+07:00",
+    "ipo_price": 9800,
+    "float": 20.4,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "207",
+                "email": [
+                    "ptvi-corpsec@vale.com"
+                ],
+                "fax": "(62) 21 524-9020 ",
+                "npwp": "01.000.541.1-091.000 ",
+                "phone": "(62) 21 524-9000 ",
+                "website": "http://www.vale.com/indonesia ",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:17+07:00",
+                "value": "<td colspan='4'>The Energy Building 31st Floor SCBD Lot 11 A, Jl. Jend. Sudirman Kav. 52-53, Jakarta 12190 \n\n        \t\t  \t\t\tPhone: (62) 21 524-9000 \n        \t\t  \t\t\tFax: (62) 21 524-9020 \n                            NPWP: 01.000.541.1-091.000 \n        \t\t  \t\t\tEmail: ptvi-corpsec@vale.com\n        \t\t  \t\t\tWebsite: http://www.vale.com/indonesia \n\n        \t  \t\t\t</td>",
+                "office": "The Energy Building 31st Floor SCBD Lot 11 A, Jl. Jend. Sudirman Kav. 52-53, Jakarta 12190"
+            }
+        ],
+        "background": "PT Vale Indonesia menambang nikel laterit untuk menghasilkan produk akhir berupa nikel dalam matte. Rata-rata volume produksi nikel per tahun mencapai 75.000 metrik ton. Dalam memproduksi nikel di Blok Sorowako, kami menggunakan teknologi pyrometalurgi (meleburkan bijih nikel laterit). Nikel yang kami hasilkan diekspor seluruhnya kepada Sumitomo Metal Mining Co, Ltd (Jepang) dalam kontrak khusus jangka panjang yang dijalin kedua perusahaan tersebut.\n\nBeroperasi dalam naungan Kontrak Karya yang telah diamandemen pada 17 Oktober 2014 dan berlaku hingga 28 Desember 2025 dengan luas konsesi seluas 118.017 hektar meliputi Sulawesi Selatan (70.566 hektar), Sulawesi Tengah (22.699 hektar) dan Sulawesi Tenggara (24.752 hektar).",
+        "history": {
+            "amount": "487 B",
+            "board": "Papan Utama",
+            "date": "16 May 1990",
+            "price": "9,800",
+            "registrar": "",
+            "shares": "49,681,694",
+            "underwriters": [
+                "PT. Danareksa Sekuritas"
+            ],
+            "administrative_bureau": "PT. Vale Indonesia Tbk",
+            "free_float": "20.40%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "15992815",
+                    "key": "Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "HERIYANTO AGUNG PUTRA"
+                },
+                {
+                    "id": "15992816",
+                    "key": "Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "BUDIAWANSYAH"
+                },
+                {
+                    "id": "15992817",
+                    "key": "Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "RIZKY ANDHIKA PUTRA"
+                },
+                {
+                    "id": "15992818",
+                    "key": "Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "MUHAMMAD ASRIL"
+                },
+                {
+                    "id": "15992819",
+                    "key": "Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "M. SLAMET SUGIHARTO  "
+                }
+            ],
+            "independent_commissioner": [],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "15992820",
+                    "key": "President Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "BERNARDUS IRMANTO"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "15992814",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-09-25T15:18:47+07:00",
+                    "value": "ABU ASHAR"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530153",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:17+07:00",
+                "value": "{\"name\":\"Cut Fika Lutfi\",\"phone\":\"524 9000\",\"email\":\"ptvi-corpsec@vale.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "34%",
+                "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+                "value": "3.58 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "33.88%",
+                "name": "VALE CANADA LIMITED",
+                "value": "3.57 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "20.4%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "2.15 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "11.48%",
+                "name": "SUMITOMO METAL MINING CO., LTD.",
+                "value": "121.04 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.24%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "25.24 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "-",
+                "percentage": "0.00%",
+                "types": "-",
+                "value": "0"
+            },
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "33,904",
+                "change": -4220,
+                "change_formatted": "(-4,220)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "38,124",
+                "change": -1865,
+                "change_formatted": "(-1,865)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "39,989",
+                "change": -219,
+                "change_formatted": "(-219)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "40,208",
+                "change": -391,
+                "change_formatted": "(-391)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "40,599",
+                "change": -1444,
+                "change_formatted": "(-1,444)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "42,043",
+                "change": 572,
+                "change_formatted": "(+572)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "BUDIAWANSYAH",
+                "value": "24.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ABU ASHAR",
+                "value": "22.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:26:05+00:00"
+}

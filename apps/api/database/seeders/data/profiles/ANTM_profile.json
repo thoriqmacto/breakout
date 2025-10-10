@@ -1,0 +1,824 @@
+{
+    "symbol": "ANTM",
+    "name": "ANTM",
+    "address": [
+        {
+            "id": "26",
+            "email": [
+                "corsec@antam.com"
+            ],
+            "fax": "021-7812822",
+            "npwp": "0010 0166 3205 1000",
+            "phone": "021-7805119; 021-7891234 ; 021-7812635",
+            "website": "http://www.antam.com/",
+            "key": "",
+            "lastupdate": "2024-12-10T15:23:08+07:00",
+            "value": "",
+            "office": "Gedung Aneka Tambang, Jl. Letjen T.B. Simatupang No. 1 Jakarta 12530"
+        }
+    ],
+    "background": "PT Aneka Tambang Tbk adalah perusahaan yang bergerak di bidang pertambangan dan pengolahan serta pemasaran mineral alam. ANTAM, anggota dari MIND ID (Mining Industry Indonesia), BUMN Holding Industri Pertambangan merupakan perusahaan pertambangan yang terdiversifikasi dan terintegrasi secara vertikal yang berorientasi ekspor. Melalui wilayah operasi yang tersebar di seluruh Indonesia yang kaya akan bahan mineral, kegiatan ANTAM mencakup eksplorasi, penambangan, pengolahan serta pemasaran dari komoditas bijih nikel, feronikel, emas, perak, bauksit, dan batubara.\n\nANTAM memiliki konsumen jangka panjang yang loyal di Eropa dan Asia. Mengingat luasnya lahan konsesi pertambangan dan besarnya jumlah cadangan dan sumber daya yang dimiliki, ANTAM membentuk beberapa usaha patungan dengan mitra internasional untuk dapat memanfaatkan cadangan yang ada menjadi tambang yang menghasilkan keuntungan.",
+    "history": {
+        "amount": "603 B",
+        "board": "Papan Utama",
+        "date": "27 Nov 1997",
+        "price": "1,400",
+        "registrar": "",
+        "shares": "430,768,992",
+        "underwriters": [
+            "PT. Danareksa Sekuritas",
+            "PT. Bahana Securities",
+            "PT. Pentasena Arthasentosa"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "34.84%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13833833",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "M. Rudy Salahuddin Ramto"
+            },
+            {
+                "id": "13833832",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Rudy Sufahriadi"
+            },
+            {
+                "id": "13833830",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Elen Setiadi"
+            },
+            {
+                "id": "13833829",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Irwandy Arif"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833827",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Ratih Amri"
+            },
+            {
+                "id": "13833826",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Handi Sutanto"
+            },
+            {
+                "id": "13833825",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Arianto Sabtonugroho Rudjito"
+            },
+            {
+                "id": "13833824",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "I Dewa Wirantaya"
+            },
+            {
+                "id": "13833823",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Hartono"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833834",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Pius Lustrilanang"
+            },
+            {
+                "id": "13833831",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Ridwan"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13833822",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Achmad Ardianto"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "13833828",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:46+07:00",
+                "value": "Rauf Purnama"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12527921",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:10+07:00",
+            "value": "{\"name\":\"Yulan Kustiyan\",\"phone\":\"6221 789 1234\",\"email\":\"corsec@antam.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "65%",
+            "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+            "value": "15.62 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "34.84%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "8.37 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.16%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "38.12 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0%",
+            "name": "SAHAM TREASURY",
+            "value": "22.88 K",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NEGARA REPUBLIK INDONESIA",
+            "value": "1.00",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Cibaliung Sumberdaya",
+            "percentage": "100%",
+            "types": "Eksplorasi, konstruksi dan pengembangan tambang, penambangan, produksi, pengolahan dan pemurnian, pengangkutan dan penjualan di industri emas",
+            "value": "95466255"
+        },
+        {
+            "company": "PT International Mineral Capital",
+            "percentage": "100%",
+            "types": "Jasa dan perdagangan",
+            "value": "622072869"
+        },
+        {
+            "company": "PT Gag Nikel",
+            "percentage": "100%",
+            "types": "Eksplorasi dan operator tambang (kepemilikan tidak langsung)",
+            "value": "917310080"
+        },
+        {
+            "company": "PT Citra Tobindo Sukses Perkasa",
+            "percentage": "100%",
+            "types": "Eksplorasi dan operator tambang batubara (kepemilikan tidak langsung)",
+            "value": "48063176"
+        },
+        {
+            "company": "PT Feni Haltim",
+            "percentage": "100%",
+            "types": "Perdagangan, pembangunan dan jasa (kepemilikan tidak langsung)",
+            "value": "555830288"
+        },
+        {
+            "company": "PT Borneo Edo International Agro",
+            "percentage": "100%",
+            "types": "Perkebunan, perindustrian, pengangkutan hasil perkebunan, perdagangan dan jasa (kepemilikan tidak langsung)",
+            "value": "41586"
+        },
+        {
+            "company": "PT Gunung Kendaik",
+            "percentage": "100%",
+            "types": "Pembangunan, perdagangan, perindustrian, pertanian, pengangkutan darat, jasa, pertambangan dan percetakan (kepemilikan tidak langsung)",
+            "value": "6971904"
+        },
+        {
+            "company": "PT Nusa Karya Arindo",
+            "percentage": "100%",
+            "types": "Jasa pertambangan mineral dan batubara (kepemilikan tidak langsung)",
+            "value": "8223484"
+        },
+        {
+            "company": "PT Sumberdaya Arindo",
+            "percentage": "100%",
+            "types": "Jasa pertambangan mineral dan batubara (kepemilikan tidak langsung)",
+            "value": "63500252"
+        },
+        {
+            "company": "PT Antam Energi Indonesia",
+            "percentage": "100%",
+            "types": "Jasa, perdagangan, dan perindustrian (kepemilikan tidak langsung)",
+            "value": "123793"
+        },
+        {
+            "company": "PT Kawasan Industri Antam Timur",
+            "percentage": "100%",
+            "types": "Jasa manajemen kawasan industrI (kepemiikan tidak langsung)",
+            "value": "43822"
+        },
+        {
+            "company": "PT Indonesia Chemical Alumina",
+            "percentage": "100%",
+            "types": "Pengolahan dan pemurnian hasil tambang Bauksit menjadi produk alumina, pengangkutan, perdagangan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\ndan pendistribusian produk alumina",
+            "value": "4056985693"
+        },
+        {
+            "company": "Asia Pacific Nickel Pty., Ltd.",
+            "percentage": "100%",
+            "types": "Perusahaan investasi",
+            "value": "908465759"
+        },
+        {
+            "company": "PT Indonesia Coal Resources",
+            "percentage": "100%",
+            "types": "Perdagangan, transportasi dan jasa tambang batubara",
+            "value": "54171594"
+        },
+        {
+            "company": "PT Antam Resourcindo",
+            "percentage": "99.98%",
+            "types": "Eksplorasi dan operator tambang",
+            "value": "161007771"
+        },
+        {
+            "company": "PT Mega Citra Utama",
+            "percentage": "100%",
+            "types": "Konstruksi, perdagangan, perindustrian, pertanian dan pertambangan",
+            "value": "56741779"
+        },
+        {
+            "company": "PT Abuki Jaya Stainless Indonesia",
+            "percentage": "100%",
+            "types": "Pengolahan stainless steel",
+            "value": "9624023"
+        },
+        {
+            "company": "PT Borneo Edo International",
+            "percentage": "100%",
+            "types": "Pembangunan, perdagangan, perindustrian, pertanian dan pertambangan",
+            "value": "42277915"
+        },
+        {
+            "company": "PT Dwimitra Enggang Khatulistiwa",
+            "percentage": "100%",
+            "types": "Eksplorasi dan operator tambang",
+            "value": "1956361"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "205,279",
+            "change": 983,
+            "change_formatted": "(+983)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "204,296",
+            "change": 4426,
+            "change_formatted": "(+4,426)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "199,870",
+            "change": 9824,
+            "change_formatted": "(+9,824)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "190,046",
+            "change": 403,
+            "change_formatted": "(+403)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "189,643",
+            "change": -21613,
+            "change_formatted": "(-21,613)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "211,256",
+            "change": 2040,
+            "change_formatted": "(+2,040)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "HARTONO",
+            "value": "12.50 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "HANDI SUTANTO",
+            "value": "300.00",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1997-11-27T00:00:00+07:00",
+    "ipo_price": 1400,
+    "float": 34.84,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "26",
+                "email": [
+                    "corsec@antam.com"
+                ],
+                "fax": "021-7812822",
+                "npwp": "0010 0166 3205 1000",
+                "phone": "021-7805119; 021-7891234 ; 021-7812635",
+                "website": "http://www.antam.com/",
+                "key": "",
+                "lastupdate": "2024-12-10T15:23:08+07:00",
+                "value": "",
+                "office": "Gedung Aneka Tambang, Jl. Letjen T.B. Simatupang No. 1 Jakarta 12530"
+            }
+        ],
+        "background": "PT Aneka Tambang Tbk adalah perusahaan yang bergerak di bidang pertambangan dan pengolahan serta pemasaran mineral alam. ANTAM, anggota dari MIND ID (Mining Industry Indonesia), BUMN Holding Industri Pertambangan merupakan perusahaan pertambangan yang terdiversifikasi dan terintegrasi secara vertikal yang berorientasi ekspor. Melalui wilayah operasi yang tersebar di seluruh Indonesia yang kaya akan bahan mineral, kegiatan ANTAM mencakup eksplorasi, penambangan, pengolahan serta pemasaran dari komoditas bijih nikel, feronikel, emas, perak, bauksit, dan batubara.\n\nANTAM memiliki konsumen jangka panjang yang loyal di Eropa dan Asia. Mengingat luasnya lahan konsesi pertambangan dan besarnya jumlah cadangan dan sumber daya yang dimiliki, ANTAM membentuk beberapa usaha patungan dengan mitra internasional untuk dapat memanfaatkan cadangan yang ada menjadi tambang yang menghasilkan keuntungan.",
+        "history": {
+            "amount": "603 B",
+            "board": "Papan Utama",
+            "date": "27 Nov 1997",
+            "price": "1,400",
+            "registrar": "",
+            "shares": "430,768,992",
+            "underwriters": [
+                "PT. Danareksa Sekuritas",
+                "PT. Bahana Securities",
+                "PT. Pentasena Arthasentosa"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "34.84%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13833833",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "M. Rudy Salahuddin Ramto"
+                },
+                {
+                    "id": "13833832",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Rudy Sufahriadi"
+                },
+                {
+                    "id": "13833830",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Elen Setiadi"
+                },
+                {
+                    "id": "13833829",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Irwandy Arif"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833827",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Ratih Amri"
+                },
+                {
+                    "id": "13833826",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Handi Sutanto"
+                },
+                {
+                    "id": "13833825",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Arianto Sabtonugroho Rudjito"
+                },
+                {
+                    "id": "13833824",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "I Dewa Wirantaya"
+                },
+                {
+                    "id": "13833823",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Hartono"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833834",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Pius Lustrilanang"
+                },
+                {
+                    "id": "13833831",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Ridwan"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13833822",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Achmad Ardianto"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "13833828",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:46+07:00",
+                    "value": "Rauf Purnama"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12527921",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:10+07:00",
+                "value": "{\"name\":\"Yulan Kustiyan\",\"phone\":\"6221 789 1234\",\"email\":\"corsec@antam.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "65%",
+                "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+                "value": "15.62 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "34.84%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "8.37 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.16%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "38.12 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0%",
+                "name": "SAHAM TREASURY",
+                "value": "22.88 K",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NEGARA REPUBLIK INDONESIA",
+                "value": "1.00",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Cibaliung Sumberdaya",
+                "percentage": "100%",
+                "types": "Eksplorasi, konstruksi dan pengembangan tambang, penambangan, produksi, pengolahan dan pemurnian, pengangkutan dan penjualan di industri emas",
+                "value": "95466255"
+            },
+            {
+                "company": "PT International Mineral Capital",
+                "percentage": "100%",
+                "types": "Jasa dan perdagangan",
+                "value": "622072869"
+            },
+            {
+                "company": "PT Gag Nikel",
+                "percentage": "100%",
+                "types": "Eksplorasi dan operator tambang (kepemilikan tidak langsung)",
+                "value": "917310080"
+            },
+            {
+                "company": "PT Citra Tobindo Sukses Perkasa",
+                "percentage": "100%",
+                "types": "Eksplorasi dan operator tambang batubara (kepemilikan tidak langsung)",
+                "value": "48063176"
+            },
+            {
+                "company": "PT Feni Haltim",
+                "percentage": "100%",
+                "types": "Perdagangan, pembangunan dan jasa (kepemilikan tidak langsung)",
+                "value": "555830288"
+            },
+            {
+                "company": "PT Borneo Edo International Agro",
+                "percentage": "100%",
+                "types": "Perkebunan, perindustrian, pengangkutan hasil perkebunan, perdagangan dan jasa (kepemilikan tidak langsung)",
+                "value": "41586"
+            },
+            {
+                "company": "PT Gunung Kendaik",
+                "percentage": "100%",
+                "types": "Pembangunan, perdagangan, perindustrian, pertanian, pengangkutan darat, jasa, pertambangan dan percetakan (kepemilikan tidak langsung)",
+                "value": "6971904"
+            },
+            {
+                "company": "PT Nusa Karya Arindo",
+                "percentage": "100%",
+                "types": "Jasa pertambangan mineral dan batubara (kepemilikan tidak langsung)",
+                "value": "8223484"
+            },
+            {
+                "company": "PT Sumberdaya Arindo",
+                "percentage": "100%",
+                "types": "Jasa pertambangan mineral dan batubara (kepemilikan tidak langsung)",
+                "value": "63500252"
+            },
+            {
+                "company": "PT Antam Energi Indonesia",
+                "percentage": "100%",
+                "types": "Jasa, perdagangan, dan perindustrian (kepemilikan tidak langsung)",
+                "value": "123793"
+            },
+            {
+                "company": "PT Kawasan Industri Antam Timur",
+                "percentage": "100%",
+                "types": "Jasa manajemen kawasan industrI (kepemiikan tidak langsung)",
+                "value": "43822"
+            },
+            {
+                "company": "PT Indonesia Chemical Alumina",
+                "percentage": "100%",
+                "types": "Pengolahan dan pemurnian hasil tambang Bauksit menjadi produk alumina, pengangkutan, perdagangan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\ndan pendistribusian produk alumina",
+                "value": "4056985693"
+            },
+            {
+                "company": "Asia Pacific Nickel Pty., Ltd.",
+                "percentage": "100%",
+                "types": "Perusahaan investasi",
+                "value": "908465759"
+            },
+            {
+                "company": "PT Indonesia Coal Resources",
+                "percentage": "100%",
+                "types": "Perdagangan, transportasi dan jasa tambang batubara",
+                "value": "54171594"
+            },
+            {
+                "company": "PT Antam Resourcindo",
+                "percentage": "99.98%",
+                "types": "Eksplorasi dan operator tambang",
+                "value": "161007771"
+            },
+            {
+                "company": "PT Mega Citra Utama",
+                "percentage": "100%",
+                "types": "Konstruksi, perdagangan, perindustrian, pertanian dan pertambangan",
+                "value": "56741779"
+            },
+            {
+                "company": "PT Abuki Jaya Stainless Indonesia",
+                "percentage": "100%",
+                "types": "Pengolahan stainless steel",
+                "value": "9624023"
+            },
+            {
+                "company": "PT Borneo Edo International",
+                "percentage": "100%",
+                "types": "Pembangunan, perdagangan, perindustrian, pertanian dan pertambangan",
+                "value": "42277915"
+            },
+            {
+                "company": "PT Dwimitra Enggang Khatulistiwa",
+                "percentage": "100%",
+                "types": "Eksplorasi dan operator tambang",
+                "value": "1956361"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "205,279",
+                "change": 983,
+                "change_formatted": "(+983)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "204,296",
+                "change": 4426,
+                "change_formatted": "(+4,426)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "199,870",
+                "change": 9824,
+                "change_formatted": "(+9,824)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "190,046",
+                "change": 403,
+                "change_formatted": "(+403)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "189,643",
+                "change": -21613,
+                "change_formatted": "(-21,613)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "211,256",
+                "change": 2040,
+                "change_formatted": "(+2,040)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "HARTONO",
+                "value": "12.50 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "HANDI SUTANTO",
+                "value": "300.00",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:26:05+00:00"
+}

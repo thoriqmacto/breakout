@@ -1,0 +1,770 @@
+{
+    "symbol": "BRIS",
+    "name": "BRIS",
+    "address": [
+        {
+            "id": "1000000005",
+            "email": [
+                "corporate.secretary@bankbsi.co.id"
+            ],
+            "fax": "+62 21 30421888",
+            "npwp": "01.105.094.5-093.000",
+            "phone": "+62 21 30405999",
+            "website": "www.bankbsi.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:54+07:00",
+            "value": "<td colspan='4'>Gedung The Tower, Jalan Gatot Subroto No.27, Kel. Karet Semanggi, Kec. Setiabudi, Jakarta Selatan 12930\n\n        \t\t  \t\t\tPhone: +62 21 30405999\n        \t\t  \t\t\tFax: +62 21 30421888\n                            NPWP: 01.105.094.5-093.000\n        \t\t  \t\t\tEmail: corporate.secretary@bankbsi.co.id\n        \t\t  \t\t\tWebsite: www.bankbsi.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Gedung The Tower, Jalan Gatot Subroto No.27, Kel. Karet Semanggi, Kec. Setiabudi, Jakarta Selatan 12930"
+        }
+    ],
+    "background": "PT Bank BRISyariah didirikan pada tanggal 03 April 1969 dengan nama PT Bank Djasa Arta.\nRuang lingkup kegiatan usaha PT Bank BRISyariah adalah bergerak di bank umum yang melaksanakan kegiatan usaha berdasarkan prinsip syariah.",
+    "history": {
+        "amount": "1,338 B",
+        "board": "Papan Utama",
+        "date": "9 May 2018",
+        "price": "510",
+        "registrar": "",
+        "shares": "2,623,350,600",
+        "underwriters": [
+            "PT. Bahana Sekuritas (Affiliated)",
+            "PT. CLSA Sekuritas Indonesia",
+            "PT. Danareksa Sekuritas (Affiliated)",
+            "PT. Indo Premier Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "9.25%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13834864",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Kamaruddin Amin"
+            },
+            {
+                "id": "13834863",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Mochamad Agus Rofiudin"
+            },
+            {
+                "id": "13834862",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Meidy Ferdiansyah"
+            }
+        ],
+        "director": [
+            {
+                "id": "13834859",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Firman Nugraha"
+            },
+            {
+                "id": "13834858",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Arief Adhi Sanjaya"
+            },
+            {
+                "id": "13834857",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Grandhis Helmi Harumansyah"
+            },
+            {
+                "id": "13834856",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Kemas Erwan Husainy"
+            },
+            {
+                "id": "13834855",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Zaidan Novari"
+            },
+            {
+                "id": "13834854",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Muharto"
+            },
+            {
+                "id": "13834853",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Ade Cahyo Nugroho"
+            },
+            {
+                "id": "13834851",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Anton Sukarna"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13834867",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Addin Jauharudin"
+            },
+            {
+                "id": "13834866",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Muhammad Syafii Antonio"
+            },
+            {
+                "id": "13834865",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Nizar Ahmad Saputra"
+            },
+            {
+                "id": "13834860",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Felicitas Tallulembang"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13834861",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Muhadjir Effendy"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13834850",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Anggoro Eko Cahyo"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13834852",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:37:06+07:00",
+                "value": "Bob Tyasika Ananta"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12534839",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:54+07:00",
+            "value": "{\"name\":\"Gunawan Arief Hartoyo\",\"phone\":\"021-3450226 \\/ 27 ext 485 \",\"email\":\"corporate.secretary@bankbsi.co.id \"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51.47%",
+            "name": "PT BANK MANDIRI (PERSERO) TBK",
+            "value": "23.74 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "23.24%",
+            "name": "PT BANK NEGARA INDONESIA (PERSERO) TBK-DIVISI PPA",
+            "value": "10.72 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "15.38%",
+            "name": "PT BANK RAKYAT INDONESIA (PERSERO) TBK",
+            "value": "7.09 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "9.91%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "4.57 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "PEMERINTAH NEGARA REPUBLIK INDONESIA",
+            "value": "1.00",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "122,849",
+            "change": 3044,
+            "change_formatted": "(+3,044)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "119,805",
+            "change": 295,
+            "change_formatted": "(+295)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "119,510",
+            "change": -8326,
+            "change_formatted": "(-8,326)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "127,836",
+            "change": 11596,
+            "change_formatted": "(+11,596)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "116,240",
+            "change": -1556,
+            "change_formatted": "(-1,556)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "117,796",
+            "change": -3962,
+            "change_formatted": "(-3,962)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "ANTON SUKARNA",
+            "value": "2.28 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ADE CAHYO NUGROHO",
+            "value": "2.28 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "BOB TYASIKA ANANTA",
+            "value": "1.13 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ZAIDAN NOVARI",
+            "value": "1.07 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "GRANDHIS",
+            "value": "343.10 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "KEMAS ERWAN HUSAINY",
+            "value": "220.10 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MEIDY FERDIANSYAH",
+            "value": "133.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2018-05-09T00:00:00+07:00",
+    "ipo_price": 510,
+    "float": 9.25,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000000005",
+                "email": [
+                    "corporate.secretary@bankbsi.co.id"
+                ],
+                "fax": "+62 21 30421888",
+                "npwp": "01.105.094.5-093.000",
+                "phone": "+62 21 30405999",
+                "website": "www.bankbsi.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:54+07:00",
+                "value": "<td colspan='4'>Gedung The Tower, Jalan Gatot Subroto No.27, Kel. Karet Semanggi, Kec. Setiabudi, Jakarta Selatan 12930\n\n        \t\t  \t\t\tPhone: +62 21 30405999\n        \t\t  \t\t\tFax: +62 21 30421888\n                            NPWP: 01.105.094.5-093.000\n        \t\t  \t\t\tEmail: corporate.secretary@bankbsi.co.id\n        \t\t  \t\t\tWebsite: www.bankbsi.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Gedung The Tower, Jalan Gatot Subroto No.27, Kel. Karet Semanggi, Kec. Setiabudi, Jakarta Selatan 12930"
+            }
+        ],
+        "background": "PT Bank BRISyariah didirikan pada tanggal 03 April 1969 dengan nama PT Bank Djasa Arta.\nRuang lingkup kegiatan usaha PT Bank BRISyariah adalah bergerak di bank umum yang melaksanakan kegiatan usaha berdasarkan prinsip syariah.",
+        "history": {
+            "amount": "1,338 B",
+            "board": "Papan Utama",
+            "date": "9 May 2018",
+            "price": "510",
+            "registrar": "",
+            "shares": "2,623,350,600",
+            "underwriters": [
+                "PT. Bahana Sekuritas (Affiliated)",
+                "PT. CLSA Sekuritas Indonesia",
+                "PT. Danareksa Sekuritas (Affiliated)",
+                "PT. Indo Premier Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "9.25%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13834864",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Kamaruddin Amin"
+                },
+                {
+                    "id": "13834863",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Mochamad Agus Rofiudin"
+                },
+                {
+                    "id": "13834862",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Meidy Ferdiansyah"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13834859",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Firman Nugraha"
+                },
+                {
+                    "id": "13834858",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Arief Adhi Sanjaya"
+                },
+                {
+                    "id": "13834857",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Grandhis Helmi Harumansyah"
+                },
+                {
+                    "id": "13834856",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Kemas Erwan Husainy"
+                },
+                {
+                    "id": "13834855",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Zaidan Novari"
+                },
+                {
+                    "id": "13834854",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Muharto"
+                },
+                {
+                    "id": "13834853",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Ade Cahyo Nugroho"
+                },
+                {
+                    "id": "13834851",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Anton Sukarna"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13834867",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Addin Jauharudin"
+                },
+                {
+                    "id": "13834866",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Muhammad Syafii Antonio"
+                },
+                {
+                    "id": "13834865",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Nizar Ahmad Saputra"
+                },
+                {
+                    "id": "13834860",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Felicitas Tallulembang"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13834861",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Muhadjir Effendy"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13834850",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Anggoro Eko Cahyo"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13834852",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:37:06+07:00",
+                    "value": "Bob Tyasika Ananta"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12534839",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:54+07:00",
+                "value": "{\"name\":\"Gunawan Arief Hartoyo\",\"phone\":\"021-3450226 \\/ 27 ext 485 \",\"email\":\"corporate.secretary@bankbsi.co.id \"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51.47%",
+                "name": "PT BANK MANDIRI (PERSERO) TBK",
+                "value": "23.74 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "23.24%",
+                "name": "PT BANK NEGARA INDONESIA (PERSERO) TBK-DIVISI PPA",
+                "value": "10.72 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "15.38%",
+                "name": "PT BANK RAKYAT INDONESIA (PERSERO) TBK",
+                "value": "7.09 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "9.91%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "4.57 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "PEMERINTAH NEGARA REPUBLIK INDONESIA",
+                "value": "1.00",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "122,849",
+                "change": 3044,
+                "change_formatted": "(+3,044)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "119,805",
+                "change": 295,
+                "change_formatted": "(+295)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "119,510",
+                "change": -8326,
+                "change_formatted": "(-8,326)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "127,836",
+                "change": 11596,
+                "change_formatted": "(+11,596)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "116,240",
+                "change": -1556,
+                "change_formatted": "(-1,556)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "117,796",
+                "change": -3962,
+                "change_formatted": "(-3,962)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "ANTON SUKARNA",
+                "value": "2.28 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ADE CAHYO NUGROHO",
+                "value": "2.28 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "BOB TYASIKA ANANTA",
+                "value": "1.13 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ZAIDAN NOVARI",
+                "value": "1.07 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "GRANDHIS",
+                "value": "343.10 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "KEMAS ERWAN HUSAINY",
+                "value": "220.10 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MEIDY FERDIANSYAH",
+                "value": "133.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:26:06+00:00"
+}
