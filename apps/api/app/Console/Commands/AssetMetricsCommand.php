@@ -3,12 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
+use App\Models\Metric;
 use App\Services\AssetMetrics;
 use Illuminate\Console\Command;
 
 class AssetMetricsCommand extends Command
 {
-    protected $signature = 'asset:metrics {--sym=} {--all}';
+    protected $signature = 'asset:metrics {--sym=} {--all} {--persist : Persist the calculated metrics to the database}';
     protected $description = 'Display asset metrics using AssetMetrics service';
 
     public function handle()
@@ -24,6 +25,8 @@ class AssetMetricsCommand extends Command
 
         $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'];
         $rows = [];
+        $persist = (bool) $this->option('persist');
+        $persistedCount = 0;
 
         foreach ($symbols as $symbol) {
             $asset = Asset::where('symbol', $symbol)->first();
@@ -31,10 +34,14 @@ class AssetMetricsCommand extends Command
                 continue;
             }
             $bars = $asset->prices()->orderBy('date')->get()->toArray();
+            if ($bars === []) {
+                continue;
+            }
             $metrics = new AssetMetrics($bars);
             $totalBars = count($bars);
 
             $close = $metrics->lastClose();
+            $closeRounded = round($close, 2);
             $ma50 = round($metrics->movingAverage(50), 0);
             $ma100 = round($metrics->movingAverage(100), 0);
             $roc13 = round($metrics->rocWeeks(13), 2);
@@ -49,6 +56,7 @@ class AssetMetricsCommand extends Command
             $high20 = round($high20, 0);
             $high55 = round($high55, 0);
             $isUptrend = $metrics->isUptrend();
+            $atr14 = round($metrics->atr(14), 0);
 
             $rows[] = [
                 'symbol' => $symbol,
@@ -57,7 +65,7 @@ class AssetMetricsCommand extends Command
                 'ma100' => $ma100,
                 'high20' => $high20,
                 'high55' => $high55,
-                'atr14' => round($metrics->atr(14), 0),
+                'atr14' => $atr14,
                 'roc13' => (float) $roc13,
                 'avg_vol20' => $avgVol20,
                 'vol_vs_avg20' => $volToAvg,
@@ -71,6 +79,35 @@ class AssetMetricsCommand extends Command
                 'sort_close_vs_high20' => (float) $closeVsHigh20,
                 'sort_vol_vs_avg20' => (float) $volToAvg,
             ];
+
+            if ($persist) {
+                Metric::updateOrCreate(
+                    ['asset_id' => $asset->id],
+                    [
+                        'symbol' => $asset->symbol,
+                        'name' => $asset->name,
+                        'close' => $closeRounded,
+                        'ma50' => $ma50,
+                        'ma100' => $ma100,
+                        'high20' => $high20,
+                        'high55' => $high55,
+                        'atr14' => $atr14,
+                        'roc13' => (float) $roc13,
+                        'avg_vol20' => $avgVol20,
+                        'vol_vs_avg20' => $volToAvg,
+                        'close_vs_high20' => $closeVsHigh20,
+                        'close_vs_high55' => $closeVsHigh55,
+                        'uptrend' => $isUptrend,
+                        'bars' => $totalBars,
+                        'sort_uptrend' => $isUptrend ? 1 : 0,
+                        'sort_roc13' => (float) $roc13,
+                        'sort_close_vs_high55' => (float) $closeVsHigh55,
+                        'sort_close_vs_high20' => (float) $closeVsHigh20,
+                        'sort_vol_vs_avg20' => (float) $volToAvg,
+                    ]
+                );
+                $persistedCount++;
+            }
         }
 
         usort($rows, function ($a, $b) {
@@ -120,6 +157,10 @@ class AssetMetricsCommand extends Command
         }
 
         $this->table($headers, $rankedRows);
+
+        if ($persist) {
+            $this->info(sprintf('Persisted metrics for %d asset(s).', $persistedCount));
+        }
 
         return Command::SUCCESS;
     }
