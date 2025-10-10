@@ -378,9 +378,26 @@ class AssetMetrics
     public function rocWeeks(int $weeks = 13): float
     {
         $days = $weeks * 5;
-        $index = count($this->bars) - $days - 1;
-        $past = $this->bars[$index]['close'];
+        $total = count($this->bars);
+
+        if ($total <= $days) {
+            return 0.0;
+        }
+
+        $index = $total - $days - 1;
+
+        if (!isset($this->bars[$index]['close'])) {
+            return 0.0;
+        }
+
+        $past = (float) $this->bars[$index]['close'];
+
+        if ($past == 0.0) {
+            return 0.0;
+        }
+
         $current = $this->lastClose();
+
         return (($current - $past) / $past) * 100;
     }
 
