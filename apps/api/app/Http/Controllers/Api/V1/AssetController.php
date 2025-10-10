@@ -86,7 +86,7 @@ class AssetController extends ApiController
                 'high20' => $high20,
                 'high55' => $high55,
                 'atr14' => $atr14,
-                'roc13' => $roc13,
+                'roc13' => $roc13 === null ? null : (float) $roc13,
                 'avg_vol20' => $avgVol20,
                 'vol_vs_avg20' => $volVsAvg20,
                 'close_vs_high20' => $closeVsHigh20,
