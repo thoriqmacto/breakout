@@ -275,7 +275,9 @@ class ScrapeStockbit extends Command
                     );
 
                     if (isset($historicalResponse['error'])) {
-                        $this->error("Error for historical {$symbol}: {$json['error']} — {$json['message']}");
+                        $code = (string) $historicalResponse['error'];
+                        $message = (string) ($historicalResponse['message'] ?? 'Unknown error');
+                        $this->error("Historical summary error for {$symbol}: {$code} — {$message}");
                         $chunkStart = $chunkEnd->copy()->addDay();
                         if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                             sleep(10);
@@ -283,10 +285,13 @@ class ScrapeStockbit extends Command
                         continue;
                     }
 
-                    $historicalResponses = [$historicalResponse['data']['result']];
+                    $initialHistoricalResult = $this->extractHistoricalResult($historicalResponse);
+                    $historicalResponses = $initialHistoricalResult === [] ? [] : [$initialHistoricalResult];
                     $historicalVisitedPages = [];
-                    $historicalNextPage = $this->extractNextPage($historicalResponse['data']);
-                    $totalData = count($historicalResponse['data']['result']);
+                    $historicalNextPage = isset($historicalResponse['data']) && is_array($historicalResponse['data'])
+                        ? $this->extractNextPage($historicalResponse['data'])
+                        : null;
+                    $totalData = count($initialHistoricalResult);
 
                     while ($historicalNextPage !== null && !in_array($historicalNextPage, $historicalVisitedPages, true) && $totalData !== 0) {
                         $historicalVisitedPages[] = $historicalNextPage;
@@ -311,9 +316,14 @@ class ScrapeStockbit extends Command
                             break;
                         }
 
-                        $historicalResponses[] = $paginatedHistorical['data']['result'];
-                        $historicalNextPage = $this->extractNextPage($paginatedHistorical['data']);
-                        $totalData = count($paginatedHistorical['data']['result']);
+                        $paginatedResult = $this->extractHistoricalResult($paginatedHistorical);
+                        if ($paginatedResult !== []) {
+                            $historicalResponses[] = $paginatedResult;
+                        }
+                        $historicalNextPage = isset($paginatedHistorical['data']) && is_array($paginatedHistorical['data'])
+                            ? $this->extractNextPage($paginatedHistorical['data'])
+                            : null;
+                        $totalData = count($paginatedResult);
 
                         if ($historicalNextPage !== null) {
                             usleep(200_000);
@@ -327,6 +337,8 @@ class ScrapeStockbit extends Command
 
                         Storage::disk($disk)->put($historicalPath, json_encode($historicalResponses, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                         $this->line('Saved Historical: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
+
+                        $this->persistHistoricalBars($symbol, $historicalResponses);
                     }
 
                     $chunkStart = $chunkEnd->copy()->addDay();
@@ -431,6 +443,167 @@ class ScrapeStockbit extends Command
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractHistoricalResult(array $response): array
+    {
+        $containers = [];
+
+        if (isset($response['data']) && is_array($response['data'])) {
+            $containers[] = $response['data'];
+        }
+
+        $containers[] = $response;
+
+        foreach ($containers as $container) {
+            if (!is_array($container)) {
+                continue;
+            }
+
+            if (isset($container['result']) && is_array($container['result'])) {
+                return $container['result'];
+            }
+
+            if (array_is_list($container)) {
+                return $container;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<int, array<int, array<string, mixed>>> $pages
+     */
+    private function persistHistoricalBars(string $symbol, array $pages): void
+    {
+        $rows = $this->normalizeHistoricalRows($pages);
+
+        if ($rows === []) {
+            return;
+        }
+
+        if ($this->option('no-persist')) {
+            $this->line('Skipping historical persistence (--no-persist).');
+            return;
+        }
+
+        $chunk = (int) config('csv.chunk_size', 200);
+        $dbBars = new DbBars($chunk, false);
+
+        $assetId = $this->getOrCreateAssetId($symbol);
+
+        if ($assetId === null) {
+            $this->warn("Unable to resolve asset ID for {$symbol}, skipping historical DB update.");
+        } else {
+            foreach ($rows as $date => $ohlcv) {
+                $dbBars->add([
+                    'asset_id' => $assetId,
+                    'date' => $date,
+                    'open' => $ohlcv['open'],
+                    'high' => $ohlcv['high'],
+                    'low' => $ohlcv['low'],
+                    'close' => $ohlcv['close'],
+                    'volume' => $ohlcv['volume'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $dbBars->flush();
+        }
+
+        $csvPath = database_path('seeders/data/historical/' . $symbol . '.csv');
+        $existing = CsvBars::read($csvPath);
+
+        foreach ($rows as $date => $ohlcv) {
+            $existing[$date] = [
+                'date' => $date,
+                'open' => $this->formatPrice($ohlcv['open'], 0),
+                'high' => $this->formatPrice($ohlcv['high'], 0),
+                'low' => $this->formatPrice($ohlcv['low'], 0),
+                'close' => $this->formatPrice($ohlcv['close'], 0),
+                'volume' => $ohlcv['volume'],
+            ];
+        }
+
+        CsvBars::write($csvPath, $existing);
+    }
+
+    /**
+     * @param array<int, array<int, array<string, mixed>>> $pages
+     * @return array<string, array{open: float, high: float, low: float, close: float, volume: int}>
+     */
+    private function normalizeHistoricalRows(array $pages): array
+    {
+        $rows = [];
+
+        foreach ($pages as $page) {
+            if (!is_array($page)) {
+                continue;
+            }
+
+            $items = [];
+
+            if (array_is_list($page)) {
+                $items = $page;
+            } elseif (isset($page['result']) && is_array($page['result'])) {
+                $items = $page['result'];
+            }
+
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+
+                $date = $this->normalizeHistoricalDate($item['date'] ?? null);
+
+                if ($date === null) {
+                    continue;
+                }
+
+                $open = $this->parsePrice($item['open'] ?? null);
+                $high = $this->parsePrice($item['high'] ?? null);
+                $low = $this->parsePrice($item['low'] ?? null);
+                $close = $this->parsePrice($item['close'] ?? null);
+                $volume = $this->parseVolume($item['volume'] ?? null);
+
+                if ($open === null || $high === null || $low === null || $close === null || $volume === null) {
+                    continue;
+                }
+
+                $rows[$date] = [
+                    'open' => $open,
+                    'high' => $high,
+                    'low' => $low,
+                    'close' => $close,
+                    'volume' => $volume,
+                ];
+            }
+        }
+
+        ksort($rows);
+
+        return $rows;
+    }
+
+    private function normalizeHistoricalDate(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse((string) $value)->toDateString();
+        } catch (\Throwable $exception) {
+            $this->warn('Unable to parse historical date value: ' . (string) $value);
+
+            return null;
+        }
     }
 
     private function captureWatchlistSnapshot(StockbitExodusClient $api, string $disk): void

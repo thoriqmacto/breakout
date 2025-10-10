@@ -173,6 +173,166 @@ class ScrapeStockbitCommandTest extends TestCase
         $this->assertStringContainsString('Historical summary error for TLKM', Artisan::output());
     }
 
+    public function test_historical_data_persists_to_db_and_csv(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
+        config()->set('stockbit.historical.page', 1);
+
+        $csvPath = database_path('seeders/data/historical/BBRI.csv');
+        $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
+        File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,90,95,85,92,100\n03/02/2024,120,125,115,122,2000\n");
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')->never();
+        $mock->shouldReceive('tickerProfile')->never();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBRI', 'HS_PERIOD_DAILY', '2024-02-01', '2024-02-05', null, 1)
+            ->andReturn([
+                'data' => [
+                    'result' => [
+                        [
+                            'date' => '2024-02-01',
+                            'open' => '100',
+                            'high' => '110',
+                            'low' => '90',
+                            'close' => '105',
+                            'volume' => '1000',
+                        ],
+                        [
+                            'date' => '2024-02-04',
+                            'open' => '150',
+                            'high' => '160',
+                            'low' => '140',
+                            'close' => '155',
+                            'volume' => '3000',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        $assetQuery = Mockery::mock();
+        $assetQuery->shouldReceive('where')->with('symbol', 'BBRI')->andReturnSelf();
+        $assetQuery->shouldReceive('value')->with('id')->andReturn(456);
+        DB::shouldReceive('table')->with('assets')->andReturn($assetQuery);
+
+        $upsertPayload = [];
+        $priceBarsQuery = Mockery::mock();
+        $priceBarsQuery->shouldReceive('upsert')
+            ->once()
+            ->with(
+                Mockery::on(function ($rows) use (&$upsertPayload) {
+                    $upsertPayload = $rows;
+
+                    return count($rows) === 2
+                        && $rows[0]['asset_id'] === 456
+                        && $rows[1]['date'] === '2024-02-04';
+                }),
+                ['asset_id', 'date'],
+                ['open', 'high', 'low', 'close', 'volume', 'updated_at']
+            );
+        DB::shouldReceive('table')->with('price_bars')->andReturn($priceBarsQuery);
+
+        Carbon::setTestNow('2024-02-06 10:00:00');
+
+        try {
+            Artisan::call('stockbit:scrape', [
+                'tickers' => ['BBRI'],
+                '--from' => '2024-02-01',
+                '--to' => '2024-02-05',
+                '--historical' => true,
+                '--no-profile-sync' => true,
+            ]);
+
+            $historicalPath = 'historical/BBRI_2024-02-01_2024-02-05_HS_PERIOD_DAILY.json';
+            Storage::disk('local')->assertExists($historicalPath);
+
+            $this->assertCount(2, $upsertPayload);
+            $this->assertSame(100.0, $upsertPayload[0]['open']);
+            $this->assertSame(155.0, $upsertPayload[1]['close']);
+
+            $csv = explode("\n", trim(File::get($csvPath)));
+            $this->assertSame('Date,Open,High,Low,Close,Volume', $csv[0]);
+            $this->assertSame('01/02/2024,100,110,90,105,1000', $csv[1]);
+            $this->assertSame('03/02/2024,120,125,115,122,2000', $csv[2]);
+            $this->assertSame('04/02/2024,150,160,140,155,3000', $csv[3]);
+        } finally {
+            Carbon::setTestNow();
+
+            if ($originalCsv !== null) {
+                File::put($csvPath, $originalCsv);
+            } else {
+                File::delete($csvPath);
+            }
+        }
+    }
+
+    public function test_historical_data_respects_no_persist_option(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
+        config()->set('stockbit.historical.page', 1);
+
+        $csvPath = database_path('seeders/data/historical/BBRI.csv');
+        $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
+        File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,90,95,85,92,100\n");
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')->never();
+        $mock->shouldReceive('tickerProfile')->never();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBRI', 'HS_PERIOD_DAILY', '2024-02-01', '2024-02-05', null, 1)
+            ->andReturn([
+                'data' => [
+                    'result' => [
+                        [
+                            'date' => '2024-02-01',
+                            'open' => '100',
+                            'high' => '110',
+                            'low' => '90',
+                            'close' => '105',
+                            'volume' => '1000',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        DB::shouldReceive('table')->never();
+
+        try {
+            Artisan::call('stockbit:scrape', [
+                'tickers' => ['BBRI'],
+                '--from' => '2024-02-01',
+                '--to' => '2024-02-05',
+                '--historical' => true,
+                '--no-profile-sync' => true,
+                '--no-persist' => true,
+            ]);
+
+            $historicalPath = 'historical/BBRI_2024-02-01_2024-02-05_HS_PERIOD_DAILY.json';
+            Storage::disk('local')->assertExists($historicalPath);
+
+            $this->assertSame("Date,Open,High,Low,Close,Volume\n01/02/2024,90,95,85,92,100\n", File::get($csvPath));
+            $this->assertStringContainsString('Skipping historical persistence (--no-persist).', Artisan::output());
+        } finally {
+            if ($originalCsv !== null) {
+                File::put($csvPath, $originalCsv);
+            } else {
+                File::delete($csvPath);
+            }
+        }
+    }
+
     public function test_fetches_all_paginated_market_detector_pages(): void
     {
         Storage::fake('local');
