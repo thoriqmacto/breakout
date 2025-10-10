@@ -25,6 +25,9 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('assets/metrics', [AssetController::class, 'metricsIndex'])
         ->name('assets.metrics');
 
+    Route::post('assets/metrics/update', [AssetController::class, 'updateMetrics'])
+        ->name('assets.metrics.update');
+
     Route::apiResource('assets', AssetController::class);
 
     // Backtest

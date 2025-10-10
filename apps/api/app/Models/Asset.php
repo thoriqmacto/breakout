@@ -40,6 +40,11 @@ class Asset extends Model {
         return $this->hasMany(Price::class);
     }
 
+    public function metric()
+    {
+        return $this->hasOne(Metric::class);
+    }
+
     /**
      * Fetch the latest price record associated with the asset.
      *
