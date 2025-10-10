@@ -58,7 +58,7 @@ class AssetMetricsCommand extends Command
                 'high20' => $high20,
                 'high55' => $high55,
                 'atr14' => round($metrics->atr(14), 0),
-                'roc13' => $roc13,
+                'roc13' => (float) $roc13,
                 'avg_vol20' => $avgVol20,
                 'vol_vs_avg20' => $volToAvg,
                 'close_vs_high20' => $closeVsHigh20,
