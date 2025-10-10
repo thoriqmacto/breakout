@@ -5,7 +5,7 @@ use App\Services\IdxTicks;
 return [
     'seed_dir' => database_path('seeders/data/historical'), // put your 30 CSVs here
     'index_symbols' => [
-        'ACES','ADRO','AKRA','AMMN','ANTM','ASII','BRIS','BRMS','BRPT','BUMI','CPIN','CUAN','DCII','EMTK','EXCL','GEMS','ICBP','INCO',
+        'ACES','ADRO','AKRA','AMMN','ANTM','ASII','BRIS','BRMS','BRPT','BUMI','CPIN','CUAN','DCII','EMTK','ENRG','EXCL','GEMS','ICBP','INCO',
         'INDF','INDY','INKP','ISAT','ITMG','KLBF','MAPI','MBMA','MDKA','MEDC','MIKA','MLPT','MSKY','NTBK','PANI','PGAS','PGEO',
         'PTBA','PTRO','SCMA','SMGR','SRTG','TEBE','TLKM','TPIA','TSPC','UNTR','UNVR'],
     'default_lot_size' => 100,
