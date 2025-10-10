@@ -23,7 +23,7 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('assets.atr.by-symbol');
 
     Route::get('assets/metrics', [AssetController::class, 'metricsIndex'])
-        ->name('assets.metrics.index');
+        ->name('assets.metrics');
 
     Route::apiResource('assets', AssetController::class);
 
