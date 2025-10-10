@@ -275,9 +275,7 @@ class ScrapeStockbit extends Command
                     );
 
                     if (isset($historicalResponse['error'])) {
-                        $code = (string) $historicalResponse['error'];
-                        $message = (string) ($historicalResponse['message'] ?? 'Unknown error');
-                        $this->error("Historical summary error for {$symbol}: {$code} — {$message}");
+                        $this->logHistoricalError($symbol, $chunkStart, $chunkEnd, $historicalResponse);
                         $chunkStart = $chunkEnd->copy()->addDay();
                         if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                             sleep(10);
@@ -307,12 +305,7 @@ class ScrapeStockbit extends Command
                         );
 
                         if (isset($paginatedHistorical['error'])) {
-                            $this->warn(
-                                "Error for historical {$symbol} page {$historicalNextPage}: " .
-                                ($paginatedHistorical['error']) .
-                                ' — ' .
-                                ($paginatedHistorical['message'] ?? 'Unknown error')
-                            );
+                            $this->logHistoricalError($symbol, $chunkStart, $chunkEnd, $paginatedHistorical, $historicalNextPage);
                             break;
                         }
 
@@ -357,6 +350,26 @@ class ScrapeStockbit extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function logHistoricalError(string $symbol, Carbon $from, Carbon $to, array $response, ?int $page = null): void
+    {
+        $code = (string) ($response['error'] ?? 'error');
+        $message = (string) ($response['message'] ?? 'Unknown error');
+        $range = $from->toDateString() . ' → ' . $to->toDateString();
+        $pageSuffix = $page !== null ? " (page {$page})" : '';
+
+        $this->error("Historical summary error for {$symbol}{$pageSuffix} [{$range}]: {$code} — {$message}");
+
+        logger()->error('stockbit.historical_error', [
+            'symbol' => $symbol,
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
+            'page' => $page,
+            'code' => $code,
+            'message' => $message,
+            'response' => $response,
+        ]);
     }
 
     /**
