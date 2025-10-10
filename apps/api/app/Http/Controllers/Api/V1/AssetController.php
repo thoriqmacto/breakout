@@ -33,6 +33,128 @@ class AssetController extends ApiController
         return ApiResponse::success(AssetResource::collection($query->get()));
     }
 
+    public function metricsIndex()
+    {
+        $assets = Asset::with(['prices' => function ($query) {
+            $query->orderBy('date');
+        }])->get();
+
+        $rows = [];
+
+        foreach ($assets as $asset) {
+            $prices = $asset->prices;
+
+            if ($prices->isEmpty()) {
+                continue;
+            }
+
+            $bars = AssetMetrics::buildDailyBars($prices);
+
+            if ($bars === []) {
+                continue;
+            }
+
+            $metrics = new AssetMetrics($bars);
+
+            $close = round($metrics->lastClose(), 2);
+            $ma50 = round($metrics->movingAverage(50), 0);
+            $ma100 = round($metrics->movingAverage(100), 0);
+            $high20 = round($metrics->periodHigh(20), 0);
+            $high55 = round($metrics->periodHigh(55), 0);
+            $atr14 = round($metrics->atr(14), 0);
+
+            $roc13 = null;
+            $rocLookback = 13 * 5;
+            if ($metrics->barCount() > $rocLookback) {
+                $roc13 = round($metrics->rocWeeks(13), 2);
+            }
+
+            $avgVol20 = round($metrics->averageVolume(20), 0);
+            $lastVolume = round($metrics->lastVolume(), 0);
+            $volVsAvg20 = $avgVol20 > 0 ? round($lastVolume / $avgVol20, 2) : null;
+
+            $closeVsHigh20 = $high20 > 0 ? round($close / $high20, 2) : null;
+            $closeVsHigh55 = $high55 > 0 ? round($close / $high55, 2) : null;
+
+            $rows[] = [
+                'asset_id' => $asset->id,
+                'symbol' => $asset->symbol,
+                'name' => $asset->name,
+                'close' => $close,
+                'ma50' => $ma50,
+                'ma100' => $ma100,
+                'high20' => $high20,
+                'high55' => $high55,
+                'atr14' => $atr14,
+                'roc13' => $roc13,
+                'avg_vol20' => $avgVol20,
+                'vol_vs_avg20' => $volVsAvg20,
+                'close_vs_high20' => $closeVsHigh20,
+                'close_vs_high55' => $closeVsHigh55,
+                'uptrend' => $metrics->isUptrend(),
+                'bars' => $metrics->barCount(),
+                'sort_uptrend' => $metrics->isUptrend() ? 1 : 0,
+                'sort_roc13' => (float) ($roc13 ?? 0.0),
+                'sort_close_vs_high55' => (float) ($closeVsHigh55 ?? 0.0),
+                'sort_close_vs_high20' => (float) ($closeVsHigh20 ?? 0.0),
+                'sort_vol_vs_avg20' => (float) ($volVsAvg20 ?? 0.0),
+            ];
+        }
+
+        usort($rows, function (array $a, array $b) {
+            $A = [
+                (int) ($a['sort_uptrend'] ?? 0),
+                (float) ($a['sort_roc13'] ?? 0),
+                (float) ($a['sort_close_vs_high55'] ?? 0),
+                (float) ($a['sort_close_vs_high20'] ?? 0),
+                (float) ($a['sort_vol_vs_avg20'] ?? 0),
+            ];
+            $B = [
+                (int) ($b['sort_uptrend'] ?? 0),
+                (float) ($b['sort_roc13'] ?? 0),
+                (float) ($b['sort_close_vs_high55'] ?? 0),
+                (float) ($b['sort_close_vs_high20'] ?? 0),
+                (float) ($b['sort_vol_vs_avg20'] ?? 0),
+            ];
+
+            $result = $B <=> $A;
+
+            if ($result === 0) {
+                return $a['symbol'] <=> $b['symbol'];
+            }
+
+            return $result;
+        });
+
+        $rankedRows = [];
+
+        foreach (array_values($rows) as $index => $row) {
+            $rankedRows[] = [
+                'rank' => $index + 1,
+                'asset_id' => $row['asset_id'],
+                'symbol' => $row['symbol'],
+                'name' => $row['name'],
+                'close' => $row['close'],
+                'ma50' => $row['ma50'],
+                'ma100' => $row['ma100'],
+                'high20' => $row['high20'],
+                'high55' => $row['high55'],
+                'atr14' => $row['atr14'],
+                'roc13' => $row['roc13'],
+                'avg_vol20' => $row['avg_vol20'],
+                'vol_vs_avg20' => $row['vol_vs_avg20'],
+                'close_vs_high20' => $row['close_vs_high20'],
+                'close_vs_high55' => $row['close_vs_high55'],
+                'uptrend' => $row['uptrend'],
+                'bars' => $row['bars'],
+            ];
+        }
+
+        return ApiResponse::success([
+            'metrics' => $rankedRows,
+        ]);
+    }
+
     /**
      * Store a newly created asset in storage.
      *
