@@ -210,7 +210,7 @@ class ScrapeStockbit extends Command
                 $jsonPath = "{$jsonDir}/{$jsonName}";
 
                 Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->line('Saved JSON: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
+                $this->line('Saved Broksum: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
 
                 if (isset($historical['error'])) {
                     $code = $historical['error'] ?? 'error';
@@ -225,18 +225,7 @@ class ScrapeStockbit extends Command
                     $historicalPath = "{$historicalDir}/{$historicalName}";
 
                     Storage::disk($disk)->put($historicalPath, json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                    $this->line('Saved historical JSON: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
-                }
-
-                if (is_array($json)) {
-                    $keys = array_keys($json);
-                    $this->line('Top-level keys: ' . implode(', ', array_slice($keys, 0, 8)) . (count($keys) > 8 ? '…' : ''));
-                    foreach (['data', 'items', 'result'] as $candidateKey) {
-                        if (isset($json[$candidateKey]) && is_array($json[$candidateKey])) {
-                            $this->line(ucfirst($candidateKey) . ' rows: ' . count($json[$candidateKey]));
-                            break;
-                        }
-                    }
+                    $this->line('Saved Historical: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
                 }
 
                 $chunkRows = BrokerSummaryTransformer::toRows($symbol, $json);
@@ -249,18 +238,6 @@ class ScrapeStockbit extends Command
                     sleep(10);
                 }
             }
-
-            $csvName = sprintf('%s_%s_%s.csv', $symbol, $rangeFromString, $rangeToString);
-            $csvPath = "{$csvDir}/{$csvName}";
-
-            $columns = ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value'];
-            $contents = CsvUtilities::rowsToCsv($allRows, $columns);
-
-            Storage::disk($disk)->put($csvPath, $contents);
-
-            $this->line('Saved CSV: ' . ($disk === 'local' ? storage_path("app/{$csvPath}") : $csvPath));
-            $this->line('CSV rows: ' . count($allRows));
-
             usleep(200_000);
         }
 
