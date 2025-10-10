@@ -33,6 +33,10 @@ class AssetController extends ApiController
         return ApiResponse::success(AssetResource::collection($query->get()));
     }
 
+    public function testReturn(){
+        return ApiResponse::success("Test Return");
+    }
+
     public function metricsIndex()
     {
         $assets = Asset::with(['prices' => function ($query) {
