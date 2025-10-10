@@ -12,6 +12,7 @@ class Asset extends Model {
         'lot_size' => 'integer',
         'tick_size' => 'float',
         'float' => 'float',
+        'ipo_date' => 'date',
         'ipo_price' => 'float',
         'marketcap' => 'float',
         'address' => 'array',

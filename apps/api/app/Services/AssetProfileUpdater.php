@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Asset;
+use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -65,6 +66,36 @@ class AssetProfileUpdater
         ];
     }
 
+    public function getIPODate(Asset|string $asset): ?Carbon
+    {
+        $model = $asset instanceof Asset ? $asset : $this->resolveAsset($asset);
+        $metrics = $this->resolveHistoryMetrics($model);
+
+        if (isset($metrics['ipo_date'])) {
+            $date = $metrics['ipo_date'];
+
+            return $date instanceof Carbon ? $date : $this->parseHistoryDate($date);
+        }
+
+        $fresh = $model->fresh();
+
+        return $fresh?->ipo_date instanceof Carbon ? $fresh->ipo_date : null;
+    }
+
+    public function getFreeFloat(Asset|string $asset): ?float
+    {
+        $model = $asset instanceof Asset ? $asset : $this->resolveAsset($asset);
+        $metrics = $this->resolveHistoryMetrics($model);
+
+        if (array_key_exists('float', $metrics)) {
+            return $metrics['float'] !== null ? (float) $metrics['float'] : null;
+        }
+
+        $fresh = $model->fresh();
+
+        return $fresh?->float;
+    }
+
     private function resolveAsset(Asset|string $asset): Asset
     {
         if ($asset instanceof Asset) {
@@ -119,6 +150,13 @@ class AssetProfileUpdater
 
         $updates = [];
 
+        if (isset($history['date'])) {
+            $date = $this->parseHistoryDate($history['date']);
+            if ($date !== null) {
+                $updates['ipo_date'] = $date;
+            }
+        }
+
         if (isset($history['price'])) {
             $price = $this->parseNumericValue($history['price']);
             if ($price !== null) {
@@ -134,6 +172,40 @@ class AssetProfileUpdater
         }
 
         return $updates;
+    }
+
+    private function parseHistoryDate(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value->copy()->startOfDay();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance(clone $value)->startOfDay();
+        }
+
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $normalized = trim($value);
+        if ($normalized === '' || $normalized === '-') {
+            return null;
+        }
+
+        foreach (['d M Y', 'd F Y'] as $format) {
+            try {
+                return Carbon::createFromFormat($format, $normalized, 'Asia/Jakarta')->startOfDay();
+            } catch (\Throwable) {
+                // Try next format.
+            }
+        }
+
+        try {
+            return Carbon::parse($normalized, 'Asia/Jakarta')->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function parseNumericValue(mixed $value): ?float
@@ -161,6 +233,82 @@ class AssetProfileUpdater
         return (float) $normalized;
     }
 
+    private function resolveHistoryMetrics(Asset $asset): array
+    {
+        $history = $this->getHistoryFromSeeder($asset);
+        if (is_array($history)) {
+            $metrics = $this->mapHistoryMetrics($history);
+            $this->persistHistoryMetrics($asset, $metrics);
+
+            return $metrics;
+        }
+
+        $response = $this->client->tickerProfile($asset->symbol);
+        $result = $this->applyTickerProfileResponse($asset, $response);
+        if (!$result['ok']) {
+            return [];
+        }
+
+        return $this->mapHistoryMetrics($result['profile']['history'] ?? null);
+    }
+
+    private function persistHistoryMetrics(Asset $asset, array $metrics): void
+    {
+        $allowedKeys = ['ipo_date', 'ipo_price', 'float'];
+        $updates = [];
+
+        foreach ($allowedKeys as $key) {
+            if (array_key_exists($key, $metrics) && $metrics[$key] !== null) {
+                $updates[$key] = $metrics[$key];
+            }
+        }
+
+        if ($updates === []) {
+            return;
+        }
+
+        $asset->fill($updates);
+        $asset->save();
+    }
+
+    private function getHistoryFromSeeder(Asset $asset): ?array
+    {
+        $profile = $this->readProfileSeederJson($asset);
+        if (!is_array($profile)) {
+            return null;
+        }
+
+        $history = $profile['history'] ?? null;
+
+        return is_array($history) ? $history : null;
+    }
+
+    private function readProfileSeederJson(Asset $asset): ?array
+    {
+        $path = $this->profileSeederPath($asset);
+
+        if (!File::exists($path)) {
+            return null;
+        }
+
+        try {
+            $contents = File::get($path);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        $decoded = json_decode($contents, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    private function profileSeederPath(Asset $asset): string
+    {
+        $directory = database_path('seeders/data/profiles');
+
+        return $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.json';
+    }
+
     private function writeProfileSeederJson(Asset $asset, array $profile, array $updates): void
     {
         $directory = database_path('seeders/data/profiles');
@@ -168,7 +316,7 @@ class AssetProfileUpdater
             File::makeDirectory($directory, 0755, true);
         }
 
-        $path = $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.json';
+        $path = $this->profileSeederPath($asset);
         if (File::exists($path)) {
             return;
         }
