@@ -131,6 +131,9 @@
   }
 
   [data-dashboard-main] table thead th {
+    position: sticky;
+    top: var(--dashboard-header-offset, 0px);
+    z-index: 21;
     background-color: inherit;
   }
 }
