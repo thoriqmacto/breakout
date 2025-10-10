@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { PanelLeft, PanelRight } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
@@ -40,6 +40,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isHeaderPinned, setIsHeaderPinned] = useState(false)
+  const [headerHeight, setHeaderHeight] = useState(0)
   const headerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -48,20 +49,38 @@ export default function DashboardLayout({
     }
   }, [loading, router, user])
 
+  const updateHeaderHeight = useCallback(() => {
+    const height = headerRef.current?.offsetHeight ?? 0
+    setHeaderHeight((previous) => (previous === height ? previous : height))
+  }, [])
+
   useEffect(() => {
     const handleScroll = () => {
-      const headerHeight = headerRef.current?.offsetHeight ?? 0
-      const pinned = window.scrollY > headerHeight
+      const height = headerRef.current?.offsetHeight ?? 0
+      const pinned = window.scrollY > height
+
       setIsHeaderPinned((previous) => (previous === pinned ? previous : pinned))
     }
 
-    handleScroll()
+    updateHeaderHeight()
     window.addEventListener("scroll", handleScroll, { passive: true })
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
     }
-  }, [])
+  }, [updateHeaderHeight])
+
+  useEffect(() => {
+    updateHeaderHeight()
+  }, [isHeaderPinned, updateHeaderHeight])
+
+  useEffect(() => {
+    window.addEventListener("resize", updateHeaderHeight)
+
+    return () => {
+      window.removeEventListener("resize", updateHeaderHeight)
+    }
+  }, [updateHeaderHeight])
 
   if (loading || !user) {
     return (
@@ -120,7 +139,15 @@ export default function DashboardLayout({
         )}
       </aside>
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div
+        className="flex min-h-screen flex-1 flex-col"
+        style={{
+          ["--dashboard-header-height" as string]: `${headerHeight}px`,
+          ["--dashboard-header-offset" as string]: `${
+            isHeaderPinned ? headerHeight : 0
+          }px`,
+        }}
+      >
         <header
           ref={headerRef}
           className={cn(
@@ -143,10 +170,23 @@ export default function DashboardLayout({
               >
                 {isSidebarCollapsed ? <PanelRight className="size-4" /> : <PanelLeft className="size-4" />}
               </Button>
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
+              <div className="flex min-w-0 flex-col text-left">
+                {isHeaderPinned ? (
+                  <p className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                    <span className="uppercase tracking-wide">Signed in as</span>
+                    <span className="font-medium text-foreground">{user.name}</span>
+                    <span aria-hidden className="text-muted-foreground">
+                      ·
+                    </span>
+                    <span className="text-muted-foreground">{user.email}</span>
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -183,7 +223,9 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-8">{children}</main>
+        <main data-dashboard-main className="flex-1 px-6 py-8">
+          {children}
+        </main>
 
         <footer className="border-t bg-background px-6 py-4 text-sm text-muted-foreground">
           © {new Date().getFullYear()} Breakout Technologies. All rights reserved.
