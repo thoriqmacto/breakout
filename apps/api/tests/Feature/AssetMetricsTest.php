@@ -55,6 +55,6 @@ class AssetMetricsTest extends TestCase
         $this->assertSame($asset->id, $metrics[0]['asset_id']);
         $this->assertSame('AAA', $metrics[0]['symbol']);
         $this->assertArrayHasKey('roc13', $metrics[0]);
-        $this->assertSame(0.0, $metrics[0]['roc13']);
+        $this->assertSame(0, $metrics[0]['roc13']);
     }
 }
