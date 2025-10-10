@@ -21,7 +21,7 @@ class ScrapeStockbit extends Command
         {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
         {--all : Process all tickers configured in csv.index_symbols}
         {--market-detector : Fetch market detector data for the provided tickers}
-        {--from= : YYYY-MM-DD (default: 14 days ago)}
+        {--from= : YYYY-MM-DD (default: IPO date if available, otherwise 14 days ago)}
         {--to=   : YYYY-MM-DD (default: today)}
         {--no-persist : Skip persisting EOD OHLCV data to CSV/DB}
         {--no-profile-sync : Skip syncing asset profiles}
@@ -39,12 +39,8 @@ class ScrapeStockbit extends Command
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
         $fetchMarketDetector = (bool) $this->option('market-detector');
-        $from = $fetchMarketDetector
-            ? ($this->option('from') ?? now()->subDays(14)->toDateString())
-            : null;
-        $to = $fetchMarketDetector
-            ? ($this->option('to') ?? now()->toDateString())
-            : null;
+        $fromOption = $fetchMarketDetector ? $this->option('from') : null;
+        $toOption = $fetchMarketDetector ? $this->option('to') : null;
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
@@ -148,86 +144,122 @@ class ScrapeStockbit extends Command
                 continue;
             }
 
-            $fromString = (string) $from;
-            $toString = (string) $to;
+            $ipoDate = $profileUpdater->getIPODate($symbol);
+            $rangeFrom = $fromOption !== null
+                ? Carbon::parse($fromOption)
+                : ($ipoDate ?? now()->subDays(14));
+            $rangeTo = $toOption !== null ? Carbon::parse($toOption) : now();
 
-            $this->info("Fetching {$symbol} {$fromString} → {$toString}");
-
-            $json = $api->marketDetectors(
-                $symbol,
-                $fromString,
-                $toString,
-                $transactionType,
-                $marketBoard,
-                $investorType,
-                $limit,
-            );
-
-            if (isset($json['error'])) {
-                $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
+            if ($rangeFrom->greaterThan($rangeTo)) {
+                $this->warn("Skipping {$symbol}: from date is after to date ({$rangeFrom->toDateString()} > {$rangeTo->toDateString()}).");
                 continue;
             }
 
-            $historical = $api->historicalSummary(
-                $symbol,
-                $historicalPeriod,
-                $fromString,
-                $toString,
-                $historicalLimit,
-                $historicalPage,
-            );
+            $rangeFromString = $rangeFrom->toDateString();
+            $rangeToString = $rangeTo->toDateString();
 
-            $jsonName = sprintf(
-                '%s_%s_%s_%s.json',
-                $symbol,
-                $fromString,
-                $toString,
-                $transactionType ?? 'default'
-            );
-            $jsonPath = "{$jsonDir}/{$jsonName}";
-
-            Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->line('Saved JSON: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
-
-            if (isset($historical['error'])) {
-                $code = $historical['error'] ?? 'error';
-                $message = $historical['message'] ?? 'Unknown error';
-                $this->warn("Historical summary error for {$symbol}: {$code} — {$message}");
-            } else {
-                $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
-                if ($historicalPage !== null) {
-                    $historicalNameParts[] = 'page' . $historicalPage;
+            $chunkStart = $rangeFrom->copy();
+            $chunkEndLimit = $rangeTo->copy();
+            $allRows = [];
+            while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                $chunkEnd = $chunkStart->copy()->addYear()->subDay();
+                if ($chunkEnd->greaterThan($chunkEndLimit)) {
+                    $chunkEnd = $chunkEndLimit->copy();
                 }
-                $historicalName = implode('_', $historicalNameParts) . '.json';
-                $historicalPath = "{$historicalDir}/{$historicalName}";
 
-                Storage::disk($disk)->put($historicalPath, json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->line('Saved historical JSON: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
-            }
+                $fromString = $chunkStart->toDateString();
+                $toString = $chunkEnd->toDateString();
 
-            if (is_array($json)) {
-                $keys = array_keys($json);
-                $this->line('Top-level keys: ' . implode(', ', array_slice($keys, 0, 8)) . (count($keys) > 8 ? '…' : ''));
-                foreach (['data', 'items', 'result'] as $candidateKey) {
-                    if (isset($json[$candidateKey]) && is_array($json[$candidateKey])) {
-                        $this->line(ucfirst($candidateKey) . ' rows: ' . count($json[$candidateKey]));
-                        break;
+                $this->info("Fetching {$symbol} {$fromString} → {$toString}");
+
+                $json = $api->marketDetectors(
+                    $symbol,
+                    $fromString,
+                    $toString,
+                    $transactionType,
+                    $marketBoard,
+                    $investorType,
+                    $limit,
+                );
+
+                if (isset($json['error'])) {
+                    $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
+                    $chunkStart = $chunkEnd->copy()->addDay();
+                    if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                        sleep(10);
+                    }
+                    continue;
+                }
+
+                $historical = $api->historicalSummary(
+                    $symbol,
+                    $historicalPeriod,
+                    $fromString,
+                    $toString,
+                    $historicalLimit,
+                    $historicalPage,
+                );
+
+                $jsonName = sprintf(
+                    '%s_%s_%s_%s.json',
+                    $symbol,
+                    $fromString,
+                    $toString,
+                    $transactionType ?? 'default'
+                );
+                $jsonPath = "{$jsonDir}/{$jsonName}";
+
+                Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->line('Saved JSON: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
+
+                if (isset($historical['error'])) {
+                    $code = $historical['error'] ?? 'error';
+                    $message = $historical['message'] ?? 'Unknown error';
+                    $this->warn("Historical summary error for {$symbol}: {$code} — {$message}");
+                } else {
+                    $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
+                    if ($historicalPage !== null) {
+                        $historicalNameParts[] = 'page' . $historicalPage;
+                    }
+                    $historicalName = implode('_', $historicalNameParts) . '.json';
+                    $historicalPath = "{$historicalDir}/{$historicalName}";
+
+                    Storage::disk($disk)->put($historicalPath, json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                    $this->line('Saved historical JSON: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
+                }
+
+                if (is_array($json)) {
+                    $keys = array_keys($json);
+                    $this->line('Top-level keys: ' . implode(', ', array_slice($keys, 0, 8)) . (count($keys) > 8 ? '…' : ''));
+                    foreach (['data', 'items', 'result'] as $candidateKey) {
+                        if (isset($json[$candidateKey]) && is_array($json[$candidateKey])) {
+                            $this->line(ucfirst($candidateKey) . ' rows: ' . count($json[$candidateKey]));
+                            break;
+                        }
                     }
                 }
+
+                $chunkRows = BrokerSummaryTransformer::toRows($symbol, $json);
+                $allRows = array_merge($allRows, $chunkRows);
+
+                $chunkStart = $chunkEnd->copy()->addDay();
+
+                if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                    $this->line('Waiting 10 seconds before next fetch to respect rate limits…');
+                    sleep(10);
+                }
             }
 
-            $rows = BrokerSummaryTransformer::toRows($symbol, $json);
-
-            $csvName = sprintf('%s_%s_%s.csv', $symbol, $fromString, $toString);
+            $csvName = sprintf('%s_%s_%s.csv', $symbol, $rangeFromString, $rangeToString);
             $csvPath = "{$csvDir}/{$csvName}";
 
             $columns = ['symbol', 'date', 'broker', 'net_value', 'buy_value', 'sell_value'];
-            $contents = CsvUtilities::rowsToCsv($rows, $columns);
+            $contents = CsvUtilities::rowsToCsv($allRows, $columns);
 
             Storage::disk($disk)->put($csvPath, $contents);
 
             $this->line('Saved CSV: ' . ($disk === 'local' ? storage_path("app/{$csvPath}") : $csvPath));
-            $this->line('CSV rows: ' . count($rows));
+            $this->line('CSV rows: ' . count($allRows));
 
             usleep(200_000);
         }
