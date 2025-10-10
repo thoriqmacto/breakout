@@ -42,7 +42,8 @@ class StockbitExodusClient
         ?string $transactionType = null,
         ?string $marketBoard = null,
         ?string $investorType = null,
-        ?int $limit = null
+        ?int $limit = null,
+        ?int $page = null
     ): array {
         $q = [
             'from' => $from,
@@ -52,6 +53,10 @@ class StockbitExodusClient
             'investor_type'    => $investorType    ?: ($this->defaults['investor_type'] ?? ''),
             'limit'            => $limit ?? ($this->defaults['limit'] ?? 25),
         ];
+
+        if ($page !== null) {
+            $q['page'] = $page;
+        }
 
         $headers = ['authorization' => 'Bearer ' . $this->bearer];
 

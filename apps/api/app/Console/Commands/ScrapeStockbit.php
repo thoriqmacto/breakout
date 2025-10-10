@@ -191,6 +191,49 @@ class ScrapeStockbit extends Command
                     continue;
                 }
 
+                $chunkResponses = [$json];
+                $visitedPages = [];
+                $nextPage = $this->extractNextPage($json);
+
+                while ($nextPage !== null && !in_array($nextPage, $visitedPages, true)) {
+                    $visitedPages[] = $nextPage;
+                    $this->line("Fetching {$symbol} {$fromString} → {$toString} (page {$nextPage})");
+
+                    $paginatedJson = $api->marketDetectors(
+                        $symbol,
+                        $fromString,
+                        $toString,
+                        $transactionType,
+                        $marketBoard,
+                        $investorType,
+                        $limit,
+                        $nextPage,
+                    );
+
+                    if (isset($paginatedJson['error'])) {
+                        $this->warn(
+                            "Error for {$symbol} page {$nextPage}: " .
+                            ($paginatedJson['error'] ?? 'error') .
+                            ' — ' .
+                            ($paginatedJson['message'] ?? 'Unknown error')
+                        );
+                        break;
+                    }
+
+                    $chunkResponses[] = $paginatedJson;
+                    $nextPage = $this->extractNextPage($paginatedJson);
+
+                    if ($nextPage !== null) {
+                        usleep(200_000);
+                    }
+                }
+
+                if ($nextPage !== null && in_array($nextPage, $visitedPages, true)) {
+                    $this->warn("Detected repeated next_page={$nextPage} for {$symbol}; stopping pagination to prevent an infinite loop.");
+                }
+
+                $json = $this->mergeMarketDetectorResponses($chunkResponses);
+
                 $historical = $api->historicalSummary(
                     $symbol,
                     $historicalPeriod,
@@ -246,6 +289,92 @@ class ScrapeStockbit extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $responses
+     * @return array<string, mixed>
+     */
+    private function mergeMarketDetectorResponses(array $responses): array
+    {
+        if ($responses === []) {
+            return [];
+        }
+
+        $merged = $responses[0];
+        if (!is_array($merged)) {
+            $merged = [];
+        }
+
+        $listKeys = ['items', 'data', 'result'];
+
+        foreach (array_slice($responses, 1) as $response) {
+            if (!is_array($response)) {
+                continue;
+            }
+
+            foreach ($listKeys as $key) {
+                if (!isset($response[$key]) || !is_array($response[$key])) {
+                    continue;
+                }
+
+                $existing = $merged[$key] ?? [];
+                if (!is_array($existing)) {
+                    $existing = [];
+                }
+
+                $merged[$key] = array_merge($existing, $response[$key]);
+            }
+        }
+
+        if (isset($merged['next_page'])) {
+            $merged['next_page'] = null;
+        }
+
+        foreach (['meta', 'pagination'] as $metaKey) {
+            if (!isset($merged[$metaKey]) || !is_array($merged[$metaKey])) {
+                continue;
+            }
+
+            if (array_key_exists('next_page', $merged[$metaKey])) {
+                $merged[$metaKey]['next_page'] = null;
+            }
+        }
+
+        return $merged;
+    }
+
+    private function extractNextPage(array $response): ?int
+    {
+        $candidates = [];
+
+        if (array_key_exists('next_page', $response)) {
+            $candidates[] = $response['next_page'];
+        }
+
+        foreach (['meta', 'pagination'] as $containerKey) {
+            if (!isset($response[$containerKey]) || !is_array($response[$containerKey])) {
+                continue;
+            }
+
+            if (array_key_exists('next_page', $response[$containerKey])) {
+                $candidates[] = $response[$containerKey]['next_page'];
+            }
+        }
+
+        foreach ($candidates as $candidate) {
+            if ($candidate === null || $candidate === false || $candidate === '') {
+                continue;
+            }
+
+            if (is_numeric($candidate)) {
+                $page = (int) $candidate;
+
+                return $page > 0 ? $page : null;
+            }
+        }
+
+        return null;
     }
 
     private function captureWatchlistSnapshot(StockbitExodusClient $api, string $disk): void

@@ -37,7 +37,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('BBCA', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 50)
+            ->with('BBCA', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 50, null)
             ->andReturn([
                 'items' => [
                     [
@@ -138,7 +138,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('TLKM', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25)
+            ->with('TLKM', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
             ->andReturn([
                 'items' => [
                     [
@@ -173,6 +173,79 @@ class ScrapeStockbitCommandTest extends TestCase
         $this->assertStringContainsString('Historical summary error for TLKM', Artisan::output());
     }
 
+    public function test_fetches_all_paginated_market_detector_pages(): void
+    {
+        Storage::fake('local');
+
+        config()->set('stockbit.save_disk', 'local');
+        config()->set('stockbit.save_dir', 'broker_summary');
+        config()->set('stockbit.defaults.transaction_type', 'TRANSACTION_TYPE_NET');
+        config()->set('stockbit.defaults.market_board', 'MARKET_BOARD_REGULER');
+        config()->set('stockbit.defaults.investor_type', 'INVESTOR_TYPE_ALL');
+        config()->set('stockbit.defaults.limit', 25);
+        config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
+
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->with('ASII', '2024-03-01', '2024-03-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
+            ->andReturn([
+                'items' => [
+                    [
+                        'date' => '2024-03-01',
+                        'broker' => 'AA',
+                        'buy_value' => 100,
+                        'sell_value' => 40,
+                    ],
+                ],
+                'next_page' => 2,
+            ]);
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->with('ASII', '2024-03-01', '2024-03-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, 2)
+            ->andReturn([
+                'items' => [
+                    [
+                        'date' => '2024-03-02',
+                        'broker' => 'BB',
+                        'buy_value' => 200,
+                        'sell_value' => 10,
+                    ],
+                ],
+                'next_page' => null,
+            ]);
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('ASII', 'HS_PERIOD_DAILY', '2024-03-01', '2024-03-05', null, null)
+            ->andReturn(['data' => []]);
+        $mock->shouldReceive('tickerProfile')->never();
+
+        $this->app->instance(StockbitExodusClient::class, $mock);
+
+        Artisan::call('stockbit:scrape', [
+            'tickers' => ['ASII'],
+            '--from' => '2024-03-01',
+            '--to' => '2024-03-05',
+            '--market-detector' => true,
+            '--no-profile-sync' => true,
+        ]);
+
+        $jsonPath = 'broker_summary/ASII_2024-03-01_2024-03-05_TRANSACTION_TYPE_NET.json';
+        $csvPath = 'broker_summary_csv/ASII_2024-03-01_2024-03-05.csv';
+
+        Storage::disk('local')->assertExists($jsonPath);
+        Storage::disk('local')->assertExists($csvPath);
+
+        $json = json_decode(Storage::disk('local')->get($jsonPath), true);
+        $this->assertCount(2, $json['items']);
+        $this->assertNull($json['next_page'] ?? null);
+
+        $csv = explode("\n", trim(Storage::disk('local')->get($csvPath)));
+        $this->assertCount(3, $csv);
+        $this->assertStringContainsString('ASII,2024-03-01,AA', $csv[1]);
+        $this->assertStringContainsString('ASII,2024-03-02,BB', $csv[2]);
+    }
+
     public function test_profile_sync_can_be_skipped(): void
     {
         Storage::fake('local');
@@ -188,7 +261,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $mock = Mockery::mock(StockbitExodusClient::class);
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('BBRI', '2024-02-01', '2024-02-02', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25)
+            ->with('BBRI', '2024-02-01', '2024-02-02', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
             ->andReturn(['items' => []]);
         $mock->shouldReceive('historicalSummary')
             ->once()

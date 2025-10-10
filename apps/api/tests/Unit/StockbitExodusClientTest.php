@@ -71,6 +71,28 @@ class StockbitExodusClientTest extends TestCase
         $this->assertSame('MARKET_BOARD_REGULER', $query['market_board']);
         $this->assertSame('INVESTOR_TYPE_ALL', $query['investor_type']);
         $this->assertSame('50', $query['limit']);
+        $this->assertArrayNotHasKey('page', $query);
+    }
+
+    public function test_market_detectors_includes_page_when_requested(): void
+    {
+        $capturedRequest = null;
+        $mock = new MockHandler([
+            function ($request) use (&$capturedRequest) {
+                $capturedRequest = $request;
+
+                return new Response(200, [], json_encode(['items' => []]));
+            },
+        ]);
+
+        $client = $this->makeClientWith($mock);
+
+        $client->marketDetectors('BBNI', '2024-02-01', '2024-02-05', page: 3);
+
+        $this->assertNotNull($capturedRequest);
+        parse_str($capturedRequest->getUri()->getQuery(), $query);
+
+        $this->assertSame('3', $query['page']);
     }
 
     public function test_market_detectors_returns_error_on_unauthorized(): void
