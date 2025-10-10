@@ -1,0 +1,706 @@
+{
+    "symbol": "UNTR",
+    "name": "UNTR",
+    "address": [
+        {
+            "id": "447",
+            "email": [
+                "ir@unitedtractors.com"
+            ],
+            "fax": "4600655",
+            "npwp": "01.308.524.6-091.000",
+            "phone": "4605959; 4605979",
+            "website": "www.unitedtractors.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:16+07:00",
+            "value": "<td colspan='4'>Jl. Raya Bekasi km. 22, Cakung, Jakarta 13910\n\n        \t\t  \t\t\tPhone: 4605959; 4605979\n        \t\t  \t\t\tFax: 4600655\n                            NPWP: 01.308.524.6-091.000\n        \t\t  \t\t\tEmail: ir@unitedtractors.com\n        \t\t  \t\t\tWebsite: www.unitedtractors.com\n\n        \t  \t\t\t</td>",
+            "office": "Jl. Raya Bekasi km. 22, Cakung, Jakarta 13910"
+        }
+    ],
+    "background": "PT United Tractors Tbk merupakan perusahaan yang bergerak dalam bidang kontraktor penambangan. Kegiatan utama Perusahaan terbagi ke dalam lima segmen: Mesin Konstruksi, Kontraktor Penambangan, Pertambangan Batu Bara, Industri Konstruksi, dan Energi. Segmen usaha Mesin Konstruksi mencakup penjualan dan penyewaan alat berat, serta layanan purna jual. Segmen usaha Kontraktor Penambangan memberi berbagai layanan pertambangan termasuk desain tambang, explorasi, ekstrasi, hauling, barging dan transportasi komoditas. Segmen usaha Pertambangan Batu Bara fokus kepada penambangan dan penjualan batubara. Segmen usaha konstruksi menyediakan jasa konstruksi yang meliputi bidang pondasi, struktur, pembongkaran dan pengembangan infrastruktur. erseroan merupakan distributor alat berat terbesar dan terkemuka di Indonesia yang menawarkan produk dari merk terkenal di dunia seperti Komatsu, Komatsu Forest, UD Trucks, Scania, Bomag, dan Tadano. Pemegang saham mayoritas perseroan adalah PT Astra International Tbk. Sejak tahun 2004, perseroan ditunjuk menjadi distributor eksklusif untuk Truk dan Bus Scania, serta Komatsu Forest untuk Indonesia.Anak usaha Perusahaan mencakup PT Pamapersada Nusantara, PT Karya Supra Perkasa, PT United Tractors Pandu Engineering, PT Bina Pertiw dan UT Heavy Industry (S) Pte Ltd. \nUnited Tractors merupakan anak usaha dari PT Astra International Tbk (“Astra”), salah satu grup usaha terbesar dan terkemuka di Indonesia dengan jaringan layanan menjangkau berbagai industri dan sektor. Sejak 19 September 1989, United Tractors telah menjadi perusahaan publik dengan mencatatkan sahamnya di Bursa Efek Indonesia (dahulu Bursa Efek Jakarta dan Bursa Efek Surabaya). Hingga kini Astra memiliki 59,5% saham United Tractors, dengan sisa saham dimiliki oleh publik.",
+    "history": {
+        "amount": "20 B",
+        "board": "Papan Utama",
+        "date": "19 Sep 1989",
+        "price": "7,250",
+        "registrar": "",
+        "shares": "2,700,000",
+        "underwriters": [
+            "PT. Aseam Indonesia",
+            "PT. Danareksa (Persero)",
+            "PT. Finconesia"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "35.16%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13840398",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Gita Tiffani Boer"
+            },
+            {
+                "id": "13840394",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Benjamin Herrenden Birks"
+            },
+            {
+                "id": "13840393",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Djoko Pranoto Santoso"
+            }
+        ],
+        "director": [
+            {
+                "id": "13840391",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Hendra Hutahean"
+            },
+            {
+                "id": "13840390",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Ari Sutrisno"
+            },
+            {
+                "id": "13840389",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Vilihati Surya"
+            },
+            {
+                "id": "13840388",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Widjaja Kartika"
+            },
+            {
+                "id": "13840387",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Idot Supriadi"
+            },
+            {
+                "id": "13840386",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Iwan Hadiantoro"
+            },
+            {
+                "id": "13840385",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Loudy Irwanto Ellias"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13840399",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Bruce Malcolm Cox"
+            },
+            {
+                "id": "13840396",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Ignasius Jonan"
+            },
+            {
+                "id": "13840395",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Paulus Bambang Widjanarko"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13840392",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Djony Bunarto Tjondro"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13840384",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Frans Kesuma"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [
+            {
+                "id": "13840397",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Rudy"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12533039",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:16+07:00",
+            "value": "{\"name\":\"Sara K. Loebis\",\"phone\":\"4605959-79\",\"email\":\"ir@unitedtractors.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "59.5%",
+            "name": "PT ASTRA INTERNATIONAL TBK",
+            "value": "2.22 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "37.805%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.41 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "2.635%",
+            "name": "SAHAM TREASURY",
+            "value": "98.33 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.06%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "2.41 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Pamapersada Nusantara",
+            "percentage": "100%",
+            "types": "Jasa penambangan terpadu",
+            "value": "63210723"
+        },
+        {
+            "company": "PT Karya Supra Perkasa",
+            "percentage": "100%",
+            "types": "Perusahaan induk atas industri konstruksi",
+            "value": "3266888"
+        },
+        {
+            "company": "PT United Tractors Pandu Engineering",
+            "percentage": "100%",
+            "types": "Perakitan dan produksi\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nmesin, peralatan, dan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nalat berat",
+            "value": "3208079"
+        },
+        {
+            "company": "PT Bina Pertiwi",
+            "percentage": "100%",
+            "types": "Perdagangan Alat Berat",
+            "value": "1505769"
+        },
+        {
+            "company": "PT Andalan Multi Kencana",
+            "percentage": "100%",
+            "types": "Perdagangan suku cadang",
+            "value": "289130"
+        },
+        {
+            "company": "UT Heavy Industry (S) Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Perdagangan dan Perakitan Alat Berat",
+            "value": "739606"
+        },
+        {
+            "company": "PT Universal Tekno Reksajaya",
+            "percentage": "100%",
+            "types": "Jasa Rekondisi Komponen",
+            "value": "562818"
+        },
+        {
+            "company": "PT Tambang Supra Perkasa",
+            "percentage": "100%",
+            "types": "Penambangan",
+            "value": "15424"
+        },
+        {
+            "company": "PT Unitra Persada Energia",
+            "percentage": "100%",
+            "types": "Perusahaan induk atas energi",
+            "value": "3434368"
+        },
+        {
+            "company": "Unitra Power Pte Ltd",
+            "percentage": "100%",
+            "types": "Energi",
+            "value": "2"
+        },
+        {
+            "company": "PT Danusa Tambang Nusantara",
+            "percentage": "100%",
+            "types": "Perusahaan induk atas\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nkonsesi penambangan",
+            "value": "23824038"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "36,370",
+            "change": -3295,
+            "change_formatted": "(-3,295)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "39,665",
+            "change": -4786,
+            "change_formatted": "(-4,786)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "44,451",
+            "change": -6973,
+            "change_formatted": "(-6,973)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "51,424",
+            "change": 639,
+            "change_formatted": "(+639)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "50,785",
+            "change": 5773,
+            "change_formatted": "(+5,773)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "45,012",
+            "change": 5484,
+            "change_formatted": "(+5,484)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1989-09-19T00:00:00+07:00",
+    "ipo_price": 7250,
+    "float": 35.16,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "447",
+                "email": [
+                    "ir@unitedtractors.com"
+                ],
+                "fax": "4600655",
+                "npwp": "01.308.524.6-091.000",
+                "phone": "4605959; 4605979",
+                "website": "www.unitedtractors.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:16+07:00",
+                "value": "<td colspan='4'>Jl. Raya Bekasi km. 22, Cakung, Jakarta 13910\n\n        \t\t  \t\t\tPhone: 4605959; 4605979\n        \t\t  \t\t\tFax: 4600655\n                            NPWP: 01.308.524.6-091.000\n        \t\t  \t\t\tEmail: ir@unitedtractors.com\n        \t\t  \t\t\tWebsite: www.unitedtractors.com\n\n        \t  \t\t\t</td>",
+                "office": "Jl. Raya Bekasi km. 22, Cakung, Jakarta 13910"
+            }
+        ],
+        "background": "PT United Tractors Tbk merupakan perusahaan yang bergerak dalam bidang kontraktor penambangan. Kegiatan utama Perusahaan terbagi ke dalam lima segmen: Mesin Konstruksi, Kontraktor Penambangan, Pertambangan Batu Bara, Industri Konstruksi, dan Energi. Segmen usaha Mesin Konstruksi mencakup penjualan dan penyewaan alat berat, serta layanan purna jual. Segmen usaha Kontraktor Penambangan memberi berbagai layanan pertambangan termasuk desain tambang, explorasi, ekstrasi, hauling, barging dan transportasi komoditas. Segmen usaha Pertambangan Batu Bara fokus kepada penambangan dan penjualan batubara. Segmen usaha konstruksi menyediakan jasa konstruksi yang meliputi bidang pondasi, struktur, pembongkaran dan pengembangan infrastruktur. erseroan merupakan distributor alat berat terbesar dan terkemuka di Indonesia yang menawarkan produk dari merk terkenal di dunia seperti Komatsu, Komatsu Forest, UD Trucks, Scania, Bomag, dan Tadano. Pemegang saham mayoritas perseroan adalah PT Astra International Tbk. Sejak tahun 2004, perseroan ditunjuk menjadi distributor eksklusif untuk Truk dan Bus Scania, serta Komatsu Forest untuk Indonesia.Anak usaha Perusahaan mencakup PT Pamapersada Nusantara, PT Karya Supra Perkasa, PT United Tractors Pandu Engineering, PT Bina Pertiw dan UT Heavy Industry (S) Pte Ltd. \nUnited Tractors merupakan anak usaha dari PT Astra International Tbk (“Astra”), salah satu grup usaha terbesar dan terkemuka di Indonesia dengan jaringan layanan menjangkau berbagai industri dan sektor. Sejak 19 September 1989, United Tractors telah menjadi perusahaan publik dengan mencatatkan sahamnya di Bursa Efek Indonesia (dahulu Bursa Efek Jakarta dan Bursa Efek Surabaya). Hingga kini Astra memiliki 59,5% saham United Tractors, dengan sisa saham dimiliki oleh publik.",
+        "history": {
+            "amount": "20 B",
+            "board": "Papan Utama",
+            "date": "19 Sep 1989",
+            "price": "7,250",
+            "registrar": "",
+            "shares": "2,700,000",
+            "underwriters": [
+                "PT. Aseam Indonesia",
+                "PT. Danareksa (Persero)",
+                "PT. Finconesia"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "35.16%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13840398",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Gita Tiffani Boer"
+                },
+                {
+                    "id": "13840394",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Benjamin Herrenden Birks"
+                },
+                {
+                    "id": "13840393",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Djoko Pranoto Santoso"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13840391",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Hendra Hutahean"
+                },
+                {
+                    "id": "13840390",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Ari Sutrisno"
+                },
+                {
+                    "id": "13840389",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Vilihati Surya"
+                },
+                {
+                    "id": "13840388",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Widjaja Kartika"
+                },
+                {
+                    "id": "13840387",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Idot Supriadi"
+                },
+                {
+                    "id": "13840386",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Iwan Hadiantoro"
+                },
+                {
+                    "id": "13840385",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Loudy Irwanto Ellias"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13840399",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Bruce Malcolm Cox"
+                },
+                {
+                    "id": "13840396",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Ignasius Jonan"
+                },
+                {
+                    "id": "13840395",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Paulus Bambang Widjanarko"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13840392",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Djony Bunarto Tjondro"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13840384",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Frans Kesuma"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [
+                {
+                    "id": "13840397",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Rudy"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12533039",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:16+07:00",
+                "value": "{\"name\":\"Sara K. Loebis\",\"phone\":\"4605959-79\",\"email\":\"ir@unitedtractors.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "59.5%",
+                "name": "PT ASTRA INTERNATIONAL TBK",
+                "value": "2.22 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "37.805%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.41 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "2.635%",
+                "name": "SAHAM TREASURY",
+                "value": "98.33 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.06%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "2.41 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Pamapersada Nusantara",
+                "percentage": "100%",
+                "types": "Jasa penambangan terpadu",
+                "value": "63210723"
+            },
+            {
+                "company": "PT Karya Supra Perkasa",
+                "percentage": "100%",
+                "types": "Perusahaan induk atas industri konstruksi",
+                "value": "3266888"
+            },
+            {
+                "company": "PT United Tractors Pandu Engineering",
+                "percentage": "100%",
+                "types": "Perakitan dan produksi\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nmesin, peralatan, dan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nalat berat",
+                "value": "3208079"
+            },
+            {
+                "company": "PT Bina Pertiwi",
+                "percentage": "100%",
+                "types": "Perdagangan Alat Berat",
+                "value": "1505769"
+            },
+            {
+                "company": "PT Andalan Multi Kencana",
+                "percentage": "100%",
+                "types": "Perdagangan suku cadang",
+                "value": "289130"
+            },
+            {
+                "company": "UT Heavy Industry (S) Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Perdagangan dan Perakitan Alat Berat",
+                "value": "739606"
+            },
+            {
+                "company": "PT Universal Tekno Reksajaya",
+                "percentage": "100%",
+                "types": "Jasa Rekondisi Komponen",
+                "value": "562818"
+            },
+            {
+                "company": "PT Tambang Supra Perkasa",
+                "percentage": "100%",
+                "types": "Penambangan",
+                "value": "15424"
+            },
+            {
+                "company": "PT Unitra Persada Energia",
+                "percentage": "100%",
+                "types": "Perusahaan induk atas energi",
+                "value": "3434368"
+            },
+            {
+                "company": "Unitra Power Pte Ltd",
+                "percentage": "100%",
+                "types": "Energi",
+                "value": "2"
+            },
+            {
+                "company": "PT Danusa Tambang Nusantara",
+                "percentage": "100%",
+                "types": "Perusahaan induk atas\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nkonsesi penambangan",
+                "value": "23824038"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "36,370",
+                "change": -3295,
+                "change_formatted": "(-3,295)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "39,665",
+                "change": -4786,
+                "change_formatted": "(-4,786)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "44,451",
+                "change": -6973,
+                "change_formatted": "(-6,973)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "51,424",
+                "change": 639,
+                "change_formatted": "(+639)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "50,785",
+                "change": 5773,
+                "change_formatted": "(+5,773)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "45,012",
+                "change": 5484,
+                "change_formatted": "(+5,484)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:33+00:00"
+}

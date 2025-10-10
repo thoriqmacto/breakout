@@ -1,0 +1,794 @@
+{
+    "symbol": "SCMA",
+    "name": "SCMA",
+    "address": [
+        {
+            "id": "371",
+            "email": [
+                "corsec@scm.co.id"
+            ],
+            "fax": "2793 5598",
+            "npwp": "01.904.039.3-054.000",
+            "phone": "2793 5599",
+            "website": "http://www.scm.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:57+07:00",
+            "value": "<td colspan='4'>SCTV Tower -Senayan City\r\nJl. Asia Afrika Lot.19\r\nJakarta 10270\n\n        \t\t  \t\t\tPhone: 2793 5599\n        \t\t  \t\t\tFax: 2793 5598\n                            NPWP: 01.904.039.3-054.000\n        \t\t  \t\t\tEmail: corsec@scm.co.id\n        \t\t  \t\t\tWebsite: http://www.scm.co.id\n\n        \t  \t\t\t</td>",
+            "office": "SCTV Tower -Senayan City Jl. Asia Afrika Lot.19 Jakarta 10270"
+        }
+    ],
+    "background": "PT Surya Citra Media Tbk (SCMA) berdiri sejak tahun 1999 dengan nama PT Cipta Aneka Selaras. Perubahan nama menjadi PT Surya Citra Media adalah berdasarkan Akta Pernyataan Keputusan Para Pemegang Saham sebagai Pengganti Rapat Umum Pemegang Saham Luar Biasa No. 103 tanggal 31 Desember 2001. Bidang usaha Perseroan meliputi: Televisi; Digital dan Iklan Luar Ruangan; serta Konten dan Lainnya.\n\nPerseroan  berkomitmen untuk memberikan tayangan, program, konten, dan layanan di bidang media yang bermakna dan memperkaya gaya hidup pemirsa Indonesia. Melalui dua saluran TV nasional terbesar di Indonesia, yaitu PT Surya Citra Televisi (SCTV) dan PT Indosiar Visual Mandiri (Indosiar), berita web portal PT Kapan Lagi Network (KLY), video on demand platform PT Vidio Dot Com (Vidio), dan entitas anak lainnya yang bergerak di bidang konten seperti PT Sinemart Indonesia (SinemArt), PT Screenplay Produksi (SP), PT Screenplay Sinema Film (SSF), PT Indonesia Entertainmen Grup (IEG), PT Indonesia Entertainmen Produksi (IEP), dan entitas-entitas anak lainnya. Perseroan terus mengasah kreativitas dan bekerja keras untuk menghadirkan tayangan yang menghibur, serta informasi yang mengedukasi dan dipercaya pemirsanya.",
+    "history": {
+        "amount": "412 B",
+        "board": "Papan Utama",
+        "date": "16 Jul 2002",
+        "price": "1,100",
+        "registrar": "",
+        "shares": "375,000,000",
+        "underwriters": [
+            "PT. CLSA Indonesia"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "13.23%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13839319",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Jay Geoffrey Wacher"
+            }
+        ],
+        "director": [
+            {
+                "id": "13839315",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "David Setiawan Suwarto"
+            },
+            {
+                "id": "13839314",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Mutia Nandika"
+            },
+            {
+                "id": "13839313",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Rusmiyati Djajaseputra"
+            },
+            {
+                "id": "13839312",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Imam Sudjarwo"
+            },
+            {
+                "id": "13839311",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Harsiwi Achmad"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13839318",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Glenn M. Surya Yusuf"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13839317",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Adi W. Sariaatmadja"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13839310",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Sutanto Hartono"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [
+            {
+                "id": "13839316",
+                "key": "Vice President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:41+07:00",
+                "value": "Suryani Zaini"
+            }
+        ],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12532080",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:57+07:00",
+            "value": "{\"name\":\"Gilang Iskandar\",\"phone\":\"02127935599\",\"email\":\"gilang.iskandar@indosiar.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "67.16%",
+            "name": "PT ELANG MAHKOTA TEKNOLOGI TBK",
+            "value": "49.68 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "14.2%",
+            "name": "SAHAM TREASURY",
+            "value": "10.50 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "13.24%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "9.79 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "4.93%",
+            "name": "PIHAK AFILIASI",
+            "value": "3.65 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "1.20 K",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Surya Citra Televisi (SCTV)",
+            "percentage": "99.99%",
+            "types": "Penyiaran televisi",
+            "value": "2263288702"
+        },
+        {
+            "company": "PT Indosiar Visual Mandiri",
+            "percentage": "99.99%",
+            "types": "Penyiaran televisi",
+            "value": "1433204522"
+        },
+        {
+            "company": "PT Screenplay Produksi",
+            "percentage": "75.50%",
+            "types": "Produksi perfilman dan perekaman video",
+            "value": "55906575"
+        },
+        {
+            "company": "PT Surya Citra Pesona",
+            "percentage": "51.00%",
+            "types": "Penyiaran televisi",
+            "value": "666673"
+        },
+        {
+            "company": "PT Surya Trioptima Multikreasi",
+            "percentage": "60.00%",
+            "types": "Manajemen Artis",
+            "value": "14260153"
+        },
+        {
+            "company": "PT Indonesia Entertainmen Grup",
+            "percentage": "72.84%",
+            "types": "Perdagangan film dan konten, jasa manajemen dan produksi konten, rumah produksi dan industri multimedia",
+            "value": "2523151412"
+        },
+        {
+            "company": "PT Kapan Lagi Dot Com Network",
+            "percentage": "50.00%",
+            "types": "Portal Web",
+            "value": "355033128"
+        },
+        {
+            "company": "PT Vidio Dot Com",
+            "percentage": "99.99%",
+            "types": "Video on Demand berbasis iklan dan Video on Demand berlangganan",
+            "value": "320233657"
+        },
+        {
+            "company": "PT Binary Ventura Indonesia",
+            "percentage": "99.99%",
+            "types": "Perdagangan, jasa dan periklanan",
+            "value": "49970148"
+        },
+        {
+            "company": "PT Mediatama Televisi",
+            "percentage": "51.00%",
+            "types": "Penyiaran berlangganan Televisi Satelit",
+            "value": "70106022"
+        },
+        {
+            "company": "PT Benson Media Kreasi",
+            "percentage": "50.00%",
+            "types": "Marketing kreatif, jasa periklanan dan penyelenggaraan acara",
+            "value": "150955624"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "28,542",
+            "change": -3821,
+            "change_formatted": "(-3,821)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "32,363",
+            "change": 2222,
+            "change_formatted": "(+2,222)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "30,141",
+            "change": -742,
+            "change_formatted": "(-742)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "30,883",
+            "change": -744,
+            "change_formatted": "(-744)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "31,627",
+            "change": 5013,
+            "change_formatted": "(+5,013)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "26,614",
+            "change": 416,
+            "change_formatted": "(+416)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.14%",
+            "name": "SUTANTO HARTONO",
+            "value": "101.67 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.1%",
+            "name": "MUTIA NANDIKA",
+            "value": "74.08 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.08%",
+            "name": "HARSIWI ACHMAD",
+            "value": "62.36 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.06%",
+            "name": "RUSMIYATI DJAJASEPUTRA",
+            "value": "47.01 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.04%",
+            "name": "DAVID SETIAWAN SUWARTO",
+            "value": "32.60 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.04%",
+            "name": "IMAM SUDJARWO",
+            "value": "28.71 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "JAY GEOFFREY WACHER",
+            "value": "8.75 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ADI W. SARIAATMADJA",
+            "value": "100.00",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2002-07-16T00:00:00+07:00",
+    "ipo_price": 1100,
+    "float": 13.23,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "371",
+                "email": [
+                    "corsec@scm.co.id"
+                ],
+                "fax": "2793 5598",
+                "npwp": "01.904.039.3-054.000",
+                "phone": "2793 5599",
+                "website": "http://www.scm.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:57+07:00",
+                "value": "<td colspan='4'>SCTV Tower -Senayan City\r\nJl. Asia Afrika Lot.19\r\nJakarta 10270\n\n        \t\t  \t\t\tPhone: 2793 5599\n        \t\t  \t\t\tFax: 2793 5598\n                            NPWP: 01.904.039.3-054.000\n        \t\t  \t\t\tEmail: corsec@scm.co.id\n        \t\t  \t\t\tWebsite: http://www.scm.co.id\n\n        \t  \t\t\t</td>",
+                "office": "SCTV Tower -Senayan City Jl. Asia Afrika Lot.19 Jakarta 10270"
+            }
+        ],
+        "background": "PT Surya Citra Media Tbk (SCMA) berdiri sejak tahun 1999 dengan nama PT Cipta Aneka Selaras. Perubahan nama menjadi PT Surya Citra Media adalah berdasarkan Akta Pernyataan Keputusan Para Pemegang Saham sebagai Pengganti Rapat Umum Pemegang Saham Luar Biasa No. 103 tanggal 31 Desember 2001. Bidang usaha Perseroan meliputi: Televisi; Digital dan Iklan Luar Ruangan; serta Konten dan Lainnya.\n\nPerseroan  berkomitmen untuk memberikan tayangan, program, konten, dan layanan di bidang media yang bermakna dan memperkaya gaya hidup pemirsa Indonesia. Melalui dua saluran TV nasional terbesar di Indonesia, yaitu PT Surya Citra Televisi (SCTV) dan PT Indosiar Visual Mandiri (Indosiar), berita web portal PT Kapan Lagi Network (KLY), video on demand platform PT Vidio Dot Com (Vidio), dan entitas anak lainnya yang bergerak di bidang konten seperti PT Sinemart Indonesia (SinemArt), PT Screenplay Produksi (SP), PT Screenplay Sinema Film (SSF), PT Indonesia Entertainmen Grup (IEG), PT Indonesia Entertainmen Produksi (IEP), dan entitas-entitas anak lainnya. Perseroan terus mengasah kreativitas dan bekerja keras untuk menghadirkan tayangan yang menghibur, serta informasi yang mengedukasi dan dipercaya pemirsanya.",
+        "history": {
+            "amount": "412 B",
+            "board": "Papan Utama",
+            "date": "16 Jul 2002",
+            "price": "1,100",
+            "registrar": "",
+            "shares": "375,000,000",
+            "underwriters": [
+                "PT. CLSA Indonesia"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "13.23%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13839319",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Jay Geoffrey Wacher"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13839315",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "David Setiawan Suwarto"
+                },
+                {
+                    "id": "13839314",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Mutia Nandika"
+                },
+                {
+                    "id": "13839313",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Rusmiyati Djajaseputra"
+                },
+                {
+                    "id": "13839312",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Imam Sudjarwo"
+                },
+                {
+                    "id": "13839311",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Harsiwi Achmad"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13839318",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Glenn M. Surya Yusuf"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13839317",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Adi W. Sariaatmadja"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13839310",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Sutanto Hartono"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [
+                {
+                    "id": "13839316",
+                    "key": "Vice President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:41+07:00",
+                    "value": "Suryani Zaini"
+                }
+            ],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12532080",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:57+07:00",
+                "value": "{\"name\":\"Gilang Iskandar\",\"phone\":\"02127935599\",\"email\":\"gilang.iskandar@indosiar.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "67.16%",
+                "name": "PT ELANG MAHKOTA TEKNOLOGI TBK",
+                "value": "49.68 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "14.2%",
+                "name": "SAHAM TREASURY",
+                "value": "10.50 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "13.24%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "9.79 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "4.93%",
+                "name": "PIHAK AFILIASI",
+                "value": "3.65 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "1.20 K",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Surya Citra Televisi (SCTV)",
+                "percentage": "99.99%",
+                "types": "Penyiaran televisi",
+                "value": "2263288702"
+            },
+            {
+                "company": "PT Indosiar Visual Mandiri",
+                "percentage": "99.99%",
+                "types": "Penyiaran televisi",
+                "value": "1433204522"
+            },
+            {
+                "company": "PT Screenplay Produksi",
+                "percentage": "75.50%",
+                "types": "Produksi perfilman dan perekaman video",
+                "value": "55906575"
+            },
+            {
+                "company": "PT Surya Citra Pesona",
+                "percentage": "51.00%",
+                "types": "Penyiaran televisi",
+                "value": "666673"
+            },
+            {
+                "company": "PT Surya Trioptima Multikreasi",
+                "percentage": "60.00%",
+                "types": "Manajemen Artis",
+                "value": "14260153"
+            },
+            {
+                "company": "PT Indonesia Entertainmen Grup",
+                "percentage": "72.84%",
+                "types": "Perdagangan film dan konten, jasa manajemen dan produksi konten, rumah produksi dan industri multimedia",
+                "value": "2523151412"
+            },
+            {
+                "company": "PT Kapan Lagi Dot Com Network",
+                "percentage": "50.00%",
+                "types": "Portal Web",
+                "value": "355033128"
+            },
+            {
+                "company": "PT Vidio Dot Com",
+                "percentage": "99.99%",
+                "types": "Video on Demand berbasis iklan dan Video on Demand berlangganan",
+                "value": "320233657"
+            },
+            {
+                "company": "PT Binary Ventura Indonesia",
+                "percentage": "99.99%",
+                "types": "Perdagangan, jasa dan periklanan",
+                "value": "49970148"
+            },
+            {
+                "company": "PT Mediatama Televisi",
+                "percentage": "51.00%",
+                "types": "Penyiaran berlangganan Televisi Satelit",
+                "value": "70106022"
+            },
+            {
+                "company": "PT Benson Media Kreasi",
+                "percentage": "50.00%",
+                "types": "Marketing kreatif, jasa periklanan dan penyelenggaraan acara",
+                "value": "150955624"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "28,542",
+                "change": -3821,
+                "change_formatted": "(-3,821)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "32,363",
+                "change": 2222,
+                "change_formatted": "(+2,222)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "30,141",
+                "change": -742,
+                "change_formatted": "(-742)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "30,883",
+                "change": -744,
+                "change_formatted": "(-744)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "31,627",
+                "change": 5013,
+                "change_formatted": "(+5,013)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "26,614",
+                "change": 416,
+                "change_formatted": "(+416)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.14%",
+                "name": "SUTANTO HARTONO",
+                "value": "101.67 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.1%",
+                "name": "MUTIA NANDIKA",
+                "value": "74.08 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.08%",
+                "name": "HARSIWI ACHMAD",
+                "value": "62.36 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.06%",
+                "name": "RUSMIYATI DJAJASEPUTRA",
+                "value": "47.01 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.04%",
+                "name": "DAVID SETIAWAN SUWARTO",
+                "value": "32.60 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.04%",
+                "name": "IMAM SUDJARWO",
+                "value": "28.71 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "JAY GEOFFREY WACHER",
+                "value": "8.75 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ADI W. SARIAATMADJA",
+                "value": "100.00",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:29+00:00"
+}

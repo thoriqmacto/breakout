@@ -1,0 +1,532 @@
+{
+    "symbol": "MLPT",
+    "name": "MLPT",
+    "address": [
+        {
+            "id": "488",
+            "email": [
+                "corsec.mlpt@multipolar.com"
+            ],
+            "fax": "(021) 5460020",
+            "npwp": "02.139.584.3-054.000",
+            "phone": "(021) 55777000",
+            "website": "www.multipolar.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:24+07:00",
+            "value": "<td colspan='4'>Sopo Del Office Towers & Lifestyle Tower 8 Lantai 18, Jalan Mega Kuningan Barat III Lot 10, 1-6, Kuningan Timur, Setiabudi, Jakarta Selatan 12950\n\n        \t\t  \t\t\tPhone: (021) 55777000\n        \t\t  \t\t\tFax: (021) 5460020\n                            NPWP: 02.139.584.3-054.000\n        \t\t  \t\t\tEmail: corsec.mlpt@multipolar.com\n        \t\t  \t\t\tWebsite: www.multipolar.com\n\n        \t  \t\t\t</td>",
+            "office": "Sopo Del Office Towers &amp; Lifestyle Tower 8 Lantai 18, Jalan Mega Kuningan Barat III Lot 10, 1-6, Kuningan Timur, Setiabudi, Jakarta Selatan 12950"
+        }
+    ],
+    "background": "PT. Multipolar Technology Tbk (MLPT) bergerak di bidang jasa, perdagangan umum, industri, percetakan dan transportasi darat. Untuk mencapai maksud dan tujuan, Perseroan menjalankan kegiatan usaha utamanya meliputi industri jasa telekomunikasi dan teknologi, bertindak sebagai agen, representatif, pemegang lisensi waralaba, yang menjalankan usaha di bidang perdagangan umum, industri komputer dan periferal, dan industri peralatan transmisi telekomunikasi. . Pada bulan Februari 2009, Perusahaan memulai operasinya.",
+    "history": {
+        "amount": "180 B",
+        "board": "Papan Pengembangan",
+        "date": "8 Jul 2013",
+        "price": "480",
+        "registrar": "",
+        "shares": "375,000,000",
+        "underwriters": [
+            "PT. Ciptadana Securities (Affiliated)"
+        ],
+        "administrative_bureau": "PT. Sharestar Indonesia",
+        "free_float": "9.63%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "13838074",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Herryyanto"
+            },
+            {
+                "id": "13838073",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Yohan Gunawan"
+            },
+            {
+                "id": "13838072",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Yugi Edison"
+            },
+            {
+                "id": "13838071",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Suyanto Halim"
+            },
+            {
+                "id": "13838070",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Jip Ivan Sutanto"
+            },
+            {
+                "id": "13838069",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Hanny Untar"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13838077",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Harijono Suwarno"
+            },
+            {
+                "id": "13838076",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Dicky Setiadi Moechtar"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13838078",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Marlo Budiman"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13838075",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Harianto Gunawan"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13838068",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:38+07:00",
+                "value": "Wahyudi Chandra"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12533525",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:24+07:00",
+            "value": "{\"name\":\"Wahyudi Chandra\",\"phone\":\"(021) 55777000\",\"email\":\"corsec.mlpt@multipolar.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "84.95%",
+            "name": "PT MULTIPOLAR TBK.",
+            "value": "1.59 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "15.05%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "282.25 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Graha Teknologi Nusantara",
+            "percentage": "65.00%",
+            "types": "jasa dan perdagangan umum",
+            "value": "321227"
+        },
+        {
+            "company": "PT Visionet Data Internasional",
+            "percentage": "99.95%",
+            "types": "jasa dan perdagangan umum",
+            "value": "526396"
+        },
+        {
+            "company": "PT Multi Solusi Andal",
+            "percentage": "99.90%",
+            "types": "jasa dan perdagangan umum",
+            "value": "9985"
+        },
+        {
+            "company": "PT Artomoro Prima Internasional",
+            "percentage": "60.86%",
+            "types": "jasa dan perdagangan umum",
+            "value": "27"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "1,359",
+            "change": -94,
+            "change_formatted": "(-94)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "1,453",
+            "change": 71,
+            "change_formatted": "(+71)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "1,382",
+            "change": -32,
+            "change_formatted": "(-32)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "1,414",
+            "change": -138,
+            "change_formatted": "(-138)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "1,552",
+            "change": 154,
+            "change_formatted": "(+154)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "1,398",
+            "change": 2,
+            "change_formatted": "(+2)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2013-07-08T00:00:00+07:00",
+    "ipo_price": 480,
+    "float": 9.63,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "488",
+                "email": [
+                    "corsec.mlpt@multipolar.com"
+                ],
+                "fax": "(021) 5460020",
+                "npwp": "02.139.584.3-054.000",
+                "phone": "(021) 55777000",
+                "website": "www.multipolar.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:24+07:00",
+                "value": "<td colspan='4'>Sopo Del Office Towers & Lifestyle Tower 8 Lantai 18, Jalan Mega Kuningan Barat III Lot 10, 1-6, Kuningan Timur, Setiabudi, Jakarta Selatan 12950\n\n        \t\t  \t\t\tPhone: (021) 55777000\n        \t\t  \t\t\tFax: (021) 5460020\n                            NPWP: 02.139.584.3-054.000\n        \t\t  \t\t\tEmail: corsec.mlpt@multipolar.com\n        \t\t  \t\t\tWebsite: www.multipolar.com\n\n        \t  \t\t\t</td>",
+                "office": "Sopo Del Office Towers &amp; Lifestyle Tower 8 Lantai 18, Jalan Mega Kuningan Barat III Lot 10, 1-6, Kuningan Timur, Setiabudi, Jakarta Selatan 12950"
+            }
+        ],
+        "background": "PT. Multipolar Technology Tbk (MLPT) bergerak di bidang jasa, perdagangan umum, industri, percetakan dan transportasi darat. Untuk mencapai maksud dan tujuan, Perseroan menjalankan kegiatan usaha utamanya meliputi industri jasa telekomunikasi dan teknologi, bertindak sebagai agen, representatif, pemegang lisensi waralaba, yang menjalankan usaha di bidang perdagangan umum, industri komputer dan periferal, dan industri peralatan transmisi telekomunikasi. . Pada bulan Februari 2009, Perusahaan memulai operasinya.",
+        "history": {
+            "amount": "180 B",
+            "board": "Papan Pengembangan",
+            "date": "8 Jul 2013",
+            "price": "480",
+            "registrar": "",
+            "shares": "375,000,000",
+            "underwriters": [
+                "PT. Ciptadana Securities (Affiliated)"
+            ],
+            "administrative_bureau": "PT. Sharestar Indonesia",
+            "free_float": "9.63%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "13838074",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Herryyanto"
+                },
+                {
+                    "id": "13838073",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Yohan Gunawan"
+                },
+                {
+                    "id": "13838072",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Yugi Edison"
+                },
+                {
+                    "id": "13838071",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Suyanto Halim"
+                },
+                {
+                    "id": "13838070",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Jip Ivan Sutanto"
+                },
+                {
+                    "id": "13838069",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Hanny Untar"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13838077",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Harijono Suwarno"
+                },
+                {
+                    "id": "13838076",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Dicky Setiadi Moechtar"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13838078",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Marlo Budiman"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13838075",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Harianto Gunawan"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13838068",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:38+07:00",
+                    "value": "Wahyudi Chandra"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12533525",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:24+07:00",
+                "value": "{\"name\":\"Wahyudi Chandra\",\"phone\":\"(021) 55777000\",\"email\":\"corsec.mlpt@multipolar.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "84.95%",
+                "name": "PT MULTIPOLAR TBK.",
+                "value": "1.59 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "15.05%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "282.25 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Graha Teknologi Nusantara",
+                "percentage": "65.00%",
+                "types": "jasa dan perdagangan umum",
+                "value": "321227"
+            },
+            {
+                "company": "PT Visionet Data Internasional",
+                "percentage": "99.95%",
+                "types": "jasa dan perdagangan umum",
+                "value": "526396"
+            },
+            {
+                "company": "PT Multi Solusi Andal",
+                "percentage": "99.90%",
+                "types": "jasa dan perdagangan umum",
+                "value": "9985"
+            },
+            {
+                "company": "PT Artomoro Prima Internasional",
+                "percentage": "60.86%",
+                "types": "jasa dan perdagangan umum",
+                "value": "27"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "1,359",
+                "change": -94,
+                "change_formatted": "(-94)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "1,453",
+                "change": 71,
+                "change_formatted": "(+71)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "1,382",
+                "change": -32,
+                "change_formatted": "(-32)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "1,414",
+                "change": -138,
+                "change_formatted": "(-138)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "1,552",
+                "change": 154,
+                "change_formatted": "(+154)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "1,398",
+                "change": 2,
+                "change_formatted": "(+2)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:25+00:00"
+}

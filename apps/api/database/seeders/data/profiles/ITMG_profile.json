@@ -1,0 +1,792 @@
+{
+    "symbol": "ITMG",
+    "name": "ITMG",
+    "address": [
+        {
+            "id": "224",
+            "email": [
+                "-"
+            ],
+            "fax": "021 - 2932 7999",
+            "npwp": "01.332.590.7-091.000",
+            "phone": "021 - 2932 8100",
+            "website": "-",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:21+07:00",
+            "value": "<td colspan='4'>Pondok Indah Office Tower III, 3rd Floor\r\nJl. Sultan Iskandar Muda\r\nPondok Indah Kav. V-TA\r\nJakarta Selatan 12310\n\n        \t\t  \t\t\tPhone: 021 - 2932 8100\n        \t\t  \t\t\tFax: 021 - 2932 7999\n                            NPWP: 01.332.590.7-091.000\n        \t\t  \t\t\tEmail: -\n        \t\t  \t\t\tWebsite: -\n\n        \t  \t\t\t</td>",
+            "office": "Pondok Indah Office Tower III, 3rd Floor Jl. Sultan Iskandar Muda Pondok Indah Kav. V-TA Jakarta Selatan 12310"
+        }
+    ],
+    "background": "PT Indo Tambangraya Megah Tbk. (ITM) menjadi perusahaan pemasok batubara yang terintegrasi di Indonesia menjadi pemasok Batubara untuk pasar energi dunia. Perusahaan memiliki wilayah kerja di Kalimantan dengan tambang batubara yang dioperasikan dan dikelola anak perusahaan. Selain itu ITM memiliki beberapa anak perusahaan lain yang memberikan dukungan operasional dan berpotensi dikembangkan bagi bisnis energi Perusahaan di masa depan. Perusahaan juga terus menambah cadangan batubara untuk mendukung kesinambungan usaha.\n",
+    "history": {
+        "amount": "3,164 B",
+        "board": "Papan Utama",
+        "date": "18 Dec 2007",
+        "price": "14,000",
+        "registrar": "",
+        "shares": "225,984,992",
+        "underwriters": [
+            "PT. UBS Securities Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "34.74%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836986",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Jamon Jamuang"
+            },
+            {
+                "id": "13836985",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Sinon Vongkusolkit"
+            },
+            {
+                "id": "13836984",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Maneewan Vachiruckul"
+            },
+            {
+                "id": "13836983",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Kirana Limpaphayom"
+            },
+            {
+                "id": "13836982",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Fredi Chandra"
+            },
+            {
+                "id": "13836979",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Somruedee Chaimongkol"
+            },
+            {
+                "id": "13836978",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Somsak Sithinamsuwan"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836976",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Warut Waramit"
+            },
+            {
+                "id": "13836975",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Niwat Boonyad"
+            },
+            {
+                "id": "13836974",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Narin Sampattanavorachai"
+            },
+            {
+                "id": "13836973",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Isara Pootrakul "
+            },
+            {
+                "id": "13836972",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Junius Prakarsa Darmawan"
+            },
+            {
+                "id": "13836971",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Ignatius Wurwanto"
+            },
+            {
+                "id": "13836970",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Yulius Kurniawan Gozali"
+            },
+            {
+                "id": "13836969",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Stephanus Demo Wawin"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836981",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Djoko Wintoro"
+            },
+            {
+                "id": "13836980",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Mahyudin Lubis"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13836968",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Mulianto"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "13836977",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:25+07:00",
+                "value": "Prof. Djisman Simandjuntak"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12530396",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:21+07:00",
+            "value": "{\"name\":\"Monika Ida Krisnamurti\",\"phone\":\"021-29328100\",\"email\":\"monika_krisnamurti@banpuindo.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "65.143%",
+            "name": "BANPU MINERALS (SINGAPORE) PRIVATE LIMITED",
+            "value": "736.07 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "34.736%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "383.49 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Indominco Mandiri (IMM)",
+            "percentage": "100%",
+            "types": "Penambangan batubara / coal mining",
+            "value": "348348"
+        },
+        {
+            "company": "PT Trubaindo Coal Mining (TCM)",
+            "percentage": "100%",
+            "types": "Penambangan batubara / coal mining",
+            "value": "263147"
+        },
+        {
+            "company": "PT Jorong Barutama Greston (JBG)",
+            "percentage": "100%",
+            "types": "Penambangan batubara / coal mining",
+            "value": "47754"
+        },
+        {
+            "company": "PT Bharinto Ekatama (BEK)",
+            "percentage": "100%",
+            "types": "Penambangan batubara / coal mining",
+            "value": "142412"
+        },
+        {
+            "company": "PT Kitadin",
+            "percentage": "100%",
+            "types": "Penambangan batubara, jasa kontraktor yang berkaitan dengan penambangan batubara dan perdagangan batubara",
+            "value": "112319"
+        },
+        {
+            "company": "PT Tambang Raya Usaha Tama",
+            "percentage": "100%",
+            "types": "Jasa Penunjang Kegiatan Pertambangan",
+            "value": "102081"
+        },
+        {
+            "company": "PT ITM Indonesia",
+            "percentage": "100%",
+            "types": "Perdagangan Batubara",
+            "value": "2294"
+        },
+        {
+            "company": "PT ITM Batubara Utama",
+            "percentage": "100%",
+            "types": "Perdagangan dan Pengangkutan Batubara",
+            "value": "2"
+        },
+        {
+            "company": "PT ITM Energi Utama",
+            "percentage": "99.99%",
+            "types": "Energi",
+            "value": "2848"
+        },
+        {
+            "company": "PT ITM Banpu Power",
+            "percentage": "70.00%",
+            "types": "Pembangkit Tenaga Listrik / Power Plant",
+            "value": "1446"
+        },
+        {
+            "company": "PT Gasemas",
+            "percentage": "98.00%",
+            "types": "Perdagangan bahan bakar",
+            "value": "45133"
+        },
+        {
+            "company": "PT Tepian Indah Sukses",
+            "percentage": "100%",
+            "types": "Penambangan Batubara",
+            "value": "4332"
+        },
+        {
+            "company": "PT Nusa Persada Resources",
+            "percentage": "100%",
+            "types": "Penambangan Batubara",
+            "value": "15524"
+        },
+        {
+            "company": "PT Energi Batubara Perkasa",
+            "percentage": "100%",
+            "types": "Pengangkutan dan Penjualan Batubara",
+            "value": "0"
+        },
+        {
+            "company": "PT SME",
+            "percentage": "100%",
+            "types": "Perdagangan dan transportasi produk batu bara",
+            "value": "7524"
+        },
+        {
+            "company": "PT GPK",
+            "percentage": "75.00%",
+            "types": "Pertambangan batubara",
+            "value": "517"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "57,181",
+            "change": -1467,
+            "change_formatted": "(-1,467)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "58,648",
+            "change": 3854,
+            "change_formatted": "(+3,854)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "54,794",
+            "change": 999,
+            "change_formatted": "(+999)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "53,795",
+            "change": -974,
+            "change_formatted": "(-974)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "54,769",
+            "change": 892,
+            "change_formatted": "(+892)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "53,877",
+            "change": 8703,
+            "change_formatted": "(+8,703)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.121%",
+            "name": "FREDI CHANDRA",
+            "value": "1.37 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2007-12-18T00:00:00+07:00",
+    "ipo_price": 14000,
+    "float": 34.74,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "224",
+                "email": [
+                    "-"
+                ],
+                "fax": "021 - 2932 7999",
+                "npwp": "01.332.590.7-091.000",
+                "phone": "021 - 2932 8100",
+                "website": "-",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:21+07:00",
+                "value": "<td colspan='4'>Pondok Indah Office Tower III, 3rd Floor\r\nJl. Sultan Iskandar Muda\r\nPondok Indah Kav. V-TA\r\nJakarta Selatan 12310\n\n        \t\t  \t\t\tPhone: 021 - 2932 8100\n        \t\t  \t\t\tFax: 021 - 2932 7999\n                            NPWP: 01.332.590.7-091.000\n        \t\t  \t\t\tEmail: -\n        \t\t  \t\t\tWebsite: -\n\n        \t  \t\t\t</td>",
+                "office": "Pondok Indah Office Tower III, 3rd Floor Jl. Sultan Iskandar Muda Pondok Indah Kav. V-TA Jakarta Selatan 12310"
+            }
+        ],
+        "background": "PT Indo Tambangraya Megah Tbk. (ITM) menjadi perusahaan pemasok batubara yang terintegrasi di Indonesia menjadi pemasok Batubara untuk pasar energi dunia. Perusahaan memiliki wilayah kerja di Kalimantan dengan tambang batubara yang dioperasikan dan dikelola anak perusahaan. Selain itu ITM memiliki beberapa anak perusahaan lain yang memberikan dukungan operasional dan berpotensi dikembangkan bagi bisnis energi Perusahaan di masa depan. Perusahaan juga terus menambah cadangan batubara untuk mendukung kesinambungan usaha.\n",
+        "history": {
+            "amount": "3,164 B",
+            "board": "Papan Utama",
+            "date": "18 Dec 2007",
+            "price": "14,000",
+            "registrar": "",
+            "shares": "225,984,992",
+            "underwriters": [
+                "PT. UBS Securities Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "34.74%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836986",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Jamon Jamuang"
+                },
+                {
+                    "id": "13836985",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Sinon Vongkusolkit"
+                },
+                {
+                    "id": "13836984",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Maneewan Vachiruckul"
+                },
+                {
+                    "id": "13836983",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Kirana Limpaphayom"
+                },
+                {
+                    "id": "13836982",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Fredi Chandra"
+                },
+                {
+                    "id": "13836979",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Somruedee Chaimongkol"
+                },
+                {
+                    "id": "13836978",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Somsak Sithinamsuwan"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836976",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Warut Waramit"
+                },
+                {
+                    "id": "13836975",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Niwat Boonyad"
+                },
+                {
+                    "id": "13836974",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Narin Sampattanavorachai"
+                },
+                {
+                    "id": "13836973",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Isara Pootrakul "
+                },
+                {
+                    "id": "13836972",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Junius Prakarsa Darmawan"
+                },
+                {
+                    "id": "13836971",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Ignatius Wurwanto"
+                },
+                {
+                    "id": "13836970",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Yulius Kurniawan Gozali"
+                },
+                {
+                    "id": "13836969",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Stephanus Demo Wawin"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836981",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Djoko Wintoro"
+                },
+                {
+                    "id": "13836980",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Mahyudin Lubis"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13836968",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Mulianto"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "13836977",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:25+07:00",
+                    "value": "Prof. Djisman Simandjuntak"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12530396",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:21+07:00",
+                "value": "{\"name\":\"Monika Ida Krisnamurti\",\"phone\":\"021-29328100\",\"email\":\"monika_krisnamurti@banpuindo.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "65.143%",
+                "name": "BANPU MINERALS (SINGAPORE) PRIVATE LIMITED",
+                "value": "736.07 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "34.736%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "383.49 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Indominco Mandiri (IMM)",
+                "percentage": "100%",
+                "types": "Penambangan batubara / coal mining",
+                "value": "348348"
+            },
+            {
+                "company": "PT Trubaindo Coal Mining (TCM)",
+                "percentage": "100%",
+                "types": "Penambangan batubara / coal mining",
+                "value": "263147"
+            },
+            {
+                "company": "PT Jorong Barutama Greston (JBG)",
+                "percentage": "100%",
+                "types": "Penambangan batubara / coal mining",
+                "value": "47754"
+            },
+            {
+                "company": "PT Bharinto Ekatama (BEK)",
+                "percentage": "100%",
+                "types": "Penambangan batubara / coal mining",
+                "value": "142412"
+            },
+            {
+                "company": "PT Kitadin",
+                "percentage": "100%",
+                "types": "Penambangan batubara, jasa kontraktor yang berkaitan dengan penambangan batubara dan perdagangan batubara",
+                "value": "112319"
+            },
+            {
+                "company": "PT Tambang Raya Usaha Tama",
+                "percentage": "100%",
+                "types": "Jasa Penunjang Kegiatan Pertambangan",
+                "value": "102081"
+            },
+            {
+                "company": "PT ITM Indonesia",
+                "percentage": "100%",
+                "types": "Perdagangan Batubara",
+                "value": "2294"
+            },
+            {
+                "company": "PT ITM Batubara Utama",
+                "percentage": "100%",
+                "types": "Perdagangan dan Pengangkutan Batubara",
+                "value": "2"
+            },
+            {
+                "company": "PT ITM Energi Utama",
+                "percentage": "99.99%",
+                "types": "Energi",
+                "value": "2848"
+            },
+            {
+                "company": "PT ITM Banpu Power",
+                "percentage": "70.00%",
+                "types": "Pembangkit Tenaga Listrik / Power Plant",
+                "value": "1446"
+            },
+            {
+                "company": "PT Gasemas",
+                "percentage": "98.00%",
+                "types": "Perdagangan bahan bakar",
+                "value": "45133"
+            },
+            {
+                "company": "PT Tepian Indah Sukses",
+                "percentage": "100%",
+                "types": "Penambangan Batubara",
+                "value": "4332"
+            },
+            {
+                "company": "PT Nusa Persada Resources",
+                "percentage": "100%",
+                "types": "Penambangan Batubara",
+                "value": "15524"
+            },
+            {
+                "company": "PT Energi Batubara Perkasa",
+                "percentage": "100%",
+                "types": "Pengangkutan dan Penjualan Batubara",
+                "value": "0"
+            },
+            {
+                "company": "PT SME",
+                "percentage": "100%",
+                "types": "Perdagangan dan transportasi produk batu bara",
+                "value": "7524"
+            },
+            {
+                "company": "PT GPK",
+                "percentage": "75.00%",
+                "types": "Pertambangan batubara",
+                "value": "517"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "57,181",
+                "change": -1467,
+                "change_formatted": "(-1,467)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "58,648",
+                "change": 3854,
+                "change_formatted": "(+3,854)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "54,794",
+                "change": 999,
+                "change_formatted": "(+999)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "53,795",
+                "change": -974,
+                "change_formatted": "(-974)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "54,769",
+                "change": 892,
+                "change_formatted": "(+892)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "53,877",
+                "change": 8703,
+                "change_formatted": "(+8,703)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.121%",
+                "name": "FREDI CHANDRA",
+                "value": "1.37 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:22+00:00"
+}

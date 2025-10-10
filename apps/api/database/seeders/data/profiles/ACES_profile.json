@@ -1,0 +1,560 @@
+{
+    "symbol": "ACES",
+    "name": "ACES",
+    "address": [
+        {
+            "id": "5",
+            "email": [
+                "corsec@ahi.id"
+            ],
+            "fax": "021 - 5824022",
+            "npwp": "01.721.123.6-054.000",
+            "phone": "021 - 5828282",
+            "website": "https://ahi.id/",
+            "key": "",
+            "lastupdate": "2024-12-20T16:19:55+07:00",
+            "value": "",
+            "office": "Gedung Kawan Lama, Jl. Puri Kencana No. 1, Kembangan Selatan, Kembangan, Jakarta Barat 11610"
+        }
+    ],
+    "background": "PT Aspirasi Hidup Indonesia Tbk didirikan pada 1995 dan bergerak di bidang usaha perlengkapan rumah tangga dan gaya hidup. Berdasarkan Anggaran Dasar Perusahaan, Perseroan menjalankan usaha dalam bidang perdagangan, perindustrian, jasa dan perbengkelan. Hingga saat ini, Perseroan masih menjalankan kegiatan usaha sesuai dengan Anggaran Dasar Perusahaan.\n\nProduk-produk Perseroan dipasarkan di bawah berbagai merk dagang, termasuk “Ace”, “Krisbow” dan “Kris”. Perseroan terus berkembang sebagai perusahaan ritel dan kini telah menjadi salah satu perusahaan ritel terkemuka yang menyediakan beragam perlengkapan rumah tangga dan gaya hidup di Indonesia.\n\nSaat ini, Perseroan telah memiliki 208 gerai Ace Hardware dengan total luas mencapai 506.400 m2, tersebar di 49 kota dan 27 provinsi serta 57 gerai Toys Kingdom dengan total luas 31.400 m2, tersebar di 21 kota dan 14 provinsi termasuk 10 gerai Ace Xpress yang berupa gerai dengan luas kurang dari 1.000 m2.",
+    "history": {
+        "amount": "422 B",
+        "board": "Papan Utama",
+        "date": "6 Nov 2007",
+        "price": "820",
+        "registrar": "",
+        "shares": "515,000,000",
+        "underwriters": [
+            "PT. CLSA Indonesia",
+            "PT. Dinamika Usaha Jaya"
+        ],
+        "administrative_bureau": "PT. Adimitra Jasa Korpora",
+        "free_float": "39.99%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13833531",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "TARISA WIDYA KRISNADI"
+            },
+            {
+                "id": "13833528",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "IR. HARTANTO DJASMAN"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833527",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "TERESA LUCIA WIBOWO"
+            },
+            {
+                "id": "13833526",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "GREGORY SUGYONO WIDJAJA"
+            },
+            {
+                "id": "13833525",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "SUHARNO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833530",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "IRJEN POL (PURN) DRS. MATHIUS SALEMPANG "
+            },
+            {
+                "id": "13833529",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "LETJEN TNI (PURN) TARUB"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13833532",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "KUNCORO WIBOWO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13833524",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:42+07:00",
+                "value": "PRABOWO WIDYA KRISNADI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12527657",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:04+07:00",
+            "value": "{\"name\":\"Helen R. Tanzil\",\"phone\":\"+62215822222\",\"email\":\"corsec@acehardware.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "60%",
+            "name": "PT KAWAN LAMA SEJAHTERA",
+            "value": "10.27 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "39.99%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "6.85 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT TOYS KINGDOM INDONESIA",
+            "percentage": "60.00%",
+            "types": "INDUSTRI DAN PERDAGANGAN",
+            "value": "270175732509"
+        },
+        {
+            "company": "PT OMNI DIGITAMA INTERNUSA",
+            "percentage": "30.00%",
+            "types": "INDUSTRI DAN PERDAGANGAN",
+            "value": "111047813308"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "51,416",
+            "change": 464,
+            "change_formatted": "(+464)"
+        },
+        {
+            "shareholder_date": "29 Aug 2025",
+            "total_share": "50,952",
+            "change": 1657,
+            "change_formatted": "(+1,657)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "49,296",
+            "change": 3840,
+            "change_formatted": "(+3,840)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "45,456",
+            "change": 1412,
+            "change_formatted": "(+1,412)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "44,044",
+            "change": 2462,
+            "change_formatted": "(+2,462)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "41,582",
+            "change": 4552,
+            "change_formatted": "(+4,552)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.01%",
+            "name": "TERESA LUCIA WIBOWO",
+            "value": "983.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "SUHARNO",
+            "value": "600.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "KUNCORO WIBOWO",
+            "value": "100.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "GREGORY SUGYONO WIDJAJA",
+            "value": "94.10 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2007-11-06T00:00:00+07:00",
+    "ipo_price": 820,
+    "float": 39.99,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "5",
+                "email": [
+                    "corsec@ahi.id"
+                ],
+                "fax": "021 - 5824022",
+                "npwp": "01.721.123.6-054.000",
+                "phone": "021 - 5828282",
+                "website": "https://ahi.id/",
+                "key": "",
+                "lastupdate": "2024-12-20T16:19:55+07:00",
+                "value": "",
+                "office": "Gedung Kawan Lama, Jl. Puri Kencana No. 1, Kembangan Selatan, Kembangan, Jakarta Barat 11610"
+            }
+        ],
+        "background": "PT Aspirasi Hidup Indonesia Tbk didirikan pada 1995 dan bergerak di bidang usaha perlengkapan rumah tangga dan gaya hidup. Berdasarkan Anggaran Dasar Perusahaan, Perseroan menjalankan usaha dalam bidang perdagangan, perindustrian, jasa dan perbengkelan. Hingga saat ini, Perseroan masih menjalankan kegiatan usaha sesuai dengan Anggaran Dasar Perusahaan.\n\nProduk-produk Perseroan dipasarkan di bawah berbagai merk dagang, termasuk “Ace”, “Krisbow” dan “Kris”. Perseroan terus berkembang sebagai perusahaan ritel dan kini telah menjadi salah satu perusahaan ritel terkemuka yang menyediakan beragam perlengkapan rumah tangga dan gaya hidup di Indonesia.\n\nSaat ini, Perseroan telah memiliki 208 gerai Ace Hardware dengan total luas mencapai 506.400 m2, tersebar di 49 kota dan 27 provinsi serta 57 gerai Toys Kingdom dengan total luas 31.400 m2, tersebar di 21 kota dan 14 provinsi termasuk 10 gerai Ace Xpress yang berupa gerai dengan luas kurang dari 1.000 m2.",
+        "history": {
+            "amount": "422 B",
+            "board": "Papan Utama",
+            "date": "6 Nov 2007",
+            "price": "820",
+            "registrar": "",
+            "shares": "515,000,000",
+            "underwriters": [
+                "PT. CLSA Indonesia",
+                "PT. Dinamika Usaha Jaya"
+            ],
+            "administrative_bureau": "PT. Adimitra Jasa Korpora",
+            "free_float": "39.99%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13833531",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "TARISA WIDYA KRISNADI"
+                },
+                {
+                    "id": "13833528",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "IR. HARTANTO DJASMAN"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833527",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "TERESA LUCIA WIBOWO"
+                },
+                {
+                    "id": "13833526",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "GREGORY SUGYONO WIDJAJA"
+                },
+                {
+                    "id": "13833525",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "SUHARNO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833530",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "IRJEN POL (PURN) DRS. MATHIUS SALEMPANG "
+                },
+                {
+                    "id": "13833529",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "LETJEN TNI (PURN) TARUB"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13833532",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "KUNCORO WIBOWO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13833524",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:42+07:00",
+                    "value": "PRABOWO WIDYA KRISNADI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12527657",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:04+07:00",
+                "value": "{\"name\":\"Helen R. Tanzil\",\"phone\":\"+62215822222\",\"email\":\"corsec@acehardware.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "60%",
+                "name": "PT KAWAN LAMA SEJAHTERA",
+                "value": "10.27 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "39.99%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "6.85 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT TOYS KINGDOM INDONESIA",
+                "percentage": "60.00%",
+                "types": "INDUSTRI DAN PERDAGANGAN",
+                "value": "270175732509"
+            },
+            {
+                "company": "PT OMNI DIGITAMA INTERNUSA",
+                "percentage": "30.00%",
+                "types": "INDUSTRI DAN PERDAGANGAN",
+                "value": "111047813308"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "51,416",
+                "change": 464,
+                "change_formatted": "(+464)"
+            },
+            {
+                "shareholder_date": "29 Aug 2025",
+                "total_share": "50,952",
+                "change": 1657,
+                "change_formatted": "(+1,657)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "49,296",
+                "change": 3840,
+                "change_formatted": "(+3,840)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "45,456",
+                "change": 1412,
+                "change_formatted": "(+1,412)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "44,044",
+                "change": 2462,
+                "change_formatted": "(+2,462)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "41,582",
+                "change": 4552,
+                "change_formatted": "(+4,552)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.01%",
+                "name": "TERESA LUCIA WIBOWO",
+                "value": "983.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "SUHARNO",
+                "value": "600.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "KUNCORO WIBOWO",
+                "value": "100.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "GREGORY SUGYONO WIDJAJA",
+                "value": "94.10 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:09+00:00"
+}

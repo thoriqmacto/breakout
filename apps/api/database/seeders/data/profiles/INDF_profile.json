@@ -1,0 +1,890 @@
+{
+    "symbol": "INDF",
+    "name": "INDF",
+    "address": [
+        {
+            "id": "208",
+            "email": [
+                "corporate.secretary@indofood.co.id "
+            ],
+            "fax": "6221 5793 5960 ",
+            "npwp": "0015 4265 8809 2000",
+            "phone": "6221 5795 8822 ",
+            "website": "www.indofood.com",
+            "key": "",
+            "lastupdate": "2024-12-10T17:15:19+07:00",
+            "value": "",
+            "office": "Sudirman Plaza, Indofood Tower, Lt. 27, Jl. Jend. Sudirman Kav. 76-78 Jakarta 12910 "
+        }
+    ],
+    "background": "PT Indofood Sukses Makmur Tbk, yang didirikan dengan nama PT Panganjaya Intikusuma di tahun 1990, memiliki berbagai kegiatan usaha yang telah beroperasi sejak awal tahun 1980an. PT. Indofood Sukses Makmur Tbk (INDF) bergerak dalam bidang makanan olahan, bumbu, minuman, kemasan, minyak goreng, pabrik gandum dan pabrik pembuatan karung tepung.",
+    "history": {
+        "amount": "-",
+        "board": "Papan Utama",
+        "date": "14 Jul 1994",
+        "price": "0",
+        "registrar": "",
+        "shares": "763,000,000",
+        "underwriters": [
+            "PT. Merincorp"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "48.21%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836737",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "John William Ryan"
+            },
+            {
+                "id": "13836736",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Joseph Hon Pong Ng"
+            },
+            {
+                "id": "13836735",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Christopher Huxley Young"
+            },
+            {
+                "id": "13836734",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Benny Setiawan Santoso"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836732",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Tan Elly (Elly Betty)"
+            },
+            {
+                "id": "13836731",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Tan Suzi Indriani"
+            },
+            {
+                "id": "13836730",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Hendra Widjaja"
+            },
+            {
+                "id": "13836729",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Joedianto Soejonopoetro"
+            },
+            {
+                "id": "13836728",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Moleonoto (Paulus Moleonoto)"
+            },
+            {
+                "id": "13836727",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Alamsyah"
+            },
+            {
+                "id": "13836726",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Taufik Wiraatmadja"
+            },
+            {
+                "id": "13836725",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Tjhie Tje Fie (Thomas Tjhie)"
+            },
+            {
+                "id": "13836724",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Axton Salim"
+            },
+            {
+                "id": "13836723",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Franciscus Welirang"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836740",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Notariza Taher"
+            },
+            {
+                "id": "13836739",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Sulaiman Arif Arianto"
+            },
+            {
+                "id": "13836738",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Hans Kartikahadi"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13836733",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Manuel Velez Pangilinan"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13836722",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Anthoni Salim"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530176",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:17+07:00",
+            "value": "{\"name\":\"Bp Victor Suhendra\",\"phone\":\"(021) 57958822 Ext. 1761\",\"email\":\"victor.suhendra@indofood.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "50.07%",
+            "name": "FIRST PACIFIC INVESTMENT MANAGEMENT LTD",
+            "value": "4.40 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "49.58%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "4.35 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.33%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "29.69 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Indofood CBP Sukses Makmur Tbk",
+            "percentage": "80.50%",
+            "types": "Produksi mie, bumbu penyedap, produk makanan kuliner, biskuit, nutrisi dan makanan khusus",
+            "value": "103588000"
+        },
+        {
+            "company": "PT Prima Intipangan Sejati",
+            "percentage": "100%",
+            "types": "Jasa investasi dan manajemen",
+            "value": "26000"
+        },
+        {
+            "company": "PT Bogasari Sentra Flour Mills",
+            "percentage": "100%",
+            "types": "Penggilingan tepung",
+            "value": "22000"
+        },
+        {
+            "company": "PT Inti Abadi Kemasindo",
+            "percentage": "100%",
+            "types": "Produksi bahan kemasan",
+            "value": "257000"
+        },
+        {
+            "company": "PT Indobahtera Era Sejahtera",
+            "percentage": "100%",
+            "types": "Pelayaran",
+            "value": "0"
+        },
+        {
+            "company": "PT Mileva Makmur Mandiri",
+            "percentage": "100%",
+            "types": "Produksi makanan dari susu",
+            "value": "12000"
+        },
+        {
+            "company": "PT Saripangan Mandiri Sejahtera",
+            "percentage": "100%",
+            "types": "Penggilingan tepung",
+            "value": "1000"
+        },
+        {
+            "company": "PT Bina Makna Indopratama",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "46000"
+        },
+        {
+            "company": "PT Indomarco Adi Prima",
+            "percentage": "100%",
+            "types": "Distribusi",
+            "value": "5286000"
+        },
+        {
+            "company": "PT Argha Giri Perkasa",
+            "percentage": "80.00%",
+            "types": "Produksi kopra dan pengolahan minyak kelapa",
+            "value": "7000"
+        },
+        {
+            "company": "PT Putri Daya Usahatama",
+            "percentage": "65.00%",
+            "types": "Distribusi",
+            "value": "622000"
+        },
+        {
+            "company": "PT Arthanugraha Mandiri",
+            "percentage": "100%",
+            "types": "Produksi kopi",
+            "value": "4000"
+        },
+        {
+            "company": "PT Pelayaran Tahta Bahtera",
+            "percentage": "90.90%",
+            "types": "Pelayaran",
+            "value": "64000"
+        },
+        {
+            "company": "Indofood Singapore Holdings Pte.Ltd.",
+            "percentage": "83.80%",
+            "types": "Investasi",
+            "value": "360000"
+        },
+        {
+            "company": "Pacsari Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Pelayaran",
+            "value": "1454000"
+        },
+        {
+            "company": "Ocean 21 Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "2550000"
+        },
+        {
+            "company": "PT Mandiri Pangan Makmur",
+            "percentage": "100%",
+            "types": "Industri dan perdagangan",
+            "value": "0"
+        },
+        {
+            "company": "PT Bogasari Flour Mills",
+            "percentage": "100%",
+            "types": "Penggilingan tepung",
+            "value": "0"
+        },
+        {
+            "company": "PT Salim Ivomas Pratama Tbk",
+            "percentage": "59.60%",
+            "types": "Perkebunan kelapa sawit, pengolahan dan produksi minyak goreng dan produk sejenis lainnya",
+            "value": "35395000"
+        },
+        {
+            "company": "Indofood Agri Resources Ltd.",
+            "percentage": "71.70%",
+            "types": "Investasi",
+            "value": "11085000"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "36,258",
+            "change": 3106,
+            "change_formatted": "(+3,106)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "33,152",
+            "change": -1247,
+            "change_formatted": "(-1,247)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "34,399",
+            "change": -1722,
+            "change_formatted": "(-1,722)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "36,121",
+            "change": -611,
+            "change_formatted": "(-611)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "36,732",
+            "change": -439,
+            "change_formatted": "(-439)"
+        },
+        {
+            "shareholder_date": "31 Mar 2025",
+            "total_share": "37,171",
+            "change": 211,
+            "change_formatted": "(+211)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.02%",
+            "name": "ANTHONI SALIM",
+            "value": "1.33 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "TAUFIK WIRAATMADJA",
+            "value": "50.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "FRANCISCUS WELIRANG",
+            "value": "250.00",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1994-07-14T00:00:00+07:00",
+    "ipo_price": 0,
+    "float": 48.21,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "208",
+                "email": [
+                    "corporate.secretary@indofood.co.id "
+                ],
+                "fax": "6221 5793 5960 ",
+                "npwp": "0015 4265 8809 2000",
+                "phone": "6221 5795 8822 ",
+                "website": "www.indofood.com",
+                "key": "",
+                "lastupdate": "2024-12-10T17:15:19+07:00",
+                "value": "",
+                "office": "Sudirman Plaza, Indofood Tower, Lt. 27, Jl. Jend. Sudirman Kav. 76-78 Jakarta 12910 "
+            }
+        ],
+        "background": "PT Indofood Sukses Makmur Tbk, yang didirikan dengan nama PT Panganjaya Intikusuma di tahun 1990, memiliki berbagai kegiatan usaha yang telah beroperasi sejak awal tahun 1980an. PT. Indofood Sukses Makmur Tbk (INDF) bergerak dalam bidang makanan olahan, bumbu, minuman, kemasan, minyak goreng, pabrik gandum dan pabrik pembuatan karung tepung.",
+        "history": {
+            "amount": "-",
+            "board": "Papan Utama",
+            "date": "14 Jul 1994",
+            "price": "0",
+            "registrar": "",
+            "shares": "763,000,000",
+            "underwriters": [
+                "PT. Merincorp"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "48.21%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836737",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "John William Ryan"
+                },
+                {
+                    "id": "13836736",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Joseph Hon Pong Ng"
+                },
+                {
+                    "id": "13836735",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Christopher Huxley Young"
+                },
+                {
+                    "id": "13836734",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Benny Setiawan Santoso"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836732",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Tan Elly (Elly Betty)"
+                },
+                {
+                    "id": "13836731",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Tan Suzi Indriani"
+                },
+                {
+                    "id": "13836730",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Hendra Widjaja"
+                },
+                {
+                    "id": "13836729",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Joedianto Soejonopoetro"
+                },
+                {
+                    "id": "13836728",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Moleonoto (Paulus Moleonoto)"
+                },
+                {
+                    "id": "13836727",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Alamsyah"
+                },
+                {
+                    "id": "13836726",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Taufik Wiraatmadja"
+                },
+                {
+                    "id": "13836725",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Tjhie Tje Fie (Thomas Tjhie)"
+                },
+                {
+                    "id": "13836724",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Axton Salim"
+                },
+                {
+                    "id": "13836723",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Franciscus Welirang"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836740",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Notariza Taher"
+                },
+                {
+                    "id": "13836739",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Sulaiman Arif Arianto"
+                },
+                {
+                    "id": "13836738",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Hans Kartikahadi"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13836733",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Manuel Velez Pangilinan"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13836722",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Anthoni Salim"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530176",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:17+07:00",
+                "value": "{\"name\":\"Bp Victor Suhendra\",\"phone\":\"(021) 57958822 Ext. 1761\",\"email\":\"victor.suhendra@indofood.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "50.07%",
+                "name": "FIRST PACIFIC INVESTMENT MANAGEMENT LTD",
+                "value": "4.40 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "49.58%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "4.35 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.33%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "29.69 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Indofood CBP Sukses Makmur Tbk",
+                "percentage": "80.50%",
+                "types": "Produksi mie, bumbu penyedap, produk makanan kuliner, biskuit, nutrisi dan makanan khusus",
+                "value": "103588000"
+            },
+            {
+                "company": "PT Prima Intipangan Sejati",
+                "percentage": "100%",
+                "types": "Jasa investasi dan manajemen",
+                "value": "26000"
+            },
+            {
+                "company": "PT Bogasari Sentra Flour Mills",
+                "percentage": "100%",
+                "types": "Penggilingan tepung",
+                "value": "22000"
+            },
+            {
+                "company": "PT Inti Abadi Kemasindo",
+                "percentage": "100%",
+                "types": "Produksi bahan kemasan",
+                "value": "257000"
+            },
+            {
+                "company": "PT Indobahtera Era Sejahtera",
+                "percentage": "100%",
+                "types": "Pelayaran",
+                "value": "0"
+            },
+            {
+                "company": "PT Mileva Makmur Mandiri",
+                "percentage": "100%",
+                "types": "Produksi makanan dari susu",
+                "value": "12000"
+            },
+            {
+                "company": "PT Saripangan Mandiri Sejahtera",
+                "percentage": "100%",
+                "types": "Penggilingan tepung",
+                "value": "1000"
+            },
+            {
+                "company": "PT Bina Makna Indopratama",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "46000"
+            },
+            {
+                "company": "PT Indomarco Adi Prima",
+                "percentage": "100%",
+                "types": "Distribusi",
+                "value": "5286000"
+            },
+            {
+                "company": "PT Argha Giri Perkasa",
+                "percentage": "80.00%",
+                "types": "Produksi kopra dan pengolahan minyak kelapa",
+                "value": "7000"
+            },
+            {
+                "company": "PT Putri Daya Usahatama",
+                "percentage": "65.00%",
+                "types": "Distribusi",
+                "value": "622000"
+            },
+            {
+                "company": "PT Arthanugraha Mandiri",
+                "percentage": "100%",
+                "types": "Produksi kopi",
+                "value": "4000"
+            },
+            {
+                "company": "PT Pelayaran Tahta Bahtera",
+                "percentage": "90.90%",
+                "types": "Pelayaran",
+                "value": "64000"
+            },
+            {
+                "company": "Indofood Singapore Holdings Pte.Ltd.",
+                "percentage": "83.80%",
+                "types": "Investasi",
+                "value": "360000"
+            },
+            {
+                "company": "Pacsari Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Pelayaran",
+                "value": "1454000"
+            },
+            {
+                "company": "Ocean 21 Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "2550000"
+            },
+            {
+                "company": "PT Mandiri Pangan Makmur",
+                "percentage": "100%",
+                "types": "Industri dan perdagangan",
+                "value": "0"
+            },
+            {
+                "company": "PT Bogasari Flour Mills",
+                "percentage": "100%",
+                "types": "Penggilingan tepung",
+                "value": "0"
+            },
+            {
+                "company": "PT Salim Ivomas Pratama Tbk",
+                "percentage": "59.60%",
+                "types": "Perkebunan kelapa sawit, pengolahan dan produksi minyak goreng dan produk sejenis lainnya",
+                "value": "35395000"
+            },
+            {
+                "company": "Indofood Agri Resources Ltd.",
+                "percentage": "71.70%",
+                "types": "Investasi",
+                "value": "11085000"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "36,258",
+                "change": 3106,
+                "change_formatted": "(+3,106)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "33,152",
+                "change": -1247,
+                "change_formatted": "(-1,247)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "34,399",
+                "change": -1722,
+                "change_formatted": "(-1,722)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "36,121",
+                "change": -611,
+                "change_formatted": "(-611)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "36,732",
+                "change": -439,
+                "change_formatted": "(-439)"
+            },
+            {
+                "shareholder_date": "31 Mar 2025",
+                "total_share": "37,171",
+                "change": 211,
+                "change_formatted": "(+211)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.02%",
+                "name": "ANTHONI SALIM",
+                "value": "1.33 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "TAUFIK WIRAATMADJA",
+                "value": "50.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "FRANCISCUS WELIRANG",
+                "value": "250.00",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:20+00:00"
+}

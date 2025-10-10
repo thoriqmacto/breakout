@@ -1,0 +1,798 @@
+{
+    "symbol": "MAPI",
+    "name": "MAPI",
+    "address": [
+        {
+            "id": "275",
+            "email": [
+                "corporate.secretary@map.co.id"
+            ],
+            "fax": "- ",
+            "npwp": "01.710.880.4-054.000",
+            "phone": "+62-21 8064 8498",
+            "website": "www.map.co.id",
+            "key": "",
+            "lastupdate": "2024-12-06T20:31:06+07:00",
+            "value": "",
+            "office": "Gedung Sahid Sudirman Center lt. 29 Jl. Jend. Sudirman kav. 86 Karet Tengsin Tanah Abang Jakarta Pusat DKI Jakarta"
+        }
+    ],
+    "background": "PT Mitra Adiperkasa Tbk (MAPI) didirikan pada tahun 1995. Portofolio Perseroan terdiri dari Department Stores, Segmen Penjualan Ritel, Digital, Food & Beverage dan lain-lain. Perseroan mengelola Lebih dari 150 Merek Kelas Dunia, Lebih dari 110 Konsep Ritel, Lebih dari 20.000 Karyawan, 2.658 Gerai Ritel dan Beroperasi di 81 Kota di Indonesia.",
+    "history": {
+        "amount": "312 B",
+        "board": "Papan Utama",
+        "date": "10 Nov 2004",
+        "price": "625",
+        "registrar": "",
+        "shares": "500,000,000",
+        "underwriters": [
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "49.00%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837722",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Zoee Ho Ziwei"
+            },
+            {
+                "id": "13837721",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Sintia Kolonas"
+            },
+            {
+                "id": "13837720",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Johanes Ridwan"
+            }
+        ],
+        "director": [
+            {
+                "id": "13837714",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Susiana Latif"
+            },
+            {
+                "id": "13837717",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Sean Gustav Standish Hughes"
+            },
+            {
+                "id": "13837716",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Sjeniwati Gusman"
+            },
+            {
+                "id": "13837715",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Handaka Santosa"
+            }
+        ],
+        "independent_commissioner": [],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13837712",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "H.B.L. Mantiri"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13837713",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "V.P. Sharma"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [
+            {
+                "id": "13837719",
+                "key": "Vice President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "G.B.P.H. H. Prabukusumo"
+            }
+        ],
+        "independent_president_commissioner": [
+            {
+                "id": "13837718",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:32+07:00",
+                "value": "Sri Indrastuti Hadiputranto"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12530995",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:33+07:00",
+            "value": "{\"name\":\"Eva Andrianie\",\"phone\":\"021-5745808\",\"email\":\"corporate.secretary@map.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51%",
+            "name": "PT SATYA MULIA GEMA GEMILANG",
+            "value": "8.47 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "49.0%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "8.13 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Prima Buana Perkasa",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "62694000000"
+        },
+        {
+            "company": "Map Active (Thailand) Ltd",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "171240000000"
+        },
+        {
+            "company": "PT Mitra Gaya Indah",
+            "percentage": "98.00%",
+            "types": "Specialty Store",
+            "value": "54699000000"
+        },
+        {
+            "company": "PT Putra Agung Lestari",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "127526000000"
+        },
+        {
+            "company": "PT Map Active",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "60703000000"
+        },
+        {
+            "company": "PT Sukses Diva Mandiri",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "61320000000"
+        },
+        {
+            "company": "PT Bersama Karuna Mandiri",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "35512000000"
+        },
+        {
+            "company": "PT Sarimode Griya",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "10653000000"
+        },
+        {
+            "company": "PT Toya Roda Utama",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "25004000000"
+        },
+        {
+            "company": "PT Creasi Mode Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "25003000000"
+        },
+        {
+            "company": "PT Panen Lestari Internusa",
+            "percentage": "99.99%",
+            "types": "Department Store",
+            "value": "1565280000000"
+        },
+        {
+            "company": "PT Benua Hamparan Luas",
+            "percentage": "99.99%",
+            "types": "Department Store",
+            "value": "207982000000"
+        },
+        {
+            "company": "PT Sari Boga Lestari",
+            "percentage": "99.98%",
+            "types": "Specialty Store - Kafe",
+            "value": "14093000000"
+        },
+        {
+            "company": "PT Sari Coffee Indonesia",
+            "percentage": "99.99%",
+            "types": "FSpecialty Store - Kafe",
+            "value": "346357000000"
+        },
+        {
+            "company": "PT Sari Pizza Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store - Restoran",
+            "value": "43369000000"
+        },
+        {
+            "company": "PT Sari Burger Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store - Restoran",
+            "value": "182126000000"
+        },
+        {
+            "company": "PT Sari IceCream Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store - Es Krim",
+            "value": "23903000000"
+        },
+        {
+            "company": "PT Dom Pizza Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store - Restoran",
+            "value": "101386000000"
+        },
+        {
+            "company": "PT Premier Doughnut Indonesia",
+            "percentage": "99.99%",
+            "types": "Specialty Store - Restoran",
+            "value": "22299000000"
+        },
+        {
+            "company": "PT Mitra Garindo Perkasa",
+            "percentage": "99.96%",
+            "types": "Garment",
+            "value": "49393000000"
+        },
+        {
+            "company": "PT Siola Sandimas",
+            "percentage": "99.99%",
+            "types": "Pemilik & Pengelola Mal",
+            "value": "77351000000"
+        },
+        {
+            "company": "PT Premier Capital Indonesia",
+            "percentage": "99.50%",
+            "types": "Investasi",
+            "value": "3057000000"
+        },
+        {
+            "company": "Map Active Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "84074000000"
+        },
+        {
+            "company": "PT Mitra Selaras Sempurna",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "257088000000"
+        },
+        {
+            "company": "PT Sarimode Fasindo Adiperkasa",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "294044000000"
+        },
+        {
+            "company": "PT Mitramode Duta Fashindo",
+            "percentage": "99.99%",
+            "types": "Specialty Store",
+            "value": "47234000000"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "21,626",
+            "change": 3247,
+            "change_formatted": "(+3,247)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "18,379",
+            "change": -1474,
+            "change_formatted": "(-1,474)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "19,853",
+            "change": 1163,
+            "change_formatted": "(+1,163)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "18,690",
+            "change": 622,
+            "change_formatted": "(+622)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "18,068",
+            "change": 1308,
+            "change_formatted": "(+1,308)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "16,760",
+            "change": -35,
+            "change_formatted": "(-35)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2004-11-10T00:00:00+07:00",
+    "ipo_price": 625,
+    "float": 49,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "275",
+                "email": [
+                    "corporate.secretary@map.co.id"
+                ],
+                "fax": "- ",
+                "npwp": "01.710.880.4-054.000",
+                "phone": "+62-21 8064 8498",
+                "website": "www.map.co.id",
+                "key": "",
+                "lastupdate": "2024-12-06T20:31:06+07:00",
+                "value": "",
+                "office": "Gedung Sahid Sudirman Center lt. 29 Jl. Jend. Sudirman kav. 86 Karet Tengsin Tanah Abang Jakarta Pusat DKI Jakarta"
+            }
+        ],
+        "background": "PT Mitra Adiperkasa Tbk (MAPI) didirikan pada tahun 1995. Portofolio Perseroan terdiri dari Department Stores, Segmen Penjualan Ritel, Digital, Food & Beverage dan lain-lain. Perseroan mengelola Lebih dari 150 Merek Kelas Dunia, Lebih dari 110 Konsep Ritel, Lebih dari 20.000 Karyawan, 2.658 Gerai Ritel dan Beroperasi di 81 Kota di Indonesia.",
+        "history": {
+            "amount": "312 B",
+            "board": "Papan Utama",
+            "date": "10 Nov 2004",
+            "price": "625",
+            "registrar": "",
+            "shares": "500,000,000",
+            "underwriters": [
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "49.00%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837722",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Zoee Ho Ziwei"
+                },
+                {
+                    "id": "13837721",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Sintia Kolonas"
+                },
+                {
+                    "id": "13837720",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Johanes Ridwan"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837714",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Susiana Latif"
+                },
+                {
+                    "id": "13837717",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Sean Gustav Standish Hughes"
+                },
+                {
+                    "id": "13837716",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Sjeniwati Gusman"
+                },
+                {
+                    "id": "13837715",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Handaka Santosa"
+                }
+            ],
+            "independent_commissioner": [],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13837712",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "H.B.L. Mantiri"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13837713",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "V.P. Sharma"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [
+                {
+                    "id": "13837719",
+                    "key": "Vice President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "G.B.P.H. H. Prabukusumo"
+                }
+            ],
+            "independent_president_commissioner": [
+                {
+                    "id": "13837718",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:32+07:00",
+                    "value": "Sri Indrastuti Hadiputranto"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12530995",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:33+07:00",
+                "value": "{\"name\":\"Eva Andrianie\",\"phone\":\"021-5745808\",\"email\":\"corporate.secretary@map.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51%",
+                "name": "PT SATYA MULIA GEMA GEMILANG",
+                "value": "8.47 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "49.0%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "8.13 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Prima Buana Perkasa",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "62694000000"
+            },
+            {
+                "company": "Map Active (Thailand) Ltd",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "171240000000"
+            },
+            {
+                "company": "PT Mitra Gaya Indah",
+                "percentage": "98.00%",
+                "types": "Specialty Store",
+                "value": "54699000000"
+            },
+            {
+                "company": "PT Putra Agung Lestari",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "127526000000"
+            },
+            {
+                "company": "PT Map Active",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "60703000000"
+            },
+            {
+                "company": "PT Sukses Diva Mandiri",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "61320000000"
+            },
+            {
+                "company": "PT Bersama Karuna Mandiri",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "35512000000"
+            },
+            {
+                "company": "PT Sarimode Griya",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "10653000000"
+            },
+            {
+                "company": "PT Toya Roda Utama",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "25004000000"
+            },
+            {
+                "company": "PT Creasi Mode Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "25003000000"
+            },
+            {
+                "company": "PT Panen Lestari Internusa",
+                "percentage": "99.99%",
+                "types": "Department Store",
+                "value": "1565280000000"
+            },
+            {
+                "company": "PT Benua Hamparan Luas",
+                "percentage": "99.99%",
+                "types": "Department Store",
+                "value": "207982000000"
+            },
+            {
+                "company": "PT Sari Boga Lestari",
+                "percentage": "99.98%",
+                "types": "Specialty Store - Kafe",
+                "value": "14093000000"
+            },
+            {
+                "company": "PT Sari Coffee Indonesia",
+                "percentage": "99.99%",
+                "types": "FSpecialty Store - Kafe",
+                "value": "346357000000"
+            },
+            {
+                "company": "PT Sari Pizza Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store - Restoran",
+                "value": "43369000000"
+            },
+            {
+                "company": "PT Sari Burger Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store - Restoran",
+                "value": "182126000000"
+            },
+            {
+                "company": "PT Sari IceCream Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store - Es Krim",
+                "value": "23903000000"
+            },
+            {
+                "company": "PT Dom Pizza Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store - Restoran",
+                "value": "101386000000"
+            },
+            {
+                "company": "PT Premier Doughnut Indonesia",
+                "percentage": "99.99%",
+                "types": "Specialty Store - Restoran",
+                "value": "22299000000"
+            },
+            {
+                "company": "PT Mitra Garindo Perkasa",
+                "percentage": "99.96%",
+                "types": "Garment",
+                "value": "49393000000"
+            },
+            {
+                "company": "PT Siola Sandimas",
+                "percentage": "99.99%",
+                "types": "Pemilik & Pengelola Mal",
+                "value": "77351000000"
+            },
+            {
+                "company": "PT Premier Capital Indonesia",
+                "percentage": "99.50%",
+                "types": "Investasi",
+                "value": "3057000000"
+            },
+            {
+                "company": "Map Active Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "84074000000"
+            },
+            {
+                "company": "PT Mitra Selaras Sempurna",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "257088000000"
+            },
+            {
+                "company": "PT Sarimode Fasindo Adiperkasa",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "294044000000"
+            },
+            {
+                "company": "PT Mitramode Duta Fashindo",
+                "percentage": "99.99%",
+                "types": "Specialty Store",
+                "value": "47234000000"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "21,626",
+                "change": 3247,
+                "change_formatted": "(+3,247)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "18,379",
+                "change": -1474,
+                "change_formatted": "(-1,474)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "19,853",
+                "change": 1163,
+                "change_formatted": "(+1,163)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "18,690",
+                "change": 622,
+                "change_formatted": "(+622)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "18,068",
+                "change": 1308,
+                "change_formatted": "(+1,308)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "16,760",
+                "change": -35,
+                "change_formatted": "(-35)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:23+00:00"
+}

@@ -1,0 +1,684 @@
+{
+    "symbol": "SRTG",
+    "name": "SRTG",
+    "address": [
+        {
+            "id": "483",
+            "email": [
+                "investor.relations@saratoga-investama.com"
+            ],
+            "fax": "021 57944781",
+            "npwp": "0015619604054000",
+            "phone": "021 57944355",
+            "website": "www.http://saratoga-investama.com",
+            "key": "",
+            "lastupdate": "2024-12-04T12:44:15+07:00",
+            "value": "",
+            "office": "Menara Karya Lantai 15, Jl. HR. Rasuna Said Blok X-5, Kav. 1-2, Jakarta Selatan 12950, Indonesia"
+        }
+    ],
+    "background": "PT Saratoga Investama Sedaya Tbk merupakan perusahaan yang bergerak dalam bidang investasi. Perusahaan berinvestasi dalam tiga sektor; konsumen, infrastruktur, dan sumber daya alam. Portofolio investasi sumber daya alamnya termasuk perusahaan yang bergerak dalam industri batu bara, seperti PT Adaro Energy Tbk; perkebunan minyak kelapa sawit, seperti PT Provident Agro Tbk; eksplorasi gas dan minyak bumi, seperti Interra Resources Ltd, dan pertambangan tembaga dan emas, seperti Sihayo Gold Ltd. Portofolio investasi infrastrukturnya mencakup perusahaan yang bergerak dalam penyewaan menara telekomunikasi, seperti PT Tower Bersama Infrastructure Tbk; industri pembangkit listrik, seperti PT Medco Power Indonesia; pengilangan minyak, seperti PT Tri Wahana Universal; layanan jalan tol dan konstruksi, seperti PT Nusa Raya Cipta Tbk, serta Seroja Investment Ltd. Portofolio investasi konsumennya mencakup perusahaan yang bergerak dalam industri otomotif, seperti PT Mitra Pinasthika Mustika Tbk, dan properti, seperti PT Etika Karya Usaha.",
+    "history": {
+        "amount": "1,492 B",
+        "board": "Papan Utama",
+        "date": "26 Jun 2013",
+        "price": "5,500",
+        "registrar": "",
+        "shares": "271,296,992",
+        "underwriters": [
+            "PT. Deutsche Securities Indonesia",
+            "PT. Indo Premier Securities",
+            "PT. UBS Securities Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "9.35%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13839761",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Joyce Soeryadjaya Kerr"
+            },
+            {
+                "id": "13839762",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Indra Cahya Uno"
+            }
+        ],
+        "director": [
+            {
+                "id": "13839758",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Lany Djuwita Wong"
+            },
+            {
+                "id": "13839759",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Devin Wirawan"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13839763",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Aria Kanaka"
+            },
+            {
+                "id": "13839764",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Stephanus Harjanto T"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13839760",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Edwin Soeryadjaya"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13839757",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:48+07:00",
+                "value": "Michael W.P. Soeryadjaya"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12533469",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:23+07:00",
+            "value": "{\"name\":\"Divisi Hukum dan Sekretariat Perusahaan dgn penanggung jawab Sandi Rahaju dan Juan Akbar Indraseno\",\"phone\":\"02157944355\",\"email\":\"corporate.secretary@saratoga-investama.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "32.7214%",
+            "name": "PT UNITRAS PERTAMA",
+            "value": "4.44 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "21.5102%",
+            "name": "SANDIAGA SALAHUDDIN UNO",
+            "value": "2.92 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "9.6406%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.31 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.111%",
+            "name": "SAHAM TREASURY",
+            "value": "15.00 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Sukses Indonesia",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "63516"
+        },
+        {
+            "company": "PT Sarana Asri",
+            "percentage": "60.00%",
+            "types": "Jasa investasi",
+            "value": "1377"
+        },
+        {
+            "company": "PT Lintas Indonesia Sejahtera",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "23625"
+        },
+        {
+            "company": "PT Nugraha Eka Kencana",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "910835"
+        },
+        {
+            "company": "PT Wahana Anugerah Sejahtera",
+            "percentage": "99.96%",
+            "types": "Jasa investasi",
+            "value": "16059768"
+        },
+        {
+            "company": "PT Bumi Hijau Asri",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "224114"
+        },
+        {
+            "company": "PT Wana Bhakti Sukses Mineral",
+            "percentage": "73.68%",
+            "types": "Jasa investasi",
+            "value": "79356"
+        },
+        {
+            "company": "PT Saratoga Sentra Business",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "1208270"
+        },
+        {
+            "company": "PT Trimitra Karya Jaya",
+            "percentage": "86.49%",
+            "types": "Jasa investasi",
+            "value": "644"
+        },
+        {
+            "company": "PT Surya Nuansa Ceria",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "235356"
+        },
+        {
+            "company": "PT Interra Indo Resources",
+            "percentage": "99.99%",
+            "types": "Jasa investasi",
+            "value": "516"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "20,948",
+            "change": 1059,
+            "change_formatted": "(+1,059)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "19,889",
+            "change": 669,
+            "change_formatted": "(+669)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "19,220",
+            "change": -1463,
+            "change_formatted": "(-1,463)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "20,683",
+            "change": -465,
+            "change_formatted": "(-465)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "21,148",
+            "change": 2172,
+            "change_formatted": "(+2,172)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "18,976",
+            "change": 369,
+            "change_formatted": "(+369)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "35.8719%",
+            "name": "EDWIN SOERYADJAYA",
+            "value": "4.87 B",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0585%",
+            "name": "DEVIN WIRAWAN",
+            "value": "7.94 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0466%",
+            "name": "LANY DJUWITA",
+            "value": "6.33 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0398%",
+            "name": "MICHAEL W.P. SOERYADJAYA",
+            "value": "5.41 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2013-06-26T00:00:00+07:00",
+    "ipo_price": 5500,
+    "float": 9.35,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "483",
+                "email": [
+                    "investor.relations@saratoga-investama.com"
+                ],
+                "fax": "021 57944781",
+                "npwp": "0015619604054000",
+                "phone": "021 57944355",
+                "website": "www.http://saratoga-investama.com",
+                "key": "",
+                "lastupdate": "2024-12-04T12:44:15+07:00",
+                "value": "",
+                "office": "Menara Karya Lantai 15, Jl. HR. Rasuna Said Blok X-5, Kav. 1-2, Jakarta Selatan 12950, Indonesia"
+            }
+        ],
+        "background": "PT Saratoga Investama Sedaya Tbk merupakan perusahaan yang bergerak dalam bidang investasi. Perusahaan berinvestasi dalam tiga sektor; konsumen, infrastruktur, dan sumber daya alam. Portofolio investasi sumber daya alamnya termasuk perusahaan yang bergerak dalam industri batu bara, seperti PT Adaro Energy Tbk; perkebunan minyak kelapa sawit, seperti PT Provident Agro Tbk; eksplorasi gas dan minyak bumi, seperti Interra Resources Ltd, dan pertambangan tembaga dan emas, seperti Sihayo Gold Ltd. Portofolio investasi infrastrukturnya mencakup perusahaan yang bergerak dalam penyewaan menara telekomunikasi, seperti PT Tower Bersama Infrastructure Tbk; industri pembangkit listrik, seperti PT Medco Power Indonesia; pengilangan minyak, seperti PT Tri Wahana Universal; layanan jalan tol dan konstruksi, seperti PT Nusa Raya Cipta Tbk, serta Seroja Investment Ltd. Portofolio investasi konsumennya mencakup perusahaan yang bergerak dalam industri otomotif, seperti PT Mitra Pinasthika Mustika Tbk, dan properti, seperti PT Etika Karya Usaha.",
+        "history": {
+            "amount": "1,492 B",
+            "board": "Papan Utama",
+            "date": "26 Jun 2013",
+            "price": "5,500",
+            "registrar": "",
+            "shares": "271,296,992",
+            "underwriters": [
+                "PT. Deutsche Securities Indonesia",
+                "PT. Indo Premier Securities",
+                "PT. UBS Securities Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "9.35%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13839761",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Joyce Soeryadjaya Kerr"
+                },
+                {
+                    "id": "13839762",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Indra Cahya Uno"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13839758",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Lany Djuwita Wong"
+                },
+                {
+                    "id": "13839759",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Devin Wirawan"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13839763",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Aria Kanaka"
+                },
+                {
+                    "id": "13839764",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Stephanus Harjanto T"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13839760",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Edwin Soeryadjaya"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13839757",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:48+07:00",
+                    "value": "Michael W.P. Soeryadjaya"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12533469",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:23+07:00",
+                "value": "{\"name\":\"Divisi Hukum dan Sekretariat Perusahaan dgn penanggung jawab Sandi Rahaju dan Juan Akbar Indraseno\",\"phone\":\"02157944355\",\"email\":\"corporate.secretary@saratoga-investama.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "32.7214%",
+                "name": "PT UNITRAS PERTAMA",
+                "value": "4.44 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "21.5102%",
+                "name": "SANDIAGA SALAHUDDIN UNO",
+                "value": "2.92 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "9.6406%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.31 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.111%",
+                "name": "SAHAM TREASURY",
+                "value": "15.00 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Sukses Indonesia",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "63516"
+            },
+            {
+                "company": "PT Sarana Asri",
+                "percentage": "60.00%",
+                "types": "Jasa investasi",
+                "value": "1377"
+            },
+            {
+                "company": "PT Lintas Indonesia Sejahtera",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "23625"
+            },
+            {
+                "company": "PT Nugraha Eka Kencana",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "910835"
+            },
+            {
+                "company": "PT Wahana Anugerah Sejahtera",
+                "percentage": "99.96%",
+                "types": "Jasa investasi",
+                "value": "16059768"
+            },
+            {
+                "company": "PT Bumi Hijau Asri",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "224114"
+            },
+            {
+                "company": "PT Wana Bhakti Sukses Mineral",
+                "percentage": "73.68%",
+                "types": "Jasa investasi",
+                "value": "79356"
+            },
+            {
+                "company": "PT Saratoga Sentra Business",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "1208270"
+            },
+            {
+                "company": "PT Trimitra Karya Jaya",
+                "percentage": "86.49%",
+                "types": "Jasa investasi",
+                "value": "644"
+            },
+            {
+                "company": "PT Surya Nuansa Ceria",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "235356"
+            },
+            {
+                "company": "PT Interra Indo Resources",
+                "percentage": "99.99%",
+                "types": "Jasa investasi",
+                "value": "516"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "20,948",
+                "change": 1059,
+                "change_formatted": "(+1,059)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "19,889",
+                "change": 669,
+                "change_formatted": "(+669)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "19,220",
+                "change": -1463,
+                "change_formatted": "(-1,463)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "20,683",
+                "change": -465,
+                "change_formatted": "(-465)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "21,148",
+                "change": 2172,
+                "change_formatted": "(+2,172)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "18,976",
+                "change": 369,
+                "change_formatted": "(+369)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "35.8719%",
+                "name": "EDWIN SOERYADJAYA",
+                "value": "4.87 B",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0585%",
+                "name": "DEVIN WIRAWAN",
+                "value": "7.94 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0466%",
+                "name": "LANY DJUWITA",
+                "value": "6.33 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0398%",
+                "name": "MICHAEL W.P. SOERYADJAYA",
+                "value": "5.41 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:30+00:00"
+}

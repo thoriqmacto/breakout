@@ -1,0 +1,548 @@
+{
+    "symbol": "PANI",
+    "name": "PANI",
+    "address": [
+        {
+            "id": "1000000083",
+            "email": [
+                "corporate.secretary@agungsedayu.com"
+            ],
+            "fax": "0",
+            "npwp": "02.155.064.5-451.000",
+            "phone": "(62-21) 39734100",
+            "website": "www.pantaiindahkapukdua.com",
+            "key": "",
+            "lastupdate": "2025-01-22T17:59:44+07:00",
+            "value": "",
+            "office": "Office Tower Agung Sedayu Group, Lantai 8 & 10 Unit G Jalan Marina Raya Kelurahan Kamal Muara, Kecamatan Penjaringan Jakarta Utama 14470 INDONESIA"
+        }
+    ],
+    "background": "PT Pantai Indah Kapuk Dua Tbk yang sebelumnya bernama PT Pratama Abadi Nusa Industri Tbk (PANI) memulai kegiatan usahanya pada 1 Maret 2001, sebagai produsen dalam industri kemasan kaleng. Pada bulan Desember 2017, PANI mengakuisisi PT Windublambangan Sejati, sebuah perusahaan yang bergerak di bidang pengolahan produk perikanan dan layanan pembekuan/penyimpanan di ruang pendingin. Pada 18 September 2018, PANI mengubah statusnya menjadi Perusahaan Terbuka dengan mencatatkan saham perdana di Bursa Efek Indonesia dengan nilai nominal saham sebesar Rp108 dan total 150 juta saham yang tercatat. Pada tahun 2021, PT Multi Artha Pratama (MAP), yang merupakan ahli di sektor properti di PIK, mengambil alih 80% saham PANI atau 328 juta saham sebagai pemegang saham pengendali. \nSetelah itu, PANI mendiversifikasi portofolio bisnisnya di sektor properti, menjalin hubungan dengan Agung Sedayu Group dan Salim Group sebagai sponsor, serta melakukan aksi korporasi dan rencana bisnis, termasuk meningkatkan modal melalui Hak Memesan Efek Terlebih Dahulu (PMHMETD I). PANI melakukan penawaran umum sebanyak 13.120 juta saham baru dengan nilai nominal Rp100 (nominal penuh) per saham dengan harga penawaran Rp500 (nominal penuh) per saham dan berhasil tercatat di Bursa Efek Indonesia pada 23 Agustus 2022. Dengan visi dan misi yang kuat, PANI bertujuan untuk menjadi pemimpin pasar di sektor properti dengan kualitas, komitmen, integritas, dan kepercayaan yang tinggi.",
+    "history": {
+        "amount": "16 B",
+        "board": "Papan Pengembangan",
+        "date": "18 Sep 2018",
+        "price": "108",
+        "registrar": "",
+        "shares": "150,000,000",
+        "underwriters": [
+            "PT. Investindo Nusantara Sekuritas"
+        ],
+        "administrative_bureau": "PT. Adimitra Jasa Korpora",
+        "free_float": "10.07%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13838594",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Richard Halim Kusuma"
+            },
+            {
+                "id": "13838591",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Steven Kusumo"
+            }
+        ],
+        "director": [
+            {
+                "id": "13838586",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Yohanes Edmond Budiman"
+            },
+            {
+                "id": "13838589",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Arthur Salim"
+            },
+            {
+                "id": "13838588",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Ipeng Widjojo"
+            },
+            {
+                "id": "13838587",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Markus Kusumaputra"
+            },
+            {
+                "id": "13838585",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Gianto Gunara"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13838596",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Adi Pranoto Leman"
+            },
+            {
+                "id": "13838595",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Djisman Simandjuntak"
+            },
+            {
+                "id": "13838592",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Hardjo Subroto Lilik"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13838590",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Susanto Kusumo"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13838582",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Sugianto Kusuma"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13838584",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Surya Pranoto Budihardjo"
+            },
+            {
+                "id": "13838583",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Alexander Halim Kusuma"
+            }
+        ],
+        "vice_president_commissioner": [
+            {
+                "id": "13838593",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:39:49+07:00",
+                "value": "Phiong Philipus Darma"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12535107",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:01+07:00",
+            "value": "{\"name\":\"Prilli Budi Pasravita Soetantyo\",\"phone\":\"(62-21) 29417685\",\"email\":\"corporatesecretary@pratamaabadi.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "89.93%",
+            "name": "PT MULTI ARTHA PRATAMA",
+            "value": "15.20 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "10.07%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.70 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Windu Blambangan Sejati",
+            "percentage": "99.00%",
+            "types": "pengolahan hasil perikanan",
+            "value": "56390111689"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "52,302",
+            "change": 6181,
+            "change_formatted": "(+6,181)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "46,121",
+            "change": 5422,
+            "change_formatted": "(+5,422)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "40,699",
+            "change": -1853,
+            "change_formatted": "(-1,853)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "42,552",
+            "change": -5736,
+            "change_formatted": "(-5,736)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "48,288",
+            "change": 880,
+            "change_formatted": "(+880)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "47,408",
+            "change": 1398,
+            "change_formatted": "(+1,398)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2018-09-18T00:00:00+07:00",
+    "ipo_price": 108,
+    "float": 10.07,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000000083",
+                "email": [
+                    "corporate.secretary@agungsedayu.com"
+                ],
+                "fax": "0",
+                "npwp": "02.155.064.5-451.000",
+                "phone": "(62-21) 39734100",
+                "website": "www.pantaiindahkapukdua.com",
+                "key": "",
+                "lastupdate": "2025-01-22T17:59:44+07:00",
+                "value": "",
+                "office": "Office Tower Agung Sedayu Group, Lantai 8 & 10 Unit G Jalan Marina Raya Kelurahan Kamal Muara, Kecamatan Penjaringan Jakarta Utama 14470 INDONESIA"
+            }
+        ],
+        "background": "PT Pantai Indah Kapuk Dua Tbk yang sebelumnya bernama PT Pratama Abadi Nusa Industri Tbk (PANI) memulai kegiatan usahanya pada 1 Maret 2001, sebagai produsen dalam industri kemasan kaleng. Pada bulan Desember 2017, PANI mengakuisisi PT Windublambangan Sejati, sebuah perusahaan yang bergerak di bidang pengolahan produk perikanan dan layanan pembekuan/penyimpanan di ruang pendingin. Pada 18 September 2018, PANI mengubah statusnya menjadi Perusahaan Terbuka dengan mencatatkan saham perdana di Bursa Efek Indonesia dengan nilai nominal saham sebesar Rp108 dan total 150 juta saham yang tercatat. Pada tahun 2021, PT Multi Artha Pratama (MAP), yang merupakan ahli di sektor properti di PIK, mengambil alih 80% saham PANI atau 328 juta saham sebagai pemegang saham pengendali. \nSetelah itu, PANI mendiversifikasi portofolio bisnisnya di sektor properti, menjalin hubungan dengan Agung Sedayu Group dan Salim Group sebagai sponsor, serta melakukan aksi korporasi dan rencana bisnis, termasuk meningkatkan modal melalui Hak Memesan Efek Terlebih Dahulu (PMHMETD I). PANI melakukan penawaran umum sebanyak 13.120 juta saham baru dengan nilai nominal Rp100 (nominal penuh) per saham dengan harga penawaran Rp500 (nominal penuh) per saham dan berhasil tercatat di Bursa Efek Indonesia pada 23 Agustus 2022. Dengan visi dan misi yang kuat, PANI bertujuan untuk menjadi pemimpin pasar di sektor properti dengan kualitas, komitmen, integritas, dan kepercayaan yang tinggi.",
+        "history": {
+            "amount": "16 B",
+            "board": "Papan Pengembangan",
+            "date": "18 Sep 2018",
+            "price": "108",
+            "registrar": "",
+            "shares": "150,000,000",
+            "underwriters": [
+                "PT. Investindo Nusantara Sekuritas"
+            ],
+            "administrative_bureau": "PT. Adimitra Jasa Korpora",
+            "free_float": "10.07%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13838594",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Richard Halim Kusuma"
+                },
+                {
+                    "id": "13838591",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Steven Kusumo"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13838586",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Yohanes Edmond Budiman"
+                },
+                {
+                    "id": "13838589",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Arthur Salim"
+                },
+                {
+                    "id": "13838588",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Ipeng Widjojo"
+                },
+                {
+                    "id": "13838587",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Markus Kusumaputra"
+                },
+                {
+                    "id": "13838585",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Gianto Gunara"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13838596",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Adi Pranoto Leman"
+                },
+                {
+                    "id": "13838595",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Djisman Simandjuntak"
+                },
+                {
+                    "id": "13838592",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Hardjo Subroto Lilik"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13838590",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Susanto Kusumo"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13838582",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Sugianto Kusuma"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13838584",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Surya Pranoto Budihardjo"
+                },
+                {
+                    "id": "13838583",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Alexander Halim Kusuma"
+                }
+            ],
+            "vice_president_commissioner": [
+                {
+                    "id": "13838593",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:49+07:00",
+                    "value": "Phiong Philipus Darma"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12535107",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:01+07:00",
+                "value": "{\"name\":\"Prilli Budi Pasravita Soetantyo\",\"phone\":\"(62-21) 29417685\",\"email\":\"corporatesecretary@pratamaabadi.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "89.93%",
+                "name": "PT MULTI ARTHA PRATAMA",
+                "value": "15.20 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "10.07%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.70 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Windu Blambangan Sejati",
+                "percentage": "99.00%",
+                "types": "pengolahan hasil perikanan",
+                "value": "56390111689"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "52,302",
+                "change": 6181,
+                "change_formatted": "(+6,181)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "46,121",
+                "change": 5422,
+                "change_formatted": "(+5,422)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "40,699",
+                "change": -1853,
+                "change_formatted": "(-1,853)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "42,552",
+                "change": -5736,
+                "change_formatted": "(-5,736)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "48,288",
+                "change": 880,
+                "change_formatted": "(+880)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "47,408",
+                "change": 1398,
+                "change_formatted": "(+1,398)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:27+00:00"
+}

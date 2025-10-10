@@ -1,0 +1,926 @@
+{
+    "symbol": "EMTK",
+    "name": "EMTK",
+    "address": [
+        {
+            "id": "150",
+            "email": [
+                "corsec@emtek.co.id"
+            ],
+            "fax": "021-7278 2194",
+            "npwp": "0013 6681 7305 4000",
+            "phone": "021-7278 2066",
+            "website": "www.emtek.co.id",
+            "key": "",
+            "lastupdate": "2024-05-30T13:57:19+07:00",
+            "value": "",
+            "office": "SCTV Tower, Lantai 18, Senayan City\r\nJl. Asia Afrika Lot 19\r\nJakarta 10270"
+        }
+    ],
+    "background": "Perseroan didirikan pada tanggal 3 Agustus 1983 dengan nama PT Elang Mahkota Komputer. Pada tanggal 10 Maret 1997, Perseroan berganti nama menjadi PT Elang Mahkota Teknologi (EMTEK). EMTEK mengakuisisi kepemilikan saham strategis di stasiun televisi free-to-air PT Surya Citra Televisi (SCTV) melalui PT Surya Citra Media Tbk (SCMA) di tahun 2002. Tak hanya itu, demi mengembangkan skala usahanya, Perseroan melaksanakan penawaran umum perdana (IPO) pada 12 Januari 2010. Melengkapi keberhasilan IPO tersebut, EMTEK mengukuhkan posisinya di industri media domestik dengan mengakuisisi PT Indosiar Karya Mandiri Tbk (IDKM) yang merupakan induk usaha stasiun televisi PT Indosiar Visual Mandiri (Indosiar). Pada tahun 2013, EMTEK mengambil langkah strategis untuk meningkatkan sinergi dalam Grup dengan menggabungkan SCMA, induk usaha SCTV, dengan IDKM, induk usaha Indosiar.\n\nPerseroan pun terus mengembangkan dan memperkuat ekosistem konten dan layanan digitalnya dengan berinvestasi pada bisnis online di berbagai industri, antara lain platform e-commerce terkemuka di Indonesia, BukaLapak, platform kesehatan digital, KlikDokter, portal lowongan kerja online karir.com, Qerja, dan Jobs.id, Home Tester Club, serta perusahaan di sektor digital lainnya seperti logistik, teknologi pendidikan, dan teknologi asuransi. Perseroan juga senantiasa mengembangkan bisnis teknologi finansial melalui dompet digital DANA serta aktif berinvestasi di berbagai sektor digital lainnya, seperti logistik, teknologi pendidikan dan teknologi asuransi.\n\nSelain itu, EMTEK telah memperkuat portofolionya di bisnis media digital online melalui anak usahanya\nPT Kreatif Media Karya (KMK Online) dengan berinvestasi di PT Kapanlagi Dot Com Networks yang menaungi 9 portal digital ternama, yaitu Liputan6.com, Merdeka.com, Dream.com , Fimela, Brilio.com, Kapanlagi.com, Bola.com, Bola.net, dan Otosia.com. Perseroan juga telah mengembangkan platform streaming OTT Vidio yang kini telah menjadi pemain terkemuka di Indonesia.\n\nTak hanya itu, Pada tanggal 30 November 2020, Perseroan telah menyelesaikan akuisisi atas 4.241.000.000 saham yang mewakili 71,88% dari seluruh saham yang ditempatkan dan disetor penuh dalam PT Sarana Meditama Metropolitan Tbk (SAME) yang memiliki dan mengoperasikan Rumah Sakit OMNI.",
+    "history": {
+        "amount": "369 B",
+        "board": "Papan Utama",
+        "date": "12 Jan 2010",
+        "price": "720",
+        "registrar": "",
+        "shares": "512,729,984",
+        "underwriters": [
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "26.82%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13835833",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Susanto Suwarto"
+            }
+        ],
+        "director": [
+            {
+                "id": "13835831",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Titi Maria Rusli"
+            },
+            {
+                "id": "13835830",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Jay Geoffrey Wacher "
+            },
+            {
+                "id": "13835829",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Sutiana Ali"
+            },
+            {
+                "id": "13835828",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Yuslinda Nasution"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13835835",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Marianna Sutadi"
+            },
+            {
+                "id": "13835834",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Stan Maringka"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13835832",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Rd. Eddy K. Sariaatmadja "
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13835826",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Rd. Alvin W. Sariaatmadja"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13835827",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:38:07+07:00",
+                "value": "Sutanto Hartono"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529458",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:49+07:00",
+            "value": "{\"name\":\"Titi Maria Rusli\",\"phone\":\"021-72782066\",\"email\":\"titi.maria@emtek.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "28.35%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "17.41 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "14.1%",
+            "name": "PT ADIKARSA SARANA",
+            "value": "8.65 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "8.98%",
+            "name": "ANTHONI SALIM",
+            "value": "5.51 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "8.13%",
+            "name": "PIET YAURY",
+            "value": "4.99 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "6.19%",
+            "name": "PT PRIMA VISUALINDO",
+            "value": "3.80 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.4%",
+            "name": "SAHAM TREASURY",
+            "value": "243.95 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Tangara Mitrakom",
+            "percentage": "92.00%",
+            "types": "Jasa telekomunikasi",
+            "value": "325079512"
+        },
+        {
+            "company": "PT Bitnet Komunikasindo",
+            "percentage": "99.99%",
+            "types": "Jasa teknologi informasi",
+            "value": "1853159"
+        },
+        {
+            "company": "PT Elang Graha Propertindo",
+            "percentage": "100%",
+            "types": "Perdagangan",
+            "value": "22803135"
+        },
+        {
+            "company": "PT Abhimata Citra Abadi",
+            "percentage": "99.99%",
+            "types": "Perdagangan dan jasa telekomunikasi",
+            "value": "549327756"
+        },
+        {
+            "company": "PT Astika Gerbang Timur",
+            "percentage": "99.90%",
+            "types": "Perdagangan dan jasa telekomunikasi",
+            "value": "227366"
+        },
+        {
+            "company": "PT Omni Intivision",
+            "percentage": "99.99%",
+            "types": "Penyiaran televisi",
+            "value": "94127883"
+        },
+        {
+            "company": "PT Surya Citra Media Tbk.",
+            "percentage": "71.33%",
+            "types": "Penyiaran televisi",
+            "value": "6859864628"
+        },
+        {
+            "company": "PT Sakalaguna Semesta",
+            "percentage": "80.00%",
+            "types": "Perdagangan dan jasa telekomunikasi",
+            "value": "202508445"
+        },
+        {
+            "company": "PT Indosurya Menara Bersama",
+            "percentage": "60.00%",
+            "types": "Jasa penyediaan sewa tower",
+            "value": "145965257"
+        },
+        {
+            "company": "PT Kreatif Media Karya",
+            "percentage": "99.99%",
+            "types": "Media Online",
+            "value": "1381137639"
+        },
+        {
+            "company": "PT Elang Medika Corpora",
+            "percentage": "100%",
+            "types": "Perdagangan dan jasa",
+            "value": "1138930937"
+        },
+        {
+            "company": "PT Elang Cakra Arena",
+            "percentage": "99.99%",
+            "types": "Jasa Impresariat",
+            "value": "108500571"
+        },
+        {
+            "company": "PT Global Kriya Propertindo",
+            "percentage": "99.99%",
+            "types": "Perdagangan dan jasa",
+            "value": "71008395"
+        },
+        {
+            "company": "PT Elang Media Visitama",
+            "percentage": "99.99%",
+            "types": "Perdagangan",
+            "value": "44654883"
+        },
+        {
+            "company": "PT Global Kencana Propertindo",
+            "percentage": "99.99%",
+            "types": "Perdagangan dan jasa",
+            "value": "122267553"
+        },
+        {
+            "company": "PT Elang Prima Retailindo",
+            "percentage": "100%",
+            "types": "Perdagangan dan jasa teknologi",
+            "value": "18814072"
+        },
+        {
+            "company": "PT Elang Persada Teknologi",
+            "percentage": "99.99%",
+            "types": "Perdagangan dan Jasa",
+            "value": "55050715"
+        },
+        {
+            "company": "PT Elang Karya Persada",
+            "percentage": "99.99%",
+            "types": "Perdagangan dan Jasa",
+            "value": "2077508"
+        },
+        {
+            "company": "PT Elang Pesona Triloka",
+            "percentage": "99.96%",
+            "types": "Perdagangan dan Jasa",
+            "value": "446550"
+        },
+        {
+            "company": "PT Indopay Merchant Services",
+            "percentage": "100%",
+            "types": "Perdagangan dan jasa",
+            "value": "11863421"
+        },
+        {
+            "company": "PT Sarana Meditama Metropolitan Tbk",
+            "percentage": "72.19%",
+            "types": "Jasa Kesehatan",
+            "value": "3130669039"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "37,404",
+            "change": -4711,
+            "change_formatted": "(-4,711)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "42,115",
+            "change": 6082,
+            "change_formatted": "(+6,082)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "36,033",
+            "change": 1978,
+            "change_formatted": "(+1,978)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "34,055",
+            "change": -366,
+            "change_formatted": "(-366)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "34,421",
+            "change": 2263,
+            "change_formatted": "(+2,263)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "32,158",
+            "change": -180,
+            "change_formatted": "(-180)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "21.89%",
+            "name": "EDDY K. SARIAATMADJA",
+            "value": "13.44 B",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "11.59%",
+            "name": "IR. SUSANTO SUWARTO",
+            "value": "7.12 B",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.16%",
+            "name": "ALVIN W. SARIAATMADJA",
+            "value": "98.09 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.09%",
+            "name": "JAY GEOFFREY WACHER",
+            "value": "54.95 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.06%",
+            "name": "SUTANTO HARTONO",
+            "value": "34.00 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.02%",
+            "name": "YUSLINDA NASUTION",
+            "value": "14.05 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.02%",
+            "name": "TITI MARIA RUSLI",
+            "value": "12.00 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.02%",
+            "name": "SUTIANA ALI ",
+            "value": "11.86 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2010-01-12T00:00:00+07:00",
+    "ipo_price": 720,
+    "float": 26.82,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "150",
+                "email": [
+                    "corsec@emtek.co.id"
+                ],
+                "fax": "021-7278 2194",
+                "npwp": "0013 6681 7305 4000",
+                "phone": "021-7278 2066",
+                "website": "www.emtek.co.id",
+                "key": "",
+                "lastupdate": "2024-05-30T13:57:19+07:00",
+                "value": "",
+                "office": "SCTV Tower, Lantai 18, Senayan City\r\nJl. Asia Afrika Lot 19\r\nJakarta 10270"
+            }
+        ],
+        "background": "Perseroan didirikan pada tanggal 3 Agustus 1983 dengan nama PT Elang Mahkota Komputer. Pada tanggal 10 Maret 1997, Perseroan berganti nama menjadi PT Elang Mahkota Teknologi (EMTEK). EMTEK mengakuisisi kepemilikan saham strategis di stasiun televisi free-to-air PT Surya Citra Televisi (SCTV) melalui PT Surya Citra Media Tbk (SCMA) di tahun 2002. Tak hanya itu, demi mengembangkan skala usahanya, Perseroan melaksanakan penawaran umum perdana (IPO) pada 12 Januari 2010. Melengkapi keberhasilan IPO tersebut, EMTEK mengukuhkan posisinya di industri media domestik dengan mengakuisisi PT Indosiar Karya Mandiri Tbk (IDKM) yang merupakan induk usaha stasiun televisi PT Indosiar Visual Mandiri (Indosiar). Pada tahun 2013, EMTEK mengambil langkah strategis untuk meningkatkan sinergi dalam Grup dengan menggabungkan SCMA, induk usaha SCTV, dengan IDKM, induk usaha Indosiar.\n\nPerseroan pun terus mengembangkan dan memperkuat ekosistem konten dan layanan digitalnya dengan berinvestasi pada bisnis online di berbagai industri, antara lain platform e-commerce terkemuka di Indonesia, BukaLapak, platform kesehatan digital, KlikDokter, portal lowongan kerja online karir.com, Qerja, dan Jobs.id, Home Tester Club, serta perusahaan di sektor digital lainnya seperti logistik, teknologi pendidikan, dan teknologi asuransi. Perseroan juga senantiasa mengembangkan bisnis teknologi finansial melalui dompet digital DANA serta aktif berinvestasi di berbagai sektor digital lainnya, seperti logistik, teknologi pendidikan dan teknologi asuransi.\n\nSelain itu, EMTEK telah memperkuat portofolionya di bisnis media digital online melalui anak usahanya\nPT Kreatif Media Karya (KMK Online) dengan berinvestasi di PT Kapanlagi Dot Com Networks yang menaungi 9 portal digital ternama, yaitu Liputan6.com, Merdeka.com, Dream.com , Fimela, Brilio.com, Kapanlagi.com, Bola.com, Bola.net, dan Otosia.com. Perseroan juga telah mengembangkan platform streaming OTT Vidio yang kini telah menjadi pemain terkemuka di Indonesia.\n\nTak hanya itu, Pada tanggal 30 November 2020, Perseroan telah menyelesaikan akuisisi atas 4.241.000.000 saham yang mewakili 71,88% dari seluruh saham yang ditempatkan dan disetor penuh dalam PT Sarana Meditama Metropolitan Tbk (SAME) yang memiliki dan mengoperasikan Rumah Sakit OMNI.",
+        "history": {
+            "amount": "369 B",
+            "board": "Papan Utama",
+            "date": "12 Jan 2010",
+            "price": "720",
+            "registrar": "",
+            "shares": "512,729,984",
+            "underwriters": [
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "26.82%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13835833",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Susanto Suwarto"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13835831",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Titi Maria Rusli"
+                },
+                {
+                    "id": "13835830",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Jay Geoffrey Wacher "
+                },
+                {
+                    "id": "13835829",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Sutiana Ali"
+                },
+                {
+                    "id": "13835828",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Yuslinda Nasution"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13835835",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Marianna Sutadi"
+                },
+                {
+                    "id": "13835834",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Stan Maringka"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13835832",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Rd. Eddy K. Sariaatmadja "
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13835826",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Rd. Alvin W. Sariaatmadja"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13835827",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:38:07+07:00",
+                    "value": "Sutanto Hartono"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529458",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:49+07:00",
+                "value": "{\"name\":\"Titi Maria Rusli\",\"phone\":\"021-72782066\",\"email\":\"titi.maria@emtek.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "28.35%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "17.41 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "14.1%",
+                "name": "PT ADIKARSA SARANA",
+                "value": "8.65 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "8.98%",
+                "name": "ANTHONI SALIM",
+                "value": "5.51 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "8.13%",
+                "name": "PIET YAURY",
+                "value": "4.99 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "6.19%",
+                "name": "PT PRIMA VISUALINDO",
+                "value": "3.80 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.4%",
+                "name": "SAHAM TREASURY",
+                "value": "243.95 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Tangara Mitrakom",
+                "percentage": "92.00%",
+                "types": "Jasa telekomunikasi",
+                "value": "325079512"
+            },
+            {
+                "company": "PT Bitnet Komunikasindo",
+                "percentage": "99.99%",
+                "types": "Jasa teknologi informasi",
+                "value": "1853159"
+            },
+            {
+                "company": "PT Elang Graha Propertindo",
+                "percentage": "100%",
+                "types": "Perdagangan",
+                "value": "22803135"
+            },
+            {
+                "company": "PT Abhimata Citra Abadi",
+                "percentage": "99.99%",
+                "types": "Perdagangan dan jasa telekomunikasi",
+                "value": "549327756"
+            },
+            {
+                "company": "PT Astika Gerbang Timur",
+                "percentage": "99.90%",
+                "types": "Perdagangan dan jasa telekomunikasi",
+                "value": "227366"
+            },
+            {
+                "company": "PT Omni Intivision",
+                "percentage": "99.99%",
+                "types": "Penyiaran televisi",
+                "value": "94127883"
+            },
+            {
+                "company": "PT Surya Citra Media Tbk.",
+                "percentage": "71.33%",
+                "types": "Penyiaran televisi",
+                "value": "6859864628"
+            },
+            {
+                "company": "PT Sakalaguna Semesta",
+                "percentage": "80.00%",
+                "types": "Perdagangan dan jasa telekomunikasi",
+                "value": "202508445"
+            },
+            {
+                "company": "PT Indosurya Menara Bersama",
+                "percentage": "60.00%",
+                "types": "Jasa penyediaan sewa tower",
+                "value": "145965257"
+            },
+            {
+                "company": "PT Kreatif Media Karya",
+                "percentage": "99.99%",
+                "types": "Media Online",
+                "value": "1381137639"
+            },
+            {
+                "company": "PT Elang Medika Corpora",
+                "percentage": "100%",
+                "types": "Perdagangan dan jasa",
+                "value": "1138930937"
+            },
+            {
+                "company": "PT Elang Cakra Arena",
+                "percentage": "99.99%",
+                "types": "Jasa Impresariat",
+                "value": "108500571"
+            },
+            {
+                "company": "PT Global Kriya Propertindo",
+                "percentage": "99.99%",
+                "types": "Perdagangan dan jasa",
+                "value": "71008395"
+            },
+            {
+                "company": "PT Elang Media Visitama",
+                "percentage": "99.99%",
+                "types": "Perdagangan",
+                "value": "44654883"
+            },
+            {
+                "company": "PT Global Kencana Propertindo",
+                "percentage": "99.99%",
+                "types": "Perdagangan dan jasa",
+                "value": "122267553"
+            },
+            {
+                "company": "PT Elang Prima Retailindo",
+                "percentage": "100%",
+                "types": "Perdagangan dan jasa teknologi",
+                "value": "18814072"
+            },
+            {
+                "company": "PT Elang Persada Teknologi",
+                "percentage": "99.99%",
+                "types": "Perdagangan dan Jasa",
+                "value": "55050715"
+            },
+            {
+                "company": "PT Elang Karya Persada",
+                "percentage": "99.99%",
+                "types": "Perdagangan dan Jasa",
+                "value": "2077508"
+            },
+            {
+                "company": "PT Elang Pesona Triloka",
+                "percentage": "99.96%",
+                "types": "Perdagangan dan Jasa",
+                "value": "446550"
+            },
+            {
+                "company": "PT Indopay Merchant Services",
+                "percentage": "100%",
+                "types": "Perdagangan dan jasa",
+                "value": "11863421"
+            },
+            {
+                "company": "PT Sarana Meditama Metropolitan Tbk",
+                "percentage": "72.19%",
+                "types": "Jasa Kesehatan",
+                "value": "3130669039"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "37,404",
+                "change": -4711,
+                "change_formatted": "(-4,711)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "42,115",
+                "change": 6082,
+                "change_formatted": "(+6,082)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "36,033",
+                "change": 1978,
+                "change_formatted": "(+1,978)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "34,055",
+                "change": -366,
+                "change_formatted": "(-366)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "34,421",
+                "change": 2263,
+                "change_formatted": "(+2,263)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "32,158",
+                "change": -180,
+                "change_formatted": "(-180)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "21.89%",
+                "name": "EDDY K. SARIAATMADJA",
+                "value": "13.44 B",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "11.59%",
+                "name": "IR. SUSANTO SUWARTO",
+                "value": "7.12 B",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.16%",
+                "name": "ALVIN W. SARIAATMADJA",
+                "value": "98.09 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.09%",
+                "name": "JAY GEOFFREY WACHER",
+                "value": "54.95 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.06%",
+                "name": "SUTANTO HARTONO",
+                "value": "34.00 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.02%",
+                "name": "YUSLINDA NASUTION",
+                "value": "14.05 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.02%",
+                "name": "TITI MARIA RUSLI",
+                "value": "12.00 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.02%",
+                "name": "SUTIANA ALI ",
+                "value": "11.86 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:17+00:00"
+}

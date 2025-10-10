@@ -1,0 +1,492 @@
+{
+    "symbol": "DCII",
+    "name": "DCII",
+    "address": [
+        {
+            "id": "1000003201",
+            "email": [
+                "corpsec@dci-indonesia.com"
+            ],
+            "fax": "+62 21 2903 7600",
+            "npwp": "31.366.071.4-012.000",
+            "phone": "+62 21 2903 7500",
+            "website": "www.dci-indonesia.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:36+07:00",
+            "value": "<td colspan='4'>Equity Tower, Lantai 17 Unit F SCBD Lot. 9, Jl. Jend. Sudirman Kav. 52 – 53, Jakarta 12190\n\n        \t\t  \t\t\tPhone: +62 21 2903 7500\n        \t\t  \t\t\tFax: +62 21 2903 7600\n                            NPWP: 31.366.071.4-012.000\n        \t\t  \t\t\tEmail: corpsec@dci-indonesia.com\n        \t\t  \t\t\tWebsite: www.dci-indonesia.com\n\n        \t  \t\t\t</td>",
+            "office": "Equity Tower, Lantai 17 Unit F SCBD Lot. 9, Jl. Jend. Sudirman Kav. 52 – 53, Jakarta 12190"
+        }
+    ],
+    "background": "DCI Indonesia (DCII) adalah penyedia pusat data terkemuka di Indonesia. Didirikan sebagai enabler bagi komunitas bisnis, DCII menyediakan Cloud dan Layanan Infrastruktur Data Center netral Operator yang andal, dan terkelola dengan baik di Indonesia. \nMenjadi pusat data Tier-IV pertama di Asia Tenggara, DCII hadir untuk menyediakan layanan pusat data kelas dunia, memberi customer ketenangan pikiran. DCII adalah pusat data yang dibangun dengan total lahan 8.5ha. Sebagai perusahaan yang berkembang, DCII terus meningkatkan layanan dan juga menambah lebih banyak gedung dengan total daya 200 MW. DCII mengamankan dan menjaga aset berharga customer tersedia setiap saat.",
+    "history": {
+        "amount": "150 B",
+        "board": "Papan Pengembangan",
+        "date": "6 Jan 2021",
+        "price": "420",
+        "registrar": "",
+        "shares": "357,561,900",
+        "underwriters": [
+            "PT. Buana Capital Sekuritas"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "18.55%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "13835488",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:02+07:00",
+                "value": "Evelyn "
+            },
+            {
+                "id": "13835489",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:02+07:00",
+                "value": "Indri Koesindrijastoeti Hidayat"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13835491",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:02+07:00",
+                "value": "Darwin Cyril Noerhadi"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13835490",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:02+07:00",
+                "value": "Marina Budiman"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13835487",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:02+07:00",
+                "value": "Otto Toto Sugiri "
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12536419",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:36+07:00",
+            "value": "{\"name\":\"Gregorius Nicholas Suharsono\",\"phone\":\"+62 21 2903 7500\",\"email\":\"corpsec@dci-indonesia.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "18.55%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "442.17 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "14.11%",
+            "name": "HAN ARMING HANAFIA",
+            "value": "336.35 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "11.12%",
+            "name": "ANTHONI SALIM",
+            "value": "265.03 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "3.81%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "90.90 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "1,015",
+            "change": 39,
+            "change_formatted": "(+39)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "976",
+            "change": 3,
+            "change_formatted": "(+3)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "973",
+            "change": 70,
+            "change_formatted": "(+70)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "903",
+            "change": -5,
+            "change_formatted": "(-5)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "908",
+            "change": -52,
+            "change_formatted": "(-52)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "960",
+            "change": -25,
+            "change_formatted": "(-25)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "29.9%",
+            "name": "OTTO TOTO SUGIRI",
+            "value": "712.78 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "22.51%",
+            "name": "MARINA BUDIMAN",
+            "value": "536.51 M",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2021-01-06T00:00:00+07:00",
+    "ipo_price": 420,
+    "float": 18.55,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000003201",
+                "email": [
+                    "corpsec@dci-indonesia.com"
+                ],
+                "fax": "+62 21 2903 7600",
+                "npwp": "31.366.071.4-012.000",
+                "phone": "+62 21 2903 7500",
+                "website": "www.dci-indonesia.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:36+07:00",
+                "value": "<td colspan='4'>Equity Tower, Lantai 17 Unit F SCBD Lot. 9, Jl. Jend. Sudirman Kav. 52 – 53, Jakarta 12190\n\n        \t\t  \t\t\tPhone: +62 21 2903 7500\n        \t\t  \t\t\tFax: +62 21 2903 7600\n                            NPWP: 31.366.071.4-012.000\n        \t\t  \t\t\tEmail: corpsec@dci-indonesia.com\n        \t\t  \t\t\tWebsite: www.dci-indonesia.com\n\n        \t  \t\t\t</td>",
+                "office": "Equity Tower, Lantai 17 Unit F SCBD Lot. 9, Jl. Jend. Sudirman Kav. 52 – 53, Jakarta 12190"
+            }
+        ],
+        "background": "DCI Indonesia (DCII) adalah penyedia pusat data terkemuka di Indonesia. Didirikan sebagai enabler bagi komunitas bisnis, DCII menyediakan Cloud dan Layanan Infrastruktur Data Center netral Operator yang andal, dan terkelola dengan baik di Indonesia. \nMenjadi pusat data Tier-IV pertama di Asia Tenggara, DCII hadir untuk menyediakan layanan pusat data kelas dunia, memberi customer ketenangan pikiran. DCII adalah pusat data yang dibangun dengan total lahan 8.5ha. Sebagai perusahaan yang berkembang, DCII terus meningkatkan layanan dan juga menambah lebih banyak gedung dengan total daya 200 MW. DCII mengamankan dan menjaga aset berharga customer tersedia setiap saat.",
+        "history": {
+            "amount": "150 B",
+            "board": "Papan Pengembangan",
+            "date": "6 Jan 2021",
+            "price": "420",
+            "registrar": "",
+            "shares": "357,561,900",
+            "underwriters": [
+                "PT. Buana Capital Sekuritas"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "18.55%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "13835488",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:02+07:00",
+                    "value": "Evelyn "
+                },
+                {
+                    "id": "13835489",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:02+07:00",
+                    "value": "Indri Koesindrijastoeti Hidayat"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13835491",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:02+07:00",
+                    "value": "Darwin Cyril Noerhadi"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13835490",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:02+07:00",
+                    "value": "Marina Budiman"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13835487",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:02+07:00",
+                    "value": "Otto Toto Sugiri "
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12536419",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:36+07:00",
+                "value": "{\"name\":\"Gregorius Nicholas Suharsono\",\"phone\":\"+62 21 2903 7500\",\"email\":\"corpsec@dci-indonesia.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "18.55%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "442.17 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "14.11%",
+                "name": "HAN ARMING HANAFIA",
+                "value": "336.35 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "11.12%",
+                "name": "ANTHONI SALIM",
+                "value": "265.03 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "3.81%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "90.90 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "1,015",
+                "change": 39,
+                "change_formatted": "(+39)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "976",
+                "change": 3,
+                "change_formatted": "(+3)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "973",
+                "change": 70,
+                "change_formatted": "(+70)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "903",
+                "change": -5,
+                "change_formatted": "(-5)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "908",
+                "change": -52,
+                "change_formatted": "(-52)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "960",
+                "change": -25,
+                "change_formatted": "(-25)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "29.9%",
+                "name": "OTTO TOTO SUGIRI",
+                "value": "712.78 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "22.51%",
+                "name": "MARINA BUDIMAN",
+                "value": "536.51 M",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:16+00:00"
+}

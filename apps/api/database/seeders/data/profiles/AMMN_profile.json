@@ -1,0 +1,668 @@
+{
+    "symbol": "AMMN",
+    "name": "AMMN",
+    "address": [
+        {
+            "id": "1000004142",
+            "email": [
+                "investor.relations@amman.co.id"
+            ],
+            "fax": "021 576 1464",
+            "npwp": "74.147.204.7-067.000",
+            "phone": "021 5799 4600",
+            "website": "www.amman.co.id",
+            "key": "",
+            "lastupdate": "2023-07-07T02:00:09+07:00",
+            "value": "",
+            "office": "Gedung Menara Karya Lantai 6 Unit A, B, C dan H\nJl. H.R. Rasuna Said Blok X-5 Kav. 1-2\nJakarta Selatan 12950"
+        }
+    ],
+    "background": "PT Amman Mineral Internasional Tbk. (\"Perseroan\") adalah perusahaan holding yang berdomisili di Indonesia dan melakukan kegiatan eksplorasi, pembangunan, penambangan, pemrosesan, serta di masa mendatang, pengolahan, dan pemurnian di Indonesia melalui perusahaan anak dan entitas asosiasi operasi Perseroan. Melalui anak perusahaan Perseroan, PT Amman Mineral Nusa Tenggara, Perseroan mengoperasikan tambang tembaga dan emas terbuka yang dikenal sebagai tambang Batu Hijau di Kecamatan Sekongkang, Kabupaten Sumbawa Barat, Provinsi Nusa Tenggara Barat, Indonesia. Tambang Batu Hijau memproduksi konsentrat tembaga berkadar tinggi yang sangat bersih serta mengandung emas dan perak sebagai mineral pengikutnya, yang merupakan bahan baku (feedstock) yang sangat diminati oleh smelter di seluruh dunia. Per tanggal 31 Desember 2022, tambang Batu Hijau secara kumulatif telah memproduksi 9.400 Mlbs tembaga dan 9,5 Moz emas. ",
+    "history": {
+        "amount": "10,726 B",
+        "board": "Papan Utama",
+        "date": "7 Jul 2023",
+        "price": "1695",
+        "registrar": "",
+        "shares": "6,328,208,800",
+        "underwriters": [
+            "PT. Mandiri Sekuritas",
+            "PT. BNI Sekuritas",
+            "PT. CLSA Sekuritas Indonesia",
+            "PT. DBS Vickers Sekuritas",
+            "PT. BRI Danareksa Sekuritas",
+            "PT. Samuel Sekuritas Indonesia",
+            "PT. Maybank Sekuritas Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "18.76%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13833790",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "M. Teguh Pamuji"
+            },
+            {
+                "id": "13833791",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Alexander Ramlie"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833783",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Aditya Sasmito"
+            },
+            {
+                "id": "13833784",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "David Alexander Gibbs"
+            },
+            {
+                "id": "13833785",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Irwin Ka Pui Wan"
+            },
+            {
+                "id": "13833786",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Lal Naveen Chandra"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833788",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Markus Permadi"
+            },
+            {
+                "id": "13833789",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Teguh Boentoro"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13833787",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Agoes Projosasmito"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13833782",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:45+07:00",
+                "value": "Arief Widyawan Sidarto"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [],
+    "shareholder": [
+        {
+            "percentage": "32.174%",
+            "name": "PT SUMBER GEMILANG PERSADA",
+            "value": "23.33 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "20.915%",
+            "name": "PT MEDCO ENERGI INTERNASIONAL TBK.",
+            "value": "15.17 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "18.759%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "13.60 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "15.45%",
+            "name": "PT AP INVESTMENT",
+            "value": "11.20 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "6.301%",
+            "name": "PT PESONA SUKSES CEMERLANG",
+            "value": "4.57 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "5.365%",
+            "name": "SAJIR 9 LLC",
+            "value": "3.89 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.147%",
+            "name": "SAHAM TREASURY",
+            "value": "105.80 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "19,155",
+            "change": 85,
+            "change_formatted": "(+85)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "19,070",
+            "change": 666,
+            "change_formatted": "(+666)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "18,404",
+            "change": -2609,
+            "change_formatted": "(-2,609)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "21,013",
+            "change": 893,
+            "change_formatted": "(+893)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "20,120",
+            "change": 455,
+            "change_formatted": "(+455)"
+        },
+        {
+            "shareholder_date": "31 Mar 2025",
+            "total_share": "19,665",
+            "change": -274,
+            "change_formatted": "(-274)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.399%",
+            "name": "AGOES PROJOSASMITO",
+            "value": "289.18 M",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.145%",
+            "name": "ALEXANDER RAMLIE",
+            "value": "105.41 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.109%",
+            "name": "ARIEF WIDYAWAN SIDARTO",
+            "value": "79.06 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.098%",
+            "name": "ADITYA SASMITO",
+            "value": "71.19 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.073%",
+            "name": "LAL NAVEEN CHANDRA",
+            "value": "53.06 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.054%",
+            "name": "IRWIN KA PUI WAN",
+            "value": "39.06 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.011%",
+            "name": "DAVID ALEXANDER GIBBS",
+            "value": "8.00 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2023-07-07T00:00:00+07:00",
+    "ipo_price": 1695,
+    "float": 18.76,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000004142",
+                "email": [
+                    "investor.relations@amman.co.id"
+                ],
+                "fax": "021 576 1464",
+                "npwp": "74.147.204.7-067.000",
+                "phone": "021 5799 4600",
+                "website": "www.amman.co.id",
+                "key": "",
+                "lastupdate": "2023-07-07T02:00:09+07:00",
+                "value": "",
+                "office": "Gedung Menara Karya Lantai 6 Unit A, B, C dan H\nJl. H.R. Rasuna Said Blok X-5 Kav. 1-2\nJakarta Selatan 12950"
+            }
+        ],
+        "background": "PT Amman Mineral Internasional Tbk. (\"Perseroan\") adalah perusahaan holding yang berdomisili di Indonesia dan melakukan kegiatan eksplorasi, pembangunan, penambangan, pemrosesan, serta di masa mendatang, pengolahan, dan pemurnian di Indonesia melalui perusahaan anak dan entitas asosiasi operasi Perseroan. Melalui anak perusahaan Perseroan, PT Amman Mineral Nusa Tenggara, Perseroan mengoperasikan tambang tembaga dan emas terbuka yang dikenal sebagai tambang Batu Hijau di Kecamatan Sekongkang, Kabupaten Sumbawa Barat, Provinsi Nusa Tenggara Barat, Indonesia. Tambang Batu Hijau memproduksi konsentrat tembaga berkadar tinggi yang sangat bersih serta mengandung emas dan perak sebagai mineral pengikutnya, yang merupakan bahan baku (feedstock) yang sangat diminati oleh smelter di seluruh dunia. Per tanggal 31 Desember 2022, tambang Batu Hijau secara kumulatif telah memproduksi 9.400 Mlbs tembaga dan 9,5 Moz emas. ",
+        "history": {
+            "amount": "10,726 B",
+            "board": "Papan Utama",
+            "date": "7 Jul 2023",
+            "price": "1695",
+            "registrar": "",
+            "shares": "6,328,208,800",
+            "underwriters": [
+                "PT. Mandiri Sekuritas",
+                "PT. BNI Sekuritas",
+                "PT. CLSA Sekuritas Indonesia",
+                "PT. DBS Vickers Sekuritas",
+                "PT. BRI Danareksa Sekuritas",
+                "PT. Samuel Sekuritas Indonesia",
+                "PT. Maybank Sekuritas Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "18.76%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13833790",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "M. Teguh Pamuji"
+                },
+                {
+                    "id": "13833791",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Alexander Ramlie"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833783",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Aditya Sasmito"
+                },
+                {
+                    "id": "13833784",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "David Alexander Gibbs"
+                },
+                {
+                    "id": "13833785",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Irwin Ka Pui Wan"
+                },
+                {
+                    "id": "13833786",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Lal Naveen Chandra"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833788",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Markus Permadi"
+                },
+                {
+                    "id": "13833789",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Teguh Boentoro"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13833787",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Agoes Projosasmito"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13833782",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:45+07:00",
+                    "value": "Arief Widyawan Sidarto"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [],
+        "shareholder": [
+            {
+                "percentage": "32.174%",
+                "name": "PT SUMBER GEMILANG PERSADA",
+                "value": "23.33 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "20.915%",
+                "name": "PT MEDCO ENERGI INTERNASIONAL TBK.",
+                "value": "15.17 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "18.759%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "13.60 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "15.45%",
+                "name": "PT AP INVESTMENT",
+                "value": "11.20 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "6.301%",
+                "name": "PT PESONA SUKSES CEMERLANG",
+                "value": "4.57 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "5.365%",
+                "name": "SAJIR 9 LLC",
+                "value": "3.89 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.147%",
+                "name": "SAHAM TREASURY",
+                "value": "105.80 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "19,155",
+                "change": 85,
+                "change_formatted": "(+85)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "19,070",
+                "change": 666,
+                "change_formatted": "(+666)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "18,404",
+                "change": -2609,
+                "change_formatted": "(-2,609)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "21,013",
+                "change": 893,
+                "change_formatted": "(+893)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "20,120",
+                "change": 455,
+                "change_formatted": "(+455)"
+            },
+            {
+                "shareholder_date": "31 Mar 2025",
+                "total_share": "19,665",
+                "change": -274,
+                "change_formatted": "(-274)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.399%",
+                "name": "AGOES PROJOSASMITO",
+                "value": "289.18 M",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.145%",
+                "name": "ALEXANDER RAMLIE",
+                "value": "105.41 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.109%",
+                "name": "ARIEF WIDYAWAN SIDARTO",
+                "value": "79.06 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.098%",
+                "name": "ADITYA SASMITO",
+                "value": "71.19 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.073%",
+                "name": "LAL NAVEEN CHANDRA",
+                "value": "53.06 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.054%",
+                "name": "IRWIN KA PUI WAN",
+                "value": "39.06 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.011%",
+                "name": "DAVID ALEXANDER GIBBS",
+                "value": "8.00 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:11+00:00"
+}

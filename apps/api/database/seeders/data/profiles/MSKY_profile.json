@@ -1,0 +1,488 @@
+{
+    "symbol": "MSKY",
+    "name": "MSKY",
+    "address": [
+        {
+            "id": "301",
+            "email": [
+                "corsec.msky@mncgroup.com"
+            ],
+            "fax": "021-5825620",
+            "npwp": "01.343.991.4-054.000",
+            "phone": "021-5828000",
+            "website": "www.mncvision.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:40+07:00",
+            "value": "<td colspan='4'>Jl. Raya Panjang Blok Z/III, Green Garden\r\nJakarta Barat 11520\n\n        \t\t  \t\t\tPhone: 021-5828000\n        \t\t  \t\t\tFax: 021-5825620\n                            NPWP: 01.343.991.4-054.000\n        \t\t  \t\t\tEmail: corsec.msky@mncgroup.com\n        \t\t  \t\t\tWebsite: www.mncvision.id\n\n        \t  \t\t\t</td>",
+            "office": "Jl. Raya Panjang Blok Z/III, Green Garden Jakarta Barat 11520"
+        }
+    ],
+    "background": "PT MNC Sky Vision Tbk (selanjutnya disebut “Perseroan”) berdiri dengan nama PT Malicak Nusa Semesta pada 8 Agustus 1988 di Jakarta. Kemudian pada 3 Desember 2006, Perseroan melakukan perubahan nama menjadi PT MNC Sky Vision. Kegiatan usaha Perseroan meliputi bidang penyelenggaraan jasa penyiaran berlangganan di industri televisi berlangganan.\n\nPada 2017 Perseroan bertransformasi menjadi MNC Vision. Transformasi ini menggabungkan Indovision dan TopTV menjadi satu brand besar yang semakin berkualitas. Perubahan ini juga didukung dengan optimalisasi sinergi bisnis dengan MNC Play dan MNC Now. Perseroan pun semakin menegaskan posisi sebagai pemimpin industri TV berlangganan berbasis satelit di Indonesia.",
+    "history": {
+        "amount": "2,147 B",
+        "board": "Papan Pengembangan",
+        "date": "9 Jul 2012",
+        "price": "1,520",
+        "registrar": "",
+        "shares": "1,412,780,032",
+        "underwriters": [
+            "PT. Danareksa Sekuritas",
+            "PT. MNC Securities (Affiliated)"
+        ],
+        "administrative_bureau": "PT. BSR Indonesia (affiliated)",
+        "free_float": "40.52%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13838189",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Rachmat Nurhadi"
+            }
+        ],
+        "director": [
+            {
+                "id": "13838184",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Yohanes Yudistira"
+            },
+            {
+                "id": "13838185",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Adita Widyansari"
+            },
+            {
+                "id": "13838186",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Ruby Budiman"
+            },
+            {
+                "id": "13838187",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Henry Wijadi"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13838190",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Jonathan Chandra"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13838188",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Ruby Panjaitan"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13838182",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Endang Mayawati"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13838183",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:41+07:00",
+                "value": "Herman Kusno"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12531321",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:41+07:00",
+            "value": "{\"name\":\"Eko Wijaya\",\"phone\":\"021-582 8000\",\"email\":\"eko.wijaya@mncgroup.com, corsec.msky@mncgroup.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "91.9%",
+            "name": "PT MNC VISION NETWORKS TBK",
+            "value": "9.16 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "8.1%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "808.11 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Media CItra Indostar",
+            "percentage": "99.99%",
+            "types": "Penyediaan sarana penyiaran internasional dan lokal serta pendistribusian peralatan pendukung satelit",
+            "value": "613579"
+        },
+        {
+            "company": "PT Mitra Operator Lokal",
+            "percentage": "99.99%",
+            "types": "Penyediaan sarana penyiaran internasional dan lokal",
+            "value": "40711"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "6,342",
+            "change": -485,
+            "change_formatted": "(-485)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "6,827",
+            "change": 1682,
+            "change_formatted": "(+1,682)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "5,145",
+            "change": -66,
+            "change_formatted": "(-66)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "5,211",
+            "change": -67,
+            "change_formatted": "(-67)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "5,278",
+            "change": -100,
+            "change_formatted": "(-100)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "5,378",
+            "change": -112,
+            "change_formatted": "(-112)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2012-07-09T00:00:00+07:00",
+    "ipo_price": 1520,
+    "float": 40.52,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "301",
+                "email": [
+                    "corsec.msky@mncgroup.com"
+                ],
+                "fax": "021-5825620",
+                "npwp": "01.343.991.4-054.000",
+                "phone": "021-5828000",
+                "website": "www.mncvision.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:40+07:00",
+                "value": "<td colspan='4'>Jl. Raya Panjang Blok Z/III, Green Garden\r\nJakarta Barat 11520\n\n        \t\t  \t\t\tPhone: 021-5828000\n        \t\t  \t\t\tFax: 021-5825620\n                            NPWP: 01.343.991.4-054.000\n        \t\t  \t\t\tEmail: corsec.msky@mncgroup.com\n        \t\t  \t\t\tWebsite: www.mncvision.id\n\n        \t  \t\t\t</td>",
+                "office": "Jl. Raya Panjang Blok Z/III, Green Garden Jakarta Barat 11520"
+            }
+        ],
+        "background": "PT MNC Sky Vision Tbk (selanjutnya disebut “Perseroan”) berdiri dengan nama PT Malicak Nusa Semesta pada 8 Agustus 1988 di Jakarta. Kemudian pada 3 Desember 2006, Perseroan melakukan perubahan nama menjadi PT MNC Sky Vision. Kegiatan usaha Perseroan meliputi bidang penyelenggaraan jasa penyiaran berlangganan di industri televisi berlangganan.\n\nPada 2017 Perseroan bertransformasi menjadi MNC Vision. Transformasi ini menggabungkan Indovision dan TopTV menjadi satu brand besar yang semakin berkualitas. Perubahan ini juga didukung dengan optimalisasi sinergi bisnis dengan MNC Play dan MNC Now. Perseroan pun semakin menegaskan posisi sebagai pemimpin industri TV berlangganan berbasis satelit di Indonesia.",
+        "history": {
+            "amount": "2,147 B",
+            "board": "Papan Pengembangan",
+            "date": "9 Jul 2012",
+            "price": "1,520",
+            "registrar": "",
+            "shares": "1,412,780,032",
+            "underwriters": [
+                "PT. Danareksa Sekuritas",
+                "PT. MNC Securities (Affiliated)"
+            ],
+            "administrative_bureau": "PT. BSR Indonesia (affiliated)",
+            "free_float": "40.52%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13838189",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Rachmat Nurhadi"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13838184",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Yohanes Yudistira"
+                },
+                {
+                    "id": "13838185",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Adita Widyansari"
+                },
+                {
+                    "id": "13838186",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Ruby Budiman"
+                },
+                {
+                    "id": "13838187",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Henry Wijadi"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13838190",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Jonathan Chandra"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13838188",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Ruby Panjaitan"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13838182",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Endang Mayawati"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13838183",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:41+07:00",
+                    "value": "Herman Kusno"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12531321",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:41+07:00",
+                "value": "{\"name\":\"Eko Wijaya\",\"phone\":\"021-582 8000\",\"email\":\"eko.wijaya@mncgroup.com, corsec.msky@mncgroup.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "91.9%",
+                "name": "PT MNC VISION NETWORKS TBK",
+                "value": "9.16 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "8.1%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "808.11 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Media CItra Indostar",
+                "percentage": "99.99%",
+                "types": "Penyediaan sarana penyiaran internasional dan lokal serta pendistribusian peralatan pendukung satelit",
+                "value": "613579"
+            },
+            {
+                "company": "PT Mitra Operator Lokal",
+                "percentage": "99.99%",
+                "types": "Penyediaan sarana penyiaran internasional dan lokal",
+                "value": "40711"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "6,342",
+                "change": -485,
+                "change_formatted": "(-485)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "6,827",
+                "change": 1682,
+                "change_formatted": "(+1,682)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "5,145",
+                "change": -66,
+                "change_formatted": "(-66)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "5,211",
+                "change": -67,
+                "change_formatted": "(-67)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "5,278",
+                "change": -100,
+                "change_formatted": "(-100)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "5,378",
+                "change": -112,
+                "change_formatted": "(-112)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:26+00:00"
+}

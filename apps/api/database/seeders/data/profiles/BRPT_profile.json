@@ -1,0 +1,1160 @@
+{
+    "symbol": "BRPT",
+    "name": "BRPT",
+    "address": [
+        {
+            "id": "93",
+            "email": [
+                "corpsec@barito.co.id"
+            ],
+            "fax": "530 6680",
+            "npwp": "01.124.461.3-054.000",
+            "phone": "(021) 530 6711\r\n",
+            "website": "www.barito-pacific.com",
+            "key": "",
+            "lastupdate": "2022-04-07T14:30:16+07:00",
+            "value": "<td colspan='4'>Wisma Barito Pacific Twr. B, LT. 9, JL. Letjen S. Parman Kav.62-63\r\nJakarta\n\n        \t\t  \t\t\tPhone: (021) 530 6711\r\n\n        \t\t  \t\t\tFax: 530 6680\n                            NPWP: 01.124.461.3-054.000\n        \t\t  \t\t\tEmail: corpsec@barito.co.id\n        \t\t  \t\t\tWebsite: www.barito-pacific.com\n\n        \t  \t\t\t</td>",
+            "office": "Wisma Barito Pacific Twr. B, LT. 9, JL. Letjen S. Parman Kav.62-63 Jakarta"
+        }
+    ],
+    "background": "PT Barito Pacific Tbk (IDX: BRPT) adalah perusahaan energi terintegrasi yang berbasis di Indonesia dengan berbagai aset di sektor energi dan industri. Melalui Star Energy, Barito Pacific mengoperasikan perusahaan panas bumi terbesar di Indonesia yang juga merupakan perusahaan panas bumi terbesar ketiga di dunia.\n\nBekerja sama dengan Indonesia Power, anak perusahaan yang sepenuhnya dimiliki oleh PLN, Barito Pacific tengah mengembangkan proyek Jawa 9 & 10, yaitu pembangkit listrik tenaga uap dengan teknologi ultra super-critical berkapasitas 2 x 1.000 MW yang akan dipasang dengan teknologi pengurangan emisi yang belum pernah ada sebelumnya. Pembangkit listrik ini akan membantu Indonesia memodernisasi kemampuan pembangkit listrik yang sudah lama sekaligus mengurangi biaya dengan menurunkan konsumsi bahan bakar hingga 20% per kwh; sehingga mengurangi emisi karbon secara pro-rata.\n\nBarito Pacific juga merupakan pemegang saham pengendali dan mengkonsolidasikan PT Chandra Asri Petrochemical Tbk. (IDX: TPIA), yang merupakan satu-satunya perusahaan petrokimia terintegrasi dan terbesar di Indonesia.\n",
+    "history": {
+        "amount": "612 B",
+        "board": "Papan Utama",
+        "date": "1 Oct 1993",
+        "price": "7,200",
+        "registrar": "",
+        "shares": "85,000,000",
+        "underwriters": [
+            "PT. Makindo"
+        ],
+        "administrative_bureau": "PT. Sirca Datapro Perdana",
+        "free_float": "27.20%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13875362",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "LIM CHONG THIAN"
+            }
+        ],
+        "director": [
+            {
+                "id": "13875359",
+                "key": "Director",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "DAVID KOSASIH"
+            },
+            {
+                "id": "13875360",
+                "key": "Director",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "DIANA ARSIYANTI"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13875364",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "SALWATI AGUSTINA"
+            },
+            {
+                "id": "13875363",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "HENKY SUSANTO"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13875361",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "PRAJOGO PANGESTU"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13875365",
+                "key": "President Director",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "AGUS SALIM PANGESTU"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13875358",
+                "key": "Vice President",
+                "lastupdate": "2025-07-10T18:37:14+07:00",
+                "value": "RUDY SUPARMAN"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12538826",
+            "key": "",
+            "lastupdate": "2022-04-07T14:30:16+07:00",
+            "value": "{\"name\":\"Diana Arsiyanti\",\"phone\":\"021 5306711\",\"email\":\"corpsec@barito.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "27.98%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "26.22 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.62%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "580.91 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.04%",
+            "name": "SAHAM TREASURY",
+            "value": "35.48 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Barito Wahana Lestari",
+            "percentage": "99.00%",
+            "types": "",
+            "value": "210391"
+        },
+        {
+            "company": "Star Energy Group Holdings Pte. Ltd",
+            "percentage": "66.67%",
+            "types": "",
+            "value": "3386143"
+        },
+        {
+            "company": "PT Barito Cahaya Nusantara",
+            "percentage": "99.20%",
+            "types": "",
+            "value": "90"
+        },
+        {
+            "company": "PT Barito Investa Prima",
+            "percentage": "99.95%",
+            "types": "",
+            "value": "1925"
+        },
+        {
+            "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+            "percentage": "96.00%",
+            "types": "",
+            "value": "2"
+        },
+        {
+            "company": "PT Chandra Asri Petrochemical Tbk",
+            "percentage": "46.63%",
+            "types": "Petrokimia",
+            "value": "3464001"
+        },
+        {
+            "company": "PT Tunggal Agathis Indah Wood Industries",
+            "percentage": "99.99%",
+            "types": "Industri Pengolahan Kayu",
+            "value": "400"
+        },
+        {
+            "company": "PT Barito Kencana Mahardika",
+            "percentage": "51.00%",
+            "types": "",
+            "value": "8514"
+        },
+        {
+            "company": "PT Rimba Equator Permai",
+            "percentage": "100%",
+            "types": "Hutan Tanaman Industri",
+            "value": "6"
+        },
+        {
+            "company": "PT Binajaya Rodakarya",
+            "percentage": "99.97%",
+            "types": "Lem (Perekat) Glue",
+            "value": "11087"
+        },
+        {
+            "company": "PT Griya Idola",
+            "percentage": "99.99%",
+            "types": "Properti",
+            "value": "50084"
+        },
+        {
+            "company": "PT Agropratama Subur Lestari",
+            "percentage": "60.00%",
+            "types": "Perkebunan",
+            "value": "0"
+        },
+        {
+            "company": "PT Wahanaguna Margapratama",
+            "percentage": "60.00%",
+            "types": "",
+            "value": "0"
+        },
+        {
+            "company": "PT Royalindo Mandiri",
+            "percentage": "99.00%",
+            "types": "Perkebunan",
+            "value": "7986"
+        },
+        {
+            "company": "Marigold Resources Pte.Ltd",
+            "percentage": "100%",
+            "types": "",
+            "value": "1598"
+        },
+        {
+            "company": "PT Wiradaya Lintas Sukses",
+            "percentage": "98.00%",
+            "types": "",
+            "value": "24"
+        },
+        {
+            "company": "PT Barito Wahana Lestari",
+            "percentage": "99.00%",
+            "types": "",
+            "value": "210391"
+        },
+        {
+            "company": "Star Energy Group Holdings Pte. Ltd",
+            "percentage": "66.67%",
+            "types": "",
+            "value": "3386143"
+        },
+        {
+            "company": "PT Barito Cahaya Nusantara",
+            "percentage": "99.20%",
+            "types": "",
+            "value": "90"
+        },
+        {
+            "company": "PT Barito Investa Prima",
+            "percentage": "99.95%",
+            "types": "",
+            "value": "1925"
+        },
+        {
+            "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+            "percentage": "96.00%",
+            "types": "",
+            "value": "2"
+        },
+        {
+            "company": "PT Chandra Asri Petrochemical Tbk",
+            "percentage": "46.63%",
+            "types": "Petrokimia",
+            "value": "3464001"
+        },
+        {
+            "company": "PT Tunggal Agathis Indah Wood Industries",
+            "percentage": "99.99%",
+            "types": "Industri Pengolahan Kayu",
+            "value": "400"
+        },
+        {
+            "company": "PT Barito Kencana Mahardika",
+            "percentage": "51.00%",
+            "types": "",
+            "value": "8514"
+        },
+        {
+            "company": "PT Rimba Equator Permai",
+            "percentage": "100%",
+            "types": "Hutan Tanaman Industri",
+            "value": "6"
+        },
+        {
+            "company": "PT Binajaya Rodakarya",
+            "percentage": "99.97%",
+            "types": "Lem (Perekat) Glue",
+            "value": "11087"
+        },
+        {
+            "company": "PT Griya Idola",
+            "percentage": "99.99%",
+            "types": "Properti",
+            "value": "50084"
+        },
+        {
+            "company": "PT Agropratama Subur Lestari",
+            "percentage": "60.00%",
+            "types": "Perkebunan",
+            "value": "0"
+        },
+        {
+            "company": "PT Wahanaguna Margapratama",
+            "percentage": "60.00%",
+            "types": "",
+            "value": "0"
+        },
+        {
+            "company": "PT Royalindo Mandiri",
+            "percentage": "99.00%",
+            "types": "Perkebunan",
+            "value": "7986"
+        },
+        {
+            "company": "Marigold Resources Pte.Ltd",
+            "percentage": "100%",
+            "types": "",
+            "value": "1598"
+        },
+        {
+            "company": "PT Wiradaya Lintas Sukses",
+            "percentage": "98.00%",
+            "types": "",
+            "value": "24"
+        },
+        {
+            "company": "PT Barito Wahana Lestari",
+            "percentage": "99.00%",
+            "types": "",
+            "value": "203532"
+        },
+        {
+            "company": "Star Energy Group Holdings Pte. Ltd",
+            "percentage": "66.67%",
+            "types": "",
+            "value": "3441814"
+        },
+        {
+            "company": "PT Barito Cahaya Nusantara",
+            "percentage": "99.20%",
+            "types": "",
+            "value": "88"
+        },
+        {
+            "company": "PT Barito Investa Prima",
+            "percentage": "99.95%",
+            "types": "",
+            "value": "2995"
+        },
+        {
+            "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+            "percentage": "96.00%",
+            "types": "",
+            "value": "2"
+        },
+        {
+            "company": "PT Chandra Asri Petrochemical Tbk",
+            "percentage": "34.63%",
+            "types": "Petrokimia",
+            "value": "4993060"
+        },
+        {
+            "company": "PT Tunggal Agathis Indah Wood Industries",
+            "percentage": "99.99%",
+            "types": "Industri Pengolahan Kayu",
+            "value": "396"
+        },
+        {
+            "company": "PT Barito Kencana Mahardika",
+            "percentage": "51.00%",
+            "types": "",
+            "value": "9314"
+        },
+        {
+            "company": "PT Rimba Equator Permai",
+            "percentage": "99.97%",
+            "types": "Hutan Tanaman Industri",
+            "value": "6"
+        },
+        {
+            "company": "PT Binajaya Rodakarya",
+            "percentage": "99.97%",
+            "types": "Lem (Perekat) Glue",
+            "value": "9689"
+        },
+        {
+            "company": "PT Griya Idola",
+            "percentage": "99.99%",
+            "types": "Properti",
+            "value": "46941"
+        },
+        {
+            "company": "PT Agropratama Subur Lestari",
+            "percentage": "60.00%",
+            "types": "Perkebunan",
+            "value": "0"
+        },
+        {
+            "company": "PT Wahanaguna Margapratama",
+            "percentage": "60.00%",
+            "types": "",
+            "value": "0"
+        },
+        {
+            "company": "PT Royalindo Mandiri",
+            "percentage": "99.00%",
+            "types": "Perkebunan",
+            "value": "6875"
+        },
+        {
+            "company": "Marigold Resources Pte.Ltd",
+            "percentage": "100%",
+            "types": "",
+            "value": "768"
+        },
+        {
+            "company": "PT Wiradaya Lintas Sukses",
+            "percentage": "98.00%",
+            "types": "",
+            "value": "24"
+        },
+        {
+            "company": "PT Barito Wanabinar Indonesia",
+            "percentage": "99.00%",
+            "types": "",
+            "value": "23491"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "84,493",
+            "change": -5329,
+            "change_formatted": "(-5,329)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "89,822",
+            "change": 14617,
+            "change_formatted": "(+14,617)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "75,205",
+            "change": 6938,
+            "change_formatted": "(+6,938)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "68,267",
+            "change": -5131,
+            "change_formatted": "(-5,131)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "73,398",
+            "change": -5409,
+            "change_formatted": "(-5,409)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "78,807",
+            "change": -1521,
+            "change_formatted": "(-1,521)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "71.36%",
+            "name": "PRAJOGO PANGESTU",
+            "value": "66.90 B",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "AGUS SALIM PANGESTU",
+            "value": "2.65 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "LIM CHONG THIAN",
+            "value": "1.89 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "DAVID KOSASIH",
+            "value": "1.77 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "DIANA ARSIYANTI",
+            "value": "1.72 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "RUDY SUPARMAN",
+            "value": "964.10 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1993-10-01T00:00:00+07:00",
+    "ipo_price": 7200,
+    "float": 27.2,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "93",
+                "email": [
+                    "corpsec@barito.co.id"
+                ],
+                "fax": "530 6680",
+                "npwp": "01.124.461.3-054.000",
+                "phone": "(021) 530 6711\r\n",
+                "website": "www.barito-pacific.com",
+                "key": "",
+                "lastupdate": "2022-04-07T14:30:16+07:00",
+                "value": "<td colspan='4'>Wisma Barito Pacific Twr. B, LT. 9, JL. Letjen S. Parman Kav.62-63\r\nJakarta\n\n        \t\t  \t\t\tPhone: (021) 530 6711\r\n\n        \t\t  \t\t\tFax: 530 6680\n                            NPWP: 01.124.461.3-054.000\n        \t\t  \t\t\tEmail: corpsec@barito.co.id\n        \t\t  \t\t\tWebsite: www.barito-pacific.com\n\n        \t  \t\t\t</td>",
+                "office": "Wisma Barito Pacific Twr. B, LT. 9, JL. Letjen S. Parman Kav.62-63 Jakarta"
+            }
+        ],
+        "background": "PT Barito Pacific Tbk (IDX: BRPT) adalah perusahaan energi terintegrasi yang berbasis di Indonesia dengan berbagai aset di sektor energi dan industri. Melalui Star Energy, Barito Pacific mengoperasikan perusahaan panas bumi terbesar di Indonesia yang juga merupakan perusahaan panas bumi terbesar ketiga di dunia.\n\nBekerja sama dengan Indonesia Power, anak perusahaan yang sepenuhnya dimiliki oleh PLN, Barito Pacific tengah mengembangkan proyek Jawa 9 & 10, yaitu pembangkit listrik tenaga uap dengan teknologi ultra super-critical berkapasitas 2 x 1.000 MW yang akan dipasang dengan teknologi pengurangan emisi yang belum pernah ada sebelumnya. Pembangkit listrik ini akan membantu Indonesia memodernisasi kemampuan pembangkit listrik yang sudah lama sekaligus mengurangi biaya dengan menurunkan konsumsi bahan bakar hingga 20% per kwh; sehingga mengurangi emisi karbon secara pro-rata.\n\nBarito Pacific juga merupakan pemegang saham pengendali dan mengkonsolidasikan PT Chandra Asri Petrochemical Tbk. (IDX: TPIA), yang merupakan satu-satunya perusahaan petrokimia terintegrasi dan terbesar di Indonesia.\n",
+        "history": {
+            "amount": "612 B",
+            "board": "Papan Utama",
+            "date": "1 Oct 1993",
+            "price": "7,200",
+            "registrar": "",
+            "shares": "85,000,000",
+            "underwriters": [
+                "PT. Makindo"
+            ],
+            "administrative_bureau": "PT. Sirca Datapro Perdana",
+            "free_float": "27.20%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13875362",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "LIM CHONG THIAN"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13875359",
+                    "key": "Director",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "DAVID KOSASIH"
+                },
+                {
+                    "id": "13875360",
+                    "key": "Director",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "DIANA ARSIYANTI"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13875364",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "SALWATI AGUSTINA"
+                },
+                {
+                    "id": "13875363",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "HENKY SUSANTO"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13875361",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "PRAJOGO PANGESTU"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13875365",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "AGUS SALIM PANGESTU"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13875358",
+                    "key": "Vice President",
+                    "lastupdate": "2025-07-10T18:37:14+07:00",
+                    "value": "RUDY SUPARMAN"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12538826",
+                "key": "",
+                "lastupdate": "2022-04-07T14:30:16+07:00",
+                "value": "{\"name\":\"Diana Arsiyanti\",\"phone\":\"021 5306711\",\"email\":\"corpsec@barito.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "27.98%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "26.22 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.62%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "580.91 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.04%",
+                "name": "SAHAM TREASURY",
+                "value": "35.48 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Barito Wahana Lestari",
+                "percentage": "99.00%",
+                "types": "",
+                "value": "210391"
+            },
+            {
+                "company": "Star Energy Group Holdings Pte. Ltd",
+                "percentage": "66.67%",
+                "types": "",
+                "value": "3386143"
+            },
+            {
+                "company": "PT Barito Cahaya Nusantara",
+                "percentage": "99.20%",
+                "types": "",
+                "value": "90"
+            },
+            {
+                "company": "PT Barito Investa Prima",
+                "percentage": "99.95%",
+                "types": "",
+                "value": "1925"
+            },
+            {
+                "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+                "percentage": "96.00%",
+                "types": "",
+                "value": "2"
+            },
+            {
+                "company": "PT Chandra Asri Petrochemical Tbk",
+                "percentage": "46.63%",
+                "types": "Petrokimia",
+                "value": "3464001"
+            },
+            {
+                "company": "PT Tunggal Agathis Indah Wood Industries",
+                "percentage": "99.99%",
+                "types": "Industri Pengolahan Kayu",
+                "value": "400"
+            },
+            {
+                "company": "PT Barito Kencana Mahardika",
+                "percentage": "51.00%",
+                "types": "",
+                "value": "8514"
+            },
+            {
+                "company": "PT Rimba Equator Permai",
+                "percentage": "100%",
+                "types": "Hutan Tanaman Industri",
+                "value": "6"
+            },
+            {
+                "company": "PT Binajaya Rodakarya",
+                "percentage": "99.97%",
+                "types": "Lem (Perekat) Glue",
+                "value": "11087"
+            },
+            {
+                "company": "PT Griya Idola",
+                "percentage": "99.99%",
+                "types": "Properti",
+                "value": "50084"
+            },
+            {
+                "company": "PT Agropratama Subur Lestari",
+                "percentage": "60.00%",
+                "types": "Perkebunan",
+                "value": "0"
+            },
+            {
+                "company": "PT Wahanaguna Margapratama",
+                "percentage": "60.00%",
+                "types": "",
+                "value": "0"
+            },
+            {
+                "company": "PT Royalindo Mandiri",
+                "percentage": "99.00%",
+                "types": "Perkebunan",
+                "value": "7986"
+            },
+            {
+                "company": "Marigold Resources Pte.Ltd",
+                "percentage": "100%",
+                "types": "",
+                "value": "1598"
+            },
+            {
+                "company": "PT Wiradaya Lintas Sukses",
+                "percentage": "98.00%",
+                "types": "",
+                "value": "24"
+            },
+            {
+                "company": "PT Barito Wahana Lestari",
+                "percentage": "99.00%",
+                "types": "",
+                "value": "210391"
+            },
+            {
+                "company": "Star Energy Group Holdings Pte. Ltd",
+                "percentage": "66.67%",
+                "types": "",
+                "value": "3386143"
+            },
+            {
+                "company": "PT Barito Cahaya Nusantara",
+                "percentage": "99.20%",
+                "types": "",
+                "value": "90"
+            },
+            {
+                "company": "PT Barito Investa Prima",
+                "percentage": "99.95%",
+                "types": "",
+                "value": "1925"
+            },
+            {
+                "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+                "percentage": "96.00%",
+                "types": "",
+                "value": "2"
+            },
+            {
+                "company": "PT Chandra Asri Petrochemical Tbk",
+                "percentage": "46.63%",
+                "types": "Petrokimia",
+                "value": "3464001"
+            },
+            {
+                "company": "PT Tunggal Agathis Indah Wood Industries",
+                "percentage": "99.99%",
+                "types": "Industri Pengolahan Kayu",
+                "value": "400"
+            },
+            {
+                "company": "PT Barito Kencana Mahardika",
+                "percentage": "51.00%",
+                "types": "",
+                "value": "8514"
+            },
+            {
+                "company": "PT Rimba Equator Permai",
+                "percentage": "100%",
+                "types": "Hutan Tanaman Industri",
+                "value": "6"
+            },
+            {
+                "company": "PT Binajaya Rodakarya",
+                "percentage": "99.97%",
+                "types": "Lem (Perekat) Glue",
+                "value": "11087"
+            },
+            {
+                "company": "PT Griya Idola",
+                "percentage": "99.99%",
+                "types": "Properti",
+                "value": "50084"
+            },
+            {
+                "company": "PT Agropratama Subur Lestari",
+                "percentage": "60.00%",
+                "types": "Perkebunan",
+                "value": "0"
+            },
+            {
+                "company": "PT Wahanaguna Margapratama",
+                "percentage": "60.00%",
+                "types": "",
+                "value": "0"
+            },
+            {
+                "company": "PT Royalindo Mandiri",
+                "percentage": "99.00%",
+                "types": "Perkebunan",
+                "value": "7986"
+            },
+            {
+                "company": "Marigold Resources Pte.Ltd",
+                "percentage": "100%",
+                "types": "",
+                "value": "1598"
+            },
+            {
+                "company": "PT Wiradaya Lintas Sukses",
+                "percentage": "98.00%",
+                "types": "",
+                "value": "24"
+            },
+            {
+                "company": "PT Barito Wahana Lestari",
+                "percentage": "99.00%",
+                "types": "",
+                "value": "203532"
+            },
+            {
+                "company": "Star Energy Group Holdings Pte. Ltd",
+                "percentage": "66.67%",
+                "types": "",
+                "value": "3441814"
+            },
+            {
+                "company": "PT Barito Cahaya Nusantara",
+                "percentage": "99.20%",
+                "types": "",
+                "value": "88"
+            },
+            {
+                "company": "PT Barito Investa Prima",
+                "percentage": "99.95%",
+                "types": "",
+                "value": "2995"
+            },
+            {
+                "company": "PT Barito Mitra Investama d/h PT Barito Mitra Hasasa",
+                "percentage": "96.00%",
+                "types": "",
+                "value": "2"
+            },
+            {
+                "company": "PT Chandra Asri Petrochemical Tbk",
+                "percentage": "34.63%",
+                "types": "Petrokimia",
+                "value": "4993060"
+            },
+            {
+                "company": "PT Tunggal Agathis Indah Wood Industries",
+                "percentage": "99.99%",
+                "types": "Industri Pengolahan Kayu",
+                "value": "396"
+            },
+            {
+                "company": "PT Barito Kencana Mahardika",
+                "percentage": "51.00%",
+                "types": "",
+                "value": "9314"
+            },
+            {
+                "company": "PT Rimba Equator Permai",
+                "percentage": "99.97%",
+                "types": "Hutan Tanaman Industri",
+                "value": "6"
+            },
+            {
+                "company": "PT Binajaya Rodakarya",
+                "percentage": "99.97%",
+                "types": "Lem (Perekat) Glue",
+                "value": "9689"
+            },
+            {
+                "company": "PT Griya Idola",
+                "percentage": "99.99%",
+                "types": "Properti",
+                "value": "46941"
+            },
+            {
+                "company": "PT Agropratama Subur Lestari",
+                "percentage": "60.00%",
+                "types": "Perkebunan",
+                "value": "0"
+            },
+            {
+                "company": "PT Wahanaguna Margapratama",
+                "percentage": "60.00%",
+                "types": "",
+                "value": "0"
+            },
+            {
+                "company": "PT Royalindo Mandiri",
+                "percentage": "99.00%",
+                "types": "Perkebunan",
+                "value": "6875"
+            },
+            {
+                "company": "Marigold Resources Pte.Ltd",
+                "percentage": "100%",
+                "types": "",
+                "value": "768"
+            },
+            {
+                "company": "PT Wiradaya Lintas Sukses",
+                "percentage": "98.00%",
+                "types": "",
+                "value": "24"
+            },
+            {
+                "company": "PT Barito Wanabinar Indonesia",
+                "percentage": "99.00%",
+                "types": "",
+                "value": "23491"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "84,493",
+                "change": -5329,
+                "change_formatted": "(-5,329)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "89,822",
+                "change": 14617,
+                "change_formatted": "(+14,617)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "75,205",
+                "change": 6938,
+                "change_formatted": "(+6,938)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "68,267",
+                "change": -5131,
+                "change_formatted": "(-5,131)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "73,398",
+                "change": -5409,
+                "change_formatted": "(-5,409)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "78,807",
+                "change": -1521,
+                "change_formatted": "(-1,521)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "71.36%",
+                "name": "PRAJOGO PANGESTU",
+                "value": "66.90 B",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "AGUS SALIM PANGESTU",
+                "value": "2.65 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "LIM CHONG THIAN",
+                "value": "1.89 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "DAVID KOSASIH",
+                "value": "1.77 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "DIANA ARSIYANTI",
+                "value": "1.72 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "RUDY SUPARMAN",
+                "value": "964.10 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:14+00:00"
+}

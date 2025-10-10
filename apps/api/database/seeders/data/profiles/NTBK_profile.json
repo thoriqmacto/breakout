@@ -1,0 +1,514 @@
+{
+    "symbol": "NTBK",
+    "name": "NTBK",
+    "address": [
+        {
+            "id": "1000003569",
+            "email": [
+                "corsec@nusatama.com"
+            ],
+            "fax": " +62-21 825 0248",
+            "npwp": "21.113.302.0-432.000",
+            "phone": "+62-21 825 0659",
+            "website": "www.nusatama.com",
+            "key": "",
+            "lastupdate": "2022-02-09T09:17:08+07:00",
+            "value": "<td colspan='4'>Jl. Raya Narogong Km. 14\nPangkalan V, Bantar Gebang\nBekasi 17152 - Indonesia\n\n        \t\t  \t\t\tPhone: +62-21 825 0659\n        \t\t  \t\t\tFax:  +62-21 825 0248\n                            NPWP: 21.113.302.0-432.000\n        \t\t  \t\t\tEmail: corsec@nusatama.com\n        \t\t  \t\t\tWebsite: www.nusatama.com\n\n        \t  \t\t\t</td>",
+            "office": "Jl. Raya Narogong Km. 14 Pangkalan V, Bantar Gebang Bekasi 17152 - Indonesia"
+        }
+    ],
+    "background": "Nusatama Special Vehicle adalah perusahaan manufacturing yang bergerak dalam pembuatan dan fabrikasi kendaraan khas penunjang industri hulu dan hilir migas, pertambangan mineral dan batubara, serta industri kehutanan.\r\n\r\nSebagai penyedia produk berkelas nasional, Nusatama terus menerus mengembangkan kualitas produksi, mutu layanan dan kapabilitas teknik dengan dedikasi tinggi, SDM berkualitas serta teknologi mutakhir.\r\n\r\nPT. Nusatama Berkah atau dikenal juga sebagai Nusatama Special Vehicle adalah perusahaan manufacturing ternama di Indonesia yang bergerak dalam bidang pembuatan dan fabrikasi kendaraan khas atau kendaraan khusus yang berfungsi sebagai kendaraan penunjang yang digunakan di dalam industri hulu dan hilir migas, selain itu juga bagi industri pertambangan, seperti misalnya pertambangan mineral dan batubara, serta banyak juga digunakan di dalam menunjang industri kehutanan di seluruh Indonesia.",
+    "history": {
+        "amount": "70 B",
+        "board": "Papan Pengembangan",
+        "date": "9 Feb 2022",
+        "price": "100",
+        "registrar": "",
+        "shares": "700,000,000",
+        "underwriters": [
+            "PT. Surya Fajar Sekuritas",
+            "PT. Danatama Makmur Sekuritas"
+        ],
+        "administrative_bureau": "PT. Bima Registra",
+        "free_float": "27.90%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13838471",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": "Hardiyanto Darjoto"
+            },
+            {
+                "id": "13838472",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": "Lia Marliana, S.E"
+            }
+        ],
+        "director": [
+            {
+                "id": "13838469",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": "Ir. Ismu Prasetyo"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13838470",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": " Ir. Hilman Risan"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13838473",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": "Ir. Hilman Risan"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13838468",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:47+07:00",
+                "value": "Ir. Bambang Susilo "
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12537809",
+            "key": "",
+            "lastupdate": "2022-02-09T09:17:08+07:00",
+            "value": "{\"name\":\"Felik Widyo Makuprathowo\",\"phone\":\"+62-21 825 0659\",\"email\":\"felik.widyo@nusatama.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51.85%",
+            "name": "PT REBORN CAPITAL",
+            "value": "1.40 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "27.89%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "753.26 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "13.17%",
+            "name": "FITRADITYO HARJUNO",
+            "value": "355.67 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "9,161",
+            "change": 528,
+            "change_formatted": "(+528)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "8,633",
+            "change": 1125,
+            "change_formatted": "(+1,125)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "7,508",
+            "change": 35,
+            "change_formatted": "(+35)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "7,473",
+            "change": 43,
+            "change_formatted": "(+43)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "7,430",
+            "change": 30,
+            "change_formatted": "(+30)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "7,400",
+            "change": 8,
+            "change_formatted": "(+8)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "3.78%",
+            "name": "IR. BAMBANG SUSILO",
+            "value": "102.03 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "3.29%",
+            "name": "LIA MARLIANA S.E.",
+            "value": "88.71 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "HARDIANTO DARJOTO",
+            "value": "250.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "IR. ISMU PRASETYO",
+            "value": "143.40 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2022-02-09T00:00:00+07:00",
+    "ipo_price": 100,
+    "float": 27.9,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000003569",
+                "email": [
+                    "corsec@nusatama.com"
+                ],
+                "fax": " +62-21 825 0248",
+                "npwp": "21.113.302.0-432.000",
+                "phone": "+62-21 825 0659",
+                "website": "www.nusatama.com",
+                "key": "",
+                "lastupdate": "2022-02-09T09:17:08+07:00",
+                "value": "<td colspan='4'>Jl. Raya Narogong Km. 14\nPangkalan V, Bantar Gebang\nBekasi 17152 - Indonesia\n\n        \t\t  \t\t\tPhone: +62-21 825 0659\n        \t\t  \t\t\tFax:  +62-21 825 0248\n                            NPWP: 21.113.302.0-432.000\n        \t\t  \t\t\tEmail: corsec@nusatama.com\n        \t\t  \t\t\tWebsite: www.nusatama.com\n\n        \t  \t\t\t</td>",
+                "office": "Jl. Raya Narogong Km. 14 Pangkalan V, Bantar Gebang Bekasi 17152 - Indonesia"
+            }
+        ],
+        "background": "Nusatama Special Vehicle adalah perusahaan manufacturing yang bergerak dalam pembuatan dan fabrikasi kendaraan khas penunjang industri hulu dan hilir migas, pertambangan mineral dan batubara, serta industri kehutanan.\r\n\r\nSebagai penyedia produk berkelas nasional, Nusatama terus menerus mengembangkan kualitas produksi, mutu layanan dan kapabilitas teknik dengan dedikasi tinggi, SDM berkualitas serta teknologi mutakhir.\r\n\r\nPT. Nusatama Berkah atau dikenal juga sebagai Nusatama Special Vehicle adalah perusahaan manufacturing ternama di Indonesia yang bergerak dalam bidang pembuatan dan fabrikasi kendaraan khas atau kendaraan khusus yang berfungsi sebagai kendaraan penunjang yang digunakan di dalam industri hulu dan hilir migas, selain itu juga bagi industri pertambangan, seperti misalnya pertambangan mineral dan batubara, serta banyak juga digunakan di dalam menunjang industri kehutanan di seluruh Indonesia.",
+        "history": {
+            "amount": "70 B",
+            "board": "Papan Pengembangan",
+            "date": "9 Feb 2022",
+            "price": "100",
+            "registrar": "",
+            "shares": "700,000,000",
+            "underwriters": [
+                "PT. Surya Fajar Sekuritas",
+                "PT. Danatama Makmur Sekuritas"
+            ],
+            "administrative_bureau": "PT. Bima Registra",
+            "free_float": "27.90%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13838471",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": "Hardiyanto Darjoto"
+                },
+                {
+                    "id": "13838472",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": "Lia Marliana, S.E"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13838469",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": "Ir. Ismu Prasetyo"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13838470",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": " Ir. Hilman Risan"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13838473",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": "Ir. Hilman Risan"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13838468",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:47+07:00",
+                    "value": "Ir. Bambang Susilo "
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12537809",
+                "key": "",
+                "lastupdate": "2022-02-09T09:17:08+07:00",
+                "value": "{\"name\":\"Felik Widyo Makuprathowo\",\"phone\":\"+62-21 825 0659\",\"email\":\"felik.widyo@nusatama.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51.85%",
+                "name": "PT REBORN CAPITAL",
+                "value": "1.40 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "27.89%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "753.26 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "13.17%",
+                "name": "FITRADITYO HARJUNO",
+                "value": "355.67 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "9,161",
+                "change": 528,
+                "change_formatted": "(+528)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "8,633",
+                "change": 1125,
+                "change_formatted": "(+1,125)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "7,508",
+                "change": 35,
+                "change_formatted": "(+35)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "7,473",
+                "change": 43,
+                "change_formatted": "(+43)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "7,430",
+                "change": 30,
+                "change_formatted": "(+30)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "7,400",
+                "change": 8,
+                "change_formatted": "(+8)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "3.78%",
+                "name": "IR. BAMBANG SUSILO",
+                "value": "102.03 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "3.29%",
+                "name": "LIA MARLIANA S.E.",
+                "value": "88.71 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "HARDIANTO DARJOTO",
+                "value": "250.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "IR. ISMU PRASETYO",
+                "value": "143.40 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:26+00:00"
+}

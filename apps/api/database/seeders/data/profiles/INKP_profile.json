@@ -1,0 +1,1042 @@
+{
+    "symbol": "INKP",
+    "name": "INKP",
+    "address": [
+        {
+            "id": "213",
+            "email": [
+                "yan_partawijaya@app.co.id; suhendra_wiriadinata@app.co.id; heri_santoso@app.co.id; lydia_lydia@app.co.id"
+            ],
+            "fax": "021 - 3927685",
+            "npwp": "01.000.566.8-092.000",
+            "phone": "021-29650800",
+            "website": "www.app.co.id",
+            "key": "",
+            "lastupdate": "2023-12-11T15:13:12+07:00",
+            "value": "",
+            "office": "GEDUNG SINAR MAS LAND PLAZA MENARA 2 LT 9 JL MH.THAMRIN NO 51 GONDANGDIA MENTENG JAKARTA PUSAT DKI JAKARTA 10350"
+        }
+    ],
+    "background": "PT. Indah Kiat Pulp and Paper (IKPP) merupakan bentuk perusahaan PMA (Penanaman Modal Asing) yang didirikan atas joint venture sebuah perusahaan Indonesia (PT. Berkat Indah Agung) dan dua perusahaan Taiwan (Chung Hwa Pulp International Corporation dan Yuen Foung Yue Global Investment Corporation). Di dalam prakteknya, perusahaan Taiwan bertindak sebagai penyedia teknologi untuk proses pembuatan kertas, sedangkan perusahaan Indonesia bertindak sebagai penyedia akses.\n\nIKPP didirikan oleh Eka Tjipta Widjaja di Tangerang pada tanggal 7 Desember 1976. Pada awalnya, di tahun 1977, perusahaan ini hanya memiliki dua buah paper machine yang masing – masing berkapasitas produksi 100 ton/hari. Pada April 1979, IKPP mulai menghasilkan produk komersial, hingga pada bulan Juni 1982, IKPP menambah sebuah paper machine untuk meningkatkan kapasitas produksi sehingga meningkat menjadi 150 ton/hari. Pada bulan Maret 1984, IKPP mencapai kesuksesan dalam memproduksi produk komersial; kemudian pada bulan April 1988 dilakukan modifikasi dan reparasi mesin kertas sehingga total produksi kertas menjadi 250 ton/hari.\n\nPada bulan Januari 1986, grup Sinar Mas membeli 67% total saham IKPP, sedangkan Chung Hwa Pulp International Corporation dan Yuen Foung Yue Global Investment Corporation sebesar 23% dan 10%. Beberapa tahun setelahnya, pada bulan Juni 1990, IKPP mulai mempublikasikan diri dengan melakukan penawaran saham perdana (IPO) di Bursa Efek Jakarta dan Surabaya dengan harga US$ 326 juta yang mewakili 13% total sahamnya.\n\nPada bulan Desember 1992, IKPP resmi mengakuisisi PT. Sinar Dunia Makmur, sebuah perusahaan kertas yang menjadi anggota manajemen PT. Sinar Mas Group dengan lokasi Desa Kragilan, Serang - Banten. Kemudian pada bulan Oktober 1996, IKPP menambah dyer pada salah satu mesinnya untuk meningkatkan kapasitas produksi menjadi 135.000 ton/tahun. Pada tahun 2006, kepemilikan saham IKPP dipegang oleh empat perusahaan, antara lain PT. Puri Nusa Eka Persada (57.25%), Chung Hwa Pulp Int (BUI), Co (16.11%), Yuen Fuon Yue Invest Co (7.62%) dan publik (19.02%).\n\nSaat ini, PT. IKPP memiliki tiga pabrik yang terletak di tiga lokasi yang berlainan; antara lain pabrik pulp dan kertas terintegrasi di Perawang - Riau, industri pabrik kertas di Serang - Banten, serta IKPP Tangerang yang memiliki kapasitas terkecil di antara dua pabrik lainnya, namun merupakan pabrik yang paling menguntungkan.\n\nIKPP Tangerang memiliki tiga mesin kertas \"Foudrinier\", yang memiliki lebar trim 2,75 m dan total kapasitas produksi sekitar 120.000 ton/tahun. Jenis kertas yang diproduksi di sini adalah kertas dan karton berwarna, kertas fotokopi, alat-alat kantor, dan produk-produk lainnya. Kertas-kertas tersebut diproduksi menggunakan bahan baku pulp LBKP (pulp serat pendek) dan pulp NBKP (pulp serat panjang). IKPP Tangerang mengimplementasikan Chain of Custody of Forest Based Product (PEFC) sehingga bahan baku pulp yang digunakan dapat dilacak hingga ke hutan asal kayunya.\n",
+    "history": {
+        "amount": "636 B",
+        "board": "Papan Utama",
+        "date": "16 Jul 1990",
+        "price": "10,600",
+        "registrar": "",
+        "shares": "60,000,000",
+        "underwriters": [
+            "PT. Ficorinvest",
+            "PT. Jardine Fleming Nusantara",
+            "PT. Aseam Indonesia",
+            "PT. Nomura Indonesia",
+            "PT. Inter-Pacific Securities",
+            "PT. Multicor",
+            "PT. Bank Pembangunan Indonesia",
+            "PT. Mutual International Finance Corporation"
+        ],
+        "administrative_bureau": "PT. Sinartama Gunita",
+        "free_float": "38.29%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "16138429",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "SUKIRTA MANGKU DJAJA"
+            },
+            {
+                "id": "16138428",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "KOSIM SUTIONO"
+            },
+            {
+                "id": "16138423",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "ANDRI SETIAWAN YAPSIR"
+            }
+        ],
+        "director": [
+            {
+                "id": "16138435",
+                "key": "Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "HERI SANTOSO ,LIEM"
+            },
+            {
+                "id": "16138434",
+                "key": "Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "AGUSTIAN RACHMANSJAH PARTAWIDJAJA"
+            },
+            {
+                "id": "16138433",
+                "key": "Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "LIOE DJOHAN (DJOHAN GUNAWAN)"
+            },
+            {
+                "id": "16138427",
+                "key": "Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "KURNIAWAN YUWONO"
+            },
+            {
+                "id": "16138426",
+                "key": "Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "DIDI HARSA TANAJA "
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "16138431",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "BAHARUDIN"
+            },
+            {
+                "id": "16138430",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "PROF. WIDYO PRAMONO"
+            },
+            {
+                "id": "16138424",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "DR. IR. RIZAL AFFANDI LUKMAN,M.A."
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "16138436",
+                "key": "President Commissioner",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "DR. SALEH HUSIN , SE, MSI"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "16138432",
+                "key": "President Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "HENDRA JAYA KOSASIH"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "16138425",
+                "key": "Vice President Director",
+                "lastupdate": "2025-10-01T10:09:33+07:00",
+                "value": "SUHENDRA WIRIADINATA"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530238",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:18+07:00",
+            "value": "{\"name\":\"Heri Santoso\",\"phone\":\"021- 29650800\",\"email\":\"heri_santoso@app.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "57.4573%",
+            "name": "PT APP PURINUSA EKAPERSADA",
+            "value": "3.14 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "38.2922%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "2.09 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "3.8542%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "210.86 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.2022%",
+            "name": "PT CAKRAWALA MEGA INDAH",
+            "value": "11.06 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.19%",
+            "name": "PT WIRAKARYA SAKTI",
+            "value": "10.40 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Graha Kemasindo Indah",
+            "percentage": "99.50%",
+            "types": "Perdagangan",
+            "value": "1878"
+        },
+        {
+            "company": "PT Paramitra Abadimas Cemerlang",
+            "percentage": "95.16%",
+            "types": "Perdagangan",
+            "value": "49808"
+        },
+        {
+            "company": "PT Paramitra Gunakarya Cemerlang",
+            "percentage": "95.10%",
+            "types": "Industri",
+            "value": "49862"
+        },
+        {
+            "company": "PT Indah Kiat Global Ventura",
+            "percentage": "99.00%",
+            "types": "Perdagangan dan Jasa",
+            "value": "7"
+        },
+        {
+            "company": "PT Indah Kiat power",
+            "percentage": "98.01%",
+            "types": "Perdagangan dan Jasa",
+            "value": "7"
+        },
+        {
+            "company": "Indah Kiat International Finance Company B.V.",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "2716"
+        },
+        {
+            "company": "Indah Kiat Finance Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "3608"
+        },
+        {
+            "company": "IK Trading Limited",
+            "percentage": "100%",
+            "types": "Distribusi",
+            "value": "0"
+        },
+        {
+            "company": "Indah Kiat Finance (IV) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "0"
+        },
+        {
+            "company": "IK Import & Export Limited",
+            "percentage": "100%",
+            "types": "Distribusi",
+            "value": "736"
+        },
+        {
+            "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "1"
+        },
+        {
+            "company": "Global Fibre Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "Imperial Investment Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "593509"
+        },
+        {
+            "company": "PT Graha Kemasindo Indah",
+            "percentage": "99.50%",
+            "types": "Perdagangan",
+            "value": "1855"
+        },
+        {
+            "company": "PT Paramitra Abadimas Cemerlang",
+            "percentage": "95.16%",
+            "types": "Perdagangan",
+            "value": "38228"
+        },
+        {
+            "company": "PT Paramitra Gunakarya Cemerlang",
+            "percentage": "95.10%",
+            "types": "Industri",
+            "value": "38153"
+        },
+        {
+            "company": "PT Indah Kiat Global Ventura",
+            "percentage": "99.00%",
+            "types": "Perdagangan dan Jasa",
+            "value": "6"
+        },
+        {
+            "company": "PT Indah Kiat power",
+            "percentage": "98.01%",
+            "types": "Perdagangan dan Jasa",
+            "value": "6"
+        },
+        {
+            "company": "Indah Kiat International Finance Company B.V.",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "2720"
+        },
+        {
+            "company": "Indah Kiat Finance Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "3712"
+        },
+        {
+            "company": "Indah Kiat Finance (IV) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "0"
+        },
+        {
+            "company": "IK Import & Export Limited",
+            "percentage": "100%",
+            "types": "Distribusi",
+            "value": "677"
+        },
+        {
+            "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "1"
+        },
+        {
+            "company": "Global Fibre Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "Imperial Investment Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "592511"
+        },
+        {
+            "company": "PT Graha Kemasindo Indah",
+            "percentage": "99.50%",
+            "types": "Perdagangan",
+            "value": "1867"
+        },
+        {
+            "company": "PT Paramitra Abadimas Cemerlang",
+            "percentage": "95.16%",
+            "types": "Perdagangan",
+            "value": "56916"
+        },
+        {
+            "company": "PT Paramitra Gunakarya Cemerlang",
+            "percentage": "95.10%",
+            "types": "Industri",
+            "value": "56840"
+        },
+        {
+            "company": "PT Indah Kiat Global Ventura",
+            "percentage": "99.00%",
+            "types": "Perdagangan dan Jasa",
+            "value": "6"
+        },
+        {
+            "company": "PT Indah Kiat power",
+            "percentage": "98.01%",
+            "types": "Perdagangan dan Jasa",
+            "value": "6"
+        },
+        {
+            "company": "Indah Kiat International Finance Company B.V.",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "2718"
+        },
+        {
+            "company": "Indah Kiat Finance Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "3712"
+        },
+        {
+            "company": "Indah Kiat Finance (IV) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "0"
+        },
+        {
+            "company": "IK Import & Export Limited",
+            "percentage": "100%",
+            "types": "Distribusi",
+            "value": "668"
+        },
+        {
+            "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+            "percentage": "100%",
+            "types": "Keuangan",
+            "value": "1"
+        },
+        {
+            "company": "Global Fibre Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "Imperial Investment Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "600549"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "25,499",
+            "change": -383,
+            "change_formatted": "(-383)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "25,882",
+            "change": -3158,
+            "change_formatted": "(-3,158)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "29,040",
+            "change": 977,
+            "change_formatted": "(+977)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "28,063",
+            "change": -236,
+            "change_formatted": "(-236)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "28,299",
+            "change": 508,
+            "change_formatted": "(+508)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "27,791",
+            "change": 521,
+            "change_formatted": "(+521)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.0041%",
+            "name": "HENDRA JAYA KOSASIH",
+            "value": "226.80 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1990-07-16T00:00:00+07:00",
+    "ipo_price": 10600,
+    "float": 38.29,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "213",
+                "email": [
+                    "yan_partawijaya@app.co.id; suhendra_wiriadinata@app.co.id; heri_santoso@app.co.id; lydia_lydia@app.co.id"
+                ],
+                "fax": "021 - 3927685",
+                "npwp": "01.000.566.8-092.000",
+                "phone": "021-29650800",
+                "website": "www.app.co.id",
+                "key": "",
+                "lastupdate": "2023-12-11T15:13:12+07:00",
+                "value": "",
+                "office": "GEDUNG SINAR MAS LAND PLAZA MENARA 2 LT 9 JL MH.THAMRIN NO 51 GONDANGDIA MENTENG JAKARTA PUSAT DKI JAKARTA 10350"
+            }
+        ],
+        "background": "PT. Indah Kiat Pulp and Paper (IKPP) merupakan bentuk perusahaan PMA (Penanaman Modal Asing) yang didirikan atas joint venture sebuah perusahaan Indonesia (PT. Berkat Indah Agung) dan dua perusahaan Taiwan (Chung Hwa Pulp International Corporation dan Yuen Foung Yue Global Investment Corporation). Di dalam prakteknya, perusahaan Taiwan bertindak sebagai penyedia teknologi untuk proses pembuatan kertas, sedangkan perusahaan Indonesia bertindak sebagai penyedia akses.\n\nIKPP didirikan oleh Eka Tjipta Widjaja di Tangerang pada tanggal 7 Desember 1976. Pada awalnya, di tahun 1977, perusahaan ini hanya memiliki dua buah paper machine yang masing – masing berkapasitas produksi 100 ton/hari. Pada April 1979, IKPP mulai menghasilkan produk komersial, hingga pada bulan Juni 1982, IKPP menambah sebuah paper machine untuk meningkatkan kapasitas produksi sehingga meningkat menjadi 150 ton/hari. Pada bulan Maret 1984, IKPP mencapai kesuksesan dalam memproduksi produk komersial; kemudian pada bulan April 1988 dilakukan modifikasi dan reparasi mesin kertas sehingga total produksi kertas menjadi 250 ton/hari.\n\nPada bulan Januari 1986, grup Sinar Mas membeli 67% total saham IKPP, sedangkan Chung Hwa Pulp International Corporation dan Yuen Foung Yue Global Investment Corporation sebesar 23% dan 10%. Beberapa tahun setelahnya, pada bulan Juni 1990, IKPP mulai mempublikasikan diri dengan melakukan penawaran saham perdana (IPO) di Bursa Efek Jakarta dan Surabaya dengan harga US$ 326 juta yang mewakili 13% total sahamnya.\n\nPada bulan Desember 1992, IKPP resmi mengakuisisi PT. Sinar Dunia Makmur, sebuah perusahaan kertas yang menjadi anggota manajemen PT. Sinar Mas Group dengan lokasi Desa Kragilan, Serang - Banten. Kemudian pada bulan Oktober 1996, IKPP menambah dyer pada salah satu mesinnya untuk meningkatkan kapasitas produksi menjadi 135.000 ton/tahun. Pada tahun 2006, kepemilikan saham IKPP dipegang oleh empat perusahaan, antara lain PT. Puri Nusa Eka Persada (57.25%), Chung Hwa Pulp Int (BUI), Co (16.11%), Yuen Fuon Yue Invest Co (7.62%) dan publik (19.02%).\n\nSaat ini, PT. IKPP memiliki tiga pabrik yang terletak di tiga lokasi yang berlainan; antara lain pabrik pulp dan kertas terintegrasi di Perawang - Riau, industri pabrik kertas di Serang - Banten, serta IKPP Tangerang yang memiliki kapasitas terkecil di antara dua pabrik lainnya, namun merupakan pabrik yang paling menguntungkan.\n\nIKPP Tangerang memiliki tiga mesin kertas \"Foudrinier\", yang memiliki lebar trim 2,75 m dan total kapasitas produksi sekitar 120.000 ton/tahun. Jenis kertas yang diproduksi di sini adalah kertas dan karton berwarna, kertas fotokopi, alat-alat kantor, dan produk-produk lainnya. Kertas-kertas tersebut diproduksi menggunakan bahan baku pulp LBKP (pulp serat pendek) dan pulp NBKP (pulp serat panjang). IKPP Tangerang mengimplementasikan Chain of Custody of Forest Based Product (PEFC) sehingga bahan baku pulp yang digunakan dapat dilacak hingga ke hutan asal kayunya.\n",
+        "history": {
+            "amount": "636 B",
+            "board": "Papan Utama",
+            "date": "16 Jul 1990",
+            "price": "10,600",
+            "registrar": "",
+            "shares": "60,000,000",
+            "underwriters": [
+                "PT. Ficorinvest",
+                "PT. Jardine Fleming Nusantara",
+                "PT. Aseam Indonesia",
+                "PT. Nomura Indonesia",
+                "PT. Inter-Pacific Securities",
+                "PT. Multicor",
+                "PT. Bank Pembangunan Indonesia",
+                "PT. Mutual International Finance Corporation"
+            ],
+            "administrative_bureau": "PT. Sinartama Gunita",
+            "free_float": "38.29%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "16138429",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "SUKIRTA MANGKU DJAJA"
+                },
+                {
+                    "id": "16138428",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "KOSIM SUTIONO"
+                },
+                {
+                    "id": "16138423",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "ANDRI SETIAWAN YAPSIR"
+                }
+            ],
+            "director": [
+                {
+                    "id": "16138435",
+                    "key": "Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "HERI SANTOSO ,LIEM"
+                },
+                {
+                    "id": "16138434",
+                    "key": "Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "AGUSTIAN RACHMANSJAH PARTAWIDJAJA"
+                },
+                {
+                    "id": "16138433",
+                    "key": "Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "LIOE DJOHAN (DJOHAN GUNAWAN)"
+                },
+                {
+                    "id": "16138427",
+                    "key": "Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "KURNIAWAN YUWONO"
+                },
+                {
+                    "id": "16138426",
+                    "key": "Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "DIDI HARSA TANAJA "
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "16138431",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "BAHARUDIN"
+                },
+                {
+                    "id": "16138430",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "PROF. WIDYO PRAMONO"
+                },
+                {
+                    "id": "16138424",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "DR. IR. RIZAL AFFANDI LUKMAN,M.A."
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "16138436",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "DR. SALEH HUSIN , SE, MSI"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "16138432",
+                    "key": "President Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "HENDRA JAYA KOSASIH"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "16138425",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-10-01T10:09:33+07:00",
+                    "value": "SUHENDRA WIRIADINATA"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530238",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:18+07:00",
+                "value": "{\"name\":\"Heri Santoso\",\"phone\":\"021- 29650800\",\"email\":\"heri_santoso@app.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "57.4573%",
+                "name": "PT APP PURINUSA EKAPERSADA",
+                "value": "3.14 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "38.2922%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "2.09 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "3.8542%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "210.86 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.2022%",
+                "name": "PT CAKRAWALA MEGA INDAH",
+                "value": "11.06 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.19%",
+                "name": "PT WIRAKARYA SAKTI",
+                "value": "10.40 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Graha Kemasindo Indah",
+                "percentage": "99.50%",
+                "types": "Perdagangan",
+                "value": "1878"
+            },
+            {
+                "company": "PT Paramitra Abadimas Cemerlang",
+                "percentage": "95.16%",
+                "types": "Perdagangan",
+                "value": "49808"
+            },
+            {
+                "company": "PT Paramitra Gunakarya Cemerlang",
+                "percentage": "95.10%",
+                "types": "Industri",
+                "value": "49862"
+            },
+            {
+                "company": "PT Indah Kiat Global Ventura",
+                "percentage": "99.00%",
+                "types": "Perdagangan dan Jasa",
+                "value": "7"
+            },
+            {
+                "company": "PT Indah Kiat power",
+                "percentage": "98.01%",
+                "types": "Perdagangan dan Jasa",
+                "value": "7"
+            },
+            {
+                "company": "Indah Kiat International Finance Company B.V.",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "2716"
+            },
+            {
+                "company": "Indah Kiat Finance Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "3608"
+            },
+            {
+                "company": "IK Trading Limited",
+                "percentage": "100%",
+                "types": "Distribusi",
+                "value": "0"
+            },
+            {
+                "company": "Indah Kiat Finance (IV) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "0"
+            },
+            {
+                "company": "IK Import & Export Limited",
+                "percentage": "100%",
+                "types": "Distribusi",
+                "value": "736"
+            },
+            {
+                "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "1"
+            },
+            {
+                "company": "Global Fibre Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "Imperial Investment Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "593509"
+            },
+            {
+                "company": "PT Graha Kemasindo Indah",
+                "percentage": "99.50%",
+                "types": "Perdagangan",
+                "value": "1855"
+            },
+            {
+                "company": "PT Paramitra Abadimas Cemerlang",
+                "percentage": "95.16%",
+                "types": "Perdagangan",
+                "value": "38228"
+            },
+            {
+                "company": "PT Paramitra Gunakarya Cemerlang",
+                "percentage": "95.10%",
+                "types": "Industri",
+                "value": "38153"
+            },
+            {
+                "company": "PT Indah Kiat Global Ventura",
+                "percentage": "99.00%",
+                "types": "Perdagangan dan Jasa",
+                "value": "6"
+            },
+            {
+                "company": "PT Indah Kiat power",
+                "percentage": "98.01%",
+                "types": "Perdagangan dan Jasa",
+                "value": "6"
+            },
+            {
+                "company": "Indah Kiat International Finance Company B.V.",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "2720"
+            },
+            {
+                "company": "Indah Kiat Finance Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "3712"
+            },
+            {
+                "company": "Indah Kiat Finance (IV) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "0"
+            },
+            {
+                "company": "IK Import & Export Limited",
+                "percentage": "100%",
+                "types": "Distribusi",
+                "value": "677"
+            },
+            {
+                "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "1"
+            },
+            {
+                "company": "Global Fibre Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "Imperial Investment Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "592511"
+            },
+            {
+                "company": "PT Graha Kemasindo Indah",
+                "percentage": "99.50%",
+                "types": "Perdagangan",
+                "value": "1867"
+            },
+            {
+                "company": "PT Paramitra Abadimas Cemerlang",
+                "percentage": "95.16%",
+                "types": "Perdagangan",
+                "value": "56916"
+            },
+            {
+                "company": "PT Paramitra Gunakarya Cemerlang",
+                "percentage": "95.10%",
+                "types": "Industri",
+                "value": "56840"
+            },
+            {
+                "company": "PT Indah Kiat Global Ventura",
+                "percentage": "99.00%",
+                "types": "Perdagangan dan Jasa",
+                "value": "6"
+            },
+            {
+                "company": "PT Indah Kiat power",
+                "percentage": "98.01%",
+                "types": "Perdagangan dan Jasa",
+                "value": "6"
+            },
+            {
+                "company": "Indah Kiat International Finance Company B.V.",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "2718"
+            },
+            {
+                "company": "Indah Kiat Finance Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "3712"
+            },
+            {
+                "company": "Indah Kiat Finance (IV) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "0"
+            },
+            {
+                "company": "IK Import & Export Limited",
+                "percentage": "100%",
+                "types": "Distribusi",
+                "value": "668"
+            },
+            {
+                "company": "Indah Kiat Finance (VIII) Mauritius Limited",
+                "percentage": "100%",
+                "types": "Keuangan",
+                "value": "1"
+            },
+            {
+                "company": "Global Fibre Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "Imperial Investment Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "600549"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "25,499",
+                "change": -383,
+                "change_formatted": "(-383)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "25,882",
+                "change": -3158,
+                "change_formatted": "(-3,158)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "29,040",
+                "change": 977,
+                "change_formatted": "(+977)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "28,063",
+                "change": -236,
+                "change_formatted": "(-236)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "28,299",
+                "change": 508,
+                "change_formatted": "(+508)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "27,791",
+                "change": 521,
+                "change_formatted": "(+521)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.0041%",
+                "name": "HENDRA JAYA KOSASIH",
+                "value": "226.80 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:21+00:00"
+}

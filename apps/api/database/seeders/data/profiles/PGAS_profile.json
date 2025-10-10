@@ -1,0 +1,664 @@
+{
+    "symbol": "PGAS",
+    "name": "PGAS",
+    "address": [
+        {
+            "id": "327",
+            "email": [
+                "investor.relations@pgn.co.id"
+            ],
+            "fax": "021-633 1302; 633 3080",
+            "npwp": "01.000.051.1-051.000",
+            "phone": "021-6333080",
+            "website": "www.pgn.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:46+07:00",
+            "value": "<td colspan='4'>Jl. KH. Zainul Arifin No. 20\r\nJakarta 11140\n\n        \t\t  \t\t\tPhone: 021-6333080\n        \t\t  \t\t\tFax: 021-633 1302; 633 3080\n                            NPWP: 01.000.051.1-051.000\n        \t\t  \t\t\tEmail: investor.relations@pgn.co.id\n        \t\t  \t\t\tWebsite: www.pgn.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Jl. KH. Zainul Arifin No. 20 Jakarta 11140"
+        }
+    ],
+    "background": "Sebagai BUMN yang bergerak di bidang hilir gas\nbumi, PGN melakukan kegiatan usaha di bidang\npengangkutan dan niaga gas bumi.\n\nPada bidang pengangkutan gas bumi, PGN memiliki\njaringan pipa transmisi di Provinsi Sumatera Utara,\nRiau, Sumatera Selatan, Kepulauan Riau dan Provinsi\nJawa Tengah untuk menghubungkan lokasi sumber\ngas bumi dengan lokasi pengguna akhir gas bumi\nmelalui moda pipa transmisi.\n\nPada bidang niaga gas bumi, PGN membeli gas bumi\ndari berbagai produsen gas bumi yang kemudian\ndijual ke berbagai segmen pengguna akhir gas bumi,\nmulai dari pelanggan rumah tangga, pelanggan\nkomersial, pelanggan industri - manufaktur,\npembangkit listrik hingga ke sektor transportasi baik\nmelalui moda pipa distribusi gas, CNG maupun LNG.\n\nUntuk mendukung usaha niaga gas bumi, PGN\nmenyediakan berbagai infrastruktur gas bumi yang\ndilakukan secara terintegrasi untuk menjamin\npenyaluran gas bumi kepada para pengguna akhir gas\nbumi memenuhi kualitas produk (komposisi, tekanan,\ntemperatur gas bumi) dan layanan (kontak pelanggan,\npenanganan gangguan) sesuai standar internasional.\nUntuk kepentingan manajemen perusahaan, dalam\nmenjalankan kegiatan usahanya, PGN dan beserta\nperusahaan-perusahaan yang tergabung dalam PGN\nGroup membagi 4 (empat) segmen usaha pokok, yaitu:\n1. Usaha transmisi dan distribusi gas bumi;\n2. Usaha niaga gas bumi;\n3. Usaha hulu minyak dan gas bumi;\n4. Usaha lainnya, yaitu telekomunikasi, jasa,\nkonstruksi dan pemeliharaan jaringan pipa\npengelolaan gedung dan sewa pembiayaan\n(financial lease).\n\nSejalan dengan strategi bisnis perusahaan, pada\ntahun 2011 PGN mengembangkan kapabilitas\ndi kegiatan hulu minyak dan gas bumi, serta\nberdasarkan PSAK No. 5 (direvisi tahun 2009)\nmengenai segmen usaha operasional dan untuk\ntujuan penilaian serta pelaporan manajemen. Di\ntahun 2013 PGN juga melaporkan kegiatan usaha hulu\nminyak dan gas bumi sebagai segmen\nbisnis perusahaan.\n",
+    "history": {
+        "amount": "1,945 B",
+        "board": "Papan Utama",
+        "date": "15 Dec 2003",
+        "price": "1,500",
+        "registrar": "",
+        "shares": "1,296,489,984",
+        "underwriters": [
+            "PT. Danareksa Sekuritas",
+            "PT. ABN AMRO Asia Securities Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "43.03%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "15276623",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "THANON ARIA DEWANGGA"
+            },
+            {
+                "id": "15276622",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "EDWARD OMAR SHARIF HIARIEJ"
+            },
+            {
+                "id": "15276620",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "RAMBE KAMARULZAMAN"
+            }
+        ],
+        "director": [
+            {
+                "id": "15276618",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "RACHMAT HUTAMA"
+            },
+            {
+                "id": "15276614",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "ERI SURYA KELANA"
+            },
+            {
+                "id": "15276613",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "MIRZA MAHENDRA"
+            },
+            {
+                "id": "15276612",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "ALDIANSYAH IDHAM"
+            },
+            {
+                "id": "15276611",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "CATUR DERMAWAN"
+            },
+            {
+                "id": "15276610",
+                "key": "Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "HERY MURAHMANTA"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "15276621",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "CONNY LOLYTA RUMONDOR"
+            },
+            {
+                "id": "15276616",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "WIDJONO HARDJANTO"
+            },
+            {
+                "id": "15276615",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": ""
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "15276617",
+                "key": "President Director",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "ARIEF KURNIA RISDIANTO"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "15276619",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-08-29T17:24:30+07:00",
+                "value": "TONY SETIA BOEDI HOESODO"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12531606",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:46+07:00",
+            "value": "{\"name\":\"Rachmat Hutama\",\"phone\":\"021-80641111\",\"email\":\"rachmat.hutama@pgn.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "56.964%",
+            "name": "PT PERTAMINA (PERSERO)",
+            "value": "13.81 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "43.035%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "10.43 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "131.50 K",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NEGARA REPUBLIK INDONESIA",
+            "value": "1.00",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT PGAS Telekomunikasi Nusantara",
+            "percentage": "99.93%",
+            "types": "Telekomunikasi",
+            "value": "33291683"
+        },
+        {
+            "company": "PT PGAS Solution",
+            "percentage": "99.91%",
+            "types": "Konstruksi",
+            "value": "95699601"
+        },
+        {
+            "company": "PT Saka Energi Indonesia",
+            "percentage": "100%",
+            "types": "Hulu Minyak dan Gas Bumi",
+            "value": "2707219510"
+        },
+        {
+            "company": "PT Gagas Energi Indonesia",
+            "percentage": "100%",
+            "types": "Hilir Minyak dan Gas Bumi",
+            "value": "73059773"
+        },
+        {
+            "company": "PT PGN LNG Indonesia (PLI)",
+            "percentage": "100%",
+            "types": "Pengolahan Minyak dan Gas Bumi",
+            "value": "437727802"
+        },
+        {
+            "company": "PT Permata Graha Nusantara",
+            "percentage": "100%",
+            "types": "Properti dan Jasa",
+            "value": "292555628"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "81,292",
+            "change": -2801,
+            "change_formatted": "(-2,801)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "84,093",
+            "change": -6911,
+            "change_formatted": "(-6,911)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "91,004",
+            "change": 3209,
+            "change_formatted": "(+3,209)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "87,795",
+            "change": 11743,
+            "change_formatted": "(+11,743)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "76,052",
+            "change": 2538,
+            "change_formatted": "(+2,538)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "73,514",
+            "change": 974,
+            "change_formatted": "(+974)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "ALDIANSYAH IDHAM",
+            "value": "60.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "RACHMAT HUTAMA",
+            "value": "2.50 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2003-12-15T00:00:00+07:00",
+    "ipo_price": 1500,
+    "float": 43.03,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "327",
+                "email": [
+                    "investor.relations@pgn.co.id"
+                ],
+                "fax": "021-633 1302; 633 3080",
+                "npwp": "01.000.051.1-051.000",
+                "phone": "021-6333080",
+                "website": "www.pgn.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:46+07:00",
+                "value": "<td colspan='4'>Jl. KH. Zainul Arifin No. 20\r\nJakarta 11140\n\n        \t\t  \t\t\tPhone: 021-6333080\n        \t\t  \t\t\tFax: 021-633 1302; 633 3080\n                            NPWP: 01.000.051.1-051.000\n        \t\t  \t\t\tEmail: investor.relations@pgn.co.id\n        \t\t  \t\t\tWebsite: www.pgn.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Jl. KH. Zainul Arifin No. 20 Jakarta 11140"
+            }
+        ],
+        "background": "Sebagai BUMN yang bergerak di bidang hilir gas\nbumi, PGN melakukan kegiatan usaha di bidang\npengangkutan dan niaga gas bumi.\n\nPada bidang pengangkutan gas bumi, PGN memiliki\njaringan pipa transmisi di Provinsi Sumatera Utara,\nRiau, Sumatera Selatan, Kepulauan Riau dan Provinsi\nJawa Tengah untuk menghubungkan lokasi sumber\ngas bumi dengan lokasi pengguna akhir gas bumi\nmelalui moda pipa transmisi.\n\nPada bidang niaga gas bumi, PGN membeli gas bumi\ndari berbagai produsen gas bumi yang kemudian\ndijual ke berbagai segmen pengguna akhir gas bumi,\nmulai dari pelanggan rumah tangga, pelanggan\nkomersial, pelanggan industri - manufaktur,\npembangkit listrik hingga ke sektor transportasi baik\nmelalui moda pipa distribusi gas, CNG maupun LNG.\n\nUntuk mendukung usaha niaga gas bumi, PGN\nmenyediakan berbagai infrastruktur gas bumi yang\ndilakukan secara terintegrasi untuk menjamin\npenyaluran gas bumi kepada para pengguna akhir gas\nbumi memenuhi kualitas produk (komposisi, tekanan,\ntemperatur gas bumi) dan layanan (kontak pelanggan,\npenanganan gangguan) sesuai standar internasional.\nUntuk kepentingan manajemen perusahaan, dalam\nmenjalankan kegiatan usahanya, PGN dan beserta\nperusahaan-perusahaan yang tergabung dalam PGN\nGroup membagi 4 (empat) segmen usaha pokok, yaitu:\n1. Usaha transmisi dan distribusi gas bumi;\n2. Usaha niaga gas bumi;\n3. Usaha hulu minyak dan gas bumi;\n4. Usaha lainnya, yaitu telekomunikasi, jasa,\nkonstruksi dan pemeliharaan jaringan pipa\npengelolaan gedung dan sewa pembiayaan\n(financial lease).\n\nSejalan dengan strategi bisnis perusahaan, pada\ntahun 2011 PGN mengembangkan kapabilitas\ndi kegiatan hulu minyak dan gas bumi, serta\nberdasarkan PSAK No. 5 (direvisi tahun 2009)\nmengenai segmen usaha operasional dan untuk\ntujuan penilaian serta pelaporan manajemen. Di\ntahun 2013 PGN juga melaporkan kegiatan usaha hulu\nminyak dan gas bumi sebagai segmen\nbisnis perusahaan.\n",
+        "history": {
+            "amount": "1,945 B",
+            "board": "Papan Utama",
+            "date": "15 Dec 2003",
+            "price": "1,500",
+            "registrar": "",
+            "shares": "1,296,489,984",
+            "underwriters": [
+                "PT. Danareksa Sekuritas",
+                "PT. ABN AMRO Asia Securities Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "43.03%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "15276623",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "THANON ARIA DEWANGGA"
+                },
+                {
+                    "id": "15276622",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "EDWARD OMAR SHARIF HIARIEJ"
+                },
+                {
+                    "id": "15276620",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "RAMBE KAMARULZAMAN"
+                }
+            ],
+            "director": [
+                {
+                    "id": "15276618",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "RACHMAT HUTAMA"
+                },
+                {
+                    "id": "15276614",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "ERI SURYA KELANA"
+                },
+                {
+                    "id": "15276613",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "MIRZA MAHENDRA"
+                },
+                {
+                    "id": "15276612",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "ALDIANSYAH IDHAM"
+                },
+                {
+                    "id": "15276611",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "CATUR DERMAWAN"
+                },
+                {
+                    "id": "15276610",
+                    "key": "Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "HERY MURAHMANTA"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "15276621",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "CONNY LOLYTA RUMONDOR"
+                },
+                {
+                    "id": "15276616",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "WIDJONO HARDJANTO"
+                },
+                {
+                    "id": "15276615",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": ""
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "15276617",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "ARIEF KURNIA RISDIANTO"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "15276619",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-08-29T17:24:30+07:00",
+                    "value": "TONY SETIA BOEDI HOESODO"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12531606",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:46+07:00",
+                "value": "{\"name\":\"Rachmat Hutama\",\"phone\":\"021-80641111\",\"email\":\"rachmat.hutama@pgn.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "56.964%",
+                "name": "PT PERTAMINA (PERSERO)",
+                "value": "13.81 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "43.035%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "10.43 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "131.50 K",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NEGARA REPUBLIK INDONESIA",
+                "value": "1.00",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT PGAS Telekomunikasi Nusantara",
+                "percentage": "99.93%",
+                "types": "Telekomunikasi",
+                "value": "33291683"
+            },
+            {
+                "company": "PT PGAS Solution",
+                "percentage": "99.91%",
+                "types": "Konstruksi",
+                "value": "95699601"
+            },
+            {
+                "company": "PT Saka Energi Indonesia",
+                "percentage": "100%",
+                "types": "Hulu Minyak dan Gas Bumi",
+                "value": "2707219510"
+            },
+            {
+                "company": "PT Gagas Energi Indonesia",
+                "percentage": "100%",
+                "types": "Hilir Minyak dan Gas Bumi",
+                "value": "73059773"
+            },
+            {
+                "company": "PT PGN LNG Indonesia (PLI)",
+                "percentage": "100%",
+                "types": "Pengolahan Minyak dan Gas Bumi",
+                "value": "437727802"
+            },
+            {
+                "company": "PT Permata Graha Nusantara",
+                "percentage": "100%",
+                "types": "Properti dan Jasa",
+                "value": "292555628"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "81,292",
+                "change": -2801,
+                "change_formatted": "(-2,801)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "84,093",
+                "change": -6911,
+                "change_formatted": "(-6,911)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "91,004",
+                "change": 3209,
+                "change_formatted": "(+3,209)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "87,795",
+                "change": 11743,
+                "change_formatted": "(+11,743)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "76,052",
+                "change": 2538,
+                "change_formatted": "(+2,538)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "73,514",
+                "change": 974,
+                "change_formatted": "(+974)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "ALDIANSYAH IDHAM",
+                "value": "60.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "RACHMAT HUTAMA",
+                "value": "2.50 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:27+00:00"
+}

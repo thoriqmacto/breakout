@@ -1,0 +1,1004 @@
+{
+    "symbol": "ASII",
+    "name": "ASII",
+    "address": [
+        {
+            "id": "40",
+            "email": [
+                "corporate.secretary@ai.astra.co.id"
+            ],
+            "fax": "(021) 6530-4957",
+            "npwp": "01.302.584.6-092.000",
+            "phone": "(021) 508 43 888",
+            "website": "www.astra.co.id",
+            "key": "",
+            "lastupdate": "2023-10-02T17:47:10+07:00",
+            "value": "",
+            "office": "Menara Astra Lt 58-63, Jl. Jendral Sudirman Kav 5-6, Jakarta, 10220"
+        }
+    ],
+    "background": "PT Astra International Tbk didirikan di Jakarta pada tahun 1957 sebagai sebuah perusahaan perdagangan umum dengan nama Astra International Inc. Pada tahun 1990, telah dilakukan perubahan nama menjadi PT Astra International Tbk, dalam rangka penawaran umum perdana saham Perseroan kepada masyarakat, yang dilanjutkan dengan pencatatan saham Perseroan di Bursa Efek Indonesia dengan menggunakan ticker ASII. Nilai kapitalisasi pasar Astra pada akhir tahun 2020 adalah sebesar Rp244 triliun. Sesuai anggaran dasar Perseroan, kegiatan usaha yang dapat dijalankan oleh Perusahaan mencakup perdagangan umum, perindustrian, pertambangan, pengangkutan, pertanian, pembangunan, jasa dan konsultasi. Hingga tahun 2020, Astra telah mengembangkan bisnisnya dengan menerapkan model bisnis yang berbasis sinergi dan terdiversifikasi pada tujuh segmen usaha, terdiri dari:\nOtomotif.\nJasa Keuangan.\nAlat Berat, Pertambangan, Konstruksi & Energi.\nAgribisnis.\nInfrastruktur dan Logistik.\nTeknologi Informasi.\nProperti.\n\nDengan bisnis yang beragam, Astra telah menyentuh berbagai aspek kehidupan bangsa melalui produk dan layanan yang dihasilkan. Dalam keseharian hidup, masyarakat Indonesia menggunakan sepeda motor dan mobil, jalan tol, printer, hingga layanan pembiayaan, perbankan dan asuransi milik Astra. Pelaku bisnis bermitra dengan Astra memanfaatkan berbagai kendaraan komersial, alat berat, layanan logistik, sistem teknologi informasi dan jasa pertambangan dari Astra. Berbagai produk yang dihasilkan, antara lain minyak kelapa sawit, batu bara dan kendaraan bermotor, senantiasa diekspor sehingga Astra dapat berkontribusi dalam menyumbangkan devisa bagi negara.\n\nSaat ini, kegiatan operasional bisnis yang tersebar di seluruh Indonesia dikelola melalui 241 anak perusahaan, ventura bersama dan entitas asosiasi, dengan didukung oleh 186.237 karyawan. Sebagai salah satu grup usaha terbesar nasional saat ini, Astra telah membangun reputasi yang kuat melalui penawaran rangkaian produk dan layanan berkualitas, dengan memperhatikan pelaksanaan tata kelola perusahaan dan tata kelola lingkungan yang baik.\n\nAstra senantiasa beraspirasi untuk menjadi perusahaan kebanggaan bangsa yang berperan serta dalam upaya untuk meningkatkan kesejahteraan masyarakat Indonesia. Oleh karena itu, kegiatan bisnis Astra berupaya menerapkan perpaduan yang berimbang pada aspek komersial bisnis dan sumbangsih non-bisnis melalui program tanggung jawab sosial yang berkelanjutan di bidang kesehatan, pendidikan, lingkungan, kewirausahaan serta teknologi.\n",
+    "history": {
+        "amount": "446 B",
+        "board": "Papan Utama",
+        "date": "4 Apr 1990",
+        "price": "14,850",
+        "registrar": "",
+        "shares": "30,000,000",
+        "underwriters": [
+            "PT. Danareksa Sekuritas"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "44.97%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13834004",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Hsu Hai Yeh"
+            },
+            {
+                "id": "13834003",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Benjamin Herrenden Birks"
+            },
+            {
+                "id": "13834002",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Stephen Patrick Gore"
+            },
+            {
+                "id": "13834001",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "John Raymond Witt"
+            },
+            {
+                "id": "13834000",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Benjamin William Keswick"
+            },
+            {
+                "id": "13833999",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Anthony John Liddell Nightingale"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833994",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Thomas Junaidi Alim. W"
+            },
+            {
+                "id": "13833992",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Hamdani Dzulkarnaen Salim"
+            },
+            {
+                "id": "13833991",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "FXL Kesuma"
+            },
+            {
+                "id": "13833990",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Gita Tiffani Boer"
+            },
+            {
+                "id": "13833989",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Santosa"
+            },
+            {
+                "id": "13833988",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Henry Tanoto"
+            },
+            {
+                "id": "13833987",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Gidion Hasan"
+            },
+            {
+                "id": "13833986",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Chiew Sin Cheok"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833998",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Muliaman Darmansyah Hadad"
+            },
+            {
+                "id": "13833997",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Apinont Suchewaboripont"
+            },
+            {
+                "id": "13833996",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Sri Indrastuti Hadiputranto"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13833995",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Prijono Sugiarto"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13833985",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Djony Bunarto Tjondro"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13833993",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:36:49+07:00",
+                "value": "Rudy"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12528080",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:14+07:00",
+            "value": "{\"name\":\"Gita Tiffany Boer\",\"phone\":\"6531 0377\",\"email\":\"gita.tiffanyboer@ai.astra.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "50.11%",
+            "name": "JARDINE CYCLE & CARRIAGE LIMITED",
+            "value": "20.29 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "45.07%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "18.24 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "4.82%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "1.95 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Arya Kharisma",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "1526"
+        },
+        {
+            "company": "PT Astra Autoprima",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "43"
+        },
+        {
+            "company": "PT Astra Auto Trust",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "130"
+        },
+        {
+            "company": "PT Astra Digital Internasional",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "836"
+        },
+        {
+            "company": "PT Astra Multi Trucks Indonesia",
+            "percentage": "75.00%",
+            "types": "Otomotif",
+            "value": "36"
+        },
+        {
+            "company": "PT Astra Otoparts Tbk",
+            "percentage": "80.00%",
+            "types": "Otomotif",
+            "value": "16010"
+        },
+        {
+            "company": "PT Fuji Technica Indonesia",
+            "percentage": "59.63%",
+            "types": "Otomotif",
+            "value": "460"
+        },
+        {
+            "company": "PT Gaya Motor",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "323"
+        },
+        {
+            "company": "PT Inti Pantja Press Industri",
+            "percentage": "89.36%",
+            "types": "Otomotif",
+            "value": "993"
+        },
+        {
+            "company": "PT Pulogadung Pawitra Laksana",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "717"
+        },
+        {
+            "company": "PT Tjahja Sakti Motor",
+            "percentage": "100%",
+            "types": "Otomotif",
+            "value": "755"
+        },
+        {
+            "company": "PT Astra Mitra Ventura",
+            "percentage": "99.85%",
+            "types": "Jasa Keuangan",
+            "value": "268"
+        },
+        {
+            "company": "PT Astra Multi Finance",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "755"
+        },
+        {
+            "company": "PT Astra Sedaya Finance",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "32485"
+        },
+        {
+            "company": "PT Cipta Sedaya Digital Indonesia",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "152"
+        },
+        {
+            "company": "PT Federal International Finance",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "31967"
+        },
+        {
+            "company": "PT Garda Era Sedaya",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "2022"
+        },
+        {
+            "company": "PT Matra Graha Sarana",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "687"
+        },
+        {
+            "company": "PT Sedaya Multi Investama",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "30467"
+        },
+        {
+            "company": "PT Sedaya Pratama",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "790"
+        },
+        {
+            "company": "PT Sharia Multifinance Astra",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "172"
+        },
+        {
+            "company": "PT Swadharma Bhakti Sedaya Finance",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "899"
+        },
+        {
+            "company": "PT United Tractors Tbk",
+            "percentage": "59.50%",
+            "types": "Alat berat, pertambangan, konstruksi dan energi",
+            "value": "105302"
+        },
+        {
+            "company": "PT Astra Agro Lestari Tbk",
+            "percentage": "79.68%",
+            "types": "Agribisnis",
+            "value": "28469"
+        },
+        {
+            "company": "PT Astra Tol Nusantara",
+            "percentage": "100%",
+            "types": "Infrastruktur dan logistik",
+            "value": "22647"
+        },
+        {
+            "company": "PT Astra Transportasi Indonesia",
+            "percentage": "100%",
+            "types": "Infrastruktur dan logistik",
+            "value": "275"
+        },
+        {
+            "company": "PT Astra Nusa Perdana",
+            "percentage": "100%",
+            "types": "Infrastruktur dan logistik",
+            "value": "607"
+        },
+        {
+            "company": "PT Serasi Autoraya",
+            "percentage": "100%",
+            "types": "Infrastruktur dan logistik",
+            "value": "6283"
+        },
+        {
+            "company": "PT Astra Graphia Tbk",
+            "percentage": "76.87%",
+            "types": "Teknologi Informasi",
+            "value": "2276"
+        },
+        {
+            "company": "PT Brahmayasa Bahtera",
+            "percentage": "60.00%",
+            "types": "Properti",
+            "value": "869"
+        },
+        {
+            "company": "PT Brahmayasa Bahtera - Divisi Komersial",
+            "percentage": "100%",
+            "types": "Properti",
+            "value": "154"
+        },
+        {
+            "company": "PT Menara Astra",
+            "percentage": "100%",
+            "types": "Properti",
+            "value": "11898"
+        },
+        {
+            "company": "PT Samadista Karya",
+            "percentage": "100%",
+            "types": "Properti",
+            "value": "1191"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "112,855",
+            "change": -10211,
+            "change_formatted": "(-10,211)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "123,066",
+            "change": -23001,
+            "change_formatted": "(-23,001)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "146,067",
+            "change": -20402,
+            "change_formatted": "(-20,402)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "166,469",
+            "change": -1747,
+            "change_formatted": "(-1,747)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "168,216",
+            "change": 16957,
+            "change_formatted": "(+16,957)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "151,259",
+            "change": 214,
+            "change_formatted": "(+214)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1990-04-04T00:00:00+07:00",
+    "ipo_price": 14850,
+    "float": 44.97,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "40",
+                "email": [
+                    "corporate.secretary@ai.astra.co.id"
+                ],
+                "fax": "(021) 6530-4957",
+                "npwp": "01.302.584.6-092.000",
+                "phone": "(021) 508 43 888",
+                "website": "www.astra.co.id",
+                "key": "",
+                "lastupdate": "2023-10-02T17:47:10+07:00",
+                "value": "",
+                "office": "Menara Astra Lt 58-63, Jl. Jendral Sudirman Kav 5-6, Jakarta, 10220"
+            }
+        ],
+        "background": "PT Astra International Tbk didirikan di Jakarta pada tahun 1957 sebagai sebuah perusahaan perdagangan umum dengan nama Astra International Inc. Pada tahun 1990, telah dilakukan perubahan nama menjadi PT Astra International Tbk, dalam rangka penawaran umum perdana saham Perseroan kepada masyarakat, yang dilanjutkan dengan pencatatan saham Perseroan di Bursa Efek Indonesia dengan menggunakan ticker ASII. Nilai kapitalisasi pasar Astra pada akhir tahun 2020 adalah sebesar Rp244 triliun. Sesuai anggaran dasar Perseroan, kegiatan usaha yang dapat dijalankan oleh Perusahaan mencakup perdagangan umum, perindustrian, pertambangan, pengangkutan, pertanian, pembangunan, jasa dan konsultasi. Hingga tahun 2020, Astra telah mengembangkan bisnisnya dengan menerapkan model bisnis yang berbasis sinergi dan terdiversifikasi pada tujuh segmen usaha, terdiri dari:\nOtomotif.\nJasa Keuangan.\nAlat Berat, Pertambangan, Konstruksi & Energi.\nAgribisnis.\nInfrastruktur dan Logistik.\nTeknologi Informasi.\nProperti.\n\nDengan bisnis yang beragam, Astra telah menyentuh berbagai aspek kehidupan bangsa melalui produk dan layanan yang dihasilkan. Dalam keseharian hidup, masyarakat Indonesia menggunakan sepeda motor dan mobil, jalan tol, printer, hingga layanan pembiayaan, perbankan dan asuransi milik Astra. Pelaku bisnis bermitra dengan Astra memanfaatkan berbagai kendaraan komersial, alat berat, layanan logistik, sistem teknologi informasi dan jasa pertambangan dari Astra. Berbagai produk yang dihasilkan, antara lain minyak kelapa sawit, batu bara dan kendaraan bermotor, senantiasa diekspor sehingga Astra dapat berkontribusi dalam menyumbangkan devisa bagi negara.\n\nSaat ini, kegiatan operasional bisnis yang tersebar di seluruh Indonesia dikelola melalui 241 anak perusahaan, ventura bersama dan entitas asosiasi, dengan didukung oleh 186.237 karyawan. Sebagai salah satu grup usaha terbesar nasional saat ini, Astra telah membangun reputasi yang kuat melalui penawaran rangkaian produk dan layanan berkualitas, dengan memperhatikan pelaksanaan tata kelola perusahaan dan tata kelola lingkungan yang baik.\n\nAstra senantiasa beraspirasi untuk menjadi perusahaan kebanggaan bangsa yang berperan serta dalam upaya untuk meningkatkan kesejahteraan masyarakat Indonesia. Oleh karena itu, kegiatan bisnis Astra berupaya menerapkan perpaduan yang berimbang pada aspek komersial bisnis dan sumbangsih non-bisnis melalui program tanggung jawab sosial yang berkelanjutan di bidang kesehatan, pendidikan, lingkungan, kewirausahaan serta teknologi.\n",
+        "history": {
+            "amount": "446 B",
+            "board": "Papan Utama",
+            "date": "4 Apr 1990",
+            "price": "14,850",
+            "registrar": "",
+            "shares": "30,000,000",
+            "underwriters": [
+                "PT. Danareksa Sekuritas"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "44.97%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13834004",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Hsu Hai Yeh"
+                },
+                {
+                    "id": "13834003",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Benjamin Herrenden Birks"
+                },
+                {
+                    "id": "13834002",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Stephen Patrick Gore"
+                },
+                {
+                    "id": "13834001",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "John Raymond Witt"
+                },
+                {
+                    "id": "13834000",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Benjamin William Keswick"
+                },
+                {
+                    "id": "13833999",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Anthony John Liddell Nightingale"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833994",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Thomas Junaidi Alim. W"
+                },
+                {
+                    "id": "13833992",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Hamdani Dzulkarnaen Salim"
+                },
+                {
+                    "id": "13833991",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "FXL Kesuma"
+                },
+                {
+                    "id": "13833990",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Gita Tiffani Boer"
+                },
+                {
+                    "id": "13833989",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Santosa"
+                },
+                {
+                    "id": "13833988",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Henry Tanoto"
+                },
+                {
+                    "id": "13833987",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Gidion Hasan"
+                },
+                {
+                    "id": "13833986",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Chiew Sin Cheok"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833998",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Muliaman Darmansyah Hadad"
+                },
+                {
+                    "id": "13833997",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Apinont Suchewaboripont"
+                },
+                {
+                    "id": "13833996",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Sri Indrastuti Hadiputranto"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13833995",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Prijono Sugiarto"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13833985",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Djony Bunarto Tjondro"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13833993",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:36:49+07:00",
+                    "value": "Rudy"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12528080",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:14+07:00",
+                "value": "{\"name\":\"Gita Tiffany Boer\",\"phone\":\"6531 0377\",\"email\":\"gita.tiffanyboer@ai.astra.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "50.11%",
+                "name": "JARDINE CYCLE & CARRIAGE LIMITED",
+                "value": "20.29 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "45.07%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "18.24 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "4.82%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "1.95 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Arya Kharisma",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "1526"
+            },
+            {
+                "company": "PT Astra Autoprima",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "43"
+            },
+            {
+                "company": "PT Astra Auto Trust",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "130"
+            },
+            {
+                "company": "PT Astra Digital Internasional",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "836"
+            },
+            {
+                "company": "PT Astra Multi Trucks Indonesia",
+                "percentage": "75.00%",
+                "types": "Otomotif",
+                "value": "36"
+            },
+            {
+                "company": "PT Astra Otoparts Tbk",
+                "percentage": "80.00%",
+                "types": "Otomotif",
+                "value": "16010"
+            },
+            {
+                "company": "PT Fuji Technica Indonesia",
+                "percentage": "59.63%",
+                "types": "Otomotif",
+                "value": "460"
+            },
+            {
+                "company": "PT Gaya Motor",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "323"
+            },
+            {
+                "company": "PT Inti Pantja Press Industri",
+                "percentage": "89.36%",
+                "types": "Otomotif",
+                "value": "993"
+            },
+            {
+                "company": "PT Pulogadung Pawitra Laksana",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "717"
+            },
+            {
+                "company": "PT Tjahja Sakti Motor",
+                "percentage": "100%",
+                "types": "Otomotif",
+                "value": "755"
+            },
+            {
+                "company": "PT Astra Mitra Ventura",
+                "percentage": "99.85%",
+                "types": "Jasa Keuangan",
+                "value": "268"
+            },
+            {
+                "company": "PT Astra Multi Finance",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "755"
+            },
+            {
+                "company": "PT Astra Sedaya Finance",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "32485"
+            },
+            {
+                "company": "PT Cipta Sedaya Digital Indonesia",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "152"
+            },
+            {
+                "company": "PT Federal International Finance",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "31967"
+            },
+            {
+                "company": "PT Garda Era Sedaya",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "2022"
+            },
+            {
+                "company": "PT Matra Graha Sarana",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "687"
+            },
+            {
+                "company": "PT Sedaya Multi Investama",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "30467"
+            },
+            {
+                "company": "PT Sedaya Pratama",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "790"
+            },
+            {
+                "company": "PT Sharia Multifinance Astra",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "172"
+            },
+            {
+                "company": "PT Swadharma Bhakti Sedaya Finance",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "899"
+            },
+            {
+                "company": "PT United Tractors Tbk",
+                "percentage": "59.50%",
+                "types": "Alat berat, pertambangan, konstruksi dan energi",
+                "value": "105302"
+            },
+            {
+                "company": "PT Astra Agro Lestari Tbk",
+                "percentage": "79.68%",
+                "types": "Agribisnis",
+                "value": "28469"
+            },
+            {
+                "company": "PT Astra Tol Nusantara",
+                "percentage": "100%",
+                "types": "Infrastruktur dan logistik",
+                "value": "22647"
+            },
+            {
+                "company": "PT Astra Transportasi Indonesia",
+                "percentage": "100%",
+                "types": "Infrastruktur dan logistik",
+                "value": "275"
+            },
+            {
+                "company": "PT Astra Nusa Perdana",
+                "percentage": "100%",
+                "types": "Infrastruktur dan logistik",
+                "value": "607"
+            },
+            {
+                "company": "PT Serasi Autoraya",
+                "percentage": "100%",
+                "types": "Infrastruktur dan logistik",
+                "value": "6283"
+            },
+            {
+                "company": "PT Astra Graphia Tbk",
+                "percentage": "76.87%",
+                "types": "Teknologi Informasi",
+                "value": "2276"
+            },
+            {
+                "company": "PT Brahmayasa Bahtera",
+                "percentage": "60.00%",
+                "types": "Properti",
+                "value": "869"
+            },
+            {
+                "company": "PT Brahmayasa Bahtera - Divisi Komersial",
+                "percentage": "100%",
+                "types": "Properti",
+                "value": "154"
+            },
+            {
+                "company": "PT Menara Astra",
+                "percentage": "100%",
+                "types": "Properti",
+                "value": "11898"
+            },
+            {
+                "company": "PT Samadista Karya",
+                "percentage": "100%",
+                "types": "Properti",
+                "value": "1191"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "112,855",
+                "change": -10211,
+                "change_formatted": "(-10,211)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "123,066",
+                "change": -23001,
+                "change_formatted": "(-23,001)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "146,067",
+                "change": -20402,
+                "change_formatted": "(-20,402)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "166,469",
+                "change": -1747,
+                "change_formatted": "(-1,747)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "168,216",
+                "change": 16957,
+                "change_formatted": "(+16,957)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "151,259",
+                "change": 214,
+                "change_formatted": "(+214)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:12+00:00"
+}

@@ -1,0 +1,900 @@
+{
+    "symbol": "ICBP",
+    "name": "ICBP",
+    "address": [
+        {
+            "id": "195",
+            "email": [
+                "corporate.secretary@icbp.indofood.co.id "
+            ],
+            "fax": "6221 5793 7557 ",
+            "npwp": "0029 9308 5609 2000",
+            "phone": "6221 5793 7500 ",
+            "website": "www.indofoodcbp.com ",
+            "key": "",
+            "lastupdate": "2024-12-10T17:45:31+07:00",
+            "value": "",
+            "office": "Sudirman Plaza, Indofood Tower Lt. 23, Jl. Jend. Sudirman Kav. 76-78, Jakarta 12910 "
+        }
+    ],
+    "background": "PT Indofood CBP Sukses Makmur Tbk (ICBP), didirikan sebagai bagian dari grup Indofood, merupakan salah satu produsen produk konsumen bermerek terbesar dan terkemuka di Indonesia. Beroperasi di berbagai kategori seperti mi instan, dairy, makanan ringan, penyedap makanan, nutrisi dan makanan khusus, minuman non-alkohol, serta kemasan, ICBP memiliki lebih dari 30 merek ternama, termasuk Indomie, Indomilk, Chitato, Bumbu Racik, Promina, dan Ichi Ocha. Dengan jaringan distribusi luas dan lebih dari 60 pabrik di Indonesia serta 20 fasilitas internasional, ICBP tengah fokus memperkuat pasar global dan menjaga keunggulan produknya di lebih dari 100 negara. Perseroan juga menjalankan kegiatan usaha perdagangan, jasa konsultasi manajemen, serta riset dan pengembangan melalui sejumlah anak usaha di dalam dan luar negeri.",
+    "history": {
+        "amount": "6,292 B",
+        "board": "Papan Utama",
+        "date": "7 Oct 2010",
+        "price": "5,395",
+        "registrar": "",
+        "shares": "1,166,190,976",
+        "underwriters": [
+            "PT. Kim Eng Securities",
+            "PT. Credit Suisse Securities Indonesia",
+            "PT. Deutsche Securities Indonesia",
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "19.47%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836580",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Moleonoto (Paulus Moleonoto)"
+            },
+            {
+                "id": "13836581",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Alamsyah"
+            },
+            {
+                "id": "13836585",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Moleonoto (Paulus Moleonoto)"
+            },
+            {
+                "id": "13836586",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Alamsyah"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836570",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Taufik Wiraatmadja"
+            },
+            {
+                "id": "13836571",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Joedianto Soejonopoetro"
+            },
+            {
+                "id": "13836572",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Hendra Widjaja"
+            },
+            {
+                "id": "13836573",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Suaimi Suriady"
+            },
+            {
+                "id": "13836574",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Mark Julian Wakeford"
+            },
+            {
+                "id": "13836575",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Sulianto Pratama"
+            },
+            {
+                "id": "13836576",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Tio Eddy Hariyanto"
+            },
+            {
+                "id": "13836577",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "In She"
+            },
+            {
+                "id": "13836578",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Chandra Arif Santoso"
+            },
+            {
+                "id": "13836568",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Axton Salim"
+            },
+            {
+                "id": "13836556",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Axton Salim"
+            },
+            {
+                "id": "13836557",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Tjhie Tje Fie (Thomas Tjhie)"
+            },
+            {
+                "id": "13836558",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Taufik Wiraatmadja"
+            },
+            {
+                "id": "13836559",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Joedianto Soejonopoetro"
+            },
+            {
+                "id": "13836560",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Hendra Widjaja"
+            },
+            {
+                "id": "13836561",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Suaimi Suriady"
+            },
+            {
+                "id": "13836562",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Mark Julian Wakeford"
+            },
+            {
+                "id": "13836563",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Sulianto Pratama"
+            },
+            {
+                "id": "13836564",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Tio Eddy Hariyanto"
+            },
+            {
+                "id": "13836565",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "In She"
+            },
+            {
+                "id": "13836566",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Chandra Arif Santoso"
+            },
+            {
+                "id": "13836569",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Tjhie Tje Fie (Thomas Tjhie)"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836588",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Adi Pranoto Leman"
+            },
+            {
+                "id": "13836582",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Florentinus Gregorius Winarno"
+            },
+            {
+                "id": "13836583",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Adi Pranoto Leman"
+            },
+            {
+                "id": "13836587",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Florentinus Gregorius Winarno"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13836579",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Franciscus Welirang"
+            },
+            {
+                "id": "13836584",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Franciscus Welirang"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13836555",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Anthoni Salim"
+            },
+            {
+                "id": "13836567",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Anthoni Salim"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530022",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:14+07:00",
+            "value": "{\"name\":\"Gideon Ariprastomo Putro\",\"phone\":\"+6221 57958822 ext. 1141\",\"email\":\"gideon.putro@icbp.indofood.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "80.53%",
+            "name": "PT INDOFOOD SUKSES MAKMUR TBK",
+            "value": "9.39 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "19.47%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "2.27 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "1.81 K",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "Drayton Pte., Ltd.",
+            "percentage": "100%",
+            "types": "Investasi dan Agen Perdagangan Ekspor",
+            "value": "1703"
+        },
+        {
+            "company": "Indofood (M) Food Industries Sdn. Bhd.",
+            "percentage": "100%",
+            "types": "Produksi Mi",
+            "value": "115"
+        },
+        {
+            "company": "PT Surya Rengo Containers",
+            "percentage": "60.00%",
+            "types": "Produksi Bahan Kemasan",
+            "value": "1236"
+        },
+        {
+            "company": "PT Indofood Fritolay Makmur",
+            "percentage": "51.00%",
+            "types": "Produksi Makanan Ringan",
+            "value": "1483"
+        },
+        {
+            "company": "PT Indofood Tsukishima Sukses Makmur",
+            "percentage": "65.00%",
+            "types": "Industri Makanan, Pengolahan Minyak dan Lemak Nabati untuk Industri Roti, Confectionary dan Restoran",
+            "value": "73"
+        },
+        {
+            "company": "PT Indofood Comsa Sukses Makmur",
+            "percentage": "86.00%",
+            "types": "Pengelolaan Restaurant Chain",
+            "value": "20"
+        },
+        {
+            "company": "PT Sukses Artha Jaya",
+            "percentage": "99.90%",
+            "types": "Jasa Konsultasi Manajemen",
+            "value": "4567"
+        },
+        {
+            "company": "PT Anugerah Indofood Barokah Makmur",
+            "percentage": "99.90%",
+            "types": "Produksi Minuman Non-Alkohol",
+            "value": "2086"
+        },
+        {
+            "company": "PT Nugraha Indah Citarasa Indonesia",
+            "percentage": "99.90%",
+            "types": "Pemasaran Produk Kuliner dan Distribusi",
+            "value": "846"
+        },
+        {
+            "company": "Pinehill Company Limited",
+            "percentage": "100%",
+            "types": "Perusahaan induk/ Holding company",
+            "value": "6051"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "43,691",
+            "change": 5799,
+            "change_formatted": "(+5,799)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "37,892",
+            "change": 1497,
+            "change_formatted": "(+1,497)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "36,395",
+            "change": 422,
+            "change_formatted": "(+422)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "35,973",
+            "change": 974,
+            "change_formatted": "(+974)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "34,999",
+            "change": 121,
+            "change_formatted": "(+121)"
+        },
+        {
+            "shareholder_date": "31 Mar 2025",
+            "total_share": "34,878",
+            "change": -329,
+            "change_formatted": "(-329)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2010-10-07T00:00:00+07:00",
+    "ipo_price": 5395,
+    "float": 19.47,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "195",
+                "email": [
+                    "corporate.secretary@icbp.indofood.co.id "
+                ],
+                "fax": "6221 5793 7557 ",
+                "npwp": "0029 9308 5609 2000",
+                "phone": "6221 5793 7500 ",
+                "website": "www.indofoodcbp.com ",
+                "key": "",
+                "lastupdate": "2024-12-10T17:45:31+07:00",
+                "value": "",
+                "office": "Sudirman Plaza, Indofood Tower Lt. 23, Jl. Jend. Sudirman Kav. 76-78, Jakarta 12910 "
+            }
+        ],
+        "background": "PT Indofood CBP Sukses Makmur Tbk (ICBP), didirikan sebagai bagian dari grup Indofood, merupakan salah satu produsen produk konsumen bermerek terbesar dan terkemuka di Indonesia. Beroperasi di berbagai kategori seperti mi instan, dairy, makanan ringan, penyedap makanan, nutrisi dan makanan khusus, minuman non-alkohol, serta kemasan, ICBP memiliki lebih dari 30 merek ternama, termasuk Indomie, Indomilk, Chitato, Bumbu Racik, Promina, dan Ichi Ocha. Dengan jaringan distribusi luas dan lebih dari 60 pabrik di Indonesia serta 20 fasilitas internasional, ICBP tengah fokus memperkuat pasar global dan menjaga keunggulan produknya di lebih dari 100 negara. Perseroan juga menjalankan kegiatan usaha perdagangan, jasa konsultasi manajemen, serta riset dan pengembangan melalui sejumlah anak usaha di dalam dan luar negeri.",
+        "history": {
+            "amount": "6,292 B",
+            "board": "Papan Utama",
+            "date": "7 Oct 2010",
+            "price": "5,395",
+            "registrar": "",
+            "shares": "1,166,190,976",
+            "underwriters": [
+                "PT. Kim Eng Securities",
+                "PT. Credit Suisse Securities Indonesia",
+                "PT. Deutsche Securities Indonesia",
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "19.47%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836580",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Moleonoto (Paulus Moleonoto)"
+                },
+                {
+                    "id": "13836581",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Alamsyah"
+                },
+                {
+                    "id": "13836585",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Moleonoto (Paulus Moleonoto)"
+                },
+                {
+                    "id": "13836586",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Alamsyah"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836570",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Taufik Wiraatmadja"
+                },
+                {
+                    "id": "13836571",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Joedianto Soejonopoetro"
+                },
+                {
+                    "id": "13836572",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Hendra Widjaja"
+                },
+                {
+                    "id": "13836573",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Suaimi Suriady"
+                },
+                {
+                    "id": "13836574",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Mark Julian Wakeford"
+                },
+                {
+                    "id": "13836575",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Sulianto Pratama"
+                },
+                {
+                    "id": "13836576",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Tio Eddy Hariyanto"
+                },
+                {
+                    "id": "13836577",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "In She"
+                },
+                {
+                    "id": "13836578",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Chandra Arif Santoso"
+                },
+                {
+                    "id": "13836568",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Axton Salim"
+                },
+                {
+                    "id": "13836556",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Axton Salim"
+                },
+                {
+                    "id": "13836557",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Tjhie Tje Fie (Thomas Tjhie)"
+                },
+                {
+                    "id": "13836558",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Taufik Wiraatmadja"
+                },
+                {
+                    "id": "13836559",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Joedianto Soejonopoetro"
+                },
+                {
+                    "id": "13836560",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Hendra Widjaja"
+                },
+                {
+                    "id": "13836561",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Suaimi Suriady"
+                },
+                {
+                    "id": "13836562",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Mark Julian Wakeford"
+                },
+                {
+                    "id": "13836563",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Sulianto Pratama"
+                },
+                {
+                    "id": "13836564",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Tio Eddy Hariyanto"
+                },
+                {
+                    "id": "13836565",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "In She"
+                },
+                {
+                    "id": "13836566",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Chandra Arif Santoso"
+                },
+                {
+                    "id": "13836569",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Tjhie Tje Fie (Thomas Tjhie)"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836588",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Adi Pranoto Leman"
+                },
+                {
+                    "id": "13836582",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Florentinus Gregorius Winarno"
+                },
+                {
+                    "id": "13836583",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Adi Pranoto Leman"
+                },
+                {
+                    "id": "13836587",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Florentinus Gregorius Winarno"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13836579",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Franciscus Welirang"
+                },
+                {
+                    "id": "13836584",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Franciscus Welirang"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13836555",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Anthoni Salim"
+                },
+                {
+                    "id": "13836567",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Anthoni Salim"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530022",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:14+07:00",
+                "value": "{\"name\":\"Gideon Ariprastomo Putro\",\"phone\":\"+6221 57958822 ext. 1141\",\"email\":\"gideon.putro@icbp.indofood.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "80.53%",
+                "name": "PT INDOFOOD SUKSES MAKMUR TBK",
+                "value": "9.39 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "19.47%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "2.27 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "1.81 K",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "Drayton Pte., Ltd.",
+                "percentage": "100%",
+                "types": "Investasi dan Agen Perdagangan Ekspor",
+                "value": "1703"
+            },
+            {
+                "company": "Indofood (M) Food Industries Sdn. Bhd.",
+                "percentage": "100%",
+                "types": "Produksi Mi",
+                "value": "115"
+            },
+            {
+                "company": "PT Surya Rengo Containers",
+                "percentage": "60.00%",
+                "types": "Produksi Bahan Kemasan",
+                "value": "1236"
+            },
+            {
+                "company": "PT Indofood Fritolay Makmur",
+                "percentage": "51.00%",
+                "types": "Produksi Makanan Ringan",
+                "value": "1483"
+            },
+            {
+                "company": "PT Indofood Tsukishima Sukses Makmur",
+                "percentage": "65.00%",
+                "types": "Industri Makanan, Pengolahan Minyak dan Lemak Nabati untuk Industri Roti, Confectionary dan Restoran",
+                "value": "73"
+            },
+            {
+                "company": "PT Indofood Comsa Sukses Makmur",
+                "percentage": "86.00%",
+                "types": "Pengelolaan Restaurant Chain",
+                "value": "20"
+            },
+            {
+                "company": "PT Sukses Artha Jaya",
+                "percentage": "99.90%",
+                "types": "Jasa Konsultasi Manajemen",
+                "value": "4567"
+            },
+            {
+                "company": "PT Anugerah Indofood Barokah Makmur",
+                "percentage": "99.90%",
+                "types": "Produksi Minuman Non-Alkohol",
+                "value": "2086"
+            },
+            {
+                "company": "PT Nugraha Indah Citarasa Indonesia",
+                "percentage": "99.90%",
+                "types": "Pemasaran Produk Kuliner dan Distribusi",
+                "value": "846"
+            },
+            {
+                "company": "Pinehill Company Limited",
+                "percentage": "100%",
+                "types": "Perusahaan induk/ Holding company",
+                "value": "6051"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "43,691",
+                "change": 5799,
+                "change_formatted": "(+5,799)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "37,892",
+                "change": 1497,
+                "change_formatted": "(+1,497)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "36,395",
+                "change": 422,
+                "change_formatted": "(+422)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "35,973",
+                "change": 974,
+                "change_formatted": "(+974)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "34,999",
+                "change": 121,
+                "change_formatted": "(+121)"
+            },
+            {
+                "shareholder_date": "31 Mar 2025",
+                "total_share": "34,878",
+                "change": -329,
+                "change_formatted": "(-329)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:19+00:00"
+}

@@ -1,0 +1,1458 @@
+{
+    "symbol": "INDY",
+    "name": "INDY",
+    "address": [
+        {
+            "id": "212",
+            "email": [
+                "info@indikaenergy.co.id"
+            ],
+            "fax": "(021) 25579889",
+            "npwp": "02.015.553.7-091.000 ",
+            "phone": "(021) 25579888 ",
+            "website": "www.indikaenergy.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:18+07:00",
+            "value": "<td colspan='4'>Gedung Mitra Lantai 3, Jl. Jend. Gatot Subroto Kav.21, Jakarta 12930\n\n        \t\t  \t\t\tPhone: (021) 25579888 \n        \t\t  \t\t\tFax: (021) 25579889\n                            NPWP: 02.015.553.7-091.000 \n        \t\t  \t\t\tEmail: info@indikaenergy.co.id\n        \t\t  \t\t\tWebsite: www.indikaenergy.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Gedung Mitra Lantai 3, Jl. Jend. Gatot Subroto Kav.21, Jakarta 12930"
+        }
+    ],
+    "background": "PT Indika Energy Tbk didirikan tahun 2000, kini menjadi salah satu perusahaan energi terintegrasi yang terkemuka di Indonesia. Portofolio bisnis Perusahaan mencakup sektor sumber daya energi, jasa energi, dan infrastruktur energi. Dengan portofolio usaha yang dimiliki, Perusahaan mampu menyediakan produk dan layanan yang saling melengkapi baik untuk pelanggan domestik maupun internasional, serta memungkinkan Perusahaan memanfaatkan peluang-peluang pertumbuhan di berbagai sektor energi di Indonesia.Indika Energy telah berkembang menjadi perusahaan dengan kegiatan operasional di berbagai wilayah nusantara",
+    "history": {
+        "amount": "2,765 B",
+        "board": "Papan Utama",
+        "date": "11 Jun 2008",
+        "price": "2,950",
+        "registrar": "",
+        "shares": "937,283,968",
+        "underwriters": [
+            "PT. Danareksa Sekuritas",
+            "PT. Mandiri Sekuritas",
+            "PT. Indo Premier Securities"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "28.45%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836770",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "M. Arsjad Rasjid P.M."
+            },
+            {
+                "id": "13836769",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Nurcahya Basuki"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836763",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Retina Rosabai"
+            },
+            {
+                "id": "13836766",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Kamen Kamenov Palatov"
+            },
+            {
+                "id": "13836765",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Johanes Ispurnawan"
+            },
+            {
+                "id": "13836764",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Deddy Hariyanto"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836772",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Eko Putro Sandjojo"
+            },
+            {
+                "id": "13836771",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Farid Harianto"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13836767",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Agus Lasmono"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13836762",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Azis Armand"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [
+            {
+                "id": "13836768",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:38:22+07:00",
+                "value": "Wishnu Wardhana"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530220",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:18+07:00",
+            "value": "{\"name\":\"Adi Pramono\",\"phone\":\"+6221 2557 9888\",\"email\":\"corporate.secretary@indikaenergy.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "37.789%",
+            "name": "PT INDIKA INTI INVESTINDO",
+            "value": "1.97 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "28.554%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.49 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "28.083%",
+            "name": "PT TELADAN RESOURCES",
+            "value": "1.46 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "5.093%",
+            "name": "PANDRI PRABONO-MOELYO",
+            "value": "265.38 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.144%",
+            "name": "SAHAM TREASURY",
+            "value": "7.50 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "10.00",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Diva Perdana Pesona",
+            "percentage": "75.00%",
+            "types": "Pembangunan, pertambangan, perdagangan, perindustrian, pengangkutan, pertanian",
+            "value": "214131"
+        },
+        {
+            "company": "PT Empat Mitra Indika Tenaga Surya",
+            "percentage": "51.00%",
+            "types": "Menyediakan jasa konsultasi terkait instalasi proyek tenaga surya; menyediakan konstruksi Abangunan proyek tenaga surya; surya; operasi",
+            "value": "0"
+        },
+        {
+            "company": "PT Tripatra Engineers and Constructors",
+            "percentage": "100%",
+            "types": "Jasa konsultasi, konstruksi, bisnis, perdagangan dan industri",
+            "value": "329067032"
+        },
+        {
+            "company": "Tripatra (Singapore) Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "16912671"
+        },
+        {
+            "company": "Tripatra Investment Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "15602584"
+        },
+        {
+            "company": "PT Jaya Bumi Paser",
+            "percentage": "99.00%",
+            "types": "Jasa pertanian, perkebunan dan peternakan",
+            "value": "678114"
+        },
+        {
+            "company": "PT POSB Infrastructure Indonesia",
+            "percentage": "69.80%",
+            "types": "Jasa penunjang perusahaan pertambangan",
+            "value": "1465000"
+        },
+        {
+            "company": "Indika Power Investments Pte. Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "65422255"
+        },
+        {
+            "company": "PTP Investments Pte. Ltd",
+            "percentage": "69.80%",
+            "types": "Investasi",
+            "value": "639180"
+        },
+        {
+            "company": "PT Petrosea Kalimantan",
+            "percentage": "69.80%",
+            "types": "Perdagangan dan jasa kontraktor",
+            "value": "38299"
+        },
+        {
+            "company": "PT Indika Indonesia Resources",
+            "percentage": "100%",
+            "types": "Pertambangan dan perdagangan dasar",
+            "value": "203102338"
+        },
+        {
+            "company": "PT Mitra Energi Agung",
+            "percentage": "60.00%",
+            "types": "Pertambangan Batubara",
+            "value": "4409"
+        },
+        {
+            "company": "Indika Capital Investments Pte. Ltd",
+            "percentage": "100%",
+            "types": "Perdagangan batubara dan mineral serta perdagangan umum",
+            "value": "171891786"
+        },
+        {
+            "company": "PT Jatim Gapura Terminal Energi",
+            "percentage": "100%",
+            "types": "Pertambangan, penggalian, pengangkutan dan pergudangan",
+            "value": "0"
+        },
+        {
+            "company": "Indika Energy Capital IV Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Jasa konsultasi bisnis dan manajemen",
+            "value": "699612561"
+        },
+        {
+            "company": "PT Indika Infrastruktur Investindo",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "21310239"
+        },
+        {
+            "company": "PT Indika Energy Infrastructure",
+            "percentage": "100%",
+            "types": "Perdagangan, pembangunan dan jasa",
+            "value": "398777557"
+        },
+        {
+            "company": "PT Indika Logistic & Support Services",
+            "percentage": "100%",
+            "types": "Pengelolaan pelabuhan",
+            "value": "67759674"
+        },
+        {
+            "company": "PT Kuala Pelabuhan Indonesia",
+            "percentage": "71.31%",
+            "types": "Pengelolaan pelabuhan",
+            "value": "13733725"
+        },
+        {
+            "company": "PT Indika Multi Energi Internasional",
+            "percentage": "100%",
+            "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+            "value": "14730289"
+        },
+        {
+            "company": "PT Prasarana Energi Indonesia",
+            "percentage": "25.00%",
+            "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+            "value": "14671806"
+        },
+        {
+            "company": "PT Prasarana Energi Cirebon\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+            "percentage": "25.00%",
+            "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+            "value": "14246087"
+        },
+        {
+            "company": "PT Mitrabahtera Segara Sejati Tbk",
+            "percentage": "51.00%",
+            "types": "Logistik dan pengangkutan kelautan",
+            "value": "188272754"
+        },
+        {
+            "company": "PT Mitra Hartono Sejati",
+            "percentage": "25.50%",
+            "types": "Pelayaran",
+            "value": "2099695"
+        },
+        {
+            "company": "PT Mitra Swire CTM",
+            "percentage": "35.68%",
+            "types": "Pelayaran",
+            "value": "1939597"
+        },
+        {
+            "company": "Mitrabahtera Segara Sejati Pte. Ltd.",
+            "percentage": "51.00%",
+            "types": "Pelayaran",
+            "value": "52386"
+        },
+        {
+            "company": "PT Mitra Alam Segara Sejati\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+            "percentage": "31.00%",
+            "types": "Pelayaran",
+            "value": "13881367"
+        },
+        {
+            "company": "Indo Energy Finance II B.V.",
+            "percentage": "100%",
+            "types": "Pembiayaan",
+            "value": "4491699"
+        },
+        {
+            "company": "Indo Energy Capital II B.V.",
+            "percentage": "100%",
+            "types": "Pembiayaan",
+            "value": "2551472"
+        },
+        {
+            "company": "PT Mahaka Industri Perdana",
+            "percentage": "35.77%",
+            "types": "Perdagangan, pertambangan dan beberapa industri lainnya",
+            "value": "1265611"
+        },
+        {
+            "company": "PT Interport Praba Prasarana",
+            "percentage": "100%",
+            "types": "Jasa pengurusan transportasi",
+            "value": "695125"
+        },
+        {
+            "company": "PT Mahabharata Dharma Ekatama",
+            "percentage": "93.75%",
+            "types": "Jasa",
+            "value": "240"
+        },
+        {
+            "company": "PT Indika Multi Niaga",
+            "percentage": "100%",
+            "types": "Jasa pengurusan transportasi dan perdagangan dan jasa lainnya",
+            "value": "551278"
+        },
+        {
+            "company": "Indika Energy Trading Pte. Ltd.",
+            "percentage": "60.00%",
+            "types": "Perdagangan batubara dan mineral serta perdagangan umum",
+            "value": "29229914"
+        },
+        {
+            "company": "PT POSB Reksabumi Indonesia",
+            "percentage": "99.98%",
+            "types": "Jasa pengelolaan limbah",
+            "value": "1961349"
+        },
+        {
+            "company": "PT Karya Bhumi Lestari",
+            "percentage": "69.73%",
+            "types": "Jasa pengelolaan limbah",
+            "value": "10400000"
+        },
+        {
+            "company": "PT Petrosea Rekayasa dan Konstruksi Indonesia",
+            "percentage": "69.73%",
+            "types": "Jasa pengelolaan limbah",
+            "value": "0"
+        },
+        {
+            "company": "PT Kariangau Gapura Terminal Energi",
+            "percentage": "100%",
+            "types": "Jasa pengurusan transportasi, perdagangan dan jasa lainnya",
+            "value": "91671490"
+        },
+        {
+            "company": "PT Tranship Teknik Solusi",
+            "percentage": "50.49%",
+            "types": "Jasa konsultan",
+            "value": "380698"
+        },
+        {
+            "company": "Indika Energy Capital Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Jasa konsultasi bisnis dan manajemen",
+            "value": "1249704385"
+        },
+        {
+            "company": "Indika Energy Capital II Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Jasa konsultasi bisnis dan manajemen",
+            "value": "354206"
+        },
+        {
+            "company": "Indika Energy Capital III Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Jasa konsultasi bisnis dan manajemen",
+            "value": "549518161"
+        },
+        {
+            "company": "PT Kideco Jaya Agung",
+            "percentage": "91.00%",
+            "types": "Pertambangan",
+            "value": "565874360"
+        },
+        {
+            "company": "PT Mitra Baruna Nusantara",
+            "percentage": "100%",
+            "types": "Jasa bongkar muat",
+            "value": "15165"
+        },
+        {
+            "company": "PT Interport Mandiri Abadi",
+            "percentage": "100%",
+            "types": "Perdagangan umum, jasa penyewaan dan leasing, jasa profesional, ilmiah dan teknis, real estate, jasa keuangan",
+            "value": "91677217"
+        },
+        {
+            "company": "PT Indika Digital Teknologi",
+            "percentage": "100%",
+            "types": "Jasa, perdagangan umum, percetakan dan jasa lainnya",
+            "value": "24670703"
+        },
+        {
+            "company": "PT Zebra Cross Teknologi",
+            "percentage": "100%",
+            "types": "Jasa konsultasi manajemen fasilitas komputer, aktivitas pemrograman komputer, jasa konsultasi keamanan informasi dan usaha di bidang konstruksi",
+            "value": "1362996"
+        },
+        {
+            "company": "PT Indika Mineral Investindo",
+            "percentage": "100%",
+            "types": "Perdagangan besar",
+            "value": "33124319"
+        },
+        {
+            "company": "PT Pusat Sarana Baruna",
+            "percentage": "99.99%",
+            "types": "Manajemen pelabuhan khusus",
+            "value": "6150934"
+        },
+        {
+            "company": "PT Interport Mandiri Utama",
+            "percentage": "100%",
+            "types": "Jasa manajemen dan perdagangan",
+            "value": "176623099"
+        },
+        {
+            "company": "PT Xapiens Teknologi Indonesia",
+            "percentage": "100%",
+            "types": "Jasa teknologi digital",
+            "value": "12898336"
+        },
+        {
+            "company": "PT Indika Multi Properti",
+            "percentage": "100%",
+            "types": "Konstruksi, perdagangan, real estate dan aktivitas profesional, ilmiah dan teknis",
+            "value": "23627835"
+        },
+        {
+            "company": "Indika Ventures Pte. Ltd.",
+            "percentage": "100%",
+            "types": "Holding company dan memberikan jasa konsultasi manajemen",
+            "value": "10421475"
+        },
+        {
+            "company": "PT Indika Inti Corpindo",
+            "percentage": "99.99%",
+            "types": "Investasi dan Perdagangan Umum",
+            "value": "2245349352"
+        },
+        {
+            "company": "PT Citra Indah Prima",
+            "percentage": "99.92%",
+            "types": "Investasi",
+            "value": "1287724"
+        },
+        {
+            "company": "PT Pan Indo Resources",
+            "percentage": "93.75%",
+            "types": "Jasa",
+            "value": "1052128"
+        },
+        {
+            "company": "PT Telaga Mas Kalimantan",
+            "percentage": "75.00%",
+            "types": "Pengusahaan hutan",
+            "value": "1051848"
+        },
+        {
+            "company": "PT Sindo Resources",
+            "percentage": "89.93%",
+            "types": "Pertambangan",
+            "value": "63"
+        },
+        {
+            "company": "PT Melawi Rimba Mineral",
+            "percentage": "89.93%",
+            "types": "Pertambangan",
+            "value": "0"
+        },
+        {
+            "company": "Indika Capital Pte. Ltd.",
+            "percentage": "99.99%",
+            "types": "Pemasaran dan Investasi",
+            "value": "1225551929"
+        },
+        {
+            "company": "Indika Capital Resources Limited",
+            "percentage": "99.99%",
+            "types": "Pembiayaan",
+            "value": "35924965"
+        },
+        {
+            "company": "PT Indy Properti Indonesia",
+            "percentage": "100%",
+            "types": "Pembangunan, jasa dan perdagangan",
+            "value": "1752285"
+        },
+        {
+            "company": "PT Tripatra Engineering",
+            "percentage": "100%",
+            "types": "Jasa konsultasi untuk bidang-bidang konstruksi, industri dan infrastruktur",
+            "value": "36480488"
+        },
+        {
+            "company": "PT Petrosea Tbk",
+            "percentage": "69.80%",
+            "types": "Rekayasa, konstruksi, pertambangan dan jasa lainnya",
+            "value": "513596000"
+        },
+        {
+            "company": "PT Indika Energi Trading",
+            "percentage": "100%",
+            "types": "Perdagangan",
+            "value": "4969504"
+        },
+        {
+            "company": "PT Multi Tambangjaya Utama",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "80252535"
+        },
+        {
+            "company": "PT Tripatra Multi Energi",
+            "percentage": "100%",
+            "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+            "value": "464728691"
+        },
+        {
+            "company": "PT Interport Patimban Agung",
+            "percentage": "100%",
+            "types": "Konsultasi transportasi, konsultasi manajemen lainnya, aktivitas kantor pusat dan perdagangan besar atas dasar balas jasa atau kontrak",
+            "value": "8578"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "25,835",
+            "change": -3762,
+            "change_formatted": "(-3,762)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "29,597",
+            "change": -643,
+            "change_formatted": "(-643)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "30,240",
+            "change": 792,
+            "change_formatted": "(+792)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "29,448",
+            "change": -1592,
+            "change_formatted": "(-1,592)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "31,040",
+            "change": 2237,
+            "change_formatted": "(+2,237)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "28,803",
+            "change": 873,
+            "change_formatted": "(+873)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.195%",
+            "name": "AGUS LASMONO, B.A, MBA.",
+            "value": "10.16 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.092%",
+            "name": "WISHNU WARDHANA",
+            "value": "4.78 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.023%",
+            "name": "M. ARSJAD RASJID P.M., BSC",
+            "value": "1.21 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.023%",
+            "name": "AZIS ARMAND, SE., MUP.",
+            "value": "1.21 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.004%",
+            "name": "JOHANES ISPURNAWAN",
+            "value": "200.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2008-06-11T00:00:00+07:00",
+    "ipo_price": 2950,
+    "float": 28.45,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "212",
+                "email": [
+                    "info@indikaenergy.co.id"
+                ],
+                "fax": "(021) 25579889",
+                "npwp": "02.015.553.7-091.000 ",
+                "phone": "(021) 25579888 ",
+                "website": "www.indikaenergy.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:18+07:00",
+                "value": "<td colspan='4'>Gedung Mitra Lantai 3, Jl. Jend. Gatot Subroto Kav.21, Jakarta 12930\n\n        \t\t  \t\t\tPhone: (021) 25579888 \n        \t\t  \t\t\tFax: (021) 25579889\n                            NPWP: 02.015.553.7-091.000 \n        \t\t  \t\t\tEmail: info@indikaenergy.co.id\n        \t\t  \t\t\tWebsite: www.indikaenergy.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Gedung Mitra Lantai 3, Jl. Jend. Gatot Subroto Kav.21, Jakarta 12930"
+            }
+        ],
+        "background": "PT Indika Energy Tbk didirikan tahun 2000, kini menjadi salah satu perusahaan energi terintegrasi yang terkemuka di Indonesia. Portofolio bisnis Perusahaan mencakup sektor sumber daya energi, jasa energi, dan infrastruktur energi. Dengan portofolio usaha yang dimiliki, Perusahaan mampu menyediakan produk dan layanan yang saling melengkapi baik untuk pelanggan domestik maupun internasional, serta memungkinkan Perusahaan memanfaatkan peluang-peluang pertumbuhan di berbagai sektor energi di Indonesia.Indika Energy telah berkembang menjadi perusahaan dengan kegiatan operasional di berbagai wilayah nusantara",
+        "history": {
+            "amount": "2,765 B",
+            "board": "Papan Utama",
+            "date": "11 Jun 2008",
+            "price": "2,950",
+            "registrar": "",
+            "shares": "937,283,968",
+            "underwriters": [
+                "PT. Danareksa Sekuritas",
+                "PT. Mandiri Sekuritas",
+                "PT. Indo Premier Securities"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "28.45%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836770",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "M. Arsjad Rasjid P.M."
+                },
+                {
+                    "id": "13836769",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Nurcahya Basuki"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836763",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Retina Rosabai"
+                },
+                {
+                    "id": "13836766",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Kamen Kamenov Palatov"
+                },
+                {
+                    "id": "13836765",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Johanes Ispurnawan"
+                },
+                {
+                    "id": "13836764",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Deddy Hariyanto"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836772",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Eko Putro Sandjojo"
+                },
+                {
+                    "id": "13836771",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Farid Harianto"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13836767",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Agus Lasmono"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13836762",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Azis Armand"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [
+                {
+                    "id": "13836768",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:22+07:00",
+                    "value": "Wishnu Wardhana"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530220",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:18+07:00",
+                "value": "{\"name\":\"Adi Pramono\",\"phone\":\"+6221 2557 9888\",\"email\":\"corporate.secretary@indikaenergy.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "37.789%",
+                "name": "PT INDIKA INTI INVESTINDO",
+                "value": "1.97 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "28.554%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.49 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "28.083%",
+                "name": "PT TELADAN RESOURCES",
+                "value": "1.46 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "5.093%",
+                "name": "PANDRI PRABONO-MOELYO",
+                "value": "265.38 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.144%",
+                "name": "SAHAM TREASURY",
+                "value": "7.50 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "10.00",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Diva Perdana Pesona",
+                "percentage": "75.00%",
+                "types": "Pembangunan, pertambangan, perdagangan, perindustrian, pengangkutan, pertanian",
+                "value": "214131"
+            },
+            {
+                "company": "PT Empat Mitra Indika Tenaga Surya",
+                "percentage": "51.00%",
+                "types": "Menyediakan jasa konsultasi terkait instalasi proyek tenaga surya; menyediakan konstruksi Abangunan proyek tenaga surya; surya; operasi",
+                "value": "0"
+            },
+            {
+                "company": "PT Tripatra Engineers and Constructors",
+                "percentage": "100%",
+                "types": "Jasa konsultasi, konstruksi, bisnis, perdagangan dan industri",
+                "value": "329067032"
+            },
+            {
+                "company": "Tripatra (Singapore) Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "16912671"
+            },
+            {
+                "company": "Tripatra Investment Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "15602584"
+            },
+            {
+                "company": "PT Jaya Bumi Paser",
+                "percentage": "99.00%",
+                "types": "Jasa pertanian, perkebunan dan peternakan",
+                "value": "678114"
+            },
+            {
+                "company": "PT POSB Infrastructure Indonesia",
+                "percentage": "69.80%",
+                "types": "Jasa penunjang perusahaan pertambangan",
+                "value": "1465000"
+            },
+            {
+                "company": "Indika Power Investments Pte. Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "65422255"
+            },
+            {
+                "company": "PTP Investments Pte. Ltd",
+                "percentage": "69.80%",
+                "types": "Investasi",
+                "value": "639180"
+            },
+            {
+                "company": "PT Petrosea Kalimantan",
+                "percentage": "69.80%",
+                "types": "Perdagangan dan jasa kontraktor",
+                "value": "38299"
+            },
+            {
+                "company": "PT Indika Indonesia Resources",
+                "percentage": "100%",
+                "types": "Pertambangan dan perdagangan dasar",
+                "value": "203102338"
+            },
+            {
+                "company": "PT Mitra Energi Agung",
+                "percentage": "60.00%",
+                "types": "Pertambangan Batubara",
+                "value": "4409"
+            },
+            {
+                "company": "Indika Capital Investments Pte. Ltd",
+                "percentage": "100%",
+                "types": "Perdagangan batubara dan mineral serta perdagangan umum",
+                "value": "171891786"
+            },
+            {
+                "company": "PT Jatim Gapura Terminal Energi",
+                "percentage": "100%",
+                "types": "Pertambangan, penggalian, pengangkutan dan pergudangan",
+                "value": "0"
+            },
+            {
+                "company": "Indika Energy Capital IV Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Jasa konsultasi bisnis dan manajemen",
+                "value": "699612561"
+            },
+            {
+                "company": "PT Indika Infrastruktur Investindo",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "21310239"
+            },
+            {
+                "company": "PT Indika Energy Infrastructure",
+                "percentage": "100%",
+                "types": "Perdagangan, pembangunan dan jasa",
+                "value": "398777557"
+            },
+            {
+                "company": "PT Indika Logistic & Support Services",
+                "percentage": "100%",
+                "types": "Pengelolaan pelabuhan",
+                "value": "67759674"
+            },
+            {
+                "company": "PT Kuala Pelabuhan Indonesia",
+                "percentage": "71.31%",
+                "types": "Pengelolaan pelabuhan",
+                "value": "13733725"
+            },
+            {
+                "company": "PT Indika Multi Energi Internasional",
+                "percentage": "100%",
+                "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+                "value": "14730289"
+            },
+            {
+                "company": "PT Prasarana Energi Indonesia",
+                "percentage": "25.00%",
+                "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+                "value": "14671806"
+            },
+            {
+                "company": "PT Prasarana Energi Cirebon\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+                "percentage": "25.00%",
+                "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+                "value": "14246087"
+            },
+            {
+                "company": "PT Mitrabahtera Segara Sejati Tbk",
+                "percentage": "51.00%",
+                "types": "Logistik dan pengangkutan kelautan",
+                "value": "188272754"
+            },
+            {
+                "company": "PT Mitra Hartono Sejati",
+                "percentage": "25.50%",
+                "types": "Pelayaran",
+                "value": "2099695"
+            },
+            {
+                "company": "PT Mitra Swire CTM",
+                "percentage": "35.68%",
+                "types": "Pelayaran",
+                "value": "1939597"
+            },
+            {
+                "company": "Mitrabahtera Segara Sejati Pte. Ltd.",
+                "percentage": "51.00%",
+                "types": "Pelayaran",
+                "value": "52386"
+            },
+            {
+                "company": "PT Mitra Alam Segara Sejati\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+                "percentage": "31.00%",
+                "types": "Pelayaran",
+                "value": "13881367"
+            },
+            {
+                "company": "Indo Energy Finance II B.V.",
+                "percentage": "100%",
+                "types": "Pembiayaan",
+                "value": "4491699"
+            },
+            {
+                "company": "Indo Energy Capital II B.V.",
+                "percentage": "100%",
+                "types": "Pembiayaan",
+                "value": "2551472"
+            },
+            {
+                "company": "PT Mahaka Industri Perdana",
+                "percentage": "35.77%",
+                "types": "Perdagangan, pertambangan dan beberapa industri lainnya",
+                "value": "1265611"
+            },
+            {
+                "company": "PT Interport Praba Prasarana",
+                "percentage": "100%",
+                "types": "Jasa pengurusan transportasi",
+                "value": "695125"
+            },
+            {
+                "company": "PT Mahabharata Dharma Ekatama",
+                "percentage": "93.75%",
+                "types": "Jasa",
+                "value": "240"
+            },
+            {
+                "company": "PT Indika Multi Niaga",
+                "percentage": "100%",
+                "types": "Jasa pengurusan transportasi dan perdagangan dan jasa lainnya",
+                "value": "551278"
+            },
+            {
+                "company": "Indika Energy Trading Pte. Ltd.",
+                "percentage": "60.00%",
+                "types": "Perdagangan batubara dan mineral serta perdagangan umum",
+                "value": "29229914"
+            },
+            {
+                "company": "PT POSB Reksabumi Indonesia",
+                "percentage": "99.98%",
+                "types": "Jasa pengelolaan limbah",
+                "value": "1961349"
+            },
+            {
+                "company": "PT Karya Bhumi Lestari",
+                "percentage": "69.73%",
+                "types": "Jasa pengelolaan limbah",
+                "value": "10400000"
+            },
+            {
+                "company": "PT Petrosea Rekayasa dan Konstruksi Indonesia",
+                "percentage": "69.73%",
+                "types": "Jasa pengelolaan limbah",
+                "value": "0"
+            },
+            {
+                "company": "PT Kariangau Gapura Terminal Energi",
+                "percentage": "100%",
+                "types": "Jasa pengurusan transportasi, perdagangan dan jasa lainnya",
+                "value": "91671490"
+            },
+            {
+                "company": "PT Tranship Teknik Solusi",
+                "percentage": "50.49%",
+                "types": "Jasa konsultan",
+                "value": "380698"
+            },
+            {
+                "company": "Indika Energy Capital Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Jasa konsultasi bisnis dan manajemen",
+                "value": "1249704385"
+            },
+            {
+                "company": "Indika Energy Capital II Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Jasa konsultasi bisnis dan manajemen",
+                "value": "354206"
+            },
+            {
+                "company": "Indika Energy Capital III Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Jasa konsultasi bisnis dan manajemen",
+                "value": "549518161"
+            },
+            {
+                "company": "PT Kideco Jaya Agung",
+                "percentage": "91.00%",
+                "types": "Pertambangan",
+                "value": "565874360"
+            },
+            {
+                "company": "PT Mitra Baruna Nusantara",
+                "percentage": "100%",
+                "types": "Jasa bongkar muat",
+                "value": "15165"
+            },
+            {
+                "company": "PT Interport Mandiri Abadi",
+                "percentage": "100%",
+                "types": "Perdagangan umum, jasa penyewaan dan leasing, jasa profesional, ilmiah dan teknis, real estate, jasa keuangan",
+                "value": "91677217"
+            },
+            {
+                "company": "PT Indika Digital Teknologi",
+                "percentage": "100%",
+                "types": "Jasa, perdagangan umum, percetakan dan jasa lainnya",
+                "value": "24670703"
+            },
+            {
+                "company": "PT Zebra Cross Teknologi",
+                "percentage": "100%",
+                "types": "Jasa konsultasi manajemen fasilitas komputer, aktivitas pemrograman komputer, jasa konsultasi keamanan informasi dan usaha di bidang konstruksi",
+                "value": "1362996"
+            },
+            {
+                "company": "PT Indika Mineral Investindo",
+                "percentage": "100%",
+                "types": "Perdagangan besar",
+                "value": "33124319"
+            },
+            {
+                "company": "PT Pusat Sarana Baruna",
+                "percentage": "99.99%",
+                "types": "Manajemen pelabuhan khusus",
+                "value": "6150934"
+            },
+            {
+                "company": "PT Interport Mandiri Utama",
+                "percentage": "100%",
+                "types": "Jasa manajemen dan perdagangan",
+                "value": "176623099"
+            },
+            {
+                "company": "PT Xapiens Teknologi Indonesia",
+                "percentage": "100%",
+                "types": "Jasa teknologi digital",
+                "value": "12898336"
+            },
+            {
+                "company": "PT Indika Multi Properti",
+                "percentage": "100%",
+                "types": "Konstruksi, perdagangan, real estate dan aktivitas profesional, ilmiah dan teknis",
+                "value": "23627835"
+            },
+            {
+                "company": "Indika Ventures Pte. Ltd.",
+                "percentage": "100%",
+                "types": "Holding company dan memberikan jasa konsultasi manajemen",
+                "value": "10421475"
+            },
+            {
+                "company": "PT Indika Inti Corpindo",
+                "percentage": "99.99%",
+                "types": "Investasi dan Perdagangan Umum",
+                "value": "2245349352"
+            },
+            {
+                "company": "PT Citra Indah Prima",
+                "percentage": "99.92%",
+                "types": "Investasi",
+                "value": "1287724"
+            },
+            {
+                "company": "PT Pan Indo Resources",
+                "percentage": "93.75%",
+                "types": "Jasa",
+                "value": "1052128"
+            },
+            {
+                "company": "PT Telaga Mas Kalimantan",
+                "percentage": "75.00%",
+                "types": "Pengusahaan hutan",
+                "value": "1051848"
+            },
+            {
+                "company": "PT Sindo Resources",
+                "percentage": "89.93%",
+                "types": "Pertambangan",
+                "value": "63"
+            },
+            {
+                "company": "PT Melawi Rimba Mineral",
+                "percentage": "89.93%",
+                "types": "Pertambangan",
+                "value": "0"
+            },
+            {
+                "company": "Indika Capital Pte. Ltd.",
+                "percentage": "99.99%",
+                "types": "Pemasaran dan Investasi",
+                "value": "1225551929"
+            },
+            {
+                "company": "Indika Capital Resources Limited",
+                "percentage": "99.99%",
+                "types": "Pembiayaan",
+                "value": "35924965"
+            },
+            {
+                "company": "PT Indy Properti Indonesia",
+                "percentage": "100%",
+                "types": "Pembangunan, jasa dan perdagangan",
+                "value": "1752285"
+            },
+            {
+                "company": "PT Tripatra Engineering",
+                "percentage": "100%",
+                "types": "Jasa konsultasi untuk bidang-bidang konstruksi, industri dan infrastruktur",
+                "value": "36480488"
+            },
+            {
+                "company": "PT Petrosea Tbk",
+                "percentage": "69.80%",
+                "types": "Rekayasa, konstruksi, pertambangan dan jasa lainnya",
+                "value": "513596000"
+            },
+            {
+                "company": "PT Indika Energi Trading",
+                "percentage": "100%",
+                "types": "Perdagangan",
+                "value": "4969504"
+            },
+            {
+                "company": "PT Multi Tambangjaya Utama",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "80252535"
+            },
+            {
+                "company": "PT Tripatra Multi Energi",
+                "percentage": "100%",
+                "types": "Perdagangan, pembangunan, perindustrian, pertanian, percetakan, perbengkelan, pengangkutan dan jasa",
+                "value": "464728691"
+            },
+            {
+                "company": "PT Interport Patimban Agung",
+                "percentage": "100%",
+                "types": "Konsultasi transportasi, konsultasi manajemen lainnya, aktivitas kantor pusat dan perdagangan besar atas dasar balas jasa atau kontrak",
+                "value": "8578"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "25,835",
+                "change": -3762,
+                "change_formatted": "(-3,762)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "29,597",
+                "change": -643,
+                "change_formatted": "(-643)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "30,240",
+                "change": 792,
+                "change_formatted": "(+792)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "29,448",
+                "change": -1592,
+                "change_formatted": "(-1,592)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "31,040",
+                "change": 2237,
+                "change_formatted": "(+2,237)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "28,803",
+                "change": 873,
+                "change_formatted": "(+873)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.195%",
+                "name": "AGUS LASMONO, B.A, MBA.",
+                "value": "10.16 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.092%",
+                "name": "WISHNU WARDHANA",
+                "value": "4.78 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.023%",
+                "name": "M. ARSJAD RASJID P.M., BSC",
+                "value": "1.21 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.023%",
+                "name": "AZIS ARMAND, SE., MUP.",
+                "value": "1.21 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.004%",
+                "name": "JOHANES ISPURNAWAN",
+                "value": "200.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:20+00:00"
+}

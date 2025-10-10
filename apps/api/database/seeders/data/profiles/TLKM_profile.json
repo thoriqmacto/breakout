@@ -1,0 +1,862 @@
+{
+    "symbol": "TLKM",
+    "name": "TLKM",
+    "address": [
+        {
+            "id": "424",
+            "email": [
+                "investor@telkom.co.id"
+            ],
+            "fax": "(021) 5215109",
+            "npwp": "01.000.013.1-093.000",
+            "phone": "(021) 5215109",
+            "website": "www.telkom.co.id",
+            "key": "",
+            "lastupdate": "2024-10-11T16:25:26+07:00",
+            "value": "",
+            "office": "Telkom Landmark Tower, Lantai 51"
+        }
+    ],
+    "background": "PT Telkom Indonesia (Persero) Tbk, secara komersial dikenal sebagai Telkom, berawal pada 6 Juli 1965 sebagai Perusahaan Negara Telekomunikasi, lalu pada 19 November 1991 statusnya berubah menjadi PT Telekomunikasi Indonesia (Persero) sebagai perseroan terbatas milik negara. Perusahaan ini bergerak di penyelenggaraan jaringan dan jasa telekomunikasi serta informatika meliputi fixed–mobile broadband, satelit, data center, serta solusi digital, dan kini memprioritaskan transformasi digital lewat inisiatif Five Bold Moves: integrasi fixed–mobile convergence (FMC), optimalisasi infrastruktur fiber melalui InfraCo, pengembangan platform digital melalui Data Center Co dan B2B IT Service Co, serta ekspansi layanan digital melalui DigiCo. Untuk mendukung ekosistem digital Indonesia, TelkomGroup membawahi berbagai anak usaha strategis seperti Telkomsel, Telkomsat, Telkom Akses, TelkomMetra, PINS, Telin, Mitratel, Metranet, Telkom Infra, Telkom Property, Telkomsigma, TIF, dan TDE.",
+    "history": {
+        "amount": "2,398 B",
+        "board": "Papan Utama",
+        "date": "14 Nov 1995",
+        "price": "2,050",
+        "registrar": "",
+        "shares": "1,170,000,000",
+        "underwriters": [
+            "PT. Bahana Securities",
+            "PT. Danareksa Sekuritas",
+            "PT. Makindo"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "47.21%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "15812786",
+                "key": "Commissioner",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "OSSY DERMAWAN"
+            },
+            {
+                "id": "15812785",
+                "key": "Commissioner",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "SILMY KARIM"
+            },
+            {
+                "id": "15812780",
+                "key": "Commissioner",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "RIONALD SILABAN"
+            },
+            {
+                "id": "15812779",
+                "key": "Commissioner",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "RIZAL MALARANGENG"
+            }
+        ],
+        "director": [
+            {
+                "id": "15812782",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "SENO SOEMADJI"
+            },
+            {
+                "id": "15812793",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "ANDY KELANA"
+            },
+            {
+                "id": "15812792",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "FAIZAL ROCHMAD DJOEMADI"
+            },
+            {
+                "id": "15812791",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "VERANITA YOSEPHINE"
+            },
+            {
+                "id": "15812789",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "ARTHUR ANGELO SYAILENDRA"
+            },
+            {
+                "id": "15812788",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "WILLY SAELAN"
+            },
+            {
+                "id": "15812787",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "HONESTI BASYIR"
+            },
+            {
+                "id": "15812777",
+                "key": "Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "NANANG HENDARNO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "15812790",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "IRA NOVIARTI"
+            },
+            {
+                "id": "15812784",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "DESWANDHY AGUSMAN"
+            },
+            {
+                "id": "15812778",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "YOHANES SURYA"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "15812783",
+                "key": "President Commissioner",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "ANGGA RAKA PRABOWO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "15812781",
+                "key": "President Director",
+                "lastupdate": "2025-09-18T15:12:15+07:00",
+                "value": "DIAN SISWARINI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12532742",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:10+07:00",
+            "value": "{\"name\":\"Andi Setiawan\",\"phone\":\"(021) 521 5109\",\"email\":\"andi.setiawan@telkom.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "52.0909%",
+            "name": "PT DANANTARA ASSET MANAGEMENT",
+            "value": "51.60 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "47.847%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "47.40 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0529%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "51.24 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0017%",
+            "name": "SAHAM TREASURY",
+            "value": "1.75 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NEGARA REPUBLIK INDONESIA",
+            "value": "1.00",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Telkom Satelit Indonesia (Telkomsat)",
+            "percentage": "100%",
+            "types": "Telekomunikasi -\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nmenyediakan sistem komunikasi satelit, jasa dan sarana terkait/",
+            "value": "4484"
+        },
+        {
+            "company": "PT Infrastruktur Telekomunikasi Indonesia",
+            "percentage": "100%",
+            "types": "Pembangunan, jasa dan perdagangan bidang telekomunikasi",
+            "value": "1074"
+        },
+        {
+            "company": "PT Metranet",
+            "percentage": "100%",
+            "types": "Jasa Portal/Multimedia",
+            "value": "1320"
+        },
+        {
+            "company": "PT Telekomunikasi Selular (Telkomsel)",
+            "percentage": "65.00%",
+            "types": "Telekomunikasi operator fasilitas telekomunikasi dan jasa telepon seluler menggunakan teknologi Global System for Mobile Communication (GSM)",
+            "value": "103652"
+        },
+        {
+            "company": "PT Dayamitra Telekomunikasi (Dayamitra)",
+            "percentage": "100%",
+            "types": "Penyewaan menara telekomunikasi dan jasa telekomunikasi lainnya",
+            "value": "25368"
+        },
+        {
+            "company": "PT Multimedia Nusantara (Metra)",
+            "percentage": "100%",
+            "types": "Jasa Jaringan Telekomunikasi dan Multimedia",
+            "value": "17708"
+        },
+        {
+            "company": "PT Telekomunikasi Indonesia International (TII)",
+            "percentage": "100%",
+            "types": "Telekomunikasi",
+            "value": "12187"
+        },
+        {
+            "company": "PT PINS Indonesia (PINS)",
+            "percentage": "100%",
+            "types": "Jasa dan Pembangunan Telekomunikasi",
+            "value": "1868"
+        },
+        {
+            "company": "PT Graha Sarana Duta (GSD)",
+            "percentage": "100%",
+            "types": "Penyewaan kantor dan manajemen gedung dan jasa pemeliharaan konsultan sipil, dan pengembangan",
+            "value": "6163"
+        },
+        {
+            "company": "PT Napsindo Primatel (Napsindo)",
+            "percentage": "60.00%",
+            "types": "Telekomunikasi-menyediakan Network Access Point (NAP),Voice Over Data(VOD) dan jasa terkait lainnya",
+            "value": "5"
+        },
+        {
+            "company": "PT Telkom Akses (Telkom Akses)",
+            "percentage": "100%",
+            "types": "Pembangunan, jasa dan perdagangan bidang telekomunikasi",
+            "value": "4154"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "180,374",
+            "change": -3515,
+            "change_formatted": "(-3,515)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "183,889",
+            "change": -25487,
+            "change_formatted": "(-25,487)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "209,376",
+            "change": -11389,
+            "change_formatted": "(-11,389)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "220,765",
+            "change": -4298,
+            "change_formatted": "(-4,298)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "225,063",
+            "change": -933,
+            "change_formatted": "(-933)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "225,996",
+            "change": -1177,
+            "change_formatted": "(-1,177)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.003%",
+            "name": "HONESTI BASYIR",
+            "value": "3.63 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.003%",
+            "name": "RIZAL MALLARANGENG",
+            "value": "3.24 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.001%",
+            "name": "SILMY KARIM",
+            "value": "1.34 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0002%",
+            "name": "FAIZAL ROCHMAD DJOEMADI",
+            "value": "248.50 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0002%",
+            "name": "DIAN SISWARINI",
+            "value": "203.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0001%",
+            "name": "VERANITA YOSEPHINE",
+            "value": "68.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NANANG HENDARNO",
+            "value": "32.50 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1995-11-14T00:00:00+07:00",
+    "ipo_price": 2050,
+    "float": 47.21,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "424",
+                "email": [
+                    "investor@telkom.co.id"
+                ],
+                "fax": "(021) 5215109",
+                "npwp": "01.000.013.1-093.000",
+                "phone": "(021) 5215109",
+                "website": "www.telkom.co.id",
+                "key": "",
+                "lastupdate": "2024-10-11T16:25:26+07:00",
+                "value": "",
+                "office": "Telkom Landmark Tower, Lantai 51"
+            }
+        ],
+        "background": "PT Telkom Indonesia (Persero) Tbk, secara komersial dikenal sebagai Telkom, berawal pada 6 Juli 1965 sebagai Perusahaan Negara Telekomunikasi, lalu pada 19 November 1991 statusnya berubah menjadi PT Telekomunikasi Indonesia (Persero) sebagai perseroan terbatas milik negara. Perusahaan ini bergerak di penyelenggaraan jaringan dan jasa telekomunikasi serta informatika meliputi fixed–mobile broadband, satelit, data center, serta solusi digital, dan kini memprioritaskan transformasi digital lewat inisiatif Five Bold Moves: integrasi fixed–mobile convergence (FMC), optimalisasi infrastruktur fiber melalui InfraCo, pengembangan platform digital melalui Data Center Co dan B2B IT Service Co, serta ekspansi layanan digital melalui DigiCo. Untuk mendukung ekosistem digital Indonesia, TelkomGroup membawahi berbagai anak usaha strategis seperti Telkomsel, Telkomsat, Telkom Akses, TelkomMetra, PINS, Telin, Mitratel, Metranet, Telkom Infra, Telkom Property, Telkomsigma, TIF, dan TDE.",
+        "history": {
+            "amount": "2,398 B",
+            "board": "Papan Utama",
+            "date": "14 Nov 1995",
+            "price": "2,050",
+            "registrar": "",
+            "shares": "1,170,000,000",
+            "underwriters": [
+                "PT. Bahana Securities",
+                "PT. Danareksa Sekuritas",
+                "PT. Makindo"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "47.21%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "15812786",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "OSSY DERMAWAN"
+                },
+                {
+                    "id": "15812785",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "SILMY KARIM"
+                },
+                {
+                    "id": "15812780",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "RIONALD SILABAN"
+                },
+                {
+                    "id": "15812779",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "RIZAL MALARANGENG"
+                }
+            ],
+            "director": [
+                {
+                    "id": "15812782",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "SENO SOEMADJI"
+                },
+                {
+                    "id": "15812793",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "ANDY KELANA"
+                },
+                {
+                    "id": "15812792",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "FAIZAL ROCHMAD DJOEMADI"
+                },
+                {
+                    "id": "15812791",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "VERANITA YOSEPHINE"
+                },
+                {
+                    "id": "15812789",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "ARTHUR ANGELO SYAILENDRA"
+                },
+                {
+                    "id": "15812788",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "WILLY SAELAN"
+                },
+                {
+                    "id": "15812787",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "HONESTI BASYIR"
+                },
+                {
+                    "id": "15812777",
+                    "key": "Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "NANANG HENDARNO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "15812790",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "IRA NOVIARTI"
+                },
+                {
+                    "id": "15812784",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "DESWANDHY AGUSMAN"
+                },
+                {
+                    "id": "15812778",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "YOHANES SURYA"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "15812783",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "ANGGA RAKA PRABOWO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "15812781",
+                    "key": "President Director",
+                    "lastupdate": "2025-09-18T15:12:15+07:00",
+                    "value": "DIAN SISWARINI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12532742",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:10+07:00",
+                "value": "{\"name\":\"Andi Setiawan\",\"phone\":\"(021) 521 5109\",\"email\":\"andi.setiawan@telkom.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "52.0909%",
+                "name": "PT DANANTARA ASSET MANAGEMENT",
+                "value": "51.60 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "47.847%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "47.40 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0529%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "51.24 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0017%",
+                "name": "SAHAM TREASURY",
+                "value": "1.75 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NEGARA REPUBLIK INDONESIA",
+                "value": "1.00",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Telkom Satelit Indonesia (Telkomsat)",
+                "percentage": "100%",
+                "types": "Telekomunikasi -\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nmenyediakan sistem komunikasi satelit, jasa dan sarana terkait/",
+                "value": "4484"
+            },
+            {
+                "company": "PT Infrastruktur Telekomunikasi Indonesia",
+                "percentage": "100%",
+                "types": "Pembangunan, jasa dan perdagangan bidang telekomunikasi",
+                "value": "1074"
+            },
+            {
+                "company": "PT Metranet",
+                "percentage": "100%",
+                "types": "Jasa Portal/Multimedia",
+                "value": "1320"
+            },
+            {
+                "company": "PT Telekomunikasi Selular (Telkomsel)",
+                "percentage": "65.00%",
+                "types": "Telekomunikasi operator fasilitas telekomunikasi dan jasa telepon seluler menggunakan teknologi Global System for Mobile Communication (GSM)",
+                "value": "103652"
+            },
+            {
+                "company": "PT Dayamitra Telekomunikasi (Dayamitra)",
+                "percentage": "100%",
+                "types": "Penyewaan menara telekomunikasi dan jasa telekomunikasi lainnya",
+                "value": "25368"
+            },
+            {
+                "company": "PT Multimedia Nusantara (Metra)",
+                "percentage": "100%",
+                "types": "Jasa Jaringan Telekomunikasi dan Multimedia",
+                "value": "17708"
+            },
+            {
+                "company": "PT Telekomunikasi Indonesia International (TII)",
+                "percentage": "100%",
+                "types": "Telekomunikasi",
+                "value": "12187"
+            },
+            {
+                "company": "PT PINS Indonesia (PINS)",
+                "percentage": "100%",
+                "types": "Jasa dan Pembangunan Telekomunikasi",
+                "value": "1868"
+            },
+            {
+                "company": "PT Graha Sarana Duta (GSD)",
+                "percentage": "100%",
+                "types": "Penyewaan kantor dan manajemen gedung dan jasa pemeliharaan konsultan sipil, dan pengembangan",
+                "value": "6163"
+            },
+            {
+                "company": "PT Napsindo Primatel (Napsindo)",
+                "percentage": "60.00%",
+                "types": "Telekomunikasi-menyediakan Network Access Point (NAP),Voice Over Data(VOD) dan jasa terkait lainnya",
+                "value": "5"
+            },
+            {
+                "company": "PT Telkom Akses (Telkom Akses)",
+                "percentage": "100%",
+                "types": "Pembangunan, jasa dan perdagangan bidang telekomunikasi",
+                "value": "4154"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "180,374",
+                "change": -3515,
+                "change_formatted": "(-3,515)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "183,889",
+                "change": -25487,
+                "change_formatted": "(-25,487)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "209,376",
+                "change": -11389,
+                "change_formatted": "(-11,389)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "220,765",
+                "change": -4298,
+                "change_formatted": "(-4,298)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "225,063",
+                "change": -933,
+                "change_formatted": "(-933)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "225,996",
+                "change": -1177,
+                "change_formatted": "(-1,177)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.003%",
+                "name": "HONESTI BASYIR",
+                "value": "3.63 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.003%",
+                "name": "RIZAL MALLARANGENG",
+                "value": "3.24 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.001%",
+                "name": "SILMY KARIM",
+                "value": "1.34 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0002%",
+                "name": "FAIZAL ROCHMAD DJOEMADI",
+                "value": "248.50 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0002%",
+                "name": "DIAN SISWARINI",
+                "value": "203.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0001%",
+                "name": "VERANITA YOSEPHINE",
+                "value": "68.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NANANG HENDARNO",
+                "value": "32.50 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:32+00:00"
+}

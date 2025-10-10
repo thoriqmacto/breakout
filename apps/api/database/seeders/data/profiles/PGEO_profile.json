@@ -1,0 +1,484 @@
+{
+    "symbol": "PGEO",
+    "name": "PGEO",
+    "address": [
+        {
+            "id": "1000003962",
+            "email": [
+                "datapge@pertamina.com"
+            ],
+            "fax": "+62 21 3983 3230",
+            "npwp": "01.061.266.1-081.000",
+            "phone": "+62 21 3983 3222",
+            "website": "https://www.pge.pertamina.com",
+            "key": "",
+            "lastupdate": "2023-02-24T02:01:07+07:00",
+            "value": "",
+            "office": "Grha Pertamina - Tower Pertamax Lt.7\nJl. Medan Merdeka Timur No. 11-13 Gambir, Jakarta Pusat 10110"
+        }
+    ],
+    "background": "Perseroan merupakan afiliasi Pertamina dan pemegang kuasa pengusahaan panas bumi terbesar di Indonesia, dalam hal kapasitas terpasang keseluruhan yang dioperasikan sendiri oleh Perseroan dan oleh para Kontraktor KOB berdasarkan data dari Wood Mackenzie Asia Pacific Pte Limited (“Wood Mackenzie”). Perseroan memiliki rekam jejak yang baik dalam fokus usaha Perseroan yaitu pengembangan dan pengelolaan proyek-proyek PLTP di berbagai lokasi di Indonesia, yang masing-masing memiliki jumlah kapasitas terpasang yang bervariasi. Per tanggal 30 Juni 2022, Perseroan baik secara langsung maupun tidak langsung memiliki hak atas 13 kuasa pengusahaan panas bumi, dengan kapasitas terpasang keseluruhan sebesar 1.877MW, di mana sebesar 672MW dioperasikan sendiri dan sebesar 1.205MW dioperasikan oleh para Kontraktor KOB.\n\nPerseroan berfokus pada tenaga panas bumi hulu dan hilir dan telah mengembangkan proyek-proyek tenaga panas bumi milik Perseroan dengan mengintegrasikan dan mengoptimalkan panas bumi dan komponen-komponen produksi listrik serta teknologi yang Perseroan dapatkan dari para pemasok yang memiliki hubungan kuat dengan Perseroan. Secara garis besar, fokus Perseroan pada segmen panas bumi hulu dan hilir telah memberikan Perseroan fleksibilitas dalam mendapatkan komponen, teknologi, dan operator yang paling sesuai serta dalam menyesuaikan proyek-proyek PLTP Perseroan berdasarkan lingkungan lokal di mana pembangkit listrik tersebut akan dioperasikan. Perseroan meyakini bahwa Perseroan memiliki kemampuan untuk berhasil dalam berkolaborasi dengan para kontraktor EPC, mengintegrasikan dan mengoptimalkan komponen-komponen dan teknologi panas bumi serta mengembangkan proyek-proyek PLTP yang sukses.\n\nPerseroan memperoleh sebagian besar pendapatan Perseroan dari (i) penjualan listrik secara langsung dan tidak langsung ke PLN, yang merupakan perusahaan utilitas listrik milik negara Indonesia, dan (ii) penjualan uap ke IPP dan PLN.\n\nDalam WKP di mana Perseroan memegang hak-hak untuk beroperasi, Perseroan beroperasi dengan salah satu dari dua cara berikut: (i) melakukan seluruh aspek proses produksi tenaga panas bumi termasuk eksplorasi dan pengembangan reservoir panas bumi, konstruksi sistem fasilitas produksi di atas permukaan (steamfield above ground system), dan baik mengoperasikan PLTP oleh Perseroan sendiri maupun dalam beberapa kasus terbatas bekerja sama dengan IPP untuk mengoperasikan pembangkit listrik, di mana dalam hal ini Perseroan menjual uap yang Perseroan hasilkan kepada IPP, atau (ii) bekerja sama dengan para Kontraktor KOB untuk beroperasi di dalam WKP Perseroan dan memberikan izin kepada Kontraktor KOB untuk melakukan seluruh aspek proses produksi tenaga panas bumi atas nama Perseroan dengan imbalan biaya yang dikenal sebagai production allowances. Dalam kasus ke 2 di atas, Kontraktor KOB bertanggung jawab untuk melakukan seluruh aspek dalam proyek, termasuk eksplorasi dan pengembangan, pembangunan infrastruktur yang menghubungkan sumur uap dengan pembangkit listrik, serta pembangunan dan pengoperasian PLTP.",
+    "history": {
+        "amount": "9,056 B",
+        "board": "Papan Utama",
+        "date": "24 Feb 2023",
+        "price": "875",
+        "registrar": "",
+        "shares": "10,350,000,000",
+        "underwriters": [
+            "PT. CLSA Sekuritas Indonesia",
+            "PT. Credit Suisse Sekuritas Indonesia",
+            "PT. Mandiri Sekuritas (affiliated)",
+            "PT. HSBC Sekuritas Indonesia",
+            "PT. Bahana Sekuritas (affiliated)",
+            "PT. Danasakti Sekuritas Indonesia",
+            "PT. Samuel Sekuritas Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "10.89%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "15049355",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "ABDULLA ZAYED"
+            },
+            {
+                "id": "15049363",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "JOHN ANIS"
+            }
+        ],
+        "director": [
+            {
+                "id": "15049359",
+                "key": "Director",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "AHMAD YANI"
+            },
+            {
+                "id": "15049360",
+                "key": "Director",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "EDWIL SUZANDI"
+            },
+            {
+                "id": "15049361",
+                "key": "Director",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "YURIZKI RIO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "15049356",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "ABDUL MUSAWIR YAHYA"
+            },
+            {
+                "id": "15049357",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "MOHAMMAD FIRMANSYAH"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "15049362",
+                "key": "President Commissioner",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "GIGIH UDI ATMO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "15049358",
+                "key": "President Director",
+                "lastupdate": "2025-08-21T22:03:57+07:00",
+                "value": "JULFI HADI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [],
+    "shareholder": [
+        {
+            "percentage": "68.332%",
+            "name": "PT PERTAMINA POWER INDONESIA (PPI)",
+            "value": "28.57 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "14.852%",
+            "name": "MASDAR INDONESIA SOLAR HOLDINGS RSC LIMITED",
+            "value": "6.21 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "10.889%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "4.55 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "5.927%",
+            "name": "PT PERTAMINA PEDEVE INDONESIA (PEDEVE)",
+            "value": "2.48 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "55,524",
+            "change": 3802,
+            "change_formatted": "(+3,802)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "51,722",
+            "change": 17317,
+            "change_formatted": "(+17,317)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "34,405",
+            "change": -2073,
+            "change_formatted": "(-2,073)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "36,478",
+            "change": 1227,
+            "change_formatted": "(+1,227)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "35,251",
+            "change": -786,
+            "change_formatted": "(-786)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "36,037",
+            "change": -418,
+            "change_formatted": "(-418)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2023-02-24T00:00:00+07:00",
+    "ipo_price": 875,
+    "float": 10.89,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000003962",
+                "email": [
+                    "datapge@pertamina.com"
+                ],
+                "fax": "+62 21 3983 3230",
+                "npwp": "01.061.266.1-081.000",
+                "phone": "+62 21 3983 3222",
+                "website": "https://www.pge.pertamina.com",
+                "key": "",
+                "lastupdate": "2023-02-24T02:01:07+07:00",
+                "value": "",
+                "office": "Grha Pertamina - Tower Pertamax Lt.7\nJl. Medan Merdeka Timur No. 11-13 Gambir, Jakarta Pusat 10110"
+            }
+        ],
+        "background": "Perseroan merupakan afiliasi Pertamina dan pemegang kuasa pengusahaan panas bumi terbesar di Indonesia, dalam hal kapasitas terpasang keseluruhan yang dioperasikan sendiri oleh Perseroan dan oleh para Kontraktor KOB berdasarkan data dari Wood Mackenzie Asia Pacific Pte Limited (“Wood Mackenzie”). Perseroan memiliki rekam jejak yang baik dalam fokus usaha Perseroan yaitu pengembangan dan pengelolaan proyek-proyek PLTP di berbagai lokasi di Indonesia, yang masing-masing memiliki jumlah kapasitas terpasang yang bervariasi. Per tanggal 30 Juni 2022, Perseroan baik secara langsung maupun tidak langsung memiliki hak atas 13 kuasa pengusahaan panas bumi, dengan kapasitas terpasang keseluruhan sebesar 1.877MW, di mana sebesar 672MW dioperasikan sendiri dan sebesar 1.205MW dioperasikan oleh para Kontraktor KOB.\n\nPerseroan berfokus pada tenaga panas bumi hulu dan hilir dan telah mengembangkan proyek-proyek tenaga panas bumi milik Perseroan dengan mengintegrasikan dan mengoptimalkan panas bumi dan komponen-komponen produksi listrik serta teknologi yang Perseroan dapatkan dari para pemasok yang memiliki hubungan kuat dengan Perseroan. Secara garis besar, fokus Perseroan pada segmen panas bumi hulu dan hilir telah memberikan Perseroan fleksibilitas dalam mendapatkan komponen, teknologi, dan operator yang paling sesuai serta dalam menyesuaikan proyek-proyek PLTP Perseroan berdasarkan lingkungan lokal di mana pembangkit listrik tersebut akan dioperasikan. Perseroan meyakini bahwa Perseroan memiliki kemampuan untuk berhasil dalam berkolaborasi dengan para kontraktor EPC, mengintegrasikan dan mengoptimalkan komponen-komponen dan teknologi panas bumi serta mengembangkan proyek-proyek PLTP yang sukses.\n\nPerseroan memperoleh sebagian besar pendapatan Perseroan dari (i) penjualan listrik secara langsung dan tidak langsung ke PLN, yang merupakan perusahaan utilitas listrik milik negara Indonesia, dan (ii) penjualan uap ke IPP dan PLN.\n\nDalam WKP di mana Perseroan memegang hak-hak untuk beroperasi, Perseroan beroperasi dengan salah satu dari dua cara berikut: (i) melakukan seluruh aspek proses produksi tenaga panas bumi termasuk eksplorasi dan pengembangan reservoir panas bumi, konstruksi sistem fasilitas produksi di atas permukaan (steamfield above ground system), dan baik mengoperasikan PLTP oleh Perseroan sendiri maupun dalam beberapa kasus terbatas bekerja sama dengan IPP untuk mengoperasikan pembangkit listrik, di mana dalam hal ini Perseroan menjual uap yang Perseroan hasilkan kepada IPP, atau (ii) bekerja sama dengan para Kontraktor KOB untuk beroperasi di dalam WKP Perseroan dan memberikan izin kepada Kontraktor KOB untuk melakukan seluruh aspek proses produksi tenaga panas bumi atas nama Perseroan dengan imbalan biaya yang dikenal sebagai production allowances. Dalam kasus ke 2 di atas, Kontraktor KOB bertanggung jawab untuk melakukan seluruh aspek dalam proyek, termasuk eksplorasi dan pengembangan, pembangunan infrastruktur yang menghubungkan sumur uap dengan pembangkit listrik, serta pembangunan dan pengoperasian PLTP.",
+        "history": {
+            "amount": "9,056 B",
+            "board": "Papan Utama",
+            "date": "24 Feb 2023",
+            "price": "875",
+            "registrar": "",
+            "shares": "10,350,000,000",
+            "underwriters": [
+                "PT. CLSA Sekuritas Indonesia",
+                "PT. Credit Suisse Sekuritas Indonesia",
+                "PT. Mandiri Sekuritas (affiliated)",
+                "PT. HSBC Sekuritas Indonesia",
+                "PT. Bahana Sekuritas (affiliated)",
+                "PT. Danasakti Sekuritas Indonesia",
+                "PT. Samuel Sekuritas Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "10.89%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "15049355",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "ABDULLA ZAYED"
+                },
+                {
+                    "id": "15049363",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "JOHN ANIS"
+                }
+            ],
+            "director": [
+                {
+                    "id": "15049359",
+                    "key": "Director",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "AHMAD YANI"
+                },
+                {
+                    "id": "15049360",
+                    "key": "Director",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "EDWIL SUZANDI"
+                },
+                {
+                    "id": "15049361",
+                    "key": "Director",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "YURIZKI RIO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "15049356",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "ABDUL MUSAWIR YAHYA"
+                },
+                {
+                    "id": "15049357",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "MOHAMMAD FIRMANSYAH"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "15049362",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "GIGIH UDI ATMO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "15049358",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-21T22:03:57+07:00",
+                    "value": "JULFI HADI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [],
+        "shareholder": [
+            {
+                "percentage": "68.332%",
+                "name": "PT PERTAMINA POWER INDONESIA (PPI)",
+                "value": "28.57 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "14.852%",
+                "name": "MASDAR INDONESIA SOLAR HOLDINGS RSC LIMITED",
+                "value": "6.21 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "10.889%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "4.55 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "5.927%",
+                "name": "PT PERTAMINA PEDEVE INDONESIA (PEDEVE)",
+                "value": "2.48 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "55,524",
+                "change": 3802,
+                "change_formatted": "(+3,802)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "51,722",
+                "change": 17317,
+                "change_formatted": "(+17,317)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "34,405",
+                "change": -2073,
+                "change_formatted": "(-2,073)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "36,478",
+                "change": 1227,
+                "change_formatted": "(+1,227)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "35,251",
+                "change": -786,
+                "change_formatted": "(-786)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "36,037",
+                "change": -418,
+                "change_formatted": "(-418)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:28+00:00"
+}

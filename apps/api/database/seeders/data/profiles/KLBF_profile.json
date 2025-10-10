@@ -1,0 +1,696 @@
+{
+    "symbol": "KLBF",
+    "name": "KLBF",
+    "address": [
+        {
+            "id": "249",
+            "email": [
+                "info@kalbe.co.id"
+            ],
+            "fax": "42873680",
+            "npwp": "01.001.836.4-092.000",
+            "phone": "42873888\r\n",
+            "website": "www.kalbe.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:27+07:00",
+            "value": "<td colspan='4'>Gedung KALBE Let.Jend Suprato Kav. 4\r\nJakarta\r\n \n\n        \t\t  \t\t\tPhone: 42873888\r\n\n        \t\t  \t\t\tFax: 42873680\n                            NPWP: 01.001.836.4-092.000\n        \t\t  \t\t\tEmail: info@kalbe.co.id\n        \t\t  \t\t\tWebsite: www.kalbe.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Gedung KALBE Let.Jend Suprato Kav. 4 Jakarta"
+        }
+    ],
+    "background": "PT. Kalbe Farma Tbk (KLBF) bergerak dalam pengembangan, pembuatan dan perdagangan persiapan farmasi termasuk obat-obatan dan produk kesehatan konsumen. Perusahaan memulai operasi komersialnya pada tahun 1966.",
+    "history": {
+        "amount": "-",
+        "board": "Papan Utama",
+        "date": "30 Jul 1991",
+        "price": "7,800",
+        "registrar": "",
+        "shares": "",
+        "underwriters": [
+            "PT. Merincorp",
+            "PT. Niaga Securities"
+        ],
+        "administrative_bureau": "PT. Adimitra Jasa Korpora",
+        "free_float": "38.46%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837297",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Ferdinand Aryanto"
+            },
+            {
+                "id": "13837296",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Santoso Oen"
+            }
+        ],
+        "director": [
+            {
+                "id": "13837294",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Kartika Setiabudy"
+            },
+            {
+                "id": "13837293",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Jos Iwan Atmadjaja"
+            },
+            {
+                "id": "13837292",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Mulialie"
+            },
+            {
+                "id": "13837291",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Sie Djohan"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13837299",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Herijanto Irawan"
+            },
+            {
+                "id": "13837298",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Rhenald Kasali"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13837295",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Ronny Hadiana"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13837290",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:25+07:00",
+                "value": "Bernadette Ruth Irawati Setiady"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530686",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:27+07:00",
+            "value": "{\"name\":\"Lukito Kurniawan Gozali\",\"phone\":\"(021) 428 73 888\",\"email\":\"Lukito.Gozali@kalbe.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "38.46%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "18.00 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "10.47%",
+            "name": "LADANG IRA PANEN, PT",
+            "value": "4.90 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "10.31%",
+            "name": "GIRA SOLE PRIMA, PT",
+            "value": "4.82 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "10.08%",
+            "name": "SANTA SEHA SANADI, PT ",
+            "value": "4.72 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "9.48%",
+            "name": "LUCASTA MURNI CEMERLANG, PT",
+            "value": "4.44 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "9.3%",
+            "name": "DIPTANALA BAHANA, PT",
+            "value": "4.35 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "8.21%",
+            "name": "BINA ARTA CHARISMA, PT",
+            "value": "3.84 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "3.2%",
+            "name": "SAHAM TREASURY",
+            "value": "1.50 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.15%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "72.49 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "41,375",
+            "change": 5507,
+            "change_formatted": "(+5,507)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "35,868",
+            "change": 3938,
+            "change_formatted": "(+3,938)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "31,930",
+            "change": 357,
+            "change_formatted": "(+357)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "31,573",
+            "change": -1822,
+            "change_formatted": "(-1,822)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "33,395",
+            "change": -435,
+            "change_formatted": "(-435)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "33,830",
+            "change": 149,
+            "change_formatted": "(+149)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.2%",
+            "name": "RONNY HADIANA",
+            "value": "92.67 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.09%",
+            "name": "SANTOSO OEN",
+            "value": "42.47 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.05%",
+            "name": "B. R. IRAWATI SETIADY",
+            "value": "21.59 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "FERDINAND ARYANTO",
+            "value": "340.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MULIALIE",
+            "value": "250.04 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1991-07-30T00:00:00+07:00",
+    "ipo_price": 7800,
+    "float": 38.46,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "249",
+                "email": [
+                    "info@kalbe.co.id"
+                ],
+                "fax": "42873680",
+                "npwp": "01.001.836.4-092.000",
+                "phone": "42873888\r\n",
+                "website": "www.kalbe.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:27+07:00",
+                "value": "<td colspan='4'>Gedung KALBE Let.Jend Suprato Kav. 4\r\nJakarta\r\n \n\n        \t\t  \t\t\tPhone: 42873888\r\n\n        \t\t  \t\t\tFax: 42873680\n                            NPWP: 01.001.836.4-092.000\n        \t\t  \t\t\tEmail: info@kalbe.co.id\n        \t\t  \t\t\tWebsite: www.kalbe.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Gedung KALBE Let.Jend Suprato Kav. 4 Jakarta"
+            }
+        ],
+        "background": "PT. Kalbe Farma Tbk (KLBF) bergerak dalam pengembangan, pembuatan dan perdagangan persiapan farmasi termasuk obat-obatan dan produk kesehatan konsumen. Perusahaan memulai operasi komersialnya pada tahun 1966.",
+        "history": {
+            "amount": "-",
+            "board": "Papan Utama",
+            "date": "30 Jul 1991",
+            "price": "7,800",
+            "registrar": "",
+            "shares": "",
+            "underwriters": [
+                "PT. Merincorp",
+                "PT. Niaga Securities"
+            ],
+            "administrative_bureau": "PT. Adimitra Jasa Korpora",
+            "free_float": "38.46%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837297",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Ferdinand Aryanto"
+                },
+                {
+                    "id": "13837296",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Santoso Oen"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837294",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Kartika Setiabudy"
+                },
+                {
+                    "id": "13837293",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Jos Iwan Atmadjaja"
+                },
+                {
+                    "id": "13837292",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Mulialie"
+                },
+                {
+                    "id": "13837291",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Sie Djohan"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13837299",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Herijanto Irawan"
+                },
+                {
+                    "id": "13837298",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Rhenald Kasali"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13837295",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Ronny Hadiana"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13837290",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:25+07:00",
+                    "value": "Bernadette Ruth Irawati Setiady"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530686",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:27+07:00",
+                "value": "{\"name\":\"Lukito Kurniawan Gozali\",\"phone\":\"(021) 428 73 888\",\"email\":\"Lukito.Gozali@kalbe.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "38.46%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "18.00 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "10.47%",
+                "name": "LADANG IRA PANEN, PT",
+                "value": "4.90 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "10.31%",
+                "name": "GIRA SOLE PRIMA, PT",
+                "value": "4.82 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "10.08%",
+                "name": "SANTA SEHA SANADI, PT ",
+                "value": "4.72 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "9.48%",
+                "name": "LUCASTA MURNI CEMERLANG, PT",
+                "value": "4.44 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "9.3%",
+                "name": "DIPTANALA BAHANA, PT",
+                "value": "4.35 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "8.21%",
+                "name": "BINA ARTA CHARISMA, PT",
+                "value": "3.84 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "3.2%",
+                "name": "SAHAM TREASURY",
+                "value": "1.50 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.15%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "72.49 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "41,375",
+                "change": 5507,
+                "change_formatted": "(+5,507)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "35,868",
+                "change": 3938,
+                "change_formatted": "(+3,938)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "31,930",
+                "change": 357,
+                "change_formatted": "(+357)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "31,573",
+                "change": -1822,
+                "change_formatted": "(-1,822)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "33,395",
+                "change": -435,
+                "change_formatted": "(-435)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "33,830",
+                "change": 149,
+                "change_formatted": "(+149)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.2%",
+                "name": "RONNY HADIANA",
+                "value": "92.67 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.09%",
+                "name": "SANTOSO OEN",
+                "value": "42.47 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.05%",
+                "name": "B. R. IRAWATI SETIADY",
+                "value": "21.59 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "FERDINAND ARYANTO",
+                "value": "340.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MULIALIE",
+                "value": "250.04 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:23+00:00"
+}

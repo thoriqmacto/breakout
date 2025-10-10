@@ -1,0 +1,892 @@
+{
+    "symbol": "PTBA",
+    "name": "PTBA",
+    "address": [
+        {
+            "id": "344",
+            "email": [
+                " corsec@bukitasam.co.id "
+            ],
+            "fax": " 021 - 5254002 ",
+            "npwp": "0010 0001 1505 1000",
+            "phone": " (021) 5254014 ",
+            "website": " www.ptba.co.id ",
+            "key": "",
+            "lastupdate": "2024-12-06T16:30:43+07:00",
+            "value": "",
+            "office": " Menara Kadin Indonesia 15th Floor & 9th Floor Jl. HR Rasuna Said X-5, Kav 2& 3 Jakarta 12950 "
+        }
+    ],
+    "background": "PT. Bukit Asam Tbk (PTBA) bergerak dalam bidang pertambangan batubara, termasuk survei umum, eksplorasi, eksploitasi, pengolahan, pemurnian, pengangkutan dan perdagangan, pemeliharaan fasilitas pelabuhan batubara khusus untuk keperluan internal dan kebutuhan eksternal, pengoperasian pembangkit listrik tenaga uap untuk kebutuhan internal dan eksternal dan memberikan jasa konsultasi terkait industri pertambangan batubara serta produk turunannya, dan pengembangan perkebunan. Pada tahun 1993, Perusahaan ditunjuk oleh Pemerintah Indonesia untuk mengembangkan Unit Usaha Briket Batubara.",
+    "history": {
+        "amount": "199 B",
+        "board": "Papan Utama",
+        "date": "23 Dec 2002",
+        "price": "575",
+        "registrar": "",
+        "shares": "346,500,000",
+        "underwriters": [
+            "PT. Danareksa Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "32.76%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13838960",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Lana Saria"
+            },
+            {
+                "id": "13838959",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Ferial Martifauzi"
+            },
+            {
+                "id": "13838958",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Zaelani"
+            },
+            {
+                "id": "13838957",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Dalu Agung Darmawan"
+            }
+        ],
+        "director": [
+            {
+                "id": "13838951",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Una Lindasari"
+            },
+            {
+                "id": "13838953",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Ihsanuddin Usman"
+            },
+            {
+                "id": "13838952",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Turino Yulianto"
+            },
+            {
+                "id": "13838950",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Verisca Hutanto"
+            },
+            {
+                "id": "13838949",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Ilham Yacob"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13838956",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Suko Hartono"
+            },
+            {
+                "id": "13838955",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Dewi Hanggraeni"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13838948",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Arsal Ismali"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "13838954",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Bambang Ismawan"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12531792",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:51+07:00",
+            "value": "{\"name\":\"Apollonius Andwie C\",\"phone\":\" (62-21) 5254014 ext. 2231 \",\"email\":\"aandwie@bukitasam.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "65.93%",
+            "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+            "value": "7.60 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "32.76%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "3.77 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "1.26%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "144.31 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.05%",
+            "name": "SAHAM TREASURY",
+            "value": "6.30 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NEGARA REPUBLIK INDONESIA",
+            "value": "5.00",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Bukitasam Transpacific Railway",
+            "percentage": "10.00%",
+            "types": "Jasa angkutan Batubara",
+            "value": "112722"
+        },
+        {
+            "company": "PT Huadian BukitAsam Power",
+            "percentage": "45.00%",
+            "types": "Produsen Energi Listrik",
+            "value": "19834459"
+        },
+        {
+            "company": "PT Tabalong Prima Resource",
+            "percentage": "34.17%",
+            "types": "Penambangan",
+            "value": "86100"
+        },
+        {
+            "company": "PT Mitra Hasrat Bersama",
+            "percentage": "34.17%",
+            "types": "Infrastruktur",
+            "value": "341407"
+        },
+        {
+            "company": "PT pelabuhan bukit prima",
+            "percentage": "99.99%",
+            "types": "Jasa Pelabuhan",
+            "value": "80882"
+        },
+        {
+            "company": "PT Nasional Hijau Lestari",
+            "percentage": "25.00%",
+            "types": "Infrastruktur",
+            "value": "50621"
+        },
+        {
+            "company": "PT Bukit Multi Properti",
+            "percentage": "99.90%",
+            "types": "Real Estate dan Konstruksi",
+            "value": "4824"
+        },
+        {
+            "company": "PT Batubara Bukit Kendi",
+            "percentage": "98.00%",
+            "types": "Penambangan Batubara",
+            "value": "266"
+        },
+        {
+            "company": "PT Bukit Asam Prima",
+            "percentage": "99.99%",
+            "types": "Perdagangan Batubara",
+            "value": "278931"
+        },
+        {
+            "company": "PT Internasional Prima Coal",
+            "percentage": "51.00%",
+            "types": "Penambangan Batubara",
+            "value": "641771"
+        },
+        {
+            "company": "PT Bukit Multi Investama",
+            "percentage": "99.99%",
+            "types": "Perdagangan umum, jasa percetakan, pembangunan, industri, pengangkutan,pertanian, perkebunan,properti, dan melakukan investasi pada perusahaan lain",
+            "value": "2909548"
+        },
+        {
+            "company": "PT Bumi Sawindo\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n Permai",
+            "percentage": "99.99%",
+            "types": "Perkebunan kelapa sawit dan hasil olahan kelapa sawit",
+            "value": "351230"
+        },
+        {
+            "company": "PT Bukit Prima Bahari",
+            "percentage": "99.99%",
+            "types": "Pelayaran",
+            "value": "135861"
+        },
+        {
+            "company": "Anthrakas Pte Ltd",
+            "percentage": "100%",
+            "types": "Perdagangan batubara",
+            "value": "29542"
+        },
+        {
+            "company": "PT Bukit Asam Medika",
+            "percentage": "97.50%",
+            "types": "Rumah skit, klinik, poliklinik, poliklinik spesialis, dan balai pengobatan",
+            "value": "54880"
+        },
+        {
+            "company": "PT Satria Bahana Sarana",
+            "percentage": "95.00%",
+            "types": "Pengangkutan, pembangunan, perdagangan, pertambangan, perbengkelan dan jasa",
+            "value": "1781792"
+        },
+        {
+            "company": "PT Bukit Energi Investama\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+            "percentage": "99.99%",
+            "types": "perdagangan, jasa, perbengkelan, pembangunan",
+            "value": "180451"
+        },
+        {
+            "company": "PT Bukit asam Metana Ombilin",
+            "percentage": "99.99%",
+            "types": "penambangan gas metana batubara",
+            "value": "34"
+        },
+        {
+            "company": "PT Bukit Asam Metana Enim",
+            "percentage": "99.99%",
+            "types": "penambangan gas metanan batubara",
+            "value": "73"
+        },
+        {
+            "company": "PT Bukit Asam Energi Metana",
+            "percentage": "99.99%",
+            "types": "penambangan gas metana batubara",
+            "value": "51"
+        },
+        {
+            "company": "PT Bukit Asam Banko",
+            "percentage": "99.99%",
+            "types": "penambangan dan pertambangan",
+            "value": "313"
+        },
+        {
+            "company": "PT Bukit Energi service Terpadu\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+            "percentage": "99.62%",
+            "types": "perdagangan, jasa, perbengkelan, pembangunan, perindustrian",
+            "value": "111570"
+        },
+        {
+            "company": "PT Internasional Prima Cemerlang",
+            "percentage": "51.00%",
+            "types": "perdagangan Batubara",
+            "value": "2278"
+        },
+        {
+            "company": "PT Penajam Internasional Terminal",
+            "percentage": "72.00%",
+            "types": "Jasa Kepelabuhan",
+            "value": "2267"
+        },
+        {
+            "company": "PT Bukit Pembangkit Innovative",
+            "percentage": "59.75%",
+            "types": "Produsen Energi Listrik",
+            "value": "6286755"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "145,590",
+            "change": 2680,
+            "change_formatted": "(+2,680)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "142,910",
+            "change": 130,
+            "change_formatted": "(+130)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "142,780",
+            "change": 6207,
+            "change_formatted": "(+6,207)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "136,573",
+            "change": 6355,
+            "change_formatted": "(+6,355)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "130,218",
+            "change": 1636,
+            "change_formatted": "(+1,636)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "128,582",
+            "change": -299,
+            "change_formatted": "(-299)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "ARSAL ISMAIL",
+            "value": "304.90 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "FERIAL MARTIFAUZI",
+            "value": "1.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2002-12-23T00:00:00+07:00",
+    "ipo_price": 575,
+    "float": 32.76,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "344",
+                "email": [
+                    " corsec@bukitasam.co.id "
+                ],
+                "fax": " 021 - 5254002 ",
+                "npwp": "0010 0001 1505 1000",
+                "phone": " (021) 5254014 ",
+                "website": " www.ptba.co.id ",
+                "key": "",
+                "lastupdate": "2024-12-06T16:30:43+07:00",
+                "value": "",
+                "office": " Menara Kadin Indonesia 15th Floor & 9th Floor Jl. HR Rasuna Said X-5, Kav 2& 3 Jakarta 12950 "
+            }
+        ],
+        "background": "PT. Bukit Asam Tbk (PTBA) bergerak dalam bidang pertambangan batubara, termasuk survei umum, eksplorasi, eksploitasi, pengolahan, pemurnian, pengangkutan dan perdagangan, pemeliharaan fasilitas pelabuhan batubara khusus untuk keperluan internal dan kebutuhan eksternal, pengoperasian pembangkit listrik tenaga uap untuk kebutuhan internal dan eksternal dan memberikan jasa konsultasi terkait industri pertambangan batubara serta produk turunannya, dan pengembangan perkebunan. Pada tahun 1993, Perusahaan ditunjuk oleh Pemerintah Indonesia untuk mengembangkan Unit Usaha Briket Batubara.",
+        "history": {
+            "amount": "199 B",
+            "board": "Papan Utama",
+            "date": "23 Dec 2002",
+            "price": "575",
+            "registrar": "",
+            "shares": "346,500,000",
+            "underwriters": [
+                "PT. Danareksa Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "32.76%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13838960",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Lana Saria"
+                },
+                {
+                    "id": "13838959",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Ferial Martifauzi"
+                },
+                {
+                    "id": "13838958",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Zaelani"
+                },
+                {
+                    "id": "13838957",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Dalu Agung Darmawan"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13838951",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Una Lindasari"
+                },
+                {
+                    "id": "13838953",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Ihsanuddin Usman"
+                },
+                {
+                    "id": "13838952",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Turino Yulianto"
+                },
+                {
+                    "id": "13838950",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Verisca Hutanto"
+                },
+                {
+                    "id": "13838949",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Ilham Yacob"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13838956",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Suko Hartono"
+                },
+                {
+                    "id": "13838955",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Dewi Hanggraeni"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13838948",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Arsal Ismali"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "13838954",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Bambang Ismawan"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12531792",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:51+07:00",
+                "value": "{\"name\":\"Apollonius Andwie C\",\"phone\":\" (62-21) 5254014 ext. 2231 \",\"email\":\"aandwie@bukitasam.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "65.93%",
+                "name": "PT MINERAL INDUSTRI INDONESIA (PERSERO)",
+                "value": "7.60 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "32.76%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "3.77 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "1.26%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "144.31 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.05%",
+                "name": "SAHAM TREASURY",
+                "value": "6.30 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NEGARA REPUBLIK INDONESIA",
+                "value": "5.00",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Bukitasam Transpacific Railway",
+                "percentage": "10.00%",
+                "types": "Jasa angkutan Batubara",
+                "value": "112722"
+            },
+            {
+                "company": "PT Huadian BukitAsam Power",
+                "percentage": "45.00%",
+                "types": "Produsen Energi Listrik",
+                "value": "19834459"
+            },
+            {
+                "company": "PT Tabalong Prima Resource",
+                "percentage": "34.17%",
+                "types": "Penambangan",
+                "value": "86100"
+            },
+            {
+                "company": "PT Mitra Hasrat Bersama",
+                "percentage": "34.17%",
+                "types": "Infrastruktur",
+                "value": "341407"
+            },
+            {
+                "company": "PT pelabuhan bukit prima",
+                "percentage": "99.99%",
+                "types": "Jasa Pelabuhan",
+                "value": "80882"
+            },
+            {
+                "company": "PT Nasional Hijau Lestari",
+                "percentage": "25.00%",
+                "types": "Infrastruktur",
+                "value": "50621"
+            },
+            {
+                "company": "PT Bukit Multi Properti",
+                "percentage": "99.90%",
+                "types": "Real Estate dan Konstruksi",
+                "value": "4824"
+            },
+            {
+                "company": "PT Batubara Bukit Kendi",
+                "percentage": "98.00%",
+                "types": "Penambangan Batubara",
+                "value": "266"
+            },
+            {
+                "company": "PT Bukit Asam Prima",
+                "percentage": "99.99%",
+                "types": "Perdagangan Batubara",
+                "value": "278931"
+            },
+            {
+                "company": "PT Internasional Prima Coal",
+                "percentage": "51.00%",
+                "types": "Penambangan Batubara",
+                "value": "641771"
+            },
+            {
+                "company": "PT Bukit Multi Investama",
+                "percentage": "99.99%",
+                "types": "Perdagangan umum, jasa percetakan, pembangunan, industri, pengangkutan,pertanian, perkebunan,properti, dan melakukan investasi pada perusahaan lain",
+                "value": "2909548"
+            },
+            {
+                "company": "PT Bumi Sawindo\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n Permai",
+                "percentage": "99.99%",
+                "types": "Perkebunan kelapa sawit dan hasil olahan kelapa sawit",
+                "value": "351230"
+            },
+            {
+                "company": "PT Bukit Prima Bahari",
+                "percentage": "99.99%",
+                "types": "Pelayaran",
+                "value": "135861"
+            },
+            {
+                "company": "Anthrakas Pte Ltd",
+                "percentage": "100%",
+                "types": "Perdagangan batubara",
+                "value": "29542"
+            },
+            {
+                "company": "PT Bukit Asam Medika",
+                "percentage": "97.50%",
+                "types": "Rumah skit, klinik, poliklinik, poliklinik spesialis, dan balai pengobatan",
+                "value": "54880"
+            },
+            {
+                "company": "PT Satria Bahana Sarana",
+                "percentage": "95.00%",
+                "types": "Pengangkutan, pembangunan, perdagangan, pertambangan, perbengkelan dan jasa",
+                "value": "1781792"
+            },
+            {
+                "company": "PT Bukit Energi Investama\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+                "percentage": "99.99%",
+                "types": "perdagangan, jasa, perbengkelan, pembangunan",
+                "value": "180451"
+            },
+            {
+                "company": "PT Bukit asam Metana Ombilin",
+                "percentage": "99.99%",
+                "types": "penambangan gas metana batubara",
+                "value": "34"
+            },
+            {
+                "company": "PT Bukit Asam Metana Enim",
+                "percentage": "99.99%",
+                "types": "penambangan gas metanan batubara",
+                "value": "73"
+            },
+            {
+                "company": "PT Bukit Asam Energi Metana",
+                "percentage": "99.99%",
+                "types": "penambangan gas metana batubara",
+                "value": "51"
+            },
+            {
+                "company": "PT Bukit Asam Banko",
+                "percentage": "99.99%",
+                "types": "penambangan dan pertambangan",
+                "value": "313"
+            },
+            {
+                "company": "PT Bukit Energi service Terpadu\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n",
+                "percentage": "99.62%",
+                "types": "perdagangan, jasa, perbengkelan, pembangunan, perindustrian",
+                "value": "111570"
+            },
+            {
+                "company": "PT Internasional Prima Cemerlang",
+                "percentage": "51.00%",
+                "types": "perdagangan Batubara",
+                "value": "2278"
+            },
+            {
+                "company": "PT Penajam Internasional Terminal",
+                "percentage": "72.00%",
+                "types": "Jasa Kepelabuhan",
+                "value": "2267"
+            },
+            {
+                "company": "PT Bukit Pembangkit Innovative",
+                "percentage": "59.75%",
+                "types": "Produsen Energi Listrik",
+                "value": "6286755"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "145,590",
+                "change": 2680,
+                "change_formatted": "(+2,680)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "142,910",
+                "change": 130,
+                "change_formatted": "(+130)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "142,780",
+                "change": 6207,
+                "change_formatted": "(+6,207)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "136,573",
+                "change": 6355,
+                "change_formatted": "(+6,355)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "130,218",
+                "change": 1636,
+                "change_formatted": "(+1,636)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "128,582",
+                "change": -299,
+                "change_formatted": "(-299)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "ARSAL ISMAIL",
+                "value": "304.90 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "FERIAL MARTIFAUZI",
+                "value": "1.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:28+00:00"
+}

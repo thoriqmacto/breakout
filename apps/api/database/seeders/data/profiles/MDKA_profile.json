@@ -1,0 +1,860 @@
+{
+    "symbol": "MDKA",
+    "name": "MDKA",
+    "address": [
+        {
+            "id": "534",
+            "email": [
+                "corporate.secretary@merdekacoppergold.com"
+            ],
+            "fax": "021 3952 5589",
+            "npwp": "0032720120011000",
+            "phone": "021 3952 5580",
+            "website": "www.merdekacoppergold.com",
+            "key": "",
+            "lastupdate": "2025-01-22T17:48:12+07:00",
+            "value": "",
+            "office": "Treasury Tower Lantai 67-68, District 8 SCBD Lot. 28, Jl. Jend. Sudirman Kav. 52-53, Desa/Kel. Senayan, Kec. Kebayoran Baru, Jakarta Selatan 12190, Indonesia"
+        }
+    ],
+    "background": "PT Merdeka Copper Gold Tbk (Merdeka) adalah perusahaan induk dengan anak perusahaan yang bergerak dalam kegiatan usaha pertambangan, meliputi eksplorasi dan produksi emas, perak, tembaga, serta mineral terkait lainnya serta layanan pertambangan. Anak-anak perusahaan tersebut adalah PT Bumi Suksesindo (BSI), pemegang izin usaha pertambangan operasi produksi untuk Tambang Tujuh Bukit; PT Damai Suksesindo (DSI), pemegang izin eksplorasi yang berdekatan; PT Batutua Tembaga Raya (BTR), pemegang izin usaha pertambangan operasi produksi khusus untuk pengolahan dan pemurnian; PT Batutua Kharisma Permai (BKP), pemegang izin usaha pertambangan operasi produksi untuk Tambang Tembaga Wetar; PT Merdeka Mining Servis (MMS), pemegang izin usaha jasa pertambangan; PT Pani Bersama Tambang (PBT), pemegang izin usaha pertambangan operasi produksi khusus untuk pengolahan dan pemurnian; dan PT Puncak Emas Tani Sejahtera (PETS), pemegang izin usaha pertambangan operasi produksi untuk Proyek Emas Pani.\n\nAset utama Perusahaan adalah Tambang Tujuh Bukit, sering disebut sebagai Proyek Heap Leach Tujuh Bukit, Tambang Tembaga Wetar, Proyek Emas Pani yang dalam pengembangan, dan deposit emas dan tembaga Tujuh Bukit yang dalam pengembangan.\n\nSelain itu, pada November 2018 Merdeka membeli 66,7% saham proyek emas di Gorontalo.  Pengembangan Proyek Emas Gorontalo memberi peluang penambangan emas dengan sumber daya terukur, tertunjuk dan tereka hingga 2.370.000 oz emas.\n\nSebagai perusahaan pertambangan Indonesia kelas dunia, Merdeka dimiliki oleh pemegang saham terkemuka termasuk PT Saratoga Investama Sedaya Tbk., PT Provident Capital Indonesia, dan Bapak Garibaldi Thohir. Ketiga pemegang saham utama Merdeka itu memiliki rekam jejak yang luar biasa dalam kesuksesan mengidentifikasi, mengembangkan, dan mengoperasikan beberapa perusahaan publik di Indonesia.",
+    "history": {
+        "amount": "839 B",
+        "board": "Papan Utama",
+        "date": "19 Jun 2015",
+        "price": "2,000",
+        "registrar": "",
+        "shares": "419,650,000",
+        "underwriters": [
+            "PT. Indo Premier Securities",
+            "PT. Bahana Securities"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "47.45%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837840",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Andrew Phillip Starkey"
+            },
+            {
+                "id": "13837836",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Tang Honghui"
+            },
+            {
+                "id": "13837835",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Yoke Candra"
+            }
+        ],
+        "director": [
+            {
+                "id": "13837830",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Gavin Arnold Caudle"
+            },
+            {
+                "id": "13837834",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Titien Supeno"
+            },
+            {
+                "id": "13837833",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Chrisanthus Supriyo"
+            },
+            {
+                "id": "13837832",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "David Thomas Fowler"
+            },
+            {
+                "id": "13837831",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Hardi Wijaya Liong"
+            },
+            {
+                "id": "13837829",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Jason Laurence Greive"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13837839",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Muhamad Munir"
+            },
+            {
+                "id": "13837838",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Budi Bowoleksono"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13837837",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Edwin Soeryadjaya"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13837828",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:34+07:00",
+                "value": "Albert Saputro"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12538123",
+            "key": "",
+            "lastupdate": "2022-03-07T16:55:31+07:00",
+            "value": "{\"name\":\"Adi Adriansyah Sjoekri\",\"phone\":\"02129880393\",\"email\":\"corporate.secretary@merdekacoppergold.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "50.436%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "12.34 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "19.473%",
+            "name": "PT SARATOGA INVESTAMA SEDAYA TBK",
+            "value": "4.77 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "11.88%",
+            "name": "PT MITRA DAYA MUSTIKA",
+            "value": "2.91 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "7.462%",
+            "name": "GARIBALDI THOHIR",
+            "value": "1.83 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "5.505%",
+            "name": "PT SUWARNA ARTA MANDIRI",
+            "value": "1.35 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "3.977%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "973.25 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.233%",
+            "name": "SAHAM TREASURY",
+            "value": "56.98 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Bumi Suksesindo",
+            "percentage": "99.89%",
+            "types": "Operasi produksi tambang",
+            "value": "504141298"
+        },
+        {
+            "company": "PT Merdeka Mining Servis",
+            "percentage": "99.99%",
+            "types": "Jasa Pertambangan",
+            "value": "11078509"
+        },
+        {
+            "company": "Eastern Field Development Limited",
+            "percentage": "100%",
+            "types": "Perusahaan Induk",
+            "value": "142647635"
+        },
+        {
+            "company": "PT Pani Bersama Jaya",
+            "percentage": "66.70%",
+            "types": "Perusahaan Induk",
+            "value": "12918159"
+        },
+        {
+            "company": "PT Batutua Pelita Investama",
+            "percentage": "99.83%",
+            "types": "Perusahaan Induk",
+            "value": "4020986"
+        },
+        {
+            "company": "PT Batutua Tembaga Raya",
+            "percentage": "78.00%",
+            "types": "Jasa Pengolahan dan Perdagangan",
+            "value": "279619510"
+        },
+        {
+            "company": "PT Bumi Suksesindo",
+            "percentage": "99.89%",
+            "types": "Pertambangan mineral",
+            "value": "513424392"
+        },
+        {
+            "company": "PT Merdeka Mining Servis",
+            "percentage": "99.99%",
+            "types": "Jasa pertambangan dan konstruksi",
+            "value": "10907343"
+        },
+        {
+            "company": "Eastern Field Development Limited",
+            "percentage": "100%",
+            "types": "Perusahaan induk",
+            "value": "176788095"
+        },
+        {
+            "company": "PT Pani Bersama Jaya",
+            "percentage": "66.70%",
+            "types": "Perusahaan induk",
+            "value": "13496218"
+        },
+        {
+            "company": "PT Batutua Pelita Investama",
+            "percentage": "99.83%",
+            "types": "Pertambangan mineral",
+            "value": "18020224"
+        },
+        {
+            "company": "PT Batutua Tembaga Raya",
+            "percentage": "100%",
+            "types": "Industri pembuatan logam dan perdagangan",
+            "value": "293079113"
+        },
+        {
+            "company": "PT Batutua Abadi Jaya",
+            "percentage": "99.99%",
+            "types": "Pertambangan mineral",
+            "value": "17580"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "42,298",
+            "change": 4321,
+            "change_formatted": "(+4,321)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "37,977",
+            "change": -4498,
+            "change_formatted": "(-4,498)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "42,475",
+            "change": -1802,
+            "change_formatted": "(-1,802)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "44,277",
+            "change": -646,
+            "change_formatted": "(-646)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "44,923",
+            "change": 4885,
+            "change_formatted": "(+4,885)"
+        },
+        {
+            "shareholder_date": "31 Mar 2025",
+            "total_share": "40,038",
+            "change": 638,
+            "change_formatted": "(+638)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.72%",
+            "name": "GAVIN ARNOLD CAUDLE",
+            "value": "176.23 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.284%",
+            "name": "HARDI WIJAYA LIONG",
+            "value": "69.60 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.011%",
+            "name": "ANDREW PHILLIP STARKEY",
+            "value": "2.63 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.008%",
+            "name": "ALBERT SAPUTRO",
+            "value": "2.09 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.008%",
+            "name": "TITIEN SUPENO",
+            "value": "1.87 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.002%",
+            "name": "JASON LAURENCE GREIVE",
+            "value": "578.20 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.001%",
+            "name": "DAVID THOMAS FOWLER",
+            "value": "339.20 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2015-06-19T00:00:00+07:00",
+    "ipo_price": 2000,
+    "float": 47.45,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "534",
+                "email": [
+                    "corporate.secretary@merdekacoppergold.com"
+                ],
+                "fax": "021 3952 5589",
+                "npwp": "0032720120011000",
+                "phone": "021 3952 5580",
+                "website": "www.merdekacoppergold.com",
+                "key": "",
+                "lastupdate": "2025-01-22T17:48:12+07:00",
+                "value": "",
+                "office": "Treasury Tower Lantai 67-68, District 8 SCBD Lot. 28, Jl. Jend. Sudirman Kav. 52-53, Desa/Kel. Senayan, Kec. Kebayoran Baru, Jakarta Selatan 12190, Indonesia"
+            }
+        ],
+        "background": "PT Merdeka Copper Gold Tbk (Merdeka) adalah perusahaan induk dengan anak perusahaan yang bergerak dalam kegiatan usaha pertambangan, meliputi eksplorasi dan produksi emas, perak, tembaga, serta mineral terkait lainnya serta layanan pertambangan. Anak-anak perusahaan tersebut adalah PT Bumi Suksesindo (BSI), pemegang izin usaha pertambangan operasi produksi untuk Tambang Tujuh Bukit; PT Damai Suksesindo (DSI), pemegang izin eksplorasi yang berdekatan; PT Batutua Tembaga Raya (BTR), pemegang izin usaha pertambangan operasi produksi khusus untuk pengolahan dan pemurnian; PT Batutua Kharisma Permai (BKP), pemegang izin usaha pertambangan operasi produksi untuk Tambang Tembaga Wetar; PT Merdeka Mining Servis (MMS), pemegang izin usaha jasa pertambangan; PT Pani Bersama Tambang (PBT), pemegang izin usaha pertambangan operasi produksi khusus untuk pengolahan dan pemurnian; dan PT Puncak Emas Tani Sejahtera (PETS), pemegang izin usaha pertambangan operasi produksi untuk Proyek Emas Pani.\n\nAset utama Perusahaan adalah Tambang Tujuh Bukit, sering disebut sebagai Proyek Heap Leach Tujuh Bukit, Tambang Tembaga Wetar, Proyek Emas Pani yang dalam pengembangan, dan deposit emas dan tembaga Tujuh Bukit yang dalam pengembangan.\n\nSelain itu, pada November 2018 Merdeka membeli 66,7% saham proyek emas di Gorontalo.  Pengembangan Proyek Emas Gorontalo memberi peluang penambangan emas dengan sumber daya terukur, tertunjuk dan tereka hingga 2.370.000 oz emas.\n\nSebagai perusahaan pertambangan Indonesia kelas dunia, Merdeka dimiliki oleh pemegang saham terkemuka termasuk PT Saratoga Investama Sedaya Tbk., PT Provident Capital Indonesia, dan Bapak Garibaldi Thohir. Ketiga pemegang saham utama Merdeka itu memiliki rekam jejak yang luar biasa dalam kesuksesan mengidentifikasi, mengembangkan, dan mengoperasikan beberapa perusahaan publik di Indonesia.",
+        "history": {
+            "amount": "839 B",
+            "board": "Papan Utama",
+            "date": "19 Jun 2015",
+            "price": "2,000",
+            "registrar": "",
+            "shares": "419,650,000",
+            "underwriters": [
+                "PT. Indo Premier Securities",
+                "PT. Bahana Securities"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "47.45%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837840",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Andrew Phillip Starkey"
+                },
+                {
+                    "id": "13837836",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Tang Honghui"
+                },
+                {
+                    "id": "13837835",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Yoke Candra"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837830",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Gavin Arnold Caudle"
+                },
+                {
+                    "id": "13837834",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Titien Supeno"
+                },
+                {
+                    "id": "13837833",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Chrisanthus Supriyo"
+                },
+                {
+                    "id": "13837832",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "David Thomas Fowler"
+                },
+                {
+                    "id": "13837831",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Hardi Wijaya Liong"
+                },
+                {
+                    "id": "13837829",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Jason Laurence Greive"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13837839",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Muhamad Munir"
+                },
+                {
+                    "id": "13837838",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Budi Bowoleksono"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13837837",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Edwin Soeryadjaya"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13837828",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:34+07:00",
+                    "value": "Albert Saputro"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12538123",
+                "key": "",
+                "lastupdate": "2022-03-07T16:55:31+07:00",
+                "value": "{\"name\":\"Adi Adriansyah Sjoekri\",\"phone\":\"02129880393\",\"email\":\"corporate.secretary@merdekacoppergold.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "50.436%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "12.34 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "19.473%",
+                "name": "PT SARATOGA INVESTAMA SEDAYA TBK",
+                "value": "4.77 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "11.88%",
+                "name": "PT MITRA DAYA MUSTIKA",
+                "value": "2.91 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "7.462%",
+                "name": "GARIBALDI THOHIR",
+                "value": "1.83 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "5.505%",
+                "name": "PT SUWARNA ARTA MANDIRI",
+                "value": "1.35 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "3.977%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "973.25 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.233%",
+                "name": "SAHAM TREASURY",
+                "value": "56.98 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Bumi Suksesindo",
+                "percentage": "99.89%",
+                "types": "Operasi produksi tambang",
+                "value": "504141298"
+            },
+            {
+                "company": "PT Merdeka Mining Servis",
+                "percentage": "99.99%",
+                "types": "Jasa Pertambangan",
+                "value": "11078509"
+            },
+            {
+                "company": "Eastern Field Development Limited",
+                "percentage": "100%",
+                "types": "Perusahaan Induk",
+                "value": "142647635"
+            },
+            {
+                "company": "PT Pani Bersama Jaya",
+                "percentage": "66.70%",
+                "types": "Perusahaan Induk",
+                "value": "12918159"
+            },
+            {
+                "company": "PT Batutua Pelita Investama",
+                "percentage": "99.83%",
+                "types": "Perusahaan Induk",
+                "value": "4020986"
+            },
+            {
+                "company": "PT Batutua Tembaga Raya",
+                "percentage": "78.00%",
+                "types": "Jasa Pengolahan dan Perdagangan",
+                "value": "279619510"
+            },
+            {
+                "company": "PT Bumi Suksesindo",
+                "percentage": "99.89%",
+                "types": "Pertambangan mineral",
+                "value": "513424392"
+            },
+            {
+                "company": "PT Merdeka Mining Servis",
+                "percentage": "99.99%",
+                "types": "Jasa pertambangan dan konstruksi",
+                "value": "10907343"
+            },
+            {
+                "company": "Eastern Field Development Limited",
+                "percentage": "100%",
+                "types": "Perusahaan induk",
+                "value": "176788095"
+            },
+            {
+                "company": "PT Pani Bersama Jaya",
+                "percentage": "66.70%",
+                "types": "Perusahaan induk",
+                "value": "13496218"
+            },
+            {
+                "company": "PT Batutua Pelita Investama",
+                "percentage": "99.83%",
+                "types": "Pertambangan mineral",
+                "value": "18020224"
+            },
+            {
+                "company": "PT Batutua Tembaga Raya",
+                "percentage": "100%",
+                "types": "Industri pembuatan logam dan perdagangan",
+                "value": "293079113"
+            },
+            {
+                "company": "PT Batutua Abadi Jaya",
+                "percentage": "99.99%",
+                "types": "Pertambangan mineral",
+                "value": "17580"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "42,298",
+                "change": 4321,
+                "change_formatted": "(+4,321)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "37,977",
+                "change": -4498,
+                "change_formatted": "(-4,498)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "42,475",
+                "change": -1802,
+                "change_formatted": "(-1,802)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "44,277",
+                "change": -646,
+                "change_formatted": "(-646)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "44,923",
+                "change": 4885,
+                "change_formatted": "(+4,885)"
+            },
+            {
+                "shareholder_date": "31 Mar 2025",
+                "total_share": "40,038",
+                "change": 638,
+                "change_formatted": "(+638)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.72%",
+                "name": "GAVIN ARNOLD CAUDLE",
+                "value": "176.23 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.284%",
+                "name": "HARDI WIJAYA LIONG",
+                "value": "69.60 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.011%",
+                "name": "ANDREW PHILLIP STARKEY",
+                "value": "2.63 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.008%",
+                "name": "ALBERT SAPUTRO",
+                "value": "2.09 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.008%",
+                "name": "TITIEN SUPENO",
+                "value": "1.87 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.002%",
+                "name": "JASON LAURENCE GREIVE",
+                "value": "578.20 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.001%",
+                "name": "DAVID THOMAS FOWLER",
+                "value": "339.20 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:24+00:00"
+}

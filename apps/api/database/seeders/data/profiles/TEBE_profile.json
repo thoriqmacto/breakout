@@ -1,0 +1,436 @@
+{
+    "symbol": "TEBE",
+    "name": "TEBE",
+    "address": [
+        {
+            "id": "1000002559",
+            "email": [
+                "corsec@tebe.co.id"
+            ],
+            "fax": "(021) 5010 6299",
+            "npwp": "02.742.141.1-019.000",
+            "phone": "(021) 5010 6300",
+            "website": "www.tebe.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:19+07:00",
+            "value": "<td colspan='4'>District 8 SCBD,\r\nTreasury Tower Lt. 15 H\r\nJl. Jend. Sudirman Lot 28, Kav. 52-53\r\nSudirman Central Business District (SCBD)\n\n        \t\t  \t\t\tPhone: (021) 5010 6300\n        \t\t  \t\t\tFax: (021) 5010 6299\n                            NPWP: 02.742.141.1-019.000\n        \t\t  \t\t\tEmail: corsec@tebe.co.id\n        \t\t  \t\t\tWebsite: www.tebe.co.id\n\n        \t  \t\t\t</td>",
+            "office": "District 8 SCBD, Treasury Tower Lt. 15 H Jl. Jend. Sudirman Lot 28, Kav. 52-53 Sudirman Central Business District (SCBD)"
+        }
+    ],
+    "background": "PT Dana Brata Luhur Tbk didirikan pada tanggal 26 Juni 2008. kegiatan utama PT Dana Brata Luhur Tbk adalah Aktivitas konsultasi manajemen lainnya, antara lain melakukan penyertaan modal dalam proyek dan/\natau perusahaan infrastuktur.\nKegiatan Usaha Penunjang :\na) Menjalankan kegiatan usaha dalam bidang jasa antara lain mencakup usaha penyiapan lahan\nuntuk jasa penunjang kegiatan pertambangan dan jasa bidang konstruksi pertambangan;\nb) Menjalankan kegiatan usaha dalam bidang perdagangan antara lain perdagangan besar bahan bakar padat, cair dan gas dan produk yang berhubungan dengan itu dan perdagangan besar logam\ndan bijih logam;\nc) Menjalankan kegiatan usaha dalam bidang perindustrian yaitu industri pengolahan barang- barang dari hasil pertambangan;",
+    "history": {
+        "amount": "38 B",
+        "board": "Pemantauan Khusus",
+        "date": "18 Nov 2019",
+        "price": "1,095",
+        "registrar": "",
+        "shares": "35,000,000",
+        "underwriters": [
+            "PT. Victoria Sekuritas Indonesia",
+            "PT. Surya Fajar Sekuritas"
+        ],
+        "administrative_bureau": "PT. Adimitra Jasa Korpora",
+        "free_float": "23.09%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "14845483",
+                "key": "Director",
+                "lastupdate": "2025-08-14T17:11:56+07:00",
+                "value": "WELLY SUSANTO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "14845485",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-14T17:11:56+07:00",
+                "value": "INDRA SURYA"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "14845484",
+                "key": "President Commissioner",
+                "lastupdate": "2025-08-14T17:11:56+07:00",
+                "value": "JUNAIDI, S.H., LL.M;"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "14845482",
+                "key": "President Director",
+                "lastupdate": "2025-08-14T17:11:56+07:00",
+                "value": "GT DENNY RAMDHANI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12535791",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:19+07:00",
+            "value": "{\"name\":\"Ayu Yusman\",\"phone\":\"(021) 5010 6300\",\"email\":\"corsec@tebe.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "76.91%",
+            "name": "PT DUA SAMUDERA PERKASA",
+            "value": "988.34 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "23.09%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "296.66 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Pelabuhan Talenta Bumi",
+            "percentage": "99.96%",
+            "types": "Berusaha dalam bidang Jasa\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nPengolahan Pelabuhan batubara.",
+            "value": "51345979"
+        },
+        {
+            "company": "PT Talenta Bumi Energi",
+            "percentage": "99.96%",
+            "types": "Berusaha dalam bidang\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nPerdagangan batubara.",
+            "value": "2603717"
+        },
+        {
+            "company": "PT Talenta Bumi",
+            "percentage": "99.15%",
+            "types": "Berusaha dalam bidang\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\npenyediaan jasa pengangkutan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\ndan pelabuhan batubara",
+            "value": "719507433"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "6,931",
+            "change": 1942,
+            "change_formatted": "(+1,942)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "4,989",
+            "change": -457,
+            "change_formatted": "(-457)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "5,446",
+            "change": 146,
+            "change_formatted": "(+146)"
+        },
+        {
+            "shareholder_date": "16 Jul 2025",
+            "total_share": "5,300",
+            "change": 0,
+            "change_formatted": "(0)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "5,300",
+            "change": -160,
+            "change_formatted": "(-160)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "5,460",
+            "change": 305,
+            "change_formatted": "(+305)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2019-11-18T00:00:00+07:00",
+    "ipo_price": 1095,
+    "float": 23.09,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000002559",
+                "email": [
+                    "corsec@tebe.co.id"
+                ],
+                "fax": "(021) 5010 6299",
+                "npwp": "02.742.141.1-019.000",
+                "phone": "(021) 5010 6300",
+                "website": "www.tebe.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:19+07:00",
+                "value": "<td colspan='4'>District 8 SCBD,\r\nTreasury Tower Lt. 15 H\r\nJl. Jend. Sudirman Lot 28, Kav. 52-53\r\nSudirman Central Business District (SCBD)\n\n        \t\t  \t\t\tPhone: (021) 5010 6300\n        \t\t  \t\t\tFax: (021) 5010 6299\n                            NPWP: 02.742.141.1-019.000\n        \t\t  \t\t\tEmail: corsec@tebe.co.id\n        \t\t  \t\t\tWebsite: www.tebe.co.id\n\n        \t  \t\t\t</td>",
+                "office": "District 8 SCBD, Treasury Tower Lt. 15 H Jl. Jend. Sudirman Lot 28, Kav. 52-53 Sudirman Central Business District (SCBD)"
+            }
+        ],
+        "background": "PT Dana Brata Luhur Tbk didirikan pada tanggal 26 Juni 2008. kegiatan utama PT Dana Brata Luhur Tbk adalah Aktivitas konsultasi manajemen lainnya, antara lain melakukan penyertaan modal dalam proyek dan/\natau perusahaan infrastuktur.\nKegiatan Usaha Penunjang :\na) Menjalankan kegiatan usaha dalam bidang jasa antara lain mencakup usaha penyiapan lahan\nuntuk jasa penunjang kegiatan pertambangan dan jasa bidang konstruksi pertambangan;\nb) Menjalankan kegiatan usaha dalam bidang perdagangan antara lain perdagangan besar bahan bakar padat, cair dan gas dan produk yang berhubungan dengan itu dan perdagangan besar logam\ndan bijih logam;\nc) Menjalankan kegiatan usaha dalam bidang perindustrian yaitu industri pengolahan barang- barang dari hasil pertambangan;",
+        "history": {
+            "amount": "38 B",
+            "board": "Pemantauan Khusus",
+            "date": "18 Nov 2019",
+            "price": "1,095",
+            "registrar": "",
+            "shares": "35,000,000",
+            "underwriters": [
+                "PT. Victoria Sekuritas Indonesia",
+                "PT. Surya Fajar Sekuritas"
+            ],
+            "administrative_bureau": "PT. Adimitra Jasa Korpora",
+            "free_float": "23.09%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "14845483",
+                    "key": "Director",
+                    "lastupdate": "2025-08-14T17:11:56+07:00",
+                    "value": "WELLY SUSANTO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "14845485",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-14T17:11:56+07:00",
+                    "value": "INDRA SURYA"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "14845484",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-08-14T17:11:56+07:00",
+                    "value": "JUNAIDI, S.H., LL.M;"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "14845482",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-14T17:11:56+07:00",
+                    "value": "GT DENNY RAMDHANI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12535791",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:19+07:00",
+                "value": "{\"name\":\"Ayu Yusman\",\"phone\":\"(021) 5010 6300\",\"email\":\"corsec@tebe.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "76.91%",
+                "name": "PT DUA SAMUDERA PERKASA",
+                "value": "988.34 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "23.09%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "296.66 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Pelabuhan Talenta Bumi",
+                "percentage": "99.96%",
+                "types": "Berusaha dalam bidang Jasa\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nPengolahan Pelabuhan batubara.",
+                "value": "51345979"
+            },
+            {
+                "company": "PT Talenta Bumi Energi",
+                "percentage": "99.96%",
+                "types": "Berusaha dalam bidang\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\nPerdagangan batubara.",
+                "value": "2603717"
+            },
+            {
+                "company": "PT Talenta Bumi",
+                "percentage": "99.15%",
+                "types": "Berusaha dalam bidang\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\npenyediaan jasa pengangkutan\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\ndan pelabuhan batubara",
+                "value": "719507433"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "6,931",
+                "change": 1942,
+                "change_formatted": "(+1,942)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "4,989",
+                "change": -457,
+                "change_formatted": "(-457)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "5,446",
+                "change": 146,
+                "change_formatted": "(+146)"
+            },
+            {
+                "shareholder_date": "16 Jul 2025",
+                "total_share": "5,300",
+                "change": 0,
+                "change_formatted": "(0)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "5,300",
+                "change": -160,
+                "change_formatted": "(-160)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "5,460",
+                "change": 305,
+                "change_formatted": "(+305)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:31+00:00"
+}

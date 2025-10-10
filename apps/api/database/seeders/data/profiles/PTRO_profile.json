@@ -1,0 +1,658 @@
+{
+    "symbol": "PTRO",
+    "name": "PTRO",
+    "address": [
+        {
+            "id": "347",
+            "email": [
+                "corporate.secretary@petrosea.com"
+            ],
+            "fax": "021-29770988",
+            "npwp": "01.001.703.6-091.000",
+            "phone": "021-29770999",
+            "website": "www.petrosea.com",
+            "key": "",
+            "lastupdate": "2025-07-02T02:03:01+07:00",
+            "value": "",
+            "office": "Wisma Barito Pacific, Jl. Let. Jend. S. Parman Kav. 62-63, Kelurahan Slipi, Kecamatan Palmerah, Jakarta Barat, Jakarta 11410"
+        }
+    ],
+    "background": "PT Petrosea Tbk adalah satu-satunya perusahaan nasional yang menyediakan jasa pertambangan lengkap di sektor industri batubara, minyak dan gas bumi di indonesia. Perusahaan menyediakan multi disiplin rekayasa, jasa konstruksi, contracting, jasa pertambangan, penyediaan perbekalan (logistic) dan peralatan untuk mendukung kegiatan/operasi industri minyak, gas bumi, sektor pertambangan dan pengembangan infrastruktur di dalam wilayah Indonesia maupun di luar wilayah Indonesia. Anak usaha PT Indika Energy Tbk (INDY) ini mempunyai pusat operasional di pulau Kalimantan.",
+    "history": {
+        "amount": "-",
+        "board": "Papan Utama",
+        "date": "21 May 1990",
+        "price": "0",
+        "registrar": "",
+        "shares": "",
+        "underwriters": [
+            "PT. Multicor"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "27.05%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13839016",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Jend. Pol. (Purn.) Drs. Sutanto"
+            },
+            {
+                "id": "13839015",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Erwin Ciputra"
+            },
+            {
+                "id": "13839014",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Djauhar Maulidi S.E., M.B.A."
+            },
+            {
+                "id": "13839013",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Prof. Ginandjar Kartasasmita"
+            }
+        ],
+        "director": [
+            {
+                "id": "13839008",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Kartika Hendrawan"
+            },
+            {
+                "id": "13839011",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Iman Darus Hikhman"
+            },
+            {
+                "id": "13839010",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Meinar Kusumastuti"
+            },
+            {
+                "id": "13839009",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Ruddy Santoso"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13839017",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Setia Untung Arimuladi S.H., M.Hum"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13839007",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Michael"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "13839012",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:35+07:00",
+                "value": "Osman Sitorus"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12531829",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:51+07:00",
+            "value": "{\"name\":\"Anto Broto\",\"phone\":\"021-29770999\",\"email\":\"corporate.secretary@petrosea.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "45.313%",
+            "name": "PT KREASI JASA PERSADA",
+            "value": "4.57 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "27.046%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "2.73 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "26.585%",
+            "name": "PT CARAKA REKSA OPTIMA",
+            "value": "2.68 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.9169%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "92.42 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Karya Bhumi Lestari",
+            "percentage": "99.99%",
+            "types": "Mining Support Services",
+            "value": "10400"
+        },
+        {
+            "company": "PT Kuala Pelabuhan Indonesia",
+            "percentage": "95.00%",
+            "types": "Port Operation, Transportation Contracting (Roads), and the rendering of Service",
+            "value": "13734"
+        },
+        {
+            "company": "PTP Investment Pte. Ltd",
+            "percentage": "100%",
+            "types": "Investment",
+            "value": "639"
+        },
+        {
+            "company": "PT Petrosea Kalimantan",
+            "percentage": "99.80%",
+            "types": "Trading and Contractor",
+            "value": "38"
+        },
+        {
+            "company": "PT POSB Infrastructure Indonesia",
+            "percentage": "99.80%",
+            "types": "Special Port Management",
+            "value": "1465"
+        },
+        {
+            "company": "PT Petrosea Rekayasa dan Konstruksi Indonesia",
+            "percentage": "99.90%",
+            "types": "Engineering Services",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "38,721",
+            "change": -6892,
+            "change_formatted": "(-6,892)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "45,613",
+            "change": -6501,
+            "change_formatted": "(-6,501)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "52,114",
+            "change": -5686,
+            "change_formatted": "(-5,686)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "57,800",
+            "change": 730,
+            "change_formatted": "(+730)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "57,070",
+            "change": -1906,
+            "change_formatted": "(-1,906)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "58,976",
+            "change": -1687,
+            "change_formatted": "(-1,687)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.1%",
+            "name": "ERWIN CIPUTRA",
+            "value": "10.05 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.02%",
+            "name": "MICHAEL",
+            "value": "2.07 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.019%",
+            "name": "KARTIKA HENDRAWAN",
+            "value": "1.94 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0001%",
+            "name": "MEINAR KUSUMASTUTI",
+            "value": "14.80 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1990-05-21T00:00:00+07:00",
+    "ipo_price": 0,
+    "float": 27.05,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "347",
+                "email": [
+                    "corporate.secretary@petrosea.com"
+                ],
+                "fax": "021-29770988",
+                "npwp": "01.001.703.6-091.000",
+                "phone": "021-29770999",
+                "website": "www.petrosea.com",
+                "key": "",
+                "lastupdate": "2025-07-02T02:03:01+07:00",
+                "value": "",
+                "office": "Wisma Barito Pacific, Jl. Let. Jend. S. Parman Kav. 62-63, Kelurahan Slipi, Kecamatan Palmerah, Jakarta Barat, Jakarta 11410"
+            }
+        ],
+        "background": "PT Petrosea Tbk adalah satu-satunya perusahaan nasional yang menyediakan jasa pertambangan lengkap di sektor industri batubara, minyak dan gas bumi di indonesia. Perusahaan menyediakan multi disiplin rekayasa, jasa konstruksi, contracting, jasa pertambangan, penyediaan perbekalan (logistic) dan peralatan untuk mendukung kegiatan/operasi industri minyak, gas bumi, sektor pertambangan dan pengembangan infrastruktur di dalam wilayah Indonesia maupun di luar wilayah Indonesia. Anak usaha PT Indika Energy Tbk (INDY) ini mempunyai pusat operasional di pulau Kalimantan.",
+        "history": {
+            "amount": "-",
+            "board": "Papan Utama",
+            "date": "21 May 1990",
+            "price": "0",
+            "registrar": "",
+            "shares": "",
+            "underwriters": [
+                "PT. Multicor"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "27.05%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13839016",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Jend. Pol. (Purn.) Drs. Sutanto"
+                },
+                {
+                    "id": "13839015",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Erwin Ciputra"
+                },
+                {
+                    "id": "13839014",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Djauhar Maulidi S.E., M.B.A."
+                },
+                {
+                    "id": "13839013",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Prof. Ginandjar Kartasasmita"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13839008",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Kartika Hendrawan"
+                },
+                {
+                    "id": "13839011",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Iman Darus Hikhman"
+                },
+                {
+                    "id": "13839010",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Meinar Kusumastuti"
+                },
+                {
+                    "id": "13839009",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Ruddy Santoso"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13839017",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Setia Untung Arimuladi S.H., M.Hum"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13839007",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Michael"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "13839012",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:35+07:00",
+                    "value": "Osman Sitorus"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12531829",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:51+07:00",
+                "value": "{\"name\":\"Anto Broto\",\"phone\":\"021-29770999\",\"email\":\"corporate.secretary@petrosea.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "45.313%",
+                "name": "PT KREASI JASA PERSADA",
+                "value": "4.57 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "27.046%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "2.73 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "26.585%",
+                "name": "PT CARAKA REKSA OPTIMA",
+                "value": "2.68 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.9169%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "92.42 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Karya Bhumi Lestari",
+                "percentage": "99.99%",
+                "types": "Mining Support Services",
+                "value": "10400"
+            },
+            {
+                "company": "PT Kuala Pelabuhan Indonesia",
+                "percentage": "95.00%",
+                "types": "Port Operation, Transportation Contracting (Roads), and the rendering of Service",
+                "value": "13734"
+            },
+            {
+                "company": "PTP Investment Pte. Ltd",
+                "percentage": "100%",
+                "types": "Investment",
+                "value": "639"
+            },
+            {
+                "company": "PT Petrosea Kalimantan",
+                "percentage": "99.80%",
+                "types": "Trading and Contractor",
+                "value": "38"
+            },
+            {
+                "company": "PT POSB Infrastructure Indonesia",
+                "percentage": "99.80%",
+                "types": "Special Port Management",
+                "value": "1465"
+            },
+            {
+                "company": "PT Petrosea Rekayasa dan Konstruksi Indonesia",
+                "percentage": "99.90%",
+                "types": "Engineering Services",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "38,721",
+                "change": -6892,
+                "change_formatted": "(-6,892)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "45,613",
+                "change": -6501,
+                "change_formatted": "(-6,501)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "52,114",
+                "change": -5686,
+                "change_formatted": "(-5,686)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "57,800",
+                "change": 730,
+                "change_formatted": "(+730)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "57,070",
+                "change": -1906,
+                "change_formatted": "(-1,906)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "58,976",
+                "change": -1687,
+                "change_formatted": "(-1,687)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.1%",
+                "name": "ERWIN CIPUTRA",
+                "value": "10.05 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.02%",
+                "name": "MICHAEL",
+                "value": "2.07 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.019%",
+                "name": "KARTIKA HENDRAWAN",
+                "value": "1.94 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0001%",
+                "name": "MEINAR KUSUMASTUTI",
+                "value": "14.80 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:29+00:00"
+}

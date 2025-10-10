@@ -1,0 +1,768 @@
+{
+    "symbol": "EXCL",
+    "name": "EXCL",
+    "address": [
+        {
+            "id": "158",
+            "email": [
+                "Corpsec@xlsmart.co.id"
+            ],
+            "fax": "(021) 576 1880",
+            "npwp": "0013452768092000",
+            "phone": "(021) 576 1881",
+            "website": "https://www.xlsmart.co.id/",
+            "key": "",
+            "lastupdate": "2025-04-21T02:02:21+07:00",
+            "value": "",
+            "office": "Gedung XLSMART Tower Jl. HR Rasuna Said Kav 11-12 Blok X-5 RT.007 RW 002 Kuningan Timur Setiabudi Jakarta Selatan DKI Jakarta 12950"
+        }
+    ],
+    "background": "PT XLSMART Telecom Sejahtera Tbk., yang awalnya berdiri sebagai PT Grahametropolitan Lestari pada 6 Oktober 1989 dan bergerak di bidang perdagangan dan jasa umum, kemudian bertransformasi ke sektor telekomunikasi. Kini, perusahaan ini fokus pada penyediaan layanan data, voice, SMS, dan digital dengan jaringan luas serta inovasi teknologi terkini seperti 4.5G Ready, 4.9G Massive MIMO, dan pengembangan jaringan 5G. Sejak rebranding pada tahun 2009 dan bergabung dengan Axiata Group, PT XLSMART Telecom Sejahtera Tbk. memiliki anak usaha serta perusahaan asosiasi internasional, antara lain CelcomDigi di Malaysia, Dialog di Sri Lanka, Robi di Bangladesh, Smart di Kamboja, dan Ncell di Nepal.",
+    "history": {
+        "amount": "2,855 B",
+        "board": "Papan Utama",
+        "date": "29 Sep 2005",
+        "price": "2,000",
+        "registrar": "",
+        "shares": "1,427,500,032",
+        "underwriters": [
+            "PT. CIMB Niaga Securities",
+            "PT. GK Goh Indonesia"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "23.85%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "14805802",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "DAVID ROBERT DEAN"
+            },
+            {
+                "id": "14805801",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "LAY KRISNAN CAHYA"
+            },
+            {
+                "id": "14805797",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "SEAN QUEK CHIN HAUR"
+            },
+            {
+                "id": "14805796",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "NIK RIZAL KAMIL BIN NIK IBRAHIM KAMIL"
+            },
+            {
+                "id": "14805795",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "VIVEK SOOD"
+            }
+        ],
+        "director": [
+            {
+                "id": "14805800",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "SANJAY KUMAR GORDHAN A VAGHASIA"
+            },
+            {
+                "id": "14805799",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "SHURISH SUBBRAMANIAM"
+            },
+            {
+                "id": "14805798",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "FEIRUZ IKHWAN BIN ABDUL MALEK"
+            },
+            {
+                "id": "14805794",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "ANDRIJANTO MULJONO"
+            },
+            {
+                "id": "14805793",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "DAVID ARCELUS OSES"
+            },
+            {
+                "id": "14805790",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "MERZA FACHYS"
+            },
+            {
+                "id": "14805787",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "JEREMIAH RATADHI"
+            },
+            {
+                "id": "14805786",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "YESSIE DIANTY YOSETYA"
+            },
+            {
+                "id": "14805785",
+                "key": "Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "ANTONY SUSILO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "14805791",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "RETNO LESTARI PRIANSARI MARSUDI"
+            },
+            {
+                "id": "14805789",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "ROBERT PAKPAHAN"
+            },
+            {
+                "id": "14805784",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "WILLEM LUCAS TIMMERMANS"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "14805788",
+                "key": "President Commissioner",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "M. ARSJAD RASJID P.M."
+            }
+        ],
+        "president_director": [
+            {
+                "id": "14805792",
+                "key": "President Director",
+                "lastupdate": "2025-08-12T16:01:10+07:00",
+                "value": "RAJEEV SETHI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529557",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:51+07:00",
+            "value": "{\"name\":\"Ranty Astari Rachman\",\"phone\":\"(62-21) 576 1881\",\"email\":\"Rantya@xl.co.id \"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "34.691%",
+            "name": "AXIATA INVESTMENTS (INDONESIA) SDN. BHD.",
+            "value": "6.31 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "26.463%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "4.82 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "24.568%",
+            "name": "PT BALI MEDIA TELEKOMUNIKASI",
+            "value": "4.47 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "6.0148%",
+            "name": "SAHAM TREASURY",
+            "value": "1.09 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "4.663%",
+            "name": "PT GLOBAL NUSA DATA",
+            "value": "848.72 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "2.847%",
+            "name": "PT WAHANA INTI NUSANTARA",
+            "value": "518.11 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.7199%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "131.05 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "222,020",
+            "change": -561,
+            "change_formatted": "(-561)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "222,581",
+            "change": -1779,
+            "change_formatted": "(-1,779)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "224,360",
+            "change": -1581,
+            "change_formatted": "(-1,581)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "225,941",
+            "change": -1733,
+            "change_formatted": "(-1,733)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "227,674",
+            "change": -953,
+            "change_formatted": "(-953)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "228,627",
+            "change": 210761,
+            "change_formatted": "(+210,761)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.0222%",
+            "name": "DAVID ARCELUS OSES",
+            "value": "4.03 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0083%",
+            "name": "YESSIE DIANTY YOSETYA",
+            "value": "1.52 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0016%",
+            "name": "SANJAY KUMAR GORDHAN A VAGHASIA",
+            "value": "300.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0012%",
+            "name": "FEIRUZ IKHWAN BIN ABDUL MALEK",
+            "value": "222.13 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ANDRIJANTO MULJONO",
+            "value": "66.00",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2005-09-29T00:00:00+07:00",
+    "ipo_price": 2000,
+    "float": 23.85,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "158",
+                "email": [
+                    "Corpsec@xlsmart.co.id"
+                ],
+                "fax": "(021) 576 1880",
+                "npwp": "0013452768092000",
+                "phone": "(021) 576 1881",
+                "website": "https://www.xlsmart.co.id/",
+                "key": "",
+                "lastupdate": "2025-04-21T02:02:21+07:00",
+                "value": "",
+                "office": "Gedung XLSMART Tower Jl. HR Rasuna Said Kav 11-12 Blok X-5 RT.007 RW 002 Kuningan Timur Setiabudi Jakarta Selatan DKI Jakarta 12950"
+            }
+        ],
+        "background": "PT XLSMART Telecom Sejahtera Tbk., yang awalnya berdiri sebagai PT Grahametropolitan Lestari pada 6 Oktober 1989 dan bergerak di bidang perdagangan dan jasa umum, kemudian bertransformasi ke sektor telekomunikasi. Kini, perusahaan ini fokus pada penyediaan layanan data, voice, SMS, dan digital dengan jaringan luas serta inovasi teknologi terkini seperti 4.5G Ready, 4.9G Massive MIMO, dan pengembangan jaringan 5G. Sejak rebranding pada tahun 2009 dan bergabung dengan Axiata Group, PT XLSMART Telecom Sejahtera Tbk. memiliki anak usaha serta perusahaan asosiasi internasional, antara lain CelcomDigi di Malaysia, Dialog di Sri Lanka, Robi di Bangladesh, Smart di Kamboja, dan Ncell di Nepal.",
+        "history": {
+            "amount": "2,855 B",
+            "board": "Papan Utama",
+            "date": "29 Sep 2005",
+            "price": "2,000",
+            "registrar": "",
+            "shares": "1,427,500,032",
+            "underwriters": [
+                "PT. CIMB Niaga Securities",
+                "PT. GK Goh Indonesia"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "23.85%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "14805802",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "DAVID ROBERT DEAN"
+                },
+                {
+                    "id": "14805801",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "LAY KRISNAN CAHYA"
+                },
+                {
+                    "id": "14805797",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "SEAN QUEK CHIN HAUR"
+                },
+                {
+                    "id": "14805796",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "NIK RIZAL KAMIL BIN NIK IBRAHIM KAMIL"
+                },
+                {
+                    "id": "14805795",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "VIVEK SOOD"
+                }
+            ],
+            "director": [
+                {
+                    "id": "14805800",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "SANJAY KUMAR GORDHAN A VAGHASIA"
+                },
+                {
+                    "id": "14805799",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "SHURISH SUBBRAMANIAM"
+                },
+                {
+                    "id": "14805798",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "FEIRUZ IKHWAN BIN ABDUL MALEK"
+                },
+                {
+                    "id": "14805794",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "ANDRIJANTO MULJONO"
+                },
+                {
+                    "id": "14805793",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "DAVID ARCELUS OSES"
+                },
+                {
+                    "id": "14805790",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "MERZA FACHYS"
+                },
+                {
+                    "id": "14805787",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "JEREMIAH RATADHI"
+                },
+                {
+                    "id": "14805786",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "YESSIE DIANTY YOSETYA"
+                },
+                {
+                    "id": "14805785",
+                    "key": "Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "ANTONY SUSILO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "14805791",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "RETNO LESTARI PRIANSARI MARSUDI"
+                },
+                {
+                    "id": "14805789",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "ROBERT PAKPAHAN"
+                },
+                {
+                    "id": "14805784",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "WILLEM LUCAS TIMMERMANS"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "14805788",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "M. ARSJAD RASJID P.M."
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "14805792",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-12T16:01:10+07:00",
+                    "value": "RAJEEV SETHI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529557",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:51+07:00",
+                "value": "{\"name\":\"Ranty Astari Rachman\",\"phone\":\"(62-21) 576 1881\",\"email\":\"Rantya@xl.co.id \"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "34.691%",
+                "name": "AXIATA INVESTMENTS (INDONESIA) SDN. BHD.",
+                "value": "6.31 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "26.463%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "4.82 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "24.568%",
+                "name": "PT BALI MEDIA TELEKOMUNIKASI",
+                "value": "4.47 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "6.0148%",
+                "name": "SAHAM TREASURY",
+                "value": "1.09 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "4.663%",
+                "name": "PT GLOBAL NUSA DATA",
+                "value": "848.72 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "2.847%",
+                "name": "PT WAHANA INTI NUSANTARA",
+                "value": "518.11 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.7199%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "131.05 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "222,020",
+                "change": -561,
+                "change_formatted": "(-561)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "222,581",
+                "change": -1779,
+                "change_formatted": "(-1,779)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "224,360",
+                "change": -1581,
+                "change_formatted": "(-1,581)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "225,941",
+                "change": -1733,
+                "change_formatted": "(-1,733)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "227,674",
+                "change": -953,
+                "change_formatted": "(-953)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "228,627",
+                "change": 210761,
+                "change_formatted": "(+210,761)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.0222%",
+                "name": "DAVID ARCELUS OSES",
+                "value": "4.03 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0083%",
+                "name": "YESSIE DIANTY YOSETYA",
+                "value": "1.52 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0016%",
+                "name": "SANJAY KUMAR GORDHAN A VAGHASIA",
+                "value": "300.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0012%",
+                "name": "FEIRUZ IKHWAN BIN ABDUL MALEK",
+                "value": "222.13 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ANDRIJANTO MULJONO",
+                "value": "66.00",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:17+00:00"
+}

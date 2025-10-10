@@ -1,0 +1,536 @@
+{
+    "symbol": "UNVR",
+    "name": "UNVR",
+    "address": [
+        {
+            "id": "449",
+            "email": [
+                "unvr.indonesia@unilever.com"
+            ],
+            "fax": "021- 80827002",
+            "npwp": "01.001.701.0-092.000",
+            "phone": "021- 80827000 ",
+            "website": "http://www.unilever.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:16+07:00",
+            "value": "<td colspan='4'>Grha Unilever\r\nBSD Green Office Park Kav. 3\r\nJln BSD Boulevard Barat, BSD City\r\nTangerang 15345\n\n        \t\t  \t\t\tPhone: 021- 80827000 \n        \t\t  \t\t\tFax: 021- 80827002\n                            NPWP: 01.001.701.0-092.000\n        \t\t  \t\t\tEmail: unvr.indonesia@unilever.com\n        \t\t  \t\t\tWebsite: http://www.unilever.com\n\n        \t  \t\t\t</td>",
+            "office": "Grha Unilever BSD Green Office Park Kav. 3 Jln BSD Boulevard Barat, BSD City Tangerang 15345"
+        }
+    ],
+    "background": "PT Unilever Indonesia Tbk merupakan perusahaan yang bergerak dalam pembuatan, pemasaran dan distribusi barang konsumen yang laku keras (FMCG). Kegiatan bisnis utama Perusahaan terbagi ke dalam dua segmen operasi: Kebutuhan Rumah Tangga dan Perawatan Tubuh yang meliputi produk kosmetik, dan juga produk-produk pembersih rumah tangga dan tubuh seperti deterjen, sabun, sampo, obat gigi, deodoran, dan Makanan dan Minuman, yang meliputi produk-produk makanan dan minuman, seperti es krim, kantong teh, kecap, minuman sari buah, bumbu-bumbu masak dan margarin. Sebagian dari merek utama untuk produk kebutuhan rumah tangga dan perawatan tubuh adalah Rinso, Lifebuoy, Clear, Pepsodent, Rexona dan Pond's, Lux, Vaseline, Sunlight, dan lainnya; merek utama untuk produk makanan dan minuman adalah Wall's, SariWangi, Bango, Buavita, Royco, Magnum, Paddle Pop, Feast, dan lain-lain.",
+    "history": {
+        "amount": "-",
+        "board": "Papan Utama",
+        "date": "11 Jan 1982",
+        "price": "0",
+        "registrar": "",
+        "shares": "",
+        "underwriters": [
+            "PT. Aseam Indonesia",
+            "PT. Danareksa (Persero)",
+            "PT. Merchant Investment Corporation"
+        ],
+        "administrative_bureau": "PT. Sharestar Indonesia",
+        "free_float": "14.49%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "13840416",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Vivek Agarwal"
+            },
+            {
+                "id": "13840415",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Neeraj Lal"
+            },
+            {
+                "id": "13840413",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Vandana Suri"
+            },
+            {
+                "id": "13840412",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Alejandro Meinardo Santos Concha"
+            },
+            {
+                "id": "13840411",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Willy Saelan"
+            },
+            {
+                "id": "13840410",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Enny Hartati"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13840421",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Alissa Wahid "
+            },
+            {
+                "id": "13840420",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Fauzi Ichsan"
+            },
+            {
+                "id": "13840419",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Ignasius Jonan"
+            },
+            {
+                "id": "13840418",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Debora Herawati Sadrach"
+            },
+            {
+                "id": "13840417",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Alexander Rusli"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13840422",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Sanjiv Mehta"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13840414",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:58+07:00",
+                "value": "Benjie Go Yap"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12533070",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:16+07:00",
+            "value": "{\"name\":\"Ibu Reski Damayanti\",\"phone\":\"021-80827000\",\"email\":\"unvr.indonesia@unilever.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "84.99%",
+            "name": "UNILEVER INDONESIA HOLDING B.V.",
+            "value": "32.42 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "14.49%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.53 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.52%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "197.05 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "Unilever Indonesia, Tbk",
+            "percentage": "0.00%",
+            "types": "Manufacturing, Marketing and distribution of consumer goods",
+            "value": "21645929"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "112,863",
+            "change": -3435,
+            "change_formatted": "(-3,435)"
+        },
+        {
+            "shareholder_date": "8 Aug 2025",
+            "total_share": "116,298",
+            "change": -1402,
+            "change_formatted": "(-1,402)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "116,298",
+            "change": -1402,
+            "change_formatted": "(-1,402)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "117,700",
+            "change": -117,
+            "change_formatted": "(-117)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "117,817",
+            "change": -2702,
+            "change_formatted": "(-2,702)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "120,519",
+            "change": 1968,
+            "change_formatted": "(+1,968)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1982-01-11T00:00:00+07:00",
+    "ipo_price": 0,
+    "float": 14.49,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "449",
+                "email": [
+                    "unvr.indonesia@unilever.com"
+                ],
+                "fax": "021- 80827002",
+                "npwp": "01.001.701.0-092.000",
+                "phone": "021- 80827000 ",
+                "website": "http://www.unilever.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:16+07:00",
+                "value": "<td colspan='4'>Grha Unilever\r\nBSD Green Office Park Kav. 3\r\nJln BSD Boulevard Barat, BSD City\r\nTangerang 15345\n\n        \t\t  \t\t\tPhone: 021- 80827000 \n        \t\t  \t\t\tFax: 021- 80827002\n                            NPWP: 01.001.701.0-092.000\n        \t\t  \t\t\tEmail: unvr.indonesia@unilever.com\n        \t\t  \t\t\tWebsite: http://www.unilever.com\n\n        \t  \t\t\t</td>",
+                "office": "Grha Unilever BSD Green Office Park Kav. 3 Jln BSD Boulevard Barat, BSD City Tangerang 15345"
+            }
+        ],
+        "background": "PT Unilever Indonesia Tbk merupakan perusahaan yang bergerak dalam pembuatan, pemasaran dan distribusi barang konsumen yang laku keras (FMCG). Kegiatan bisnis utama Perusahaan terbagi ke dalam dua segmen operasi: Kebutuhan Rumah Tangga dan Perawatan Tubuh yang meliputi produk kosmetik, dan juga produk-produk pembersih rumah tangga dan tubuh seperti deterjen, sabun, sampo, obat gigi, deodoran, dan Makanan dan Minuman, yang meliputi produk-produk makanan dan minuman, seperti es krim, kantong teh, kecap, minuman sari buah, bumbu-bumbu masak dan margarin. Sebagian dari merek utama untuk produk kebutuhan rumah tangga dan perawatan tubuh adalah Rinso, Lifebuoy, Clear, Pepsodent, Rexona dan Pond's, Lux, Vaseline, Sunlight, dan lainnya; merek utama untuk produk makanan dan minuman adalah Wall's, SariWangi, Bango, Buavita, Royco, Magnum, Paddle Pop, Feast, dan lain-lain.",
+        "history": {
+            "amount": "-",
+            "board": "Papan Utama",
+            "date": "11 Jan 1982",
+            "price": "0",
+            "registrar": "",
+            "shares": "",
+            "underwriters": [
+                "PT. Aseam Indonesia",
+                "PT. Danareksa (Persero)",
+                "PT. Merchant Investment Corporation"
+            ],
+            "administrative_bureau": "PT. Sharestar Indonesia",
+            "free_float": "14.49%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "13840416",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Vivek Agarwal"
+                },
+                {
+                    "id": "13840415",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Neeraj Lal"
+                },
+                {
+                    "id": "13840413",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Vandana Suri"
+                },
+                {
+                    "id": "13840412",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Alejandro Meinardo Santos Concha"
+                },
+                {
+                    "id": "13840411",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Willy Saelan"
+                },
+                {
+                    "id": "13840410",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Enny Hartati"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13840421",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Alissa Wahid "
+                },
+                {
+                    "id": "13840420",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Fauzi Ichsan"
+                },
+                {
+                    "id": "13840419",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Ignasius Jonan"
+                },
+                {
+                    "id": "13840418",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Debora Herawati Sadrach"
+                },
+                {
+                    "id": "13840417",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Alexander Rusli"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13840422",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Sanjiv Mehta"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13840414",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:58+07:00",
+                    "value": "Benjie Go Yap"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12533070",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:16+07:00",
+                "value": "{\"name\":\"Ibu Reski Damayanti\",\"phone\":\"021-80827000\",\"email\":\"unvr.indonesia@unilever.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "84.99%",
+                "name": "UNILEVER INDONESIA HOLDING B.V.",
+                "value": "32.42 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "14.49%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.53 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.52%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "197.05 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "Unilever Indonesia, Tbk",
+                "percentage": "0.00%",
+                "types": "Manufacturing, Marketing and distribution of consumer goods",
+                "value": "21645929"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "112,863",
+                "change": -3435,
+                "change_formatted": "(-3,435)"
+            },
+            {
+                "shareholder_date": "8 Aug 2025",
+                "total_share": "116,298",
+                "change": -1402,
+                "change_formatted": "(-1,402)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "116,298",
+                "change": -1402,
+                "change_formatted": "(-1,402)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "117,700",
+                "change": -117,
+                "change_formatted": "(-117)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "117,817",
+                "change": -2702,
+                "change_formatted": "(-2,702)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "120,519",
+                "change": 1968,
+                "change_formatted": "(+1,968)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:34+00:00"
+}

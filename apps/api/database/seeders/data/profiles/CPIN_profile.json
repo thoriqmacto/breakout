@@ -1,0 +1,604 @@
+{
+    "symbol": "CPIN",
+    "name": "CPIN",
+    "address": [
+        {
+            "id": "123",
+            "email": [
+                "hadijanto@cp.co.id"
+            ],
+            "fax": "021-690 7324",
+            "npwp": "01.000.172.5-092.000",
+            "phone": "021-691 9999",
+            "website": "www.cp.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:36+07:00",
+            "value": "<td colspan='4'>Jl. Ancol VIII/1\r\nJakarta 14430\n\n        \t\t  \t\t\tPhone: 021-691 9999\n        \t\t  \t\t\tFax: 021-690 7324\n                            NPWP: 01.000.172.5-092.000\n        \t\t  \t\t\tEmail: hadijanto@cp.co.id\n        \t\t  \t\t\tWebsite: www.cp.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Jl. Ancol VIII/1 Jakarta 14430"
+        }
+    ],
+    "background": "PT Charoen Pokphand Indonesia Tbk merupakan perusahaan yang berbasis agribisnis di Indonesia. Ruang lingkup kegiatan perusahaan yang utama bergerak dalam industri makanan ternak, pembibitan dan budidaya ayam ras serta pengolahannya, industri pengolahan makanan, pengawetan daging ayam dan sapi termasuk unit-unit cold storage, menjual makanan ternak, makanan, daging ayam & sapi dan bahan-bahan asal hewan yang diperdagangkan di wilayah Indonesia maupun ke luar negeri. Pabrik pakan ternak PT Charoen Pokphand Indonesia Tbk terletak di Banten, Jawa Timur, Sumatra Utara, dan Jawa Tengah dan beberapa produk yang sudah terkenal adalah Fiesta Chicken Nugget.\n",
+    "history": {
+        "amount": "-",
+        "board": "Papan Utama",
+        "date": "18 Mar 1991",
+        "price": "5,100",
+        "registrar": "",
+        "shares": "",
+        "underwriters": [
+            "PT. Danareksa",
+            "PT. Makindo",
+            "PT. Asean Development Securities",
+            "PT. Surya Securities"
+        ],
+        "administrative_bureau": "PT. Adimitra Jasa Korpora",
+        "free_float": "34.14%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "13835339",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Ferdiansyah Gunawan Tjoe"
+            },
+            {
+                "id": "13835338",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Eddy Dharmawan Mansjoer"
+            },
+            {
+                "id": "13835337",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Jemmy"
+            },
+            {
+                "id": "13835336",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Ong Mei Sian"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13835343",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Hendri Murtany"
+            },
+            {
+                "id": "13835342",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Suparman S."
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13835340",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Hadi Gunawan Tjoe"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13835334",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Tjiu Thomas Effendy"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13835335",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Peraphon Prayooravong"
+            }
+        ],
+        "vice_president_commissioner": [
+            {
+                "id": "13835341",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:38:00+07:00",
+                "value": "Rusmin Ryadi"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529146",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:36+07:00",
+            "value": "{\"name\":\"Bapak Hadijanto Kartika\",\"phone\":\"021-6919999, 6907324\",\"email\":\"hadijanto@cp.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "55.53%",
+            "name": "PT CHAROEN POKPHAND INDONESIA GROUP",
+            "value": "9.11 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "34.14%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.60 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "5.98%",
+            "name": "UBS AG",
+            "value": "980.52 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "4.35%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "712.02 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Charoen Pokphand Jaya Farm",
+            "percentage": "99.99%",
+            "types": "Peternakan unggas",
+            "value": "9098751"
+        },
+        {
+            "company": "PT Primafood International",
+            "percentage": "99.96%",
+            "types": "Perdagangan produk makanan olahan",
+            "value": "580757"
+        },
+        {
+            "company": "PT Vista Grain",
+            "percentage": "99.92%",
+            "types": "produksi dan distribusi makanan ternak",
+            "value": "10429"
+        },
+        {
+            "company": "PT Poly Packaging Industry",
+            "percentage": "99.98%",
+            "types": "Produksi kemasan plastik",
+            "value": "96612"
+        },
+        {
+            "company": "PT Feprotama Pertiwi",
+            "percentage": "99.32%",
+            "types": "Produksi dan distribusi bahan baku pakan",
+            "value": "40738"
+        },
+        {
+            "company": "PT Agrico International",
+            "percentage": "99.99%",
+            "types": "Perdagangan",
+            "value": "310047"
+        },
+        {
+            "company": "PT Sarana Farmindo Utama",
+            "percentage": "99.99%",
+            "types": "Induk Perusahaan",
+            "value": "7173049"
+        },
+        {
+            "company": "PT Singa Mas International",
+            "percentage": "99.99%",
+            "types": "Industri air minum dalam kemasan",
+            "value": "395740"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "14,995",
+            "change": -3092,
+            "change_formatted": "(-3,092)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "18,087",
+            "change": 3216,
+            "change_formatted": "(+3,216)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "14,871",
+            "change": -604,
+            "change_formatted": "(-604)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "15,475",
+            "change": -607,
+            "change_formatted": "(-607)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "16,082",
+            "change": -781,
+            "change_formatted": "(-781)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "16,863",
+            "change": 732,
+            "change_formatted": "(+732)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1991-03-18T00:00:00+07:00",
+    "ipo_price": 5100,
+    "float": 34.14,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "123",
+                "email": [
+                    "hadijanto@cp.co.id"
+                ],
+                "fax": "021-690 7324",
+                "npwp": "01.000.172.5-092.000",
+                "phone": "021-691 9999",
+                "website": "www.cp.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:36+07:00",
+                "value": "<td colspan='4'>Jl. Ancol VIII/1\r\nJakarta 14430\n\n        \t\t  \t\t\tPhone: 021-691 9999\n        \t\t  \t\t\tFax: 021-690 7324\n                            NPWP: 01.000.172.5-092.000\n        \t\t  \t\t\tEmail: hadijanto@cp.co.id\n        \t\t  \t\t\tWebsite: www.cp.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Jl. Ancol VIII/1 Jakarta 14430"
+            }
+        ],
+        "background": "PT Charoen Pokphand Indonesia Tbk merupakan perusahaan yang berbasis agribisnis di Indonesia. Ruang lingkup kegiatan perusahaan yang utama bergerak dalam industri makanan ternak, pembibitan dan budidaya ayam ras serta pengolahannya, industri pengolahan makanan, pengawetan daging ayam dan sapi termasuk unit-unit cold storage, menjual makanan ternak, makanan, daging ayam & sapi dan bahan-bahan asal hewan yang diperdagangkan di wilayah Indonesia maupun ke luar negeri. Pabrik pakan ternak PT Charoen Pokphand Indonesia Tbk terletak di Banten, Jawa Timur, Sumatra Utara, dan Jawa Tengah dan beberapa produk yang sudah terkenal adalah Fiesta Chicken Nugget.\n",
+        "history": {
+            "amount": "-",
+            "board": "Papan Utama",
+            "date": "18 Mar 1991",
+            "price": "5,100",
+            "registrar": "",
+            "shares": "",
+            "underwriters": [
+                "PT. Danareksa",
+                "PT. Makindo",
+                "PT. Asean Development Securities",
+                "PT. Surya Securities"
+            ],
+            "administrative_bureau": "PT. Adimitra Jasa Korpora",
+            "free_float": "34.14%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "13835339",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Ferdiansyah Gunawan Tjoe"
+                },
+                {
+                    "id": "13835338",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Eddy Dharmawan Mansjoer"
+                },
+                {
+                    "id": "13835337",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Jemmy"
+                },
+                {
+                    "id": "13835336",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Ong Mei Sian"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13835343",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Hendri Murtany"
+                },
+                {
+                    "id": "13835342",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Suparman S."
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13835340",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Hadi Gunawan Tjoe"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13835334",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Tjiu Thomas Effendy"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13835335",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Peraphon Prayooravong"
+                }
+            ],
+            "vice_president_commissioner": [
+                {
+                    "id": "13835341",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:00+07:00",
+                    "value": "Rusmin Ryadi"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529146",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:36+07:00",
+                "value": "{\"name\":\"Bapak Hadijanto Kartika\",\"phone\":\"021-6919999, 6907324\",\"email\":\"hadijanto@cp.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "55.53%",
+                "name": "PT CHAROEN POKPHAND INDONESIA GROUP",
+                "value": "9.11 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "34.14%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.60 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "5.98%",
+                "name": "UBS AG",
+                "value": "980.52 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "4.35%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "712.02 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Charoen Pokphand Jaya Farm",
+                "percentage": "99.99%",
+                "types": "Peternakan unggas",
+                "value": "9098751"
+            },
+            {
+                "company": "PT Primafood International",
+                "percentage": "99.96%",
+                "types": "Perdagangan produk makanan olahan",
+                "value": "580757"
+            },
+            {
+                "company": "PT Vista Grain",
+                "percentage": "99.92%",
+                "types": "produksi dan distribusi makanan ternak",
+                "value": "10429"
+            },
+            {
+                "company": "PT Poly Packaging Industry",
+                "percentage": "99.98%",
+                "types": "Produksi kemasan plastik",
+                "value": "96612"
+            },
+            {
+                "company": "PT Feprotama Pertiwi",
+                "percentage": "99.32%",
+                "types": "Produksi dan distribusi bahan baku pakan",
+                "value": "40738"
+            },
+            {
+                "company": "PT Agrico International",
+                "percentage": "99.99%",
+                "types": "Perdagangan",
+                "value": "310047"
+            },
+            {
+                "company": "PT Sarana Farmindo Utama",
+                "percentage": "99.99%",
+                "types": "Induk Perusahaan",
+                "value": "7173049"
+            },
+            {
+                "company": "PT Singa Mas International",
+                "percentage": "99.99%",
+                "types": "Industri air minum dalam kemasan",
+                "value": "395740"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "14,995",
+                "change": -3092,
+                "change_formatted": "(-3,092)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "18,087",
+                "change": 3216,
+                "change_formatted": "(+3,216)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "14,871",
+                "change": -604,
+                "change_formatted": "(-604)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "15,475",
+                "change": -607,
+                "change_formatted": "(-607)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "16,082",
+                "change": -781,
+                "change_formatted": "(-781)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "16,863",
+                "change": 732,
+                "change_formatted": "(+732)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:15+00:00"
+}

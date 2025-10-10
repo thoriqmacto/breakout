@@ -1,0 +1,784 @@
+{
+    "symbol": "GEMS",
+    "name": "GEMS",
+    "address": [
+        {
+            "id": "170",
+            "email": [
+                "corsec@goldenenergymines.com"
+            ],
+            "fax": "021-31990319",
+            "npwp": "01.831.727.1-021.000",
+            "phone": "02150186888",
+            "website": "www.goldenenergymines.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:07+07:00",
+            "value": "<td colspan='4'>Sinar Mas Land Plaza, Tower II, Lantai 6\r\nJl. MH Thamrin No. 51 \r\nJakarta Pusat 10350\n\n        \t\t  \t\t\tPhone: 02150186888\n        \t\t  \t\t\tFax: 021-31990319\n                            NPWP: 01.831.727.1-021.000\n        \t\t  \t\t\tEmail: corsec@goldenenergymines.com\n        \t\t  \t\t\tWebsite: www.goldenenergymines.com\n\n        \t  \t\t\t</td>",
+            "office": "Sinar Mas Land Plaza, Tower II, Lantai 6 Jl. MH Thamrin No. 51  Jakarta Pusat 10350"
+        }
+    ],
+    "background": "PT Golden Energy Mines Tbk Didirikan dengan nama PT Bumi Kencana Eka Sakti berdasarkan Akta Pendirian No. 81 tanggal 13 Maret 1997 yang dibuat dihadapan Notaris Imam Santoso, SH yang telah disahkan oleh Menteri Hukum dan Hak Asasi Manusia melalui Surat Keputusan No. C2-7.922HT.01.01.TH.98 tanggal 30 Juni 1998 dan telah diumumkan pada Berita Negara Republik Indonesia No. 30 tanggal 12 April 2002, Tambahan No. 3667. bergerak di bidang Pertambangan batubara, melalui Entitas Anak, dan perdagangan batubara.\n",
+    "history": {
+        "amount": "2,206 B",
+        "board": "Papan Utama",
+        "date": "17 Nov 2011",
+        "price": "2,500",
+        "registrar": "",
+        "shares": "882,353,024",
+        "underwriters": [
+            "PT. Sinarmas Sekuritas (Affiliated)"
+        ],
+        "administrative_bureau": "PT. Sinartama Gunita",
+        "free_float": "10.39%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836140",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Feriwan Sinatra"
+            },
+            {
+                "id": "13836139",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Alex Sutanto"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836136",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Paulus Yuniar"
+            },
+            {
+                "id": "13836135",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Suhendra"
+            },
+            {
+                "id": "13836134",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "R. Utoro"
+            },
+            {
+                "id": "13836133",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Yoghi Nuswantoro"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836142",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Ketut Sanjaya"
+            },
+            {
+                "id": "13836141",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Dr. Ir. Bambang Setiawan"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13836137",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Lokita Prasetya"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13836131",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Bonifasius"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13836132",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Iwan Hermawan"
+            }
+        ],
+        "vice_president_commissioner": [
+            {
+                "id": "13836138",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:38:12+07:00",
+                "value": "Achmad Ananda Djajanegara"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529709",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:07+07:00",
+            "value": "{\"name\":\"Sudin S H\",\"phone\":\"(62)8811109999 ext 1621\",\"email\":\"corsec@goldenenergymines.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51%",
+            "name": "PT DIAN SWASTATIKA SENTOSA TBK",
+            "value": "3.00 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "30%",
+            "name": "PT RADHIKA JANANTA RAYA",
+            "value": "1.76 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "12.01%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "706.45 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "6.99%",
+            "name": "GOLDEN ENERGY AND RESOURCES LIMITED",
+            "value": "411.19 M",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "GEMS Trading Resources Pte. Ltd",
+            "percentage": "100%",
+            "types": "Perdagangan Batubara",
+            "value": "40253892"
+        },
+        {
+            "company": "PT Karya Mining Solutions (d/h BAS)",
+            "percentage": "100%",
+            "types": "Perdagangan",
+            "value": "796528"
+        },
+        {
+            "company": "PT Karya Cemerlang Persada",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "25975500"
+        },
+        {
+            "company": "PT Bungo Bara Utama",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "22733007"
+        },
+        {
+            "company": "PT Bara Harmonis Batang Asam",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "1167648"
+        },
+        {
+            "company": "PT Berkat Nusantara Permai",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "19960860"
+        },
+        {
+            "company": "PT Tanjung Belit Bara Utama",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "27409091"
+        },
+        {
+            "company": "PT Borneo Indobara",
+            "percentage": "98.10%",
+            "types": "Pertambangan",
+            "value": "297638846"
+        },
+        {
+            "company": "PT GEMS Energy Indonesia",
+            "percentage": "99.99%",
+            "types": "Perdagangan Besar",
+            "value": "139983"
+        },
+        {
+            "company": "PT Era Mitra Selaras",
+            "percentage": "100%",
+            "types": "Penyertaan Saham",
+            "value": "1040990"
+        },
+        {
+            "company": "PT Wahana Rimba Lestari",
+            "percentage": "100%",
+            "types": "Pertambangan batubara",
+            "value": "796028"
+        },
+        {
+            "company": "PT Berkat Satria Abadi",
+            "percentage": "100%",
+            "types": "Pertambangan batubara",
+            "value": "209527"
+        },
+        {
+            "company": "PT Kuansing Inti Sejahtera",
+            "percentage": "100%",
+            "types": "Pertambangan batubara",
+            "value": "61487"
+        },
+        {
+            "company": "PT Bungo Bara Makmur",
+            "percentage": "100%",
+            "types": "Pertambangan batubara",
+            "value": "5048962"
+        },
+        {
+            "company": "PT Dwikarya Sejati Utama",
+            "percentage": "100%",
+            "types": "Modal Ventura dan Manajemen Konsultasi",
+            "value": "108791849"
+        },
+        {
+            "company": "PT Unsoco",
+            "percentage": "100%",
+            "types": "Jasa Konsultasi Manajemen",
+            "value": "82576"
+        },
+        {
+            "company": "PT Duta Sarana Internusa",
+            "percentage": "100%",
+            "types": "Jasa Konsultasi Manajemen",
+            "value": "108789080"
+        },
+        {
+            "company": "PT Barasentosa Lestari",
+            "percentage": "100%",
+            "types": "Pertambangan batubara dan pengembangan pembagkit listrik mulut tambang",
+            "value": "108425965"
+        },
+        {
+            "company": "PT Roundhill Capital Indonesia",
+            "percentage": "99.02%",
+            "types": "Penyertaan Saham dan perdagangan besar",
+            "value": "482992073"
+        },
+        {
+            "company": "PT Kuansing Inti Makmur",
+            "percentage": "100%",
+            "types": "Pertambangan Batubara",
+            "value": "102876627"
+        },
+        {
+            "company": "PT Trisula Kencana Sakti",
+            "percentage": "70.00%",
+            "types": "Pertambangan Batubara",
+            "value": "9077908"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "9,110",
+            "change": -24,
+            "change_formatted": "(-24)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "9,134",
+            "change": 53,
+            "change_formatted": "(+53)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "9,081",
+            "change": -214,
+            "change_formatted": "(-214)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "9,295",
+            "change": 267,
+            "change_formatted": "(+267)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "9,028",
+            "change": 1146,
+            "change_formatted": "(+1,146)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "7,882",
+            "change": 251,
+            "change_formatted": "(+251)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2011-11-17T00:00:00+07:00",
+    "ipo_price": 2500,
+    "float": 10.39,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "170",
+                "email": [
+                    "corsec@goldenenergymines.com"
+                ],
+                "fax": "021-31990319",
+                "npwp": "01.831.727.1-021.000",
+                "phone": "02150186888",
+                "website": "www.goldenenergymines.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:07+07:00",
+                "value": "<td colspan='4'>Sinar Mas Land Plaza, Tower II, Lantai 6\r\nJl. MH Thamrin No. 51 \r\nJakarta Pusat 10350\n\n        \t\t  \t\t\tPhone: 02150186888\n        \t\t  \t\t\tFax: 021-31990319\n                            NPWP: 01.831.727.1-021.000\n        \t\t  \t\t\tEmail: corsec@goldenenergymines.com\n        \t\t  \t\t\tWebsite: www.goldenenergymines.com\n\n        \t  \t\t\t</td>",
+                "office": "Sinar Mas Land Plaza, Tower II, Lantai 6 Jl. MH Thamrin No. 51  Jakarta Pusat 10350"
+            }
+        ],
+        "background": "PT Golden Energy Mines Tbk Didirikan dengan nama PT Bumi Kencana Eka Sakti berdasarkan Akta Pendirian No. 81 tanggal 13 Maret 1997 yang dibuat dihadapan Notaris Imam Santoso, SH yang telah disahkan oleh Menteri Hukum dan Hak Asasi Manusia melalui Surat Keputusan No. C2-7.922HT.01.01.TH.98 tanggal 30 Juni 1998 dan telah diumumkan pada Berita Negara Republik Indonesia No. 30 tanggal 12 April 2002, Tambahan No. 3667. bergerak di bidang Pertambangan batubara, melalui Entitas Anak, dan perdagangan batubara.\n",
+        "history": {
+            "amount": "2,206 B",
+            "board": "Papan Utama",
+            "date": "17 Nov 2011",
+            "price": "2,500",
+            "registrar": "",
+            "shares": "882,353,024",
+            "underwriters": [
+                "PT. Sinarmas Sekuritas (Affiliated)"
+            ],
+            "administrative_bureau": "PT. Sinartama Gunita",
+            "free_float": "10.39%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836140",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Feriwan Sinatra"
+                },
+                {
+                    "id": "13836139",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Alex Sutanto"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836136",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Paulus Yuniar"
+                },
+                {
+                    "id": "13836135",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Suhendra"
+                },
+                {
+                    "id": "13836134",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "R. Utoro"
+                },
+                {
+                    "id": "13836133",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Yoghi Nuswantoro"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836142",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Ketut Sanjaya"
+                },
+                {
+                    "id": "13836141",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Dr. Ir. Bambang Setiawan"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13836137",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Lokita Prasetya"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13836131",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Bonifasius"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13836132",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Iwan Hermawan"
+                }
+            ],
+            "vice_president_commissioner": [
+                {
+                    "id": "13836138",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:12+07:00",
+                    "value": "Achmad Ananda Djajanegara"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529709",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:07+07:00",
+                "value": "{\"name\":\"Sudin S H\",\"phone\":\"(62)8811109999 ext 1621\",\"email\":\"corsec@goldenenergymines.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51%",
+                "name": "PT DIAN SWASTATIKA SENTOSA TBK",
+                "value": "3.00 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "30%",
+                "name": "PT RADHIKA JANANTA RAYA",
+                "value": "1.76 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "12.01%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "706.45 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "6.99%",
+                "name": "GOLDEN ENERGY AND RESOURCES LIMITED",
+                "value": "411.19 M",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "GEMS Trading Resources Pte. Ltd",
+                "percentage": "100%",
+                "types": "Perdagangan Batubara",
+                "value": "40253892"
+            },
+            {
+                "company": "PT Karya Mining Solutions (d/h BAS)",
+                "percentage": "100%",
+                "types": "Perdagangan",
+                "value": "796528"
+            },
+            {
+                "company": "PT Karya Cemerlang Persada",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "25975500"
+            },
+            {
+                "company": "PT Bungo Bara Utama",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "22733007"
+            },
+            {
+                "company": "PT Bara Harmonis Batang Asam",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "1167648"
+            },
+            {
+                "company": "PT Berkat Nusantara Permai",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "19960860"
+            },
+            {
+                "company": "PT Tanjung Belit Bara Utama",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "27409091"
+            },
+            {
+                "company": "PT Borneo Indobara",
+                "percentage": "98.10%",
+                "types": "Pertambangan",
+                "value": "297638846"
+            },
+            {
+                "company": "PT GEMS Energy Indonesia",
+                "percentage": "99.99%",
+                "types": "Perdagangan Besar",
+                "value": "139983"
+            },
+            {
+                "company": "PT Era Mitra Selaras",
+                "percentage": "100%",
+                "types": "Penyertaan Saham",
+                "value": "1040990"
+            },
+            {
+                "company": "PT Wahana Rimba Lestari",
+                "percentage": "100%",
+                "types": "Pertambangan batubara",
+                "value": "796028"
+            },
+            {
+                "company": "PT Berkat Satria Abadi",
+                "percentage": "100%",
+                "types": "Pertambangan batubara",
+                "value": "209527"
+            },
+            {
+                "company": "PT Kuansing Inti Sejahtera",
+                "percentage": "100%",
+                "types": "Pertambangan batubara",
+                "value": "61487"
+            },
+            {
+                "company": "PT Bungo Bara Makmur",
+                "percentage": "100%",
+                "types": "Pertambangan batubara",
+                "value": "5048962"
+            },
+            {
+                "company": "PT Dwikarya Sejati Utama",
+                "percentage": "100%",
+                "types": "Modal Ventura dan Manajemen Konsultasi",
+                "value": "108791849"
+            },
+            {
+                "company": "PT Unsoco",
+                "percentage": "100%",
+                "types": "Jasa Konsultasi Manajemen",
+                "value": "82576"
+            },
+            {
+                "company": "PT Duta Sarana Internusa",
+                "percentage": "100%",
+                "types": "Jasa Konsultasi Manajemen",
+                "value": "108789080"
+            },
+            {
+                "company": "PT Barasentosa Lestari",
+                "percentage": "100%",
+                "types": "Pertambangan batubara dan pengembangan pembagkit listrik mulut tambang",
+                "value": "108425965"
+            },
+            {
+                "company": "PT Roundhill Capital Indonesia",
+                "percentage": "99.02%",
+                "types": "Penyertaan Saham dan perdagangan besar",
+                "value": "482992073"
+            },
+            {
+                "company": "PT Kuansing Inti Makmur",
+                "percentage": "100%",
+                "types": "Pertambangan Batubara",
+                "value": "102876627"
+            },
+            {
+                "company": "PT Trisula Kencana Sakti",
+                "percentage": "70.00%",
+                "types": "Pertambangan Batubara",
+                "value": "9077908"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "9,110",
+                "change": -24,
+                "change_formatted": "(-24)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "9,134",
+                "change": 53,
+                "change_formatted": "(+53)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "9,081",
+                "change": -214,
+                "change_formatted": "(-214)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "9,295",
+                "change": 267,
+                "change_formatted": "(+267)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "9,028",
+                "change": 1146,
+                "change_formatted": "(+1,146)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "7,882",
+                "change": 251,
+                "change_formatted": "(+251)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:18+00:00"
+}

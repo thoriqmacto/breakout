@@ -1,0 +1,912 @@
+{
+    "symbol": "TPIA",
+    "name": "TPIA",
+    "address": [
+        {
+            "id": "432",
+            "email": [
+                "corporatesecretary@capcx.com"
+            ],
+            "fax": "(021) 5308950",
+            "npwp": "01.062.049.0-092.000",
+            "phone": "(021) 5307950",
+            "website": "www.chandra-asri.com",
+            "key": "",
+            "lastupdate": "2024-02-06T02:00:05+07:00",
+            "value": "",
+            "office": "Gedung Wisma Barito Pacific Tower A, Lt. 7 Jl. Let Jend S. Parman Kav. 62-63 RT.008 RW.004 Slipi Palmerah. Jakarta Barat. DKI Jakarta - 11410 "
+        }
+    ],
+    "background": "PT Chandra Asri Petrochemical Tbk merupakan perusahaan petrokimia terbesar dan terintegrasi di Indonesia serta satu-satunya yang mengoperasikan Naphtha Cracker. Komplek petrokimia Perseroan terletak di Banten, merupakan pabrik petrokimia utama yang memanfaatkan teknologi dan fasilitas pendukung canggih berkelas dunia yang memproduksi Olefins (Ethylene, Propylene dan produk turunan seperti Py-Gas dan Mixed C4). Segmen bisnis Perusahaan termasuk Olefin (etilen, propilen, bensin pirolisis, C4 campuran) Poliolefin (polietilen dan polipropilen), monomer Stirena, Butadiena, dan penyewaan Tangki dan dermaga. Produknya termasuk produk-produk monomer, polietilen (PE), dan polipropilen (PP). Monomer produksinya mencakup etilen, propilen, C4 Campuran (butadiena mentah), minyak bakar pirolisis (PFO), dan bensin pirolisis (Pygas). Perusahaan ini menawarkan monomer, termasuk polistirena (styrofoam), polistirena ekspansi (EPS), Karet Stirena Butadiena (SBR), Lateks Butadiena Stirena (SBL), Akrilonitril Stirena (SAN), Stirena Butadiena Akrilonitril (ABS), dan Resin Poliester Tak Jenuh. Perusahaan ini menawarkan produk PE, termasuk PE dengan kepadatan rendah linear dan resin PE dengan kepadatan tinggi dengan merek Asrene. Perusahaan juga menawarkan produk PE-nya, termasuk homopolimer, kopolimer random, dan resin kopolimer blok dengan merek Trilene.",
+    "history": {
+        "amount": "1,602 B",
+        "board": "Papan Pengembangan",
+        "date": "26 May 2008",
+        "price": "2,200",
+        "registrar": "",
+        "shares": "728,401,000",
+        "underwriters": [
+            "PT. Truscel Capital"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "10.67%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13840189",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Santi Wasanasiri"
+            },
+            {
+                "id": "13840188",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Bandhit Thamprajamchit"
+            },
+            {
+                "id": "13840187",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Sakchai Patiparnpreechavud"
+            },
+            {
+                "id": "13840186",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Lim Chong Thian"
+            },
+            {
+                "id": "13840185",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Agus Salim Pangestu"
+            }
+        ],
+        "director": [
+            {
+                "id": "13840176",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Andre Khor Kah Hin"
+            },
+            {
+                "id": "13840182",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Hamim Thohari"
+            },
+            {
+                "id": "13840181",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Ronald Sihombing"
+            },
+            {
+                "id": "13840180",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Wittaya Guntawang"
+            },
+            {
+                "id": "13840179",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Nongnapat Saisuthi"
+            },
+            {
+                "id": "13840178",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Suryandi"
+            },
+            {
+                "id": "13840177",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Fransiskus Ruly Aryawan"
+            },
+            {
+                "id": "13840172",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Raymond Budhin"
+            },
+            {
+                "id": "13840171",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Edi Riva'i"
+            },
+            {
+                "id": "13840170",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Suwit Wiwattanawanich"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13840184",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Ho Hon Cheong"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13840173",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Erwin Ciputra"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13840175",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Baritono Prajogo Pangestu"
+            },
+            {
+                "id": "13840174",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Pholavit Thiebpattama"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [
+            {
+                "id": "13840183",
+                "key": "Vice President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Tan Ek Kia"
+            }
+        ],
+        "independent_president_commissioner": [
+            {
+                "id": "13840190",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:40:55+07:00",
+                "value": "Djoko Suyanto"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12537126",
+            "key": "",
+            "lastupdate": "2022-01-06T11:01:48+07:00",
+            "value": "{\"name\":\"Erri Dewi Riani\",\"phone\":\"(021) 5307950 \",\"email\":\"erri.riani@capcx.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "34.63%",
+            "name": "PT BARITO PACIFIC TBK",
+            "value": "29.96 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "30.57%",
+            "name": "SCG CHEMICALS PUBLIC COMPANY LIMITED",
+            "value": "26.45 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "15%",
+            "name": "PT TOP INVESTMENT INDONESIA",
+            "value": "12.98 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "10.68%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "9.24 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "5.03%",
+            "name": "PRAJOGO PANGESTU",
+            "value": "4.35 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "3.92%",
+            "name": "MARIGOLD RESOURCES PTE LTD",
+            "value": "3.39 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "SAHAM TREASURY",
+            "value": "7.64 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "2.01 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Styrindo Mono Indonesia",
+            "percentage": "100%",
+            "types": "Petrokimia",
+            "value": "324912"
+        },
+        {
+            "company": "PT Redeco Petrolin Utama",
+            "percentage": "50.75%",
+            "types": "Sewa Tanki",
+            "value": "13248"
+        },
+        {
+            "company": "Chandra Asri Trading Company Pte. Ltd. ex. Altus Capital Pte., Ltd.",
+            "percentage": "100%",
+            "types": "Perdagangan",
+            "value": "10152"
+        },
+        {
+            "company": "PT Chandra Asri Perkasa",
+            "percentage": "99.00%",
+            "types": "Petrokimia",
+            "value": "295395"
+        },
+        {
+            "company": "PT Redeco Petrolin Utama",
+            "percentage": "50.75%",
+            "types": "Sewa Tanki",
+            "value": "14858"
+        },
+        {
+            "company": "Chandra Asri Trading Company Pte. Ltd. ex. Altus Capital Pte., Ltd.",
+            "percentage": "100%",
+            "types": "Perdagangan",
+            "value": "50826"
+        },
+        {
+            "company": "PT Chandra Asri Perkasa",
+            "percentage": "99.99%",
+            "types": "Petrokimia",
+            "value": "348171"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "23,113",
+            "change": 1578,
+            "change_formatted": "(+1,578)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "21,535",
+            "change": -502,
+            "change_formatted": "(-502)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "22,037",
+            "change": 3462,
+            "change_formatted": "(+3,462)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "18,575",
+            "change": 2976,
+            "change_formatted": "(+2,976)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "15,599",
+            "change": 744,
+            "change_formatted": "(+744)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "14,855",
+            "change": -587,
+            "change_formatted": "(-587)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.16%",
+            "name": "ERWIN CIPUTRA",
+            "value": "139.41 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "RAYMOND",
+            "value": "2.40 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "LIM CHONG THIAN",
+            "value": "1.18 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "FRANSISKUS RULY ARYAWAN",
+            "value": "400.21 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "BARITONO PRAJOGO PANGESTU",
+            "value": "298.10 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ANDRE KHOR KAH HIN",
+            "value": "295.80 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "EDI RIVA'I",
+            "value": "110.20 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2008-05-26T00:00:00+07:00",
+    "ipo_price": 2200,
+    "float": 10.67,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "432",
+                "email": [
+                    "corporatesecretary@capcx.com"
+                ],
+                "fax": "(021) 5308950",
+                "npwp": "01.062.049.0-092.000",
+                "phone": "(021) 5307950",
+                "website": "www.chandra-asri.com",
+                "key": "",
+                "lastupdate": "2024-02-06T02:00:05+07:00",
+                "value": "",
+                "office": "Gedung Wisma Barito Pacific Tower A, Lt. 7 Jl. Let Jend S. Parman Kav. 62-63 RT.008 RW.004 Slipi Palmerah. Jakarta Barat. DKI Jakarta - 11410 "
+            }
+        ],
+        "background": "PT Chandra Asri Petrochemical Tbk merupakan perusahaan petrokimia terbesar dan terintegrasi di Indonesia serta satu-satunya yang mengoperasikan Naphtha Cracker. Komplek petrokimia Perseroan terletak di Banten, merupakan pabrik petrokimia utama yang memanfaatkan teknologi dan fasilitas pendukung canggih berkelas dunia yang memproduksi Olefins (Ethylene, Propylene dan produk turunan seperti Py-Gas dan Mixed C4). Segmen bisnis Perusahaan termasuk Olefin (etilen, propilen, bensin pirolisis, C4 campuran) Poliolefin (polietilen dan polipropilen), monomer Stirena, Butadiena, dan penyewaan Tangki dan dermaga. Produknya termasuk produk-produk monomer, polietilen (PE), dan polipropilen (PP). Monomer produksinya mencakup etilen, propilen, C4 Campuran (butadiena mentah), minyak bakar pirolisis (PFO), dan bensin pirolisis (Pygas). Perusahaan ini menawarkan monomer, termasuk polistirena (styrofoam), polistirena ekspansi (EPS), Karet Stirena Butadiena (SBR), Lateks Butadiena Stirena (SBL), Akrilonitril Stirena (SAN), Stirena Butadiena Akrilonitril (ABS), dan Resin Poliester Tak Jenuh. Perusahaan ini menawarkan produk PE, termasuk PE dengan kepadatan rendah linear dan resin PE dengan kepadatan tinggi dengan merek Asrene. Perusahaan juga menawarkan produk PE-nya, termasuk homopolimer, kopolimer random, dan resin kopolimer blok dengan merek Trilene.",
+        "history": {
+            "amount": "1,602 B",
+            "board": "Papan Pengembangan",
+            "date": "26 May 2008",
+            "price": "2,200",
+            "registrar": "",
+            "shares": "728,401,000",
+            "underwriters": [
+                "PT. Truscel Capital"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "10.67%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13840189",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Santi Wasanasiri"
+                },
+                {
+                    "id": "13840188",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Bandhit Thamprajamchit"
+                },
+                {
+                    "id": "13840187",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Sakchai Patiparnpreechavud"
+                },
+                {
+                    "id": "13840186",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Lim Chong Thian"
+                },
+                {
+                    "id": "13840185",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Agus Salim Pangestu"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13840176",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Andre Khor Kah Hin"
+                },
+                {
+                    "id": "13840182",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Hamim Thohari"
+                },
+                {
+                    "id": "13840181",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Ronald Sihombing"
+                },
+                {
+                    "id": "13840180",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Wittaya Guntawang"
+                },
+                {
+                    "id": "13840179",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Nongnapat Saisuthi"
+                },
+                {
+                    "id": "13840178",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Suryandi"
+                },
+                {
+                    "id": "13840177",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Fransiskus Ruly Aryawan"
+                },
+                {
+                    "id": "13840172",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Raymond Budhin"
+                },
+                {
+                    "id": "13840171",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Edi Riva'i"
+                },
+                {
+                    "id": "13840170",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Suwit Wiwattanawanich"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13840184",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Ho Hon Cheong"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13840173",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Erwin Ciputra"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13840175",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Baritono Prajogo Pangestu"
+                },
+                {
+                    "id": "13840174",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Pholavit Thiebpattama"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [
+                {
+                    "id": "13840183",
+                    "key": "Vice President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Tan Ek Kia"
+                }
+            ],
+            "independent_president_commissioner": [
+                {
+                    "id": "13840190",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:40:55+07:00",
+                    "value": "Djoko Suyanto"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12537126",
+                "key": "",
+                "lastupdate": "2022-01-06T11:01:48+07:00",
+                "value": "{\"name\":\"Erri Dewi Riani\",\"phone\":\"(021) 5307950 \",\"email\":\"erri.riani@capcx.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "34.63%",
+                "name": "PT BARITO PACIFIC TBK",
+                "value": "29.96 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "30.57%",
+                "name": "SCG CHEMICALS PUBLIC COMPANY LIMITED",
+                "value": "26.45 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "15%",
+                "name": "PT TOP INVESTMENT INDONESIA",
+                "value": "12.98 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "10.68%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "9.24 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "5.03%",
+                "name": "PRAJOGO PANGESTU",
+                "value": "4.35 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "3.92%",
+                "name": "MARIGOLD RESOURCES PTE LTD",
+                "value": "3.39 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "SAHAM TREASURY",
+                "value": "7.64 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "2.01 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Styrindo Mono Indonesia",
+                "percentage": "100%",
+                "types": "Petrokimia",
+                "value": "324912"
+            },
+            {
+                "company": "PT Redeco Petrolin Utama",
+                "percentage": "50.75%",
+                "types": "Sewa Tanki",
+                "value": "13248"
+            },
+            {
+                "company": "Chandra Asri Trading Company Pte. Ltd. ex. Altus Capital Pte., Ltd.",
+                "percentage": "100%",
+                "types": "Perdagangan",
+                "value": "10152"
+            },
+            {
+                "company": "PT Chandra Asri Perkasa",
+                "percentage": "99.00%",
+                "types": "Petrokimia",
+                "value": "295395"
+            },
+            {
+                "company": "PT Redeco Petrolin Utama",
+                "percentage": "50.75%",
+                "types": "Sewa Tanki",
+                "value": "14858"
+            },
+            {
+                "company": "Chandra Asri Trading Company Pte. Ltd. ex. Altus Capital Pte., Ltd.",
+                "percentage": "100%",
+                "types": "Perdagangan",
+                "value": "50826"
+            },
+            {
+                "company": "PT Chandra Asri Perkasa",
+                "percentage": "99.99%",
+                "types": "Petrokimia",
+                "value": "348171"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "23,113",
+                "change": 1578,
+                "change_formatted": "(+1,578)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "21,535",
+                "change": -502,
+                "change_formatted": "(-502)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "22,037",
+                "change": 3462,
+                "change_formatted": "(+3,462)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "18,575",
+                "change": 2976,
+                "change_formatted": "(+2,976)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "15,599",
+                "change": 744,
+                "change_formatted": "(+744)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "14,855",
+                "change": -587,
+                "change_formatted": "(-587)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.16%",
+                "name": "ERWIN CIPUTRA",
+                "value": "139.41 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "RAYMOND",
+                "value": "2.40 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "LIM CHONG THIAN",
+                "value": "1.18 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "FRANSISKUS RULY ARYAWAN",
+                "value": "400.21 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "BARITONO PRAJOGO PANGESTU",
+                "value": "298.10 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ANDRE KHOR KAH HIN",
+                "value": "295.80 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "EDI RIVA'I",
+                "value": "110.20 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:32+00:00"
+}

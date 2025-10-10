@@ -1,0 +1,758 @@
+{
+    "symbol": "AKRA",
+    "name": "AKRA",
+    "address": [
+        {
+            "id": "17",
+            "email": [
+                "corporate.secretary@akr.co.id"
+            ],
+            "fax": "(021) 531 1185",
+            "npwp": "01.132.905.9-092.000",
+            "phone": "(021) 531 1110",
+            "website": "www.akr.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:07+07:00",
+            "value": "<td colspan='4'>AKR Tower Lt.26, Jl. Panjang No.5 Kebon Jeruk, Jakarta Barat 11530\n\n        \t\t  \t\t\tPhone: (021) 531 1110\n        \t\t  \t\t\tFax: (021) 531 1185\n                            NPWP: 01.132.905.9-092.000\n        \t\t  \t\t\tEmail: corporate.secretary@akr.co.id\n        \t\t  \t\t\tWebsite: www.akr.co.id\n\n        \t  \t\t\t</td>",
+            "office": "AKR Tower Lt.26, Jl. Panjang No.5 Kebon Jeruk, Jakarta Barat 11530"
+        }
+    ],
+    "background": "PT AKR Corporindo Tbk adalah perusahaan swasta yang bergerak di bidang Infrastruktur Logistik, Perdagangan dan Distribusi Bahan Kimia Dasar, Distribusi BBM,  dan Pertambangan dan Perdagangan Batubara. PT AKR Corporindo Tbk beroperasi di Indonesia dan China. Sebagian besar produksi dari usaha Pabrikan perusahaan di ekspor ke pelanggan yang sebagian besar berbasis di Jepang dan Eropa. Kegiatan usaha perseroan terkait BBM adalah dalam bentuk distribusi. Perseroan mengimpor BBM untuk kemudian didistribusikan di dalam negeri. Perseroan mendistribusikan 2 jenis BBM yaitu BBM bersubsidi yg didistribusikan kepada pengendara bermotor dan nelayan,BBM nonsubsidi yang didistribusikan ke sektor industri, pertambangan dan pembangkit listrik.Kegiatan Perusahaan selain bahan kimia dan bahan bakar minyak (BBM) dan gas; juga meliputi usaha dalam bidang logistik, jasa pengangkutan, penyewaan gudang dan tangki, perbengkelan, ekspedisi dan pengemasan, kontraktor bangunan dan jasa (kecuali jasa hukum) juga menjalankan usaha dan bertindak sebagai perwakilan dan/atau peragenan dari perusahaan lain baik didalam dan luar negeri.",
+    "history": {
+        "amount": "60 B",
+        "board": "Papan Utama",
+        "date": "3 Oct 1994",
+        "price": "4,000",
+        "registrar": "",
+        "shares": "15,000,000",
+        "underwriters": [
+            "PT. Lippo Securities"
+        ],
+        "administrative_bureau": "PT. Raya Saham Registra",
+        "free_float": "32.64%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13833698",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Sofyan A. Djalil"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833691",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Jimmy Tandyo"
+            },
+            {
+                "id": "13833696",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Termurti Tiban"
+            },
+            {
+                "id": "13833695",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Nery Polim"
+            },
+            {
+                "id": "13833694",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Suresh Vembu"
+            },
+            {
+                "id": "13833693",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Mery Sofi"
+            },
+            {
+                "id": "13833692",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Bambang Soetiono Soedijanto"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833699",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Mohamad Fauzi Maulana Ichsan"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13833697",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Soegiarto Adikoesoemo"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13833690",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:44+07:00",
+                "value": "Haryanto Adikoesoemo"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12527813",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:07+07:00",
+            "value": "{\"name\":\"Suresh Vembu\",\"phone\":\"021-5311110 ext.28200\",\"email\":\"suresh.vembu@akr.co.id                                                                                                          \"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "63.71%",
+            "name": "PT ARTHAKENCANA RAYATAMA",
+            "value": "12.79 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "32.74%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "6.57 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "1.36%",
+            "name": "SAHAM TREASURY",
+            "value": "273.70 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.05%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "9.40 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT. ANUGERAH KRIDA RETAILINDO",
+            "percentage": "99.98%",
+            "types": "PERDAGANGAN,",
+            "value": "819592"
+        },
+        {
+            "company": "PT. USAHA ERA PRATAMA NUSANTARA DAN ENTITAS ANAK",
+            "percentage": "99.99%",
+            "types": "JASA LOGISTIK",
+            "value": "7351893"
+        },
+        {
+            "company": "PT. ANDAHANESA ABADI DAN ENTITAS ANAK",
+            "percentage": "99.99%",
+            "types": "JASA LOGISTIK",
+            "value": "406890"
+        },
+        {
+            "company": "PT. ARJUNA UTAMA KIMIA",
+            "percentage": "99.96%",
+            "types": "PABRIKAN BAHAN PEREKAT",
+            "value": "419298"
+        },
+        {
+            "company": "PT. ANUGRAH KARYA RAYA DAN ENTITAS ANAK",
+            "percentage": "99.99%",
+            "types": "PERDAGANGAN DAN PERTAMBANGAN BATUBARA",
+            "value": "86688"
+        },
+        {
+            "company": "PT. JAKARTA TANK TERMINAL",
+            "percentage": "51.00%",
+            "types": "TERMINAL TANGKI PENYIMPANAN",
+            "value": "1426716"
+        },
+        {
+            "company": "PT. AKR SEA TRANSPORT",
+            "percentage": "99.99%",
+            "types": "PELAYARAN DOMESTIK",
+            "value": "547356"
+        },
+        {
+            "company": "PT. AKR NIAGA INDONESIA",
+            "percentage": "99.90%",
+            "types": "PERDAGANGAN KIMIA DASAR",
+            "value": "26266"
+        },
+        {
+            "company": "PT. AKR TRANSPORTASI INDONESIA (ATI)",
+            "percentage": "99.90%",
+            "types": "JASA LOGISTIK",
+            "value": "108280"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "28,669",
+            "change": 444,
+            "change_formatted": "(+444)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "28,225",
+            "change": 1928,
+            "change_formatted": "(+1,928)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "26,297",
+            "change": 805,
+            "change_formatted": "(+805)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "25,492",
+            "change": 1451,
+            "change_formatted": "(+1,451)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "24,041",
+            "change": -901,
+            "change_formatted": "(-901)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "24,942",
+            "change": 664,
+            "change_formatted": "(+664)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "1.06%",
+            "name": "HARYANTO ADIKOESOEMO",
+            "value": "212.60 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.72%",
+            "name": "SOEGIARTO ADIKOESOEMO",
+            "value": "145.27 M",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.24%",
+            "name": "JIMMY TANDYO",
+            "value": "48.00 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.04%",
+            "name": "MERY SOFI",
+            "value": "8.30 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.04%",
+            "name": "BAMBANG SOETIONO S.",
+            "value": "7.78 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.02%",
+            "name": "SURESH VEMBU",
+            "value": "4.93 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "NERY POLIM",
+            "value": "2.96 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.01%",
+            "name": "TERMURTI TIBAN",
+            "value": "1.65 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1994-10-03T00:00:00+07:00",
+    "ipo_price": 4000,
+    "float": 32.64,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "17",
+                "email": [
+                    "corporate.secretary@akr.co.id"
+                ],
+                "fax": "(021) 531 1185",
+                "npwp": "01.132.905.9-092.000",
+                "phone": "(021) 531 1110",
+                "website": "www.akr.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:07+07:00",
+                "value": "<td colspan='4'>AKR Tower Lt.26, Jl. Panjang No.5 Kebon Jeruk, Jakarta Barat 11530\n\n        \t\t  \t\t\tPhone: (021) 531 1110\n        \t\t  \t\t\tFax: (021) 531 1185\n                            NPWP: 01.132.905.9-092.000\n        \t\t  \t\t\tEmail: corporate.secretary@akr.co.id\n        \t\t  \t\t\tWebsite: www.akr.co.id\n\n        \t  \t\t\t</td>",
+                "office": "AKR Tower Lt.26, Jl. Panjang No.5 Kebon Jeruk, Jakarta Barat 11530"
+            }
+        ],
+        "background": "PT AKR Corporindo Tbk adalah perusahaan swasta yang bergerak di bidang Infrastruktur Logistik, Perdagangan dan Distribusi Bahan Kimia Dasar, Distribusi BBM,  dan Pertambangan dan Perdagangan Batubara. PT AKR Corporindo Tbk beroperasi di Indonesia dan China. Sebagian besar produksi dari usaha Pabrikan perusahaan di ekspor ke pelanggan yang sebagian besar berbasis di Jepang dan Eropa. Kegiatan usaha perseroan terkait BBM adalah dalam bentuk distribusi. Perseroan mengimpor BBM untuk kemudian didistribusikan di dalam negeri. Perseroan mendistribusikan 2 jenis BBM yaitu BBM bersubsidi yg didistribusikan kepada pengendara bermotor dan nelayan,BBM nonsubsidi yang didistribusikan ke sektor industri, pertambangan dan pembangkit listrik.Kegiatan Perusahaan selain bahan kimia dan bahan bakar minyak (BBM) dan gas; juga meliputi usaha dalam bidang logistik, jasa pengangkutan, penyewaan gudang dan tangki, perbengkelan, ekspedisi dan pengemasan, kontraktor bangunan dan jasa (kecuali jasa hukum) juga menjalankan usaha dan bertindak sebagai perwakilan dan/atau peragenan dari perusahaan lain baik didalam dan luar negeri.",
+        "history": {
+            "amount": "60 B",
+            "board": "Papan Utama",
+            "date": "3 Oct 1994",
+            "price": "4,000",
+            "registrar": "",
+            "shares": "15,000,000",
+            "underwriters": [
+                "PT. Lippo Securities"
+            ],
+            "administrative_bureau": "PT. Raya Saham Registra",
+            "free_float": "32.64%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13833698",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Sofyan A. Djalil"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833691",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Jimmy Tandyo"
+                },
+                {
+                    "id": "13833696",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Termurti Tiban"
+                },
+                {
+                    "id": "13833695",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Nery Polim"
+                },
+                {
+                    "id": "13833694",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Suresh Vembu"
+                },
+                {
+                    "id": "13833693",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Mery Sofi"
+                },
+                {
+                    "id": "13833692",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Bambang Soetiono Soedijanto"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833699",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Mohamad Fauzi Maulana Ichsan"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13833697",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Soegiarto Adikoesoemo"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13833690",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:44+07:00",
+                    "value": "Haryanto Adikoesoemo"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12527813",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:07+07:00",
+                "value": "{\"name\":\"Suresh Vembu\",\"phone\":\"021-5311110 ext.28200\",\"email\":\"suresh.vembu@akr.co.id                                                                                                          \"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "63.71%",
+                "name": "PT ARTHAKENCANA RAYATAMA",
+                "value": "12.79 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "32.74%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "6.57 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "1.36%",
+                "name": "SAHAM TREASURY",
+                "value": "273.70 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.05%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "9.40 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT. ANUGERAH KRIDA RETAILINDO",
+                "percentage": "99.98%",
+                "types": "PERDAGANGAN,",
+                "value": "819592"
+            },
+            {
+                "company": "PT. USAHA ERA PRATAMA NUSANTARA DAN ENTITAS ANAK",
+                "percentage": "99.99%",
+                "types": "JASA LOGISTIK",
+                "value": "7351893"
+            },
+            {
+                "company": "PT. ANDAHANESA ABADI DAN ENTITAS ANAK",
+                "percentage": "99.99%",
+                "types": "JASA LOGISTIK",
+                "value": "406890"
+            },
+            {
+                "company": "PT. ARJUNA UTAMA KIMIA",
+                "percentage": "99.96%",
+                "types": "PABRIKAN BAHAN PEREKAT",
+                "value": "419298"
+            },
+            {
+                "company": "PT. ANUGRAH KARYA RAYA DAN ENTITAS ANAK",
+                "percentage": "99.99%",
+                "types": "PERDAGANGAN DAN PERTAMBANGAN BATUBARA",
+                "value": "86688"
+            },
+            {
+                "company": "PT. JAKARTA TANK TERMINAL",
+                "percentage": "51.00%",
+                "types": "TERMINAL TANGKI PENYIMPANAN",
+                "value": "1426716"
+            },
+            {
+                "company": "PT. AKR SEA TRANSPORT",
+                "percentage": "99.99%",
+                "types": "PELAYARAN DOMESTIK",
+                "value": "547356"
+            },
+            {
+                "company": "PT. AKR NIAGA INDONESIA",
+                "percentage": "99.90%",
+                "types": "PERDAGANGAN KIMIA DASAR",
+                "value": "26266"
+            },
+            {
+                "company": "PT. AKR TRANSPORTASI INDONESIA (ATI)",
+                "percentage": "99.90%",
+                "types": "JASA LOGISTIK",
+                "value": "108280"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "28,669",
+                "change": 444,
+                "change_formatted": "(+444)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "28,225",
+                "change": 1928,
+                "change_formatted": "(+1,928)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "26,297",
+                "change": 805,
+                "change_formatted": "(+805)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "25,492",
+                "change": 1451,
+                "change_formatted": "(+1,451)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "24,041",
+                "change": -901,
+                "change_formatted": "(-901)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "24,942",
+                "change": 664,
+                "change_formatted": "(+664)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "1.06%",
+                "name": "HARYANTO ADIKOESOEMO",
+                "value": "212.60 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.72%",
+                "name": "SOEGIARTO ADIKOESOEMO",
+                "value": "145.27 M",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.24%",
+                "name": "JIMMY TANDYO",
+                "value": "48.00 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.04%",
+                "name": "MERY SOFI",
+                "value": "8.30 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.04%",
+                "name": "BAMBANG SOETIONO S.",
+                "value": "7.78 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.02%",
+                "name": "SURESH VEMBU",
+                "value": "4.93 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "NERY POLIM",
+                "value": "2.96 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.01%",
+                "name": "TERMURTI TIBAN",
+                "value": "1.65 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:10+00:00"
+}

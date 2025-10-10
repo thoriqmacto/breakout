@@ -1,0 +1,820 @@
+{
+    "symbol": "ISAT",
+    "name": "ISAT",
+    "address": [
+        {
+            "id": "222",
+            "email": [
+                "investor@indosatooredoo.com"
+            ],
+            "fax": "(021) 3000 3757",
+            "npwp": "01.000.502.3-051.000",
+            "phone": "(021) 3000 3001",
+            "website": "indosatooredoo.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:21+07:00",
+            "value": "<td colspan='4'> Jl. Medan Merdeka Barat No.21 Jakarta 10110\n\n        \t\t  \t\t\tPhone: (021) 3000 3001\n        \t\t  \t\t\tFax: (021) 3000 3757\n                            NPWP: 01.000.502.3-051.000\n        \t\t  \t\t\tEmail: investor@indosatooredoo.com\n        \t\t  \t\t\tWebsite: indosatooredoo.com\n\n        \t  \t\t\t</td>",
+            "office": "Jl. Medan Merdeka Barat No.21 Jakarta 10110"
+        }
+    ],
+    "background": "PT. Indosat Tbk (ISAT) didirikan oleh Pemerintah pada tanggal 20 November 1967 sebagai perusahaan investasi asing untuk menyediakan layanan telekomunikasi internasional di Indonesia dan mulai beroperasi secara komersial pada bulan September 1969 untuk membangun, mengalihkan dan mengoperasikan International Telecommunications Satellite Organization, atau Intelsat, stasiun bumi di Indonesia untuk mengakses satelit Intelsats Indian Ocean Region. Perusahaan menyediakan layanan selular, prabayar dan pascabayar, melalui produk merek Indosat Mobile, IM3 yang didukung oleh Indosat dan Indosat Internet, layanan telekomunikasi tetap.",
+    "history": {
+        "amount": "725 B",
+        "board": "Papan Utama",
+        "date": "19 Oct 1994",
+        "price": "7,000",
+        "registrar": "",
+        "shares": "103,550,000",
+        "underwriters": [
+            "PT. Bahana Securities",
+            "PT. Danareksa Sekuritas",
+            "PT. Jardine Fleming Nusantara",
+            "PT. Pentasena Arthasentosa"
+        ],
+        "administrative_bureau": "PT. EDI Indonesia",
+        "free_float": "16.34%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "16177949",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "ACHMAD SYAH REZA"
+            },
+            {
+                "id": "16177948",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "AHMAD ABDULAZIZ A A AL-NEAMA"
+            },
+            {
+                "id": "16177947",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "EFTHYMIOS TSOKANIS"
+            },
+            {
+                "id": "16177946",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "RENE HEINZ WERNER"
+            },
+            {
+                "id": "16177942",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "SUGITO WALUJO"
+            },
+            {
+                "id": "16177940",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "CHEUNG KWAN HOI"
+            },
+            {
+                "id": "16177934",
+                "key": "Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "WOO CHIU MAN, CLIFF"
+            }
+        ],
+        "director": [
+            {
+                "id": "16177945",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "SYED BILAL KAZMI"
+            },
+            {
+                "id": "16177944",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "IRSYAD SAHRONI"
+            },
+            {
+                "id": "16177938",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "AHMAD ZULFIKAR"
+            },
+            {
+                "id": "16177937",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "LEE CHI HUNG"
+            },
+            {
+                "id": "16177931",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "CHEUNG KWOK TUNG"
+            },
+            {
+                "id": "16177930",
+                "key": "Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "MUHAMMAD BULDANSYAH"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "16177936",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "AJAY BAHRI"
+            },
+            {
+                "id": "16177935",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "RUDIANTARA"
+            },
+            {
+                "id": "16177933",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "ELISA LUMBANTORUAN"
+            },
+            {
+                "id": "16177929",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "WIJAYANTO "
+            },
+            {
+                "id": "16177928",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "SIDHARTA PRAWIRA OETAMA"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "16177939",
+                "key": "President Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "NEZAR PATRIA"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "16177943",
+                "key": "President Director",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "VIKRAM SINHA"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [
+            {
+                "id": "16177941",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "AZIZ AHMAD M ALUTHMAN FAKHROO"
+            },
+            {
+                "id": "16177932",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-10-02T23:23:21+07:00",
+                "value": "FOK KIN NING, CANNING"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530366",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:21+07:00",
+            "value": "{\"name\":\"Billy Nikolas Simanjuntak\",\"phone\":\"021 3000 3001\",\"email\":\"billy.simanjuntak@indosatooredoo.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "65.6444%",
+            "name": "OOREDOO HUTCHISON ASIA PTE. LTD",
+            "value": "21.17 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "16.3411%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.27 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "9.6323%",
+            "name": "PT PERUSAHAAN PENGELOLA ASET",
+            "value": "3.11 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "8.3316%",
+            "name": "PT TIGA TELEKOMUNIKASI INDONESIA",
+            "value": "2.69 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0151%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "4.86 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "NEGARA REPUBLIK INDONESIA",
+            "value": "1.00",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Starone Mitra Telekomunikasi (  SMT  )",
+            "percentage": "99.94%",
+            "types": "Telekomunikasi",
+            "value": "19220"
+        },
+        {
+            "company": "PT Aplikanusa Lintasarta (  Lintasarta  )",
+            "percentage": "72.36%",
+            "types": "Komunikasi Data",
+            "value": "5316378"
+        },
+        {
+            "company": "PT Lintas Media Danawa (LMD)",
+            "percentage": "50.65%",
+            "types": "Jasa Informasi dan Komunikasi",
+            "value": "6462"
+        },
+        {
+            "company": "PT Interactive Vision Media (  IVM )",
+            "percentage": "99.83%",
+            "types": "TV Berbayar",
+            "value": "7525"
+        },
+        {
+            "company": "PT Portal Bursa Digital",
+            "percentage": "62.00%",
+            "types": "Portal Web",
+            "value": "100139"
+        },
+        {
+            "company": "Indosat Singapore Pte. Ltd. (  ISPL )",
+            "percentage": "100%",
+            "types": "Telekomunikasi",
+            "value": "328470"
+        },
+        {
+            "company": "PT Indosat Mega Media (  IMM  )",
+            "percentage": "99.85%",
+            "types": "Multimedia",
+            "value": "832329"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "19,584",
+            "change": 3150,
+            "change_formatted": "(+3,150)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "16,434",
+            "change": 1878,
+            "change_formatted": "(+1,878)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "14,556",
+            "change": -1704,
+            "change_formatted": "(-1,704)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "16,260",
+            "change": -2319,
+            "change_formatted": "(-2,319)"
+        },
+        {
+            "shareholder_date": "31 May 2025",
+            "total_share": "18,579",
+            "change": 592,
+            "change_formatted": "(+592)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "17,987",
+            "change": -175,
+            "change_formatted": "(-175)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.0273%",
+            "name": "VIKRAM SINHA",
+            "value": "8.80 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0046%",
+            "name": "MUHAMMAD BULDANSYAH",
+            "value": "1.48 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0036%",
+            "name": "CHI HUNG LEE",
+            "value": "1.17 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1994-10-19T00:00:00+07:00",
+    "ipo_price": 7000,
+    "float": 16.34,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "222",
+                "email": [
+                    "investor@indosatooredoo.com"
+                ],
+                "fax": "(021) 3000 3757",
+                "npwp": "01.000.502.3-051.000",
+                "phone": "(021) 3000 3001",
+                "website": "indosatooredoo.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:21+07:00",
+                "value": "<td colspan='4'> Jl. Medan Merdeka Barat No.21 Jakarta 10110\n\n        \t\t  \t\t\tPhone: (021) 3000 3001\n        \t\t  \t\t\tFax: (021) 3000 3757\n                            NPWP: 01.000.502.3-051.000\n        \t\t  \t\t\tEmail: investor@indosatooredoo.com\n        \t\t  \t\t\tWebsite: indosatooredoo.com\n\n        \t  \t\t\t</td>",
+                "office": "Jl. Medan Merdeka Barat No.21 Jakarta 10110"
+            }
+        ],
+        "background": "PT. Indosat Tbk (ISAT) didirikan oleh Pemerintah pada tanggal 20 November 1967 sebagai perusahaan investasi asing untuk menyediakan layanan telekomunikasi internasional di Indonesia dan mulai beroperasi secara komersial pada bulan September 1969 untuk membangun, mengalihkan dan mengoperasikan International Telecommunications Satellite Organization, atau Intelsat, stasiun bumi di Indonesia untuk mengakses satelit Intelsats Indian Ocean Region. Perusahaan menyediakan layanan selular, prabayar dan pascabayar, melalui produk merek Indosat Mobile, IM3 yang didukung oleh Indosat dan Indosat Internet, layanan telekomunikasi tetap.",
+        "history": {
+            "amount": "725 B",
+            "board": "Papan Utama",
+            "date": "19 Oct 1994",
+            "price": "7,000",
+            "registrar": "",
+            "shares": "103,550,000",
+            "underwriters": [
+                "PT. Bahana Securities",
+                "PT. Danareksa Sekuritas",
+                "PT. Jardine Fleming Nusantara",
+                "PT. Pentasena Arthasentosa"
+            ],
+            "administrative_bureau": "PT. EDI Indonesia",
+            "free_float": "16.34%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "16177949",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "ACHMAD SYAH REZA"
+                },
+                {
+                    "id": "16177948",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "AHMAD ABDULAZIZ A A AL-NEAMA"
+                },
+                {
+                    "id": "16177947",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "EFTHYMIOS TSOKANIS"
+                },
+                {
+                    "id": "16177946",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "RENE HEINZ WERNER"
+                },
+                {
+                    "id": "16177942",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "SUGITO WALUJO"
+                },
+                {
+                    "id": "16177940",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "CHEUNG KWAN HOI"
+                },
+                {
+                    "id": "16177934",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "WOO CHIU MAN, CLIFF"
+                }
+            ],
+            "director": [
+                {
+                    "id": "16177945",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "SYED BILAL KAZMI"
+                },
+                {
+                    "id": "16177944",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "IRSYAD SAHRONI"
+                },
+                {
+                    "id": "16177938",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "AHMAD ZULFIKAR"
+                },
+                {
+                    "id": "16177937",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "LEE CHI HUNG"
+                },
+                {
+                    "id": "16177931",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "CHEUNG KWOK TUNG"
+                },
+                {
+                    "id": "16177930",
+                    "key": "Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "MUHAMMAD BULDANSYAH"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "16177936",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "AJAY BAHRI"
+                },
+                {
+                    "id": "16177935",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "RUDIANTARA"
+                },
+                {
+                    "id": "16177933",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "ELISA LUMBANTORUAN"
+                },
+                {
+                    "id": "16177929",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "WIJAYANTO "
+                },
+                {
+                    "id": "16177928",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "SIDHARTA PRAWIRA OETAMA"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "16177939",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "NEZAR PATRIA"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "16177943",
+                    "key": "President Director",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "VIKRAM SINHA"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [
+                {
+                    "id": "16177941",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "AZIZ AHMAD M ALUTHMAN FAKHROO"
+                },
+                {
+                    "id": "16177932",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-10-02T23:23:21+07:00",
+                    "value": "FOK KIN NING, CANNING"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530366",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:21+07:00",
+                "value": "{\"name\":\"Billy Nikolas Simanjuntak\",\"phone\":\"021 3000 3001\",\"email\":\"billy.simanjuntak@indosatooredoo.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "65.6444%",
+                "name": "OOREDOO HUTCHISON ASIA PTE. LTD",
+                "value": "21.17 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "16.3411%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.27 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "9.6323%",
+                "name": "PT PERUSAHAAN PENGELOLA ASET",
+                "value": "3.11 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "8.3316%",
+                "name": "PT TIGA TELEKOMUNIKASI INDONESIA",
+                "value": "2.69 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0151%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "4.86 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "NEGARA REPUBLIK INDONESIA",
+                "value": "1.00",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Starone Mitra Telekomunikasi (  SMT  )",
+                "percentage": "99.94%",
+                "types": "Telekomunikasi",
+                "value": "19220"
+            },
+            {
+                "company": "PT Aplikanusa Lintasarta (  Lintasarta  )",
+                "percentage": "72.36%",
+                "types": "Komunikasi Data",
+                "value": "5316378"
+            },
+            {
+                "company": "PT Lintas Media Danawa (LMD)",
+                "percentage": "50.65%",
+                "types": "Jasa Informasi dan Komunikasi",
+                "value": "6462"
+            },
+            {
+                "company": "PT Interactive Vision Media (  IVM )",
+                "percentage": "99.83%",
+                "types": "TV Berbayar",
+                "value": "7525"
+            },
+            {
+                "company": "PT Portal Bursa Digital",
+                "percentage": "62.00%",
+                "types": "Portal Web",
+                "value": "100139"
+            },
+            {
+                "company": "Indosat Singapore Pte. Ltd. (  ISPL )",
+                "percentage": "100%",
+                "types": "Telekomunikasi",
+                "value": "328470"
+            },
+            {
+                "company": "PT Indosat Mega Media (  IMM  )",
+                "percentage": "99.85%",
+                "types": "Multimedia",
+                "value": "832329"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "19,584",
+                "change": 3150,
+                "change_formatted": "(+3,150)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "16,434",
+                "change": 1878,
+                "change_formatted": "(+1,878)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "14,556",
+                "change": -1704,
+                "change_formatted": "(-1,704)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "16,260",
+                "change": -2319,
+                "change_formatted": "(-2,319)"
+            },
+            {
+                "shareholder_date": "31 May 2025",
+                "total_share": "18,579",
+                "change": 592,
+                "change_formatted": "(+592)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "17,987",
+                "change": -175,
+                "change_formatted": "(-175)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.0273%",
+                "name": "VIKRAM SINHA",
+                "value": "8.80 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0046%",
+                "name": "MUHAMMAD BULDANSYAH",
+                "value": "1.48 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0036%",
+                "name": "CHI HUNG LEE",
+                "value": "1.17 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T04:52:21+00:00"
+}
