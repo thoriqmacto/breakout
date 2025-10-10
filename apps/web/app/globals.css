@@ -120,3 +120,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  [data-dashboard-main] table thead {
+    position: sticky;
+    top: var(--dashboard-header-offset, 0px);
+    z-index: 20;
+    background-color: var(--color-background);
+    box-shadow: 0 1px 0 0 var(--color-border);
+  }
+
+  [data-dashboard-main] table thead th {
+    background-color: inherit;
+  }
+}
