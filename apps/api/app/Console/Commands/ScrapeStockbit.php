@@ -21,6 +21,7 @@ class ScrapeStockbit extends Command
         {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
         {--all : Process all tickers configured in csv.index_symbols}
         {--market-detector : Fetch market detector data for the provided tickers}
+        {--historical : Fetch historical data for the provided tickers}
         {--from= : YYYY-MM-DD (default: IPO date if available, otherwise 14 days ago)}
         {--to=   : YYYY-MM-DD (default: today)}
         {--no-persist : Skip persisting EOD OHLCV data to CSV/DB}
@@ -39,13 +40,13 @@ class ScrapeStockbit extends Command
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
     {
         $fetchMarketDetector = (bool) $this->option('market-detector');
-        $fromOption = $fetchMarketDetector ? $this->option('from') : null;
-        $toOption = $fetchMarketDetector ? $this->option('to') : null;
+        $fetchHistorical = (bool) $this->option('historical');
+        $fromOption = ($fetchMarketDetector || $fetchHistorical) ? $this->option('from') : null;
+        $toOption = ($fetchMarketDetector || $fetchHistorical) ? $this->option('to') : null;
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
-        $historicalDir = trim('historical_summary', '/');
-        $csvDir  = 'broker_summary_csv';
+        $historicalDir = trim('historical', '/');
 
         $defaults = config('stockbit.defaults', []);
         $transactionType = is_string($defaults['transaction_type'] ?? null)
@@ -72,7 +73,7 @@ class ScrapeStockbit extends Command
         if ($historicalLimit !== null && $historicalLimit <= 0) {
             $historicalLimit = null;
         }
-        $historicalPageDefault = $historicalDefaults['page'] ?? null;
+        $historicalPageDefault = $historicalDefaults['page'] ?? 1;
         $historicalPage = is_numeric($historicalPageDefault) ? (int) $historicalPageDefault : null;
         if ($historicalPage !== null && $historicalPage <= 0) {
             $historicalPage = null;
@@ -140,10 +141,6 @@ class ScrapeStockbit extends Command
                 $this->line('Profile sync skipped for ' . $symbol);
             }
 
-            if (!$fetchMarketDetector) {
-                continue;
-            }
-
             $ipoDate = $profileUpdater->getIPODate($symbol);
             $rangeFrom = $fromOption !== null
                 ? Carbon::parse($fromOption)
@@ -155,51 +152,23 @@ class ScrapeStockbit extends Command
                 continue;
             }
 
-            $rangeFromString = $rangeFrom->toDateString();
-            $rangeToString = $rangeTo->toDateString();
-
             $chunkStart = $rangeFrom->copy();
             $chunkEndLimit = $rangeTo->copy();
             $allRows = [];
-            while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
-                $chunkEnd = $chunkStart->copy()->addYear()->subDay();
-                if ($chunkEnd->greaterThan($chunkEndLimit)) {
-                    $chunkEnd = $chunkEndLimit->copy();
-                }
 
-                $fromString = $chunkStart->toDateString();
-                $toString = $chunkEnd->toDateString();
-
-                $this->info("Fetching {$symbol} {$fromString} → {$toString}");
-
-                $json = $api->marketDetectors(
-                    $symbol,
-                    $fromString,
-                    $toString,
-                    $transactionType,
-                    $marketBoard,
-                    $investorType,
-                    $limit,
-                );
-
-                if (isset($json['error'])) {
-                    $this->error("Error for {$symbol}: {$json['error']} — {$json['message']}");
-                    $chunkStart = $chunkEnd->copy()->addDay();
-                    if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
-                        sleep(10);
+            if ($fetchMarketDetector){
+                while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                    $chunkEnd = $chunkStart->copy()->addYear()->subDay();
+                    if ($chunkEnd->greaterThan($chunkEndLimit)) {
+                        $chunkEnd = $chunkEndLimit->copy();
                     }
-                    continue;
-                }
 
-                $chunkResponses = [$json];
-                $visitedPages = [];
-                $nextPage = $this->extractNextPage($json);
+                    $fromString = $chunkStart->toDateString();
+                    $toString = $chunkEnd->toDateString();
 
-                while ($nextPage !== null && !in_array($nextPage, $visitedPages, true)) {
-                    $visitedPages[] = $nextPage;
-                    $this->line("Fetching {$symbol} {$fromString} → {$toString} (page {$nextPage})");
+                    $this->info("Fetching broksum {$symbol} {$fromString} → {$toString}");
 
-                    $paginatedJson = $api->marketDetectors(
+                    $json = $api->marketDetectors(
                         $symbol,
                         $fromString,
                         $toString,
@@ -207,55 +176,94 @@ class ScrapeStockbit extends Command
                         $marketBoard,
                         $investorType,
                         $limit,
-                        $nextPage,
                     );
 
-                    if (isset($paginatedJson['error'])) {
-                        $this->warn(
-                            "Error for {$symbol} page {$nextPage}: " .
-                            ($paginatedJson['error'] ?? 'error') .
-                            ' — ' .
-                            ($paginatedJson['message'] ?? 'Unknown error')
+                    if (isset($json['error'])) {
+                        $this->error("Error for broksum {$symbol}: {$json['error']} — {$json['message']}");
+                        $chunkStart = $chunkEnd->copy()->addDay();
+                        if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                            sleep(10);
+                        }
+                        continue;
+                    }
+
+                    $chunkResponses = [$json];
+                    $visitedPages = [];
+                    $nextPage = $this->extractNextPage($json);
+
+                    while ($nextPage !== null && !in_array($nextPage, $visitedPages, true)) {
+                        $visitedPages[] = $nextPage;
+                        $this->line("Fetching broksum {$symbol} {$fromString} → {$toString} (page {$nextPage})");
+
+                        $paginatedJson = $api->marketDetectors(
+                            $symbol,
+                            $fromString,
+                            $toString,
+                            $transactionType,
+                            $marketBoard,
+                            $investorType,
+                            $limit,
+                            $nextPage,
                         );
-                        break;
+
+                        if (isset($paginatedJson['error'])) {
+                            $this->warn(
+                                "Error for {$symbol} page {$nextPage}: " .
+                                ($paginatedJson['error'] ?? 'error') .
+                                ' — ' .
+                                ($paginatedJson['message'] ?? 'Unknown error')
+                            );
+                            break;
+                        }
+
+                        $chunkResponses[] = $paginatedJson;
+                        $nextPage = $this->extractNextPage($paginatedJson);
+
+                        if ($nextPage !== null) {
+                            usleep(200_000);
+                        }
                     }
 
-                    $chunkResponses[] = $paginatedJson;
-                    $nextPage = $this->extractNextPage($paginatedJson);
+                    if ($nextPage !== null && in_array($nextPage, $visitedPages, true)) {
+                        $this->warn("Detected repeated next_page={$nextPage} for {$symbol}; stopping pagination to prevent an infinite loop.");
+                    }
 
-                    if ($nextPage !== null) {
-                        usleep(200_000);
+                    $json = $this->mergePaginatedResponses($chunkResponses);
+
+                    $jsonName = sprintf(
+                        '%s_%s_%s_%s.json',
+                        $symbol,
+                        $fromString,
+                        $toString,
+                        $transactionType ?? 'default'
+                    );
+                    $jsonPath = "{$jsonDir}/{$jsonName}";
+
+                    Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                    $this->line('Saved Broksum: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
+
+                    $chunkRows = BrokerSummaryTransformer::toRows($symbol, $json);
+                    $allRows = array_merge($allRows, $chunkRows);
+                    $chunkStart = $chunkEnd->copy()->addDay();
+
+                    if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                        $this->line('Waiting 10 seconds before next fetch to respect rate limits…');
+                        sleep(10);
                     }
                 }
+            }
 
-                if ($nextPage !== null && in_array($nextPage, $visitedPages, true)) {
-                    $this->warn("Detected repeated next_page={$nextPage} for {$symbol}; stopping pagination to prevent an infinite loop.");
-                }
-
-                $json = $this->mergePaginatedResponses($chunkResponses);
-
-                $historicalResponses = [];
-                $historicalVisitedPages = [];
-                $historicalNextPage = $historicalPage;
-
-                while (true) {
-                    if ($historicalResponses !== [] && $historicalNextPage === null) {
-                        break;
+            if ($fetchHistorical){
+                while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                    $chunkEnd = $chunkStart->copy()->addYear()->subDay();
+                    if ($chunkEnd->greaterThan($chunkEndLimit)) {
+                        $chunkEnd = $chunkEndLimit->copy();
                     }
 
-                    $pageToFetch = $historicalResponses === [] ? $historicalPage : $historicalNextPage;
+                    $fromString = $chunkStart->toDateString();
+                    $toString = $chunkEnd->toDateString();
 
-                    if ($pageToFetch !== null && in_array($pageToFetch, $historicalVisitedPages, true)) {
-                        $this->warn("Detected repeated historical next_page={$pageToFetch} for {$symbol}; stopping pagination to prevent an infinite loop.");
-                        break;
-                    }
-
-                    if ($pageToFetch !== null) {
-                        $historicalVisitedPages[] = $pageToFetch;
-                    }
-
-                    $pageMessage = $pageToFetch !== null ? " (page {$pageToFetch})" : '';
-                    $this->line("Fetching historical summary {$symbol} {$fromString} → {$toString}{$pageMessage}");
+                    $this->info("Fetching historical {$symbol} {$fromString} → {$toString} (page {$historicalPage})");
 
                     $historicalResponse = $api->historicalSummary(
                         $symbol,
@@ -263,62 +271,70 @@ class ScrapeStockbit extends Command
                         $fromString,
                         $toString,
                         $historicalLimit,
-                        $pageToFetch,
+                        $historicalPage,
                     );
 
                     if (isset($historicalResponse['error'])) {
-                        $code = $historicalResponse['error'] ?? 'error';
-                        $message = $historicalResponse['message'] ?? 'Unknown error';
-                        $this->warn("Historical summary error for {$symbol}{$pageMessage}: {$code} — {$message}");
-
-                        break;
+                        $this->error("Error for historical {$symbol}: {$json['error']} — {$json['message']}");
+                        $chunkStart = $chunkEnd->copy()->addDay();
+                        if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                            sleep(10);
+                        }
+                        continue;
                     }
 
-                    $historicalResponses[] = $historicalResponse;
-                    $historicalNextPage = $this->extractNextPage($historicalResponse);
+                    $historicalResponses = [$historicalResponse['data']['result']];
+                    $historicalVisitedPages = [];
+                    $historicalNextPage = $this->extractNextPage($historicalResponse['data']);
+                    $totalData = count($historicalResponse['data']['result']);
 
-                    if ($historicalNextPage !== null) {
-                        usleep(200_000);
+                    while ($historicalNextPage !== null && !in_array($historicalNextPage, $historicalVisitedPages, true) && $totalData !== 0) {
+                        $historicalVisitedPages[] = $historicalNextPage;
+                        $this->info("Fetching historical {$symbol} {$fromString} → {$toString} (page {$historicalNextPage})");
+
+                        $paginatedHistorical = $api->historicalSummary(
+                            $symbol,
+                            $historicalPeriod,
+                            $fromString,
+                            $toString,
+                            $historicalLimit,
+                            $historicalNextPage,
+                        );
+
+                        if (isset($paginatedHistorical['error'])) {
+                            $this->warn(
+                                "Error for historical {$symbol} page {$historicalNextPage}: " .
+                                ($paginatedHistorical['error']) .
+                                ' — ' .
+                                ($paginatedHistorical['message'] ?? 'Unknown error')
+                            );
+                            break;
+                        }
+
+                        $historicalResponses[] = $paginatedHistorical['data']['result'];
+                        $historicalNextPage = $this->extractNextPage($paginatedHistorical['data']);
+                        $totalData = count($paginatedHistorical['data']['result']);
+
+                        if ($historicalNextPage !== null) {
+                            usleep(200_000);
+                        }
                     }
-                }
 
-                $historical = null;
-                if ($historicalResponses !== []) {
-                    $historical = $this->mergePaginatedResponses($historicalResponses);
-                }
+                    if (count($historicalResponses)>0) {
+                        $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
+                        $historicalName = implode('_', $historicalNameParts) . '.json';
+                        $historicalPath = "{$historicalDir}/{$historicalName}";
 
-                $jsonName = sprintf(
-                    '%s_%s_%s_%s.json',
-                    $symbol,
-                    $fromString,
-                    $toString,
-                    $transactionType ?? 'default'
-                );
-                $jsonPath = "{$jsonDir}/{$jsonName}";
-
-                Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->line('Saved Broksum: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
-
-                if ($historical !== null) {
-                    $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
-                    if ($historicalPage !== null) {
-                        $historicalNameParts[] = 'page' . $historicalPage;
+                        Storage::disk($disk)->put($historicalPath, json_encode($historicalResponses, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                        $this->line('Saved Historical: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
                     }
-                    $historicalName = implode('_', $historicalNameParts) . '.json';
-                    $historicalPath = "{$historicalDir}/{$historicalName}";
 
-                    Storage::disk($disk)->put($historicalPath, json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                    $this->line('Saved Historical: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
-                }
+                    $chunkStart = $chunkEnd->copy()->addDay();
 
-                $chunkRows = BrokerSummaryTransformer::toRows($symbol, $json);
-                $allRows = array_merge($allRows, $chunkRows);
-
-                $chunkStart = $chunkEnd->copy()->addDay();
-
-                if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
-                    $this->line('Waiting 10 seconds before next fetch to respect rate limits…');
-                    sleep(10);
+                    if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
+                        $this->warn('Waiting 3 seconds before next fetch to respect rate limits');
+                        sleep(3);
+                    }
                 }
             }
             usleep(200_000);
@@ -392,7 +408,7 @@ class ScrapeStockbit extends Command
             $candidates[] = $response['next_page'];
         }
 
-        foreach (['meta', 'pagination'] as $containerKey) {
+        foreach (['meta', 'pagination', 'paginate'] as $containerKey) {
             if (!isset($response[$containerKey]) || !is_array($response[$containerKey])) {
                 continue;
             }
