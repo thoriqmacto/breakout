@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
+use App\Http\Controllers\Api\V1\ScraperRequestController;
 
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Assets
@@ -32,4 +33,8 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
 
     // Backtest
     Route::get('backtest', [BacktestController::class, 'run']);
+
+    // Scraper requests history
+    Route::get('scraper-requests', [ScraperRequestController::class, 'index']);
+    Route::post('scraper-requests', [ScraperRequestController::class, 'store']);
 });
