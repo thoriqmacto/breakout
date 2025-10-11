@@ -19,6 +19,10 @@ const navigation = [
     href: "/dashboard/assets",
   },
   {
+    label: "Scrapers",
+    href: "/dashboard/scrapers",
+  },
+  {
     label: "Reports",
     href: "/dashboard/reports",
     disabled: true,
