@@ -1,0 +1,858 @@
+{
+    "symbol": "ENRG",
+    "name": "ENRG",
+    "address": [
+        {
+            "id": "151",
+            "email": [
+                "corsec@emp.id"
+            ],
+            "fax": "021-29941247",
+            "npwp": "02.091.654.0-081.000",
+            "phone": "021-29941540",
+            "website": "www.emp.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:50+07:00",
+            "value": "<td colspan='4'>Bakrie Tower 32nd Floor, Rasuna Epicentrum, Jl. HR Rasuna Said, Jakarta 12960\n\n        \t\t  \t\t\tPhone: 021-29941540\n        \t\t  \t\t\tFax: 021-29941247\n                            NPWP: 02.091.654.0-081.000\n        \t\t  \t\t\tEmail: corsec@emp.id\n        \t\t  \t\t\tWebsite: www.emp.id\n\n        \t  \t\t\t</td>",
+            "office": "Bakrie Tower 32nd Floor, Rasuna Epicentrum, Jl. HR Rasuna Said, Jakarta 12960"
+        }
+    ],
+    "background": "PT Energi Mega Persada Tbk. adalah sebuah perusahaan hulu minyak dan gas bumi yang memiliki wilayah operasi di Indonesia dan Mozambik. Kegiatan usaha EMP meliputi eksplorasi, pengembangan dan produksi minyak mentah, gas bumi dan gas metana batubara.\n",
+    "history": {
+        "amount": "456 B",
+        "board": "Papan Utama",
+        "date": "7 Jun 2004",
+        "price": "160",
+        "registrar": "",
+        "shares": "2,847,432,960",
+        "underwriters": [
+            "PT. Danatama Makmur"
+        ],
+        "administrative_bureau": "PT. Ficomindo Buana Registrar",
+        "free_float": "41.68%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "15075283",
+                "key": "Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "TRI FIRMANTO"
+            },
+            {
+                "id": "15075284",
+                "key": "Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "KELIK RUDI SUHARYA"
+            },
+            {
+                "id": "15075285",
+                "key": "Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "RIRI HOSNIARI HARAHAP"
+            },
+            {
+                "id": "15075286",
+                "key": "Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "ADINDA ANDARINA BAKRIE"
+            },
+            {
+                "id": "15075289",
+                "key": "Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "EDI SUTRIONO"
+            }
+        ],
+        "independent_commissioner": [],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "15075287",
+                "key": "President Director",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "SYAILENDRA SURMANSYAH BAKRIE"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "15075288",
+                "key": "Vice President",
+                "lastupdate": "2025-08-22T17:54:46+07:00",
+                "value": "EDOARDUS ARDIANTO"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529470",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:50+07:00",
+            "value": "{\"name\":\"Riri Hosniari Harahap\",\"phone\":\"52906250\",\"email\":\"riri.harahap@energi-mp.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "54.42%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "14.15 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "20.55%",
+            "name": "TRIMEGAH SEKURITAS INDONESIA TBK, PT",
+            "value": "5.34 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "17.34%",
+            "name": "PT SHIMA GLOBAL KAPITAL",
+            "value": "4.51 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "7.69%",
+            "name": "PT CGS INTERNATIONAL SEKURITAS INDONESIA",
+            "value": "2.00 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "592.52 K",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "EMP Energy Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "140122098"
+        },
+        {
+            "company": "EMP Energy Offshore Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "130312664"
+        },
+        {
+            "company": "Buzi Hydrocarbons Pte., Ltd",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "16129769"
+        },
+        {
+            "company": "EMP Energi Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "100"
+        },
+        {
+            "company": "Roset International Holdings Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "RHI Corporation",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "750346056"
+        },
+        {
+            "company": "EMP Malacca Strait S.A.",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "750379633"
+        },
+        {
+            "company": "PT Imbang Tata Alam",
+            "percentage": "99.99%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "60506833"
+        },
+        {
+            "company": "Energi Mega Pratama Inc.",
+            "percentage": "50.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "538824260"
+        },
+        {
+            "company": "EMP Exploration (Kangean) Ltd.",
+            "percentage": "50.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "222367382"
+        },
+        {
+            "company": "Kangean Energy Indonesia Ltd.",
+            "percentage": "50.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "360777517"
+        },
+        {
+            "company": "PT Tunas Harapan Perkasa",
+            "percentage": "99.99%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "309793380"
+        },
+        {
+            "company": "PT EMP Semberah",
+            "percentage": "99.99%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "9918085"
+        },
+        {
+            "company": "PT EMP Gelam",
+            "percentage": "99.99%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "7768517"
+        },
+        {
+            "company": "EMP Gebang Limited",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "29693622"
+        },
+        {
+            "company": "EMP Bentu Limited",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "253999970"
+        },
+        {
+            "company": "EMP (Korinci Baru) Limited",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "10312610"
+        },
+        {
+            "company": "Energy Mega Persada Pte Ltd.",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "10"
+        },
+        {
+            "company": "EMP International Holdings Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "Enviroco Company Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "68787832"
+        },
+        {
+            "company": "EMP Tonga",
+            "percentage": "99.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "33319284"
+        },
+        {
+            "company": "EMP Holding Singapore Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "57151659"
+        },
+        {
+            "company": "PT Visi Multi Artha",
+            "percentage": "70.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "7784189"
+        },
+        {
+            "company": "PT Artha Widya Persada",
+            "percentage": "70.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "72218"
+        },
+        {
+            "company": "PT EMP Energi Indonesia",
+            "percentage": "99.99%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "182996562"
+        },
+        {
+            "company": "Freemont Capital Group Limited",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "Goldhill Investments Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "4253"
+        },
+        {
+            "company": "Allgold (88) Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "0"
+        },
+        {
+            "company": "EMP International (BVI) Ltd.",
+            "percentage": "51.00%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "253205124"
+        },
+        {
+            "company": "EMP ONWJ Ltd.",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "432483182"
+        },
+        {
+            "company": "PT Kencana Surya Perkasa",
+            "percentage": "100%",
+            "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+            "value": "8134854"
+        },
+        {
+            "company": "Tansar Gas Pte., Ltd.",
+            "percentage": "70.00%",
+            "types": "Investasi",
+            "value": "8"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "38,523",
+            "change": -2820,
+            "change_formatted": "(-2,820)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "41,343",
+            "change": 1882,
+            "change_formatted": "(+1,882)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "39,461",
+            "change": -6766,
+            "change_formatted": "(-6,766)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "46,227",
+            "change": 10198,
+            "change_formatted": "(+10,198)"
+        },
+        {
+            "shareholder_date": "30 May 2025",
+            "total_share": "36,029",
+            "change": 1570,
+            "change_formatted": "(+1,570)"
+        },
+        {
+            "shareholder_date": "30 Apr 2025",
+            "total_share": "34,459",
+            "change": -349,
+            "change_formatted": "(-349)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2004-06-07T00:00:00+07:00",
+    "ipo_price": 160,
+    "float": 41.68,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "151",
+                "email": [
+                    "corsec@emp.id"
+                ],
+                "fax": "021-29941247",
+                "npwp": "02.091.654.0-081.000",
+                "phone": "021-29941540",
+                "website": "www.emp.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:50+07:00",
+                "value": "<td colspan='4'>Bakrie Tower 32nd Floor, Rasuna Epicentrum, Jl. HR Rasuna Said, Jakarta 12960\n\n        \t\t  \t\t\tPhone: 021-29941540\n        \t\t  \t\t\tFax: 021-29941247\n                            NPWP: 02.091.654.0-081.000\n        \t\t  \t\t\tEmail: corsec@emp.id\n        \t\t  \t\t\tWebsite: www.emp.id\n\n        \t  \t\t\t</td>",
+                "office": "Bakrie Tower 32nd Floor, Rasuna Epicentrum, Jl. HR Rasuna Said, Jakarta 12960"
+            }
+        ],
+        "background": "PT Energi Mega Persada Tbk. adalah sebuah perusahaan hulu minyak dan gas bumi yang memiliki wilayah operasi di Indonesia dan Mozambik. Kegiatan usaha EMP meliputi eksplorasi, pengembangan dan produksi minyak mentah, gas bumi dan gas metana batubara.\n",
+        "history": {
+            "amount": "456 B",
+            "board": "Papan Utama",
+            "date": "7 Jun 2004",
+            "price": "160",
+            "registrar": "",
+            "shares": "2,847,432,960",
+            "underwriters": [
+                "PT. Danatama Makmur"
+            ],
+            "administrative_bureau": "PT. Ficomindo Buana Registrar",
+            "free_float": "41.68%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "15075283",
+                    "key": "Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "TRI FIRMANTO"
+                },
+                {
+                    "id": "15075284",
+                    "key": "Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "KELIK RUDI SUHARYA"
+                },
+                {
+                    "id": "15075285",
+                    "key": "Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "RIRI HOSNIARI HARAHAP"
+                },
+                {
+                    "id": "15075286",
+                    "key": "Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "ADINDA ANDARINA BAKRIE"
+                },
+                {
+                    "id": "15075289",
+                    "key": "Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "EDI SUTRIONO"
+                }
+            ],
+            "independent_commissioner": [],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "15075287",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "SYAILENDRA SURMANSYAH BAKRIE"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "15075288",
+                    "key": "Vice President",
+                    "lastupdate": "2025-08-22T17:54:46+07:00",
+                    "value": "EDOARDUS ARDIANTO"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529470",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:50+07:00",
+                "value": "{\"name\":\"Riri Hosniari Harahap\",\"phone\":\"52906250\",\"email\":\"riri.harahap@energi-mp.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "54.42%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "14.15 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "20.55%",
+                "name": "TRIMEGAH SEKURITAS INDONESIA TBK, PT",
+                "value": "5.34 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "17.34%",
+                "name": "PT SHIMA GLOBAL KAPITAL",
+                "value": "4.51 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "7.69%",
+                "name": "PT CGS INTERNATIONAL SEKURITAS INDONESIA",
+                "value": "2.00 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "592.52 K",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "EMP Energy Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "140122098"
+            },
+            {
+                "company": "EMP Energy Offshore Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "130312664"
+            },
+            {
+                "company": "Buzi Hydrocarbons Pte., Ltd",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "16129769"
+            },
+            {
+                "company": "EMP Energi Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "100"
+            },
+            {
+                "company": "Roset International Holdings Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "RHI Corporation",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "750346056"
+            },
+            {
+                "company": "EMP Malacca Strait S.A.",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "750379633"
+            },
+            {
+                "company": "PT Imbang Tata Alam",
+                "percentage": "99.99%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "60506833"
+            },
+            {
+                "company": "Energi Mega Pratama Inc.",
+                "percentage": "50.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "538824260"
+            },
+            {
+                "company": "EMP Exploration (Kangean) Ltd.",
+                "percentage": "50.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "222367382"
+            },
+            {
+                "company": "Kangean Energy Indonesia Ltd.",
+                "percentage": "50.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "360777517"
+            },
+            {
+                "company": "PT Tunas Harapan Perkasa",
+                "percentage": "99.99%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "309793380"
+            },
+            {
+                "company": "PT EMP Semberah",
+                "percentage": "99.99%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "9918085"
+            },
+            {
+                "company": "PT EMP Gelam",
+                "percentage": "99.99%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "7768517"
+            },
+            {
+                "company": "EMP Gebang Limited",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "29693622"
+            },
+            {
+                "company": "EMP Bentu Limited",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "253999970"
+            },
+            {
+                "company": "EMP (Korinci Baru) Limited",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "10312610"
+            },
+            {
+                "company": "Energy Mega Persada Pte Ltd.",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "10"
+            },
+            {
+                "company": "EMP International Holdings Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "Enviroco Company Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "68787832"
+            },
+            {
+                "company": "EMP Tonga",
+                "percentage": "99.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "33319284"
+            },
+            {
+                "company": "EMP Holding Singapore Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "57151659"
+            },
+            {
+                "company": "PT Visi Multi Artha",
+                "percentage": "70.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "7784189"
+            },
+            {
+                "company": "PT Artha Widya Persada",
+                "percentage": "70.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "72218"
+            },
+            {
+                "company": "PT EMP Energi Indonesia",
+                "percentage": "99.99%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "182996562"
+            },
+            {
+                "company": "Freemont Capital Group Limited",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "Goldhill Investments Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "4253"
+            },
+            {
+                "company": "Allgold (88) Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "0"
+            },
+            {
+                "company": "EMP International (BVI) Ltd.",
+                "percentage": "51.00%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "253205124"
+            },
+            {
+                "company": "EMP ONWJ Ltd.",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "432483182"
+            },
+            {
+                "company": "PT Kencana Surya Perkasa",
+                "percentage": "100%",
+                "types": "Eksplorasi dan Produksi Minyak dan Gas Bumi",
+                "value": "8134854"
+            },
+            {
+                "company": "Tansar Gas Pte., Ltd.",
+                "percentage": "70.00%",
+                "types": "Investasi",
+                "value": "8"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "38,523",
+                "change": -2820,
+                "change_formatted": "(-2,820)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "41,343",
+                "change": 1882,
+                "change_formatted": "(+1,882)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "39,461",
+                "change": -6766,
+                "change_formatted": "(-6,766)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "46,227",
+                "change": 10198,
+                "change_formatted": "(+10,198)"
+            },
+            {
+                "shareholder_date": "30 May 2025",
+                "total_share": "36,029",
+                "change": 1570,
+                "change_formatted": "(+1,570)"
+            },
+            {
+                "shareholder_date": "30 Apr 2025",
+                "total_share": "34,459",
+                "change": -349,
+                "change_formatted": "(-349)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2025-10-10T12:17:38+00:00"
+}

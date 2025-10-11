@@ -47,7 +47,7 @@ class AssetMetricsCommand extends Command
             $roc13 = round($metrics->rocWeeks(13), 2);
             $avgVol20 = $metrics->averageVolume(20);
             $lastVolume = $metrics->lastVolume();
-            $volToAvg = $avgVol20 > 0 ? round($lastVolume / $avgVol20, 2) : 0;
+            $volToAvg = $avgVol20 > 0 ? round($lastVolume / $avgVol20, 5) : 0;
             $avgVol20 = round($avgVol20, 0);
             $high20 = $metrics->periodHigh(20);
             $high55 = $metrics->periodHigh(55);
