@@ -1,7 +1,9 @@
 "use client"
 
-import { FormEvent, useMemo, useState } from "react"
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react"
+import { Check, Clipboard } from "lucide-react"
 
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 
 const DEFAULT_BASE_URL = "https://exodus.stockbit.com"
 
@@ -38,7 +41,33 @@ const normalizeQuery = (value: string) => {
   return trimmed.startsWith("?") ? trimmed : `?${trimmed}`
 }
 
+type ScraperHistoryEntry = {
+  id: number
+  base_url: string
+  endpoint: string | null
+  query: string | null
+  bearer_token: string | null
+  request_url: string
+  curl_command: string
+  response_status: string | null
+  response_body: string
+  created_at: string | null
+  updated_at: string | null
+}
+
+type SaveHistoryPayload = {
+  base_url: string
+  endpoint: string | null
+  query: string | null
+  bearer_token: string | null
+  request_url: string
+  curl_command: string
+  response_status: string | null
+  response_body: string
+}
+
 export default function ScrapersPage() {
+  const { accessToken } = useAuth()
   const [baseUrl, setBaseUrl] = useState(DEFAULT_BASE_URL)
   const [endpoint, setEndpoint] = useState("")
   const [query, setQuery] = useState("")
@@ -47,6 +76,10 @@ export default function ScrapersPage() {
   const [responseStatus, setResponseStatus] = useState<string | null>(null)
   const [responseBody, setResponseBody] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<ScraperHistoryEntry[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyError, setHistoryError] = useState<string | null>(null)
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle")
 
   const requestUrl = useMemo(() => {
     const normalizedBase = normalizeBaseUrl(baseUrl.trim())
@@ -71,6 +104,97 @@ export default function ScrapersPage() {
     return `curl -X GET "${requestUrl}"${headerString}`
   }, [bearerToken, requestUrl])
 
+  const loadHistory = useCallback(async () => {
+    if (!accessToken) {
+      setHistory([])
+      return
+    }
+
+    setHistoryLoading(true)
+    setHistoryError(null)
+
+    try {
+      const response = await fetch(buildApiUrl("/v1/scraper-requests"), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      const payload = await parseJson<ApiResponse<ScraperHistoryEntry[]>>(response)
+
+      if (!response.ok) {
+        const message =
+          (payload && "message" in payload && typeof payload.message === "string" && payload.message) ||
+          "Unable to load saved commands."
+        throw new Error(message)
+      }
+
+      if (!payload || payload.status !== "success" || !Array.isArray(payload.data)) {
+        throw new Error("Unexpected response when loading saved commands.")
+      }
+
+      setHistory(payload.data)
+    } catch (historyError) {
+      console.error(historyError)
+      setHistoryError(historyError instanceof Error ? historyError.message : "Unable to load saved commands.")
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [accessToken])
+
+  useEffect(() => {
+    void loadHistory()
+  }, [loadHistory])
+
+  useEffect(() => {
+    setCopyStatus("idle")
+  }, [responseBody])
+
+  const saveHistory = useCallback(
+    async (payload: SaveHistoryPayload) => {
+      if (!accessToken) {
+        return
+      }
+
+      try {
+        const response = await fetch(buildApiUrl("/v1/scraper-requests"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+        })
+
+        const data = await parseJson<ApiResponse<ScraperHistoryEntry>>(response)
+
+        if (!response.ok) {
+          const message =
+            (data && "message" in data && typeof data.message === "string" && data.message) ||
+            "Unable to save this request."
+          throw new Error(message)
+        }
+
+        if (!data || data.status !== "success" || !data.data) {
+          throw new Error("Unexpected response when saving the request.")
+        }
+
+        setHistory((previous) => {
+          const filtered = previous.filter((entry) => entry.id !== data.data.id)
+          return [data.data, ...filtered].slice(0, 50)
+        })
+        setHistoryError(null)
+      } catch (saveError) {
+        console.error(saveError)
+        setHistoryError("Unable to save this request for later.")
+      }
+    },
+    [accessToken],
+  )
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -87,6 +211,17 @@ export default function ScrapersPage() {
     setResponseStatus(null)
     setResponseBody(null)
 
+    const historyBasePayload: SaveHistoryPayload = {
+      base_url: normalizeBaseUrl(baseUrl),
+      endpoint: endpoint.trim() || null,
+      query: query.trim() || null,
+      bearer_token: bearerToken.trim() || null,
+      request_url: requestUrl,
+      curl_command: curlCommand,
+      response_status: null,
+      response_body: "",
+    }
+
     try {
       const response = await fetch(requestUrl, {
         method: "GET",
@@ -94,26 +229,67 @@ export default function ScrapersPage() {
       })
 
       const statusLabel = `${response.status} ${response.statusText || ""}`.trim()
-      setResponseStatus(statusLabel)
-
       const text = await response.text()
+
+      let formattedBody = text || "No response body returned."
 
       try {
         const parsed = JSON.parse(text)
-        setResponseBody(JSON.stringify(parsed, null, 2))
+        formattedBody = JSON.stringify(parsed, null, 2)
       } catch {
-        setResponseBody(text || "No response body returned.")
+        // Leave as plain text
       }
+
+      setResponseStatus(statusLabel)
+      setResponseBody(formattedBody)
+
+      historyBasePayload.response_status = statusLabel || null
+      historyBasePayload.response_body = formattedBody
+
+      void saveHistory(historyBasePayload)
     } catch (requestError) {
-      if (requestError instanceof Error) {
-        setError(requestError.message)
-      } else {
-        setError("Request failed. Please try again.")
-      }
+      const message =
+        requestError instanceof Error ? requestError.message : "Request failed. Please try again."
+      setError(message)
+      setResponseStatus("Request failed")
+      setResponseBody(message)
+
+      historyBasePayload.response_status = "Request failed"
+      historyBasePayload.response_body = message
+
+      void saveHistory(historyBasePayload)
     } finally {
       setIsLoading(false)
     }
   }
+
+  const handleCopyResponse = useCallback(async () => {
+    if (!responseBody) {
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(responseBody)
+      setCopyStatus("copied")
+      setTimeout(() => setCopyStatus("idle"), 2000)
+    } catch (copyError) {
+      console.error("Failed to copy response", copyError)
+    }
+  }, [responseBody])
+
+  const handleSelectHistory = useCallback(
+    (entry: ScraperHistoryEntry) => {
+      setBaseUrl(entry.base_url || DEFAULT_BASE_URL)
+      setEndpoint(entry.endpoint ?? "")
+      setQuery(entry.query ?? "")
+      setBearerToken(entry.bearer_token ?? "")
+      setResponseStatus(entry.response_status ?? null)
+      setResponseBody(entry.response_body ?? "")
+      setError(null)
+      setCopyStatus("idle")
+    },
+    [],
+  )
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -212,11 +388,21 @@ export default function ScrapersPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Response</CardTitle>
-          <CardDescription>
-            The API response will be formatted for readability when possible.
-          </CardDescription>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle>Response</CardTitle>
+            <CardDescription>The API response will be formatted for readability when possible.</CardDescription>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleCopyResponse}
+            disabled={!responseBody}
+          >
+            {copyStatus === "copied" ? <Check className="size-4" /> : <Clipboard className="size-4" />}
+            {copyStatus === "copied" ? "Copied" : "Copy"}
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {error ? (
@@ -234,6 +420,49 @@ export default function ScrapersPage() {
           <pre className="bg-muted text-xs max-h-[560px] overflow-auto rounded-md border px-3 py-3 font-mono text-left text-foreground/80 whitespace-pre-wrap">
             {responseBody ?? (isLoading ? "" : "Awaiting response...")}
           </pre>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Saved Commands</CardTitle>
+          <CardDescription>Review previous requests and quickly reload them into the form.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {historyLoading ? (
+            <p className="text-sm text-muted-foreground">Loading saved commands...</p>
+          ) : historyError ? (
+            <p className="text-sm text-destructive">{historyError}</p>
+          ) : history.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No saved commands yet. Send a request to start building your history.</p>
+          ) : (
+            history.map((entry) => (
+              <Button
+                key={entry.id}
+                type="button"
+                variant="outline"
+                className="h-auto w-full flex-col items-start gap-2 whitespace-normal text-left"
+                onClick={() => handleSelectHistory(entry)}
+              >
+                <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                  <span className="text-sm font-medium">
+                    {entry.response_status ? `Status: ${entry.response_status}` : "Status unavailable"}
+                  </span>
+                  {entry.created_at ? (
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(entry.created_at).toLocaleString()}
+                    </span>
+                  ) : null}
+                </div>
+                <code className="block w-full overflow-hidden text-xs font-mono text-muted-foreground">
+                  {entry.curl_command}
+                </code>
+                <pre className="w-full max-h-32 overflow-hidden whitespace-pre-wrap text-xs text-muted-foreground">
+                  {entry.response_body}
+                </pre>
+              </Button>
+            ))
+          )}
         </CardContent>
       </Card>
     </div>
