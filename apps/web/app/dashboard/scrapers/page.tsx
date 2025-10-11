@@ -169,12 +169,15 @@ export default function ScrapersPage() {
               <label className="text-sm font-medium" htmlFor="bearer-token">
                 Bearer Token (optional)
               </label>
-              <Input
+              <textarea
                 id="bearer-token"
                 value={bearerToken}
                 onChange={(event) => setBearerToken(event.target.value)}
                 placeholder="Paste your token here"
                 autoComplete="off"
+                spellCheck={false}
+                rows={4}
+                className="w-full min-h-24 resize-y overflow-auto rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40"
               />
             </div>
 
@@ -189,12 +192,14 @@ export default function ScrapersPage() {
               <label className="text-sm font-medium" htmlFor="curl-command">
                 Generated Command
               </label>
-              <pre
+              <textarea
                 id="curl-command"
-                className="bg-muted text-xs rounded-md border px-3 py-2 font-mono text-left text-foreground/80"
-              >
-                {curlCommand}
-              </pre>
+                value={curlCommand}
+                readOnly
+                rows={4}
+                spellCheck={false}
+                className="bg-muted text-xs w-full min-h-24 resize-y overflow-auto rounded-md border px-3 py-2 font-mono text-left text-foreground/80 whitespace-pre-wrap focus-visible:border-ring focus-visible:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
             </div>
 
             <div className="flex items-center justify-end">
@@ -226,7 +231,7 @@ export default function ScrapersPage() {
                 : "No request sent yet."}
           </p>
 
-          <pre className="bg-muted text-xs max-h-[420px] overflow-auto rounded-md border px-3 py-3 font-mono text-left text-foreground/80 whitespace-pre-wrap">
+          <pre className="bg-muted text-xs max-h-[560px] overflow-auto rounded-md border px-3 py-3 font-mono text-left text-foreground/80 whitespace-pre-wrap">
             {responseBody ?? (isLoading ? "" : "Awaiting response...")}
           </pre>
         </CardContent>
