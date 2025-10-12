@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             BulkAssetCsvSeeder::class,
             AssetProfileJsonSeeder::class,
+            TradingDaySeeder::class,
         ]);
     }
 }
