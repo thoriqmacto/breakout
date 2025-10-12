@@ -80,6 +80,7 @@ export default function ScrapersPage() {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle")
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const requestUrl = useMemo(() => {
     const normalizedBase = normalizeBaseUrl(baseUrl.trim())
@@ -291,6 +292,59 @@ export default function ScrapersPage() {
     [],
   )
 
+  const handleDeleteHistory = useCallback(
+    async (id: number) => {
+      if (!accessToken) {
+        return
+      }
+
+      setDeletingId(id)
+      setHistoryError(null)
+
+      try {
+        const response = await fetch(buildApiUrl(`/v1/scraper-requests/${id}`), {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        let payload: ApiResponse<unknown> | null = null
+
+        try {
+          payload = await parseJson<ApiResponse<unknown>>(response)
+        } catch (error) {
+          console.error("Failed to parse delete response", error)
+        }
+
+        if (!response.ok) {
+          const message =
+            (payload &&
+              typeof payload === "object" &&
+              payload !== null &&
+              "message" in payload &&
+              typeof (payload as { message?: unknown }).message === "string" &&
+              (payload as { message: string }).message) ||
+            "Unable to delete this saved command."
+          throw new Error(message)
+        }
+
+        setHistory((previous) => previous.filter((entry) => entry.id !== id))
+      } catch (deleteError) {
+        console.error(deleteError)
+        setHistoryError(
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Unable to delete this saved command.",
+        )
+      } finally {
+        setDeletingId((previous) => (previous === id ? null : previous))
+      }
+    },
+    [accessToken],
+  )
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <Card>
@@ -436,32 +490,59 @@ export default function ScrapersPage() {
           ) : history.length === 0 ? (
             <p className="text-sm text-muted-foreground">No saved commands yet. Send a request to start building your history.</p>
           ) : (
-            history.map((entry) => (
-              <Button
-                key={entry.id}
-                type="button"
-                variant="outline"
-                className="h-auto w-full flex-col items-start gap-2 whitespace-normal text-left"
-                onClick={() => handleSelectHistory(entry)}
-              >
-                <div className="flex w-full flex-wrap items-center justify-between gap-2">
-                  <span className="text-sm font-medium">
-                    {entry.response_status ? `Status: ${entry.response_status}` : "Status unavailable"}
-                  </span>
-                  {entry.created_at ? (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(entry.created_at).toLocaleString()}
-                    </span>
-                  ) : null}
-                </div>
-                <code className="block w-full overflow-hidden text-xs font-mono text-muted-foreground">
-                  {entry.curl_command}
-                </code>
-                <pre className="w-full max-h-32 overflow-hidden whitespace-pre-wrap text-xs text-muted-foreground">
-                  {entry.response_body}
-                </pre>
-              </Button>
-            ))
+            <div className="overflow-hidden rounded-md border">
+              <table className="w-full table-fixed border-collapse text-sm">
+                <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="w-14 px-3 py-2 text-left font-medium">#</th>
+                    <th className="px-3 py-2 text-left font-medium">Request URL</th>
+                    <th className="w-40 px-3 py-2 text-left font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((entry, index) => (
+                    <tr key={entry.id} className="border-t bg-background/50 align-top">
+                      <td className="px-3 py-2 text-xs font-medium text-muted-foreground">{index + 1}</td>
+                      <td className="px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectHistory(entry)}
+                          className="w-full break-words text-left text-sm font-medium text-primary underline-offset-4 hover:underline focus:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {entry.request_url}
+                        </button>
+                        {entry.created_at ? (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Saved {new Date(entry.created_at).toLocaleString()}
+                          </p>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSelectHistory(entry)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteHistory(entry.id)}
+                            disabled={deletingId === entry.id}
+                          >
+                            {deletingId === entry.id ? "Deleting..." : "Delete"}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
