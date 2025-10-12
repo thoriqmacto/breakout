@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { Bot, Boxes, FileText, LayoutDashboard, PanelLeft, PanelRight, Terminal } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -56,48 +56,12 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [isHeaderPinned, setIsHeaderPinned] = useState(false)
-  const [headerHeight, setHeaderHeight] = useState(0)
-  const headerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login")
     }
   }, [loading, router, user])
-
-  const updateHeaderHeight = useCallback(() => {
-    const height = headerRef.current?.offsetHeight ?? 0
-    setHeaderHeight((previous) => (previous === height ? previous : height))
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const height = headerRef.current?.offsetHeight ?? 0
-      const pinned = window.scrollY > height
-
-      setIsHeaderPinned((previous) => (previous === pinned ? previous : pinned))
-    }
-
-    updateHeaderHeight()
-    window.addEventListener("scroll", handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [updateHeaderHeight])
-
-  useEffect(() => {
-    updateHeaderHeight()
-  }, [isHeaderPinned, updateHeaderHeight])
-
-  useEffect(() => {
-    window.addEventListener("resize", updateHeaderHeight)
-
-    return () => {
-      window.removeEventListener("resize", updateHeaderHeight)
-    }
-  }, [updateHeaderHeight])
 
   if (loading || !user) {
     return (
@@ -169,24 +133,21 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      <div
-        className="flex min-h-screen flex-1 flex-col"
-        style={{
-          ["--dashboard-header-height" as string]: `${headerHeight}px`,
-          ["--dashboard-header-offset" as string]: `${
-            isHeaderPinned ? headerHeight : 0
-          }px`,
-        }}
-      >
-        <header
-          ref={headerRef}
-          className={cn(
-            "flex flex-col gap-4 border-b bg-background px-6 transition-all duration-300 lg:flex-row lg:items-center lg:justify-between",
-            isHeaderPinned
-              ? "sticky top-0 z-30 bg-background/95 py-2 shadow-sm backdrop-blur"
-              : "py-4",
-          )}
+      {isSidebarCollapsed ? (
+        <Button
+          type="button"
+          variant="secondary"
+          size="icon"
+          className="fixed left-4 top-4 z-40 hidden lg:inline-flex"
+          onClick={() => setIsSidebarCollapsed(false)}
+          aria-label="Expand sidebar"
         >
+          <PanelRight className="size-4" />
+        </Button>
+      ) : null}
+
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="flex flex-col gap-4 border-b bg-background px-6 py-4 transition-all duration-300 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-start gap-3 lg:items-center">
               <Button
@@ -201,22 +162,9 @@ export default function DashboardLayout({
                 {isSidebarCollapsed ? <PanelRight className="size-4" /> : <PanelLeft className="size-4" />}
               </Button>
               <div className="flex min-w-0 flex-col text-left">
-                {isHeaderPinned ? (
-                  <p className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                    <span className="uppercase tracking-wide">Signed in as</span>
-                    <span className="font-medium text-foreground">{user.name}</span>
-                    <span aria-hidden className="text-muted-foreground">
-                      ·
-                    </span>
-                    <span className="text-muted-foreground">{user.email}</span>
-                  </p>
-                ) : (
-                  <>
-                    <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </>
-                )}
+                <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
+                <p className="text-sm font-medium">{user.name}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
             </div>
 
