@@ -167,7 +167,7 @@ export default function DashboardLayout({
         </Button>
       ) : null}
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <header
           className={cn(
             "sticky top-0 z-30 flex flex-col gap-4 border-b bg-background/95 px-6 transition-all duration-300 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:flex-row lg:items-center lg:justify-between",
