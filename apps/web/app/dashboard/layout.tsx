@@ -56,12 +56,26 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isHeaderCondensed, setIsHeaderCondensed] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login")
     }
   }, [loading, router, user])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeaderCondensed(window.scrollY > 16)
+    }
+
+    handleScroll()
+    window.addEventListener("scroll", handleScroll)
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
 
   if (loading || !user) {
     return (
@@ -76,7 +90,7 @@ export default function DashboardLayout({
     <div className="flex min-h-screen bg-muted/30">
       <aside
         className={cn(
-          "hidden flex-col overflow-hidden border-r bg-sidebar transition-all duration-300 ease-in-out lg:flex",
+          "sticky top-0 hidden h-screen shrink-0 flex-col border-r bg-sidebar transition-all duration-300 ease-in-out lg:flex",
           isSidebarCollapsed ? "w-16 px-2 py-6" : "w-64 px-6 py-8",
         )}
       >
@@ -99,37 +113,44 @@ export default function DashboardLayout({
             </p>
           </div>
 
-          <nav className="flex flex-1 flex-col gap-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              const Icon = item.icon
-              const className = buttonVariants({
-                variant: isActive ? "secondary" : "ghost",
-                size: "sm",
-              })
+          <div className="flex flex-1 flex-col overflow-y-auto">
+            <nav
+              className={cn(
+                "flex flex-col gap-1",
+                isSidebarCollapsed ? "items-center" : undefined,
+              )}
+            >
+              {navigation.map((item) => {
+                const isActive = pathname === item.href
+                const Icon = item.icon
+                const className = buttonVariants({
+                  variant: isActive ? "secondary" : "ghost",
+                  size: "sm",
+                })
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.disabled ? "#" : item.href}
-                  className={cn(
-                    className,
-                    "w-full",
-                    isSidebarCollapsed ? "justify-center px-0" : "justify-start",
-                    item.disabled ? "pointer-events-none opacity-50" : undefined,
-                  )}
-                  aria-disabled={item.disabled}
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {isSidebarCollapsed ? (
-                    <span className="sr-only">{item.label}</span>
-                  ) : (
-                    <span className="truncate">{item.label}</span>
-                  )}
-                </Link>
-              )
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.disabled ? "#" : item.href}
+                    className={cn(
+                      className,
+                      "w-full",
+                      isSidebarCollapsed ? "justify-center px-0" : "justify-start",
+                      item.disabled ? "pointer-events-none opacity-50" : undefined,
+                    )}
+                    aria-disabled={item.disabled}
+                  >
+                    <Icon className="size-4" aria-hidden />
+                    {isSidebarCollapsed ? (
+                      <span className="sr-only">{item.label}</span>
+                    ) : (
+                      <span className="truncate">{item.label}</span>
+                    )}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
         </div>
       </aside>
 
@@ -147,7 +168,12 @@ export default function DashboardLayout({
       ) : null}
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="flex flex-col gap-4 border-b bg-background px-6 py-4 transition-all duration-300 lg:flex-row lg:items-center lg:justify-between">
+        <header
+          className={cn(
+            "sticky top-0 z-30 flex flex-col gap-4 border-b bg-background/95 px-6 transition-all duration-300 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:flex-row lg:items-center lg:justify-between",
+            isHeaderCondensed ? "py-2 shadow-sm" : "py-4",
+          )}
+        >
           <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-start gap-3 lg:items-center">
               <Button
@@ -162,9 +188,20 @@ export default function DashboardLayout({
                 {isSidebarCollapsed ? <PanelRight className="size-4" /> : <PanelLeft className="size-4" />}
               </Button>
               <div className="flex min-w-0 flex-col text-left">
-                <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
+                {isHeaderCondensed ? (
+                  <p className="text-sm font-medium text-foreground">
+                    <span className="block truncate">
+                      {user.name}
+                      {user.email ? ` · ${user.email}` : ""}
+                    </span>
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </>
+                )}
               </div>
             </div>
 
