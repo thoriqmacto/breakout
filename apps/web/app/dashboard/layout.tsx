@@ -3,33 +3,46 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
-import { PanelLeft, PanelRight } from "lucide-react"
+import { Bot, Boxes, FileText, LayoutDashboard, PanelLeft, PanelRight, Terminal } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const navigation = [
+type NavigationItem = {
+  label: string
+  href: string
+  disabled?: boolean
+  icon: LucideIcon
+}
+
+const navigation: NavigationItem[] = [
   {
     label: "Overview",
     href: "/dashboard",
+    icon: LayoutDashboard,
   },
   {
     label: "Assets",
     href: "/dashboard/assets",
+    icon: Boxes,
   },
   {
     label: "Scrapers",
     href: "/dashboard/scrapers",
+    icon: Terminal,
   },
   {
     label: "Reports",
     href: "/dashboard/reports",
+    icon: FileText,
     disabled: true,
   },
   {
     label: "Automation",
     href: "/dashboard/automation",
+    icon: Bot,
     disabled: true,
   },
 ]
@@ -100,47 +113,60 @@ export default function DashboardLayout({
       <aside
         className={cn(
           "hidden flex-col overflow-hidden border-r bg-sidebar transition-all duration-300 ease-in-out lg:flex",
-          isSidebarCollapsed
-            ? "w-0 border-r-0 px-0 py-0 opacity-0"
-            : "w-64 px-6 py-8 opacity-100",
+          isSidebarCollapsed ? "w-16 px-2 py-6" : "w-64 px-6 py-8",
         )}
-        aria-hidden={isSidebarCollapsed}
       >
-        {!isSidebarCollapsed && (
-          <>
-            <div className="space-y-2 pb-8">
-              <Link href="/dashboard" className="text-lg font-semibold">
-                Breakout Dashboard
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                Stay up to date with trading performance.
-              </p>
-            </div>
+        <div className="flex h-full flex-col gap-6">
+          <div
+            className={cn(
+              "space-y-2 pb-4 transition-opacity duration-200",
+              isSidebarCollapsed ? "pointer-events-none opacity-0" : "opacity-100",
+            )}
+          >
+            <Link
+              href="/dashboard"
+              className="block text-lg font-semibold"
+              tabIndex={isSidebarCollapsed ? -1 : 0}
+            >
+              Breakout Dashboard
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              Stay up to date with trading performance.
+            </p>
+          </div>
 
-            <nav className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href
-                const className = buttonVariants({
-                  variant: isActive ? "secondary" : "ghost",
-                  size: "sm",
-                })
+          <nav className="flex flex-1 flex-col gap-1">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href
+              const Icon = item.icon
+              const className = buttonVariants({
+                variant: isActive ? "secondary" : "ghost",
+                size: "sm",
+              })
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.disabled ? "#" : item.href}
-                    className={`${className} w-full justify-start ${
-                      item.disabled ? "pointer-events-none opacity-50" : ""
-                    }`}
-                    aria-disabled={item.disabled}
-                  >
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </nav>
-          </>
-        )}
+              return (
+                <Link
+                  key={item.href}
+                  href={item.disabled ? "#" : item.href}
+                  className={cn(
+                    className,
+                    "w-full",
+                    isSidebarCollapsed ? "justify-center px-0" : "justify-start",
+                    item.disabled ? "pointer-events-none opacity-50" : undefined,
+                  )}
+                  aria-disabled={item.disabled}
+                >
+                  <Icon className="size-4" aria-hidden />
+                  {isSidebarCollapsed ? (
+                    <span className="sr-only">{item.label}</span>
+                  ) : (
+                    <span className="truncate">{item.label}</span>
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
       </aside>
 
       <div
