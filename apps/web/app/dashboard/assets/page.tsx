@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react"
@@ -11,7 +12,7 @@ import {
 import { useAuth } from "@/components/auth-provider"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Settings2 } from "lucide-react"
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
@@ -175,6 +176,7 @@ type ColumnDefinition = {
   cellStickyClassName?: string
   headerClassName?: string
   cellClassName?: string
+  defaultVisible?: boolean
   getSortValue: (row: AssetMetricRow) => string | number | boolean | null
   getCopyValue: (row: AssetMetricRow) => string
   render: (row: AssetMetricRow) => ReactNode
@@ -210,6 +212,7 @@ const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
     label: "Name",
     align: "left",
     cellClassName: "text-muted-foreground",
+    defaultVisible: false,
     getSortValue: (row) => row.name,
     getCopyValue: (row) => row.name,
     render: (row) => row.name,
@@ -352,7 +355,10 @@ const COLUMN_MAP = ASSET_METRIC_COLUMNS.reduce(
   {} as Record<ColumnKey, ColumnDefinition>,
 )
 
-const TABLE_HEADERS = ASSET_METRIC_COLUMNS.map((column) => column.label)
+const ALL_COLUMN_KEYS = ASSET_METRIC_COLUMNS.map((column) => column.key)
+const DEFAULT_VISIBLE_COLUMN_KEYS = ASSET_METRIC_COLUMNS.filter(
+  (column) => column.defaultVisible !== false,
+).map((column) => column.key)
 
 export default function AssetsMetricsPage() {
   const { accessToken } = useAuth()
@@ -362,6 +368,11 @@ export default function AssetsMetricsPage() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle")
   const [copying, setCopying] = useState(false)
   const [sortRules, setSortRules] = useState<SortRule[]>([])
+  const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(
+    DEFAULT_VISIBLE_COLUMN_KEYS,
+  )
+  const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false)
+  const columnMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!accessToken) {
@@ -497,6 +508,86 @@ export default function AssetsMetricsPage() {
     return stabilized.map((item) => item.row)
   }, [rows, sortRules])
 
+  const visibleColumnDefinitions = useMemo(
+    () =>
+      ASSET_METRIC_COLUMNS.filter((column) =>
+        visibleColumns.includes(column.key),
+      ),
+    [visibleColumns],
+  )
+
+  const columnCount = visibleColumnDefinitions.length
+
+  const handleToggleColumn = useCallback((columnKey: ColumnKey) => {
+    setVisibleColumns((previous) => {
+      const isVisible = previous.includes(columnKey)
+
+      if (isVisible) {
+        if (previous.length === 1) {
+          return previous
+        }
+
+        return previous.filter((key) => key !== columnKey)
+      }
+
+      const nextVisible = [...previous, columnKey]
+
+      return ASSET_METRIC_COLUMNS.filter((column) =>
+        nextVisible.includes(column.key),
+      ).map((column) => column.key)
+    })
+  }, [])
+
+  const handleSelectAllColumns = useCallback(() => {
+    setVisibleColumns(ALL_COLUMN_KEYS)
+  }, [])
+
+  const handleResetColumns = useCallback(() => {
+    setVisibleColumns(DEFAULT_VISIBLE_COLUMN_KEYS)
+  }, [])
+
+  useEffect(() => {
+    if (!isColumnMenuOpen) {
+      return
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!columnMenuRef.current) {
+        return
+      }
+
+      if (
+        event.target instanceof Node &&
+        columnMenuRef.current.contains(event.target)
+      ) {
+        return
+      }
+
+      setIsColumnMenuOpen(false)
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsColumnMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isColumnMenuOpen])
+
+  useEffect(() => {
+    setSortRules((previous) => {
+      const next = previous.filter((rule) => visibleColumns.includes(rule.key))
+      return next.length === previous.length ? previous : next
+    })
+  }, [visibleColumns])
+
   const handleCopyTable = useCallback(async () => {
     if (sortedRows.length === 0) {
       return
@@ -511,9 +602,11 @@ export default function AssetsMetricsPage() {
 
     try {
       const tableText = [
-        TABLE_HEADERS.join("\t"),
+        visibleColumnDefinitions.map((column) => column.label).join("\t"),
         ...sortedRows.map((row) =>
-          ASSET_METRIC_COLUMNS.map((column) => column.getCopyValue(row)).join("\t"),
+          visibleColumnDefinitions
+            .map((column) => column.getCopyValue(row))
+            .join("\t"),
         ),
       ].join("\n")
 
@@ -525,7 +618,7 @@ export default function AssetsMetricsPage() {
     } finally {
       setCopying(false)
     }
-  }, [sortedRows])
+  }, [sortedRows, visibleColumnDefinitions])
 
   const handleSortToggle = useCallback((columnKey: ColumnKey, isMultiSort: boolean) => {
     setSortRules((previous) => {
@@ -617,18 +710,82 @@ export default function AssetsMetricsPage() {
             <div className="min-h-[1.25rem] text-sm text-muted-foreground">{copyMessage}</div>
             <div className="text-xs text-muted-foreground">
               Click a column header to sort. Hold <span className="font-semibold">Shift</span> and click to
-              set secondary sort priorities.
+              set secondary sort priorities. Use the Columns menu to show or hide metrics.
             </div>
           </div>
-          <Button type="button" onClick={handleCopyTable} disabled={copying} variant="outline">
-            {copyButtonLabel}
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="relative" ref={columnMenuRef}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsColumnMenuOpen((previous) => !previous)}
+                aria-haspopup="menu"
+                aria-expanded={isColumnMenuOpen}
+              >
+                <Settings2 className="h-4 w-4" aria-hidden />
+                Columns
+              </Button>
+              {isColumnMenuOpen ? (
+                <div className="absolute right-0 z-20 mt-2 w-64 rounded-md border border-border bg-background p-2 text-sm shadow-lg">
+                  <div className="flex items-center justify-between gap-2 border-b border-border/60 px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Visible columns
+                    <button
+                      type="button"
+                      onClick={handleResetColumns}
+                      className="text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  <div className="mt-1 max-h-64 overflow-y-auto">
+                    {ASSET_METRIC_COLUMNS.map((column) => {
+                      const isVisible = visibleColumns.includes(column.key)
+                      const isDisabled = isVisible && columnCount === 1
+
+                      return (
+                        <label
+                          key={column.key}
+                          className={classNames(
+                            "flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted",
+                            isDisabled && "cursor-not-allowed opacity-60",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            className="size-4"
+                            checked={isVisible}
+                            disabled={isDisabled}
+                            onChange={() => handleToggleColumn(column.key)}
+                            aria-label={`Toggle ${column.label} column`}
+                          />
+                          <span className="flex-1 text-foreground">{column.label}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-2 flex items-center justify-end gap-2 border-t border-border/60 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleSelectAllColumns}
+                      className="text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Select all
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <Button type="button" onClick={handleCopyTable} disabled={copying} variant="outline" size="sm">
+              {copyButtonLabel}
+            </Button>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-lg border bg-background text-sm shadow-sm">
             <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
-                {ASSET_METRIC_COLUMNS.map((column) => {
+                {visibleColumnDefinitions.map((column) => {
                   const sortIndex = sortRules.findIndex((rule) => rule.key === column.key)
                   const direction = sortIndex >= 0 ? sortRules[sortIndex].direction : null
                   const alignmentClass = column.align === "right" ? "text-right" : "text-left"
@@ -680,7 +837,7 @@ export default function AssetsMetricsPage() {
             <tbody>
               {sortedRows.map((row) => (
                 <tr key={`${row.symbol}-${row.rank}`} className="border-t border-border/60">
-                  {ASSET_METRIC_COLUMNS.map((column) => (
+                  {visibleColumnDefinitions.map((column) => (
                     <td
                       key={column.key}
                       className={classNames(
@@ -706,10 +863,17 @@ export default function AssetsMetricsPage() {
     error,
     handleCopyTable,
     handleSortToggle,
+    handleToggleColumn,
+    handleResetColumns,
+    handleSelectAllColumns,
+    isColumnMenuOpen,
     loading,
     rows,
     sortRules,
     sortedRows,
+    columnCount,
+    visibleColumnDefinitions,
+    visibleColumns,
   ])
 
   return (
