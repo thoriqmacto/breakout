@@ -175,7 +175,6 @@ export default function TradingDaysPage() {
   const [statistics, setStatistics] = useState<TradingDayStatistics | null>(null)
   const [dateFilter, setDateFilter] = useState("")
   const [dateSort, setDateSort] = useState<"asc" | "desc">("desc")
-  const [goToPageValue, setGoToPageValue] = useState("")
 
   useEffect(() => {
     if (symbols.length === 0) {
@@ -527,8 +526,10 @@ export default function TradingDaysPage() {
     return <ArrowDown className="h-3.5 w-3.5" aria-hidden />
   }
 
-  const handleGoToPageSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+  const PaginationControls = ({ className }: { className?: string }) => {
+    const [goToPageValue, setGoToPageValue] = useState("")
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault()
 
       if (!pagination) {
@@ -543,11 +544,8 @@ export default function TradingDaysPage() {
       const nextPage = Math.min(Math.max(parsed, 1), pagination.lastPage)
       setCurrentPage(nextPage)
       setGoToPageValue("")
-    },
-    [goToPageValue, pagination],
-  )
+    }
 
-  const PaginationControls = ({ className }: { className?: string }) => {
     if (!pagination || rows.length === 0) {
       return null
     }
@@ -563,7 +561,7 @@ export default function TradingDaysPage() {
           Page {pagination.currentPage} of {pagination.lastPage}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-          <form className="flex items-center gap-2" onSubmit={handleGoToPageSubmit}>
+          <form className="flex items-center gap-2" onSubmit={handleSubmit}>
             <Input
               type="number"
               min={1}
