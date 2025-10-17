@@ -90,6 +90,33 @@ class AssetMetricsTest extends TestCase
         $this->assertEquals(2.0, $metrics->atr(14));
     }
 
+    public function test_weekly_atr_considers_full_true_range_components(): void
+    {
+        $bars = [
+            [
+                'date' => '2024-01-05',
+                'open' => 6.0,
+                'high' => 10.0,
+                'low' => 5.0,
+                'close' => 6.0,
+            ],
+            [
+                'date' => '2024-01-12',
+                'open' => 9.0,
+                'high' => 12.0,
+                'low' => 8.0,
+                'close' => 9.0,
+            ],
+        ];
+
+        $metrics = new AssetMetrics($bars);
+
+        // First bar true range = 10 - 5 = 5.
+        // Second bar true range = max(12-8=4, |12-6|=6, |8-6|=2) = 6.
+        // Weekly ATR(2) should therefore be (5 + 6) / 2 = 5.5.
+        $this->assertEqualsWithDelta(5.5, $metrics->atr(2, 'weekly'), 0.0001);
+    }
+
     public function test_weekly_highs_and_moving_averages(): void
     {
         $metrics = $this->metrics();
