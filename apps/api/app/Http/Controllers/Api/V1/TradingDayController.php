@@ -10,11 +10,13 @@ use Illuminate\Http\Request;
 
 class TradingDayController extends ApiController
 {
-    private const DEFAULT_SYMBOLS = ['ANTM', 'INCO', 'MDKA', 'ASII', 'TEBE'];
+    private const FALLBACK_SYMBOLS = ['ANTM', 'INCO', 'MDKA', 'ASII', 'TEBE'];
 
     public function index(Request $request)
     {
         $symbols = $this->resolveSymbols($request);
+
+        $statistics = $this->buildStatistics();
 
         $perPage = (int) $request->query('per_page', 30);
         $perPage = max(1, min($perPage, 200));
@@ -135,6 +137,7 @@ class TradingDayController extends ApiController
             'symbols' => $symbols,
             'trading_days' => $rows,
             'pagination' => $this->buildPaginationMeta($paginator),
+            'statistics' => $statistics,
         ]);
     }
 
@@ -153,10 +156,21 @@ class TradingDayController extends ApiController
         $symbols = array_values(array_unique(array_filter($symbols)));
 
         if ($symbols === []) {
-            $symbols = self::DEFAULT_SYMBOLS;
+            $symbols = $this->defaultSymbols();
         }
 
-        return array_slice($symbols, 0, 5);
+        return $symbols;
+    }
+
+    private function defaultSymbols(): array
+    {
+        $configured = config('csv.index_symbols', []);
+
+        if (is_array($configured) && $configured !== []) {
+            return array_values(array_unique(array_map(fn ($symbol) => strtoupper((string) $symbol), $configured)));
+        }
+
+        return self::FALLBACK_SYMBOLS;
     }
 
     private function loadAssets(array $symbols): array
@@ -179,6 +193,68 @@ class TradingDayController extends ApiController
             'per_page' => $paginator->perPage(),
             'last_page' => $paginator->lastPage(),
             'total' => $paginator->total(),
+        ];
+    }
+
+    private function buildStatistics(): array
+    {
+        $rows = TradingDay::query()
+            ->orderBy('date')
+            ->get(['date', 'close']);
+
+        if ($rows->isEmpty()) {
+            return [
+                'total_valid_trading_days' => 0,
+                'highest_change' => null,
+                'lowest_change' => null,
+            ];
+        }
+
+        $totalValidTradingDays = 0;
+        $previousClose = null;
+        $highestChange = null;
+        $highestDate = null;
+        $lowestChange = null;
+        $lowestDate = null;
+
+        foreach ($rows as $day) {
+            $close = $day->close !== null ? (float) $day->close : null;
+
+            if ($close !== null) {
+                $totalValidTradingDays++;
+
+                if ($previousClose !== null && $previousClose != 0.0) {
+                    $change = (($close - $previousClose) / $previousClose) * 100;
+
+                    if ($highestChange === null || $change > $highestChange) {
+                        $highestChange = $change;
+                        $highestDate = $day->date->toDateString();
+                    }
+
+                    if ($lowestChange === null || $change < $lowestChange) {
+                        $lowestChange = $change;
+                        $lowestDate = $day->date->toDateString();
+                    }
+                }
+
+                $previousClose = $close;
+            }
+        }
+
+        return [
+            'total_valid_trading_days' => $totalValidTradingDays,
+            'highest_change' => $highestChange === null
+                ? null
+                : [
+                    'date' => $highestDate,
+                    'change_percent' => $highestChange,
+                ],
+            'lowest_change' => $lowestChange === null
+                ? null
+                : [
+                    'date' => $lowestDate,
+                    'change_percent' => $lowestChange,
+                ],
         ];
     }
 }
