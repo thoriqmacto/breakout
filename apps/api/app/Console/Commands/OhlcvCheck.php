@@ -10,6 +10,7 @@ use App\Services\PythonRunner;
 use App\Services\StockbitExodusClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Carbon;
 
 class OhlcvCheck extends Command
@@ -19,7 +20,8 @@ class OhlcvCheck extends Command
         {--all : Check all configured index symbols}
         {--from= : Restrict the check to start at this YYYY-MM-DD date}
         {--to= : Restrict the check to end at this YYYY-MM-DD date}
-        {--resolve= : Resolve detected issues (supported: extra-bars, missing-days)}';
+        {--resolve= : Resolve detected issues (supported: extra-bars, missing-days)}
+        {--force-delete : Remove unresolved trading days from the calendar when resolving missing days}';
 
     protected $description = 'Check OHLCV bar integrity for assets.';
 
@@ -37,6 +39,7 @@ class OhlcvCheck extends Command
         $from = $this->option('from') ?: null;
         $to = $this->option('to') ?: null;
         $resolve = $this->option('resolve') ?: null;
+        $forceDelete = (bool) $this->option('force-delete');
 
         if ($resolve !== null) {
             $resolve = strtolower((string) $resolve);
@@ -52,8 +55,12 @@ class OhlcvCheck extends Command
             }
         }
 
+        if ($forceDelete && $resolve !== 'missing-days') {
+            $this->warn('The --force-delete option is only applicable when resolving missing days.');
+        }
+
         if ($this->option('all')) {
-            return $this->checkAllConfiguredSymbols($from, $to, $resolve);
+            return $this->checkAllConfiguredSymbols($from, $to, $resolve, $forceDelete);
         }
 
         $symbol = $this->argument('symbol');
@@ -63,7 +70,7 @@ class OhlcvCheck extends Command
             return self::INVALID;
         }
 
-        $result = $this->checkSymbol(strtoupper((string) $symbol), $from, $to, $resolve);
+        $result = $this->checkSymbol(strtoupper((string) $symbol), $from, $to, $resolve, $forceDelete);
         if ($result === null) {
             return self::FAILURE;
         }
@@ -71,7 +78,7 @@ class OhlcvCheck extends Command
         return $result ? self::SUCCESS : self::FAILURE;
     }
 
-    private function checkAllConfiguredSymbols(?string $from, ?string $to, ?string $resolve): int
+    private function checkAllConfiguredSymbols(?string $from, ?string $to, ?string $resolve, bool $forceDelete): int
     {
         $symbols = array_map('strtoupper', config('csv.index_symbols', []));
         if ($symbols === []) {
@@ -82,7 +89,7 @@ class OhlcvCheck extends Command
 
         $hadIssues = false;
         foreach ($symbols as $symbol) {
-            $result = $this->checkSymbol($symbol, $from, $to, $resolve);
+            $result = $this->checkSymbol($symbol, $from, $to, $resolve, $forceDelete);
             if ($result !== true) {
                 $hadIssues = true;
             }
@@ -91,7 +98,7 @@ class OhlcvCheck extends Command
         return $hadIssues ? self::FAILURE : self::SUCCESS;
     }
 
-    private function checkSymbol(string $symbol, ?string $from, ?string $to, ?string $resolve): ?bool
+    private function checkSymbol(string $symbol, ?string $from, ?string $to, ?string $resolve, bool $forceDelete): ?bool
     {
         /** @var Asset|null $asset */
         $asset = Asset::query()->where('symbol', $symbol)->first();
@@ -117,7 +124,7 @@ class OhlcvCheck extends Command
         if ($resolve === 'missing-days' && !empty($report['missing_trading_days'])) {
             $this->newLine();
             $this->info(sprintf('Resolving missing trading days for %s...', $symbol));
-            $this->resolveMissingDays($asset, $report['missing_trading_days']);
+            $this->resolveMissingDays($asset, $report['missing_trading_days'], $forceDelete);
             $report = $this->checker->checkAsset($asset, $from, $to);
         } elseif ($resolve === 'missing-days') {
             $this->newLine();
@@ -229,7 +236,7 @@ class OhlcvCheck extends Command
         }
     }
 
-    private function resolveMissingDays(Asset $asset, array $missingDays): void
+    private function resolveMissingDays(Asset $asset, array $missingDays, bool $forceDelete): void
     {
         $dates = array_values(array_unique(array_filter(
             $missingDays,
@@ -286,6 +293,10 @@ class OhlcvCheck extends Command
                         $asset->symbol,
                         $date
                     ));
+
+                    if ($forceDelete) {
+                        $this->forceDeleteTradingDay($date);
+                    }
 
                     continue;
                 }
@@ -546,5 +557,86 @@ class OhlcvCheck extends Command
         }
 
         return null;
+    }
+
+    private function forceDeleteTradingDay(string $date): void
+    {
+        $deleted = DB::table('trading_days')->where('date', $date)->delete();
+
+        if ($deleted > 0) {
+            $this->info(sprintf('  Removed trading day %s from database.', $date));
+        } else {
+            $this->warn(sprintf('  Trading day %s not found in database.', $date));
+        }
+
+        $path = database_path('seeders/data/trading_days.php');
+
+        if (!is_file($path)) {
+            $this->warn('  Trading day seeder file not found; skipping seeder removal.');
+
+            return;
+        }
+
+        try {
+            $data = include $path;
+        } catch (\Throwable $e) {
+            $this->warn('  Unable to load trading day seeder file: ' . $e->getMessage());
+
+            return;
+        }
+
+        if (!is_array($data)) {
+            $this->warn('  Trading day seeder file did not return an array; skipping seeder removal.');
+
+            return;
+        }
+
+        $remaining = [];
+        $removed = false;
+
+        foreach ($data as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            if (($row['date'] ?? null) === $date) {
+                $removed = true;
+
+                continue;
+            }
+
+            $remaining[] = $row;
+        }
+
+        if (!$removed) {
+            $this->warn(sprintf('  Trading day %s not found in seeder file.', $date));
+
+            return;
+        }
+
+        $contents = "<?php\n\nreturn " . $this->exportArray(array_values($remaining)) . ";\n";
+
+        File::ensureDirectoryExists(dirname($path));
+
+        if (File::put($path, $contents) === false) {
+            $this->warn('  Failed to update trading day seeder file.');
+
+            return;
+        }
+
+        $this->info(sprintf('  Removed trading day %s from seeder file.', $date));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $records
+     */
+    private function exportArray(array $records): string
+    {
+        $export = var_export($records, true);
+
+        $export = preg_replace('/^([ ]*)array \(/m', '$1[', $export);
+        $export = preg_replace('/\)(,?)$/m', ']$1', $export);
+
+        return str_replace('NULL', 'null', (string) $export);
     }
 }
