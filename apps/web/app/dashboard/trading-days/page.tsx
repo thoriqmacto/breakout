@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { useAuth } from "@/components/auth-provider"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Card,
   CardContent,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/card"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { cn } from "@/lib/utils"
+import { ArrowDown, ArrowUp } from "lucide-react"
 
 const indexFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
@@ -58,6 +60,11 @@ type TradingDaysApiResponse = {
     last_page: number
     total: number
   }
+  statistics?: {
+    total_valid_trading_days?: number
+    highest_change?: { date?: string; change_percent?: number | null } | null
+    lowest_change?: { date?: string; change_percent?: number | null } | null
+  }
 }
 
 type TradingDayRow = {
@@ -72,6 +79,17 @@ type PaginationMeta = {
   perPage: number
   lastPage: number
   total: number
+}
+
+type TradingDayStatisticChange = {
+  date: string
+  changePercent: number
+}
+
+type TradingDayStatistics = {
+  totalValidTradingDays: number
+  highestChange: TradingDayStatisticChange | null
+  lowestChange: TradingDayStatisticChange | null
 }
 
 const normalizeNumber = (value: unknown): number | null => {
@@ -115,6 +133,42 @@ const normalizeRow = (row: TradingDayApiRow): TradingDayRow => ({
   symbols: normalizeSymbols(row.symbols ?? {}),
 })
 
+const normalizeChangeStatistic = (
+  value: { date?: string; change_percent?: number | null } | null | undefined,
+): TradingDayStatisticChange | null => {
+  if (!value || typeof value.date !== "string") {
+    return null
+  }
+
+  const change = normalizeNumber(value.change_percent ?? null)
+  if (change === null) {
+    return null
+  }
+
+  return {
+    date: value.date,
+    changePercent: change,
+  }
+}
+
+const normalizeStatistics = (
+  stats: TradingDaysApiResponse["statistics"] | undefined,
+): TradingDayStatistics | null => {
+  if (!stats) {
+    return null
+  }
+
+  const total = normalizeNumber(stats.total_valid_trading_days ?? null)
+  const highest = normalizeChangeStatistic(stats.highest_change)
+  const lowest = normalizeChangeStatistic(stats.lowest_change)
+
+  return {
+    totalValidTradingDays: total !== null ? Math.max(0, Math.round(total)) : 0,
+    highestChange: highest,
+    lowestChange: lowest,
+  }
+}
+
 export default function TradingDaysPage() {
   const { accessToken } = useAuth()
   const [rows, setRows] = useState<TradingDayRow[]>([])
@@ -124,6 +178,9 @@ export default function TradingDaysPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [statistics, setStatistics] = useState<TradingDayStatistics | null>(null)
+  const [dateFilter, setDateFilter] = useState("")
+  const [dateSort, setDateSort] = useState<"asc" | "desc">("desc")
 
   useEffect(() => {
     if (symbols.length === 0) {
@@ -150,6 +207,7 @@ export default function TradingDaysPage() {
       setRows([])
       setSymbols([])
       setPagination(null)
+      setStatistics(null)
       return
     }
 
@@ -206,6 +264,7 @@ export default function TradingDaysPage() {
           lastPage: data.pagination?.last_page ?? currentPage,
           total: data.pagination?.total ?? data.trading_days.length,
         })
+        setStatistics(normalizeStatistics(data.statistics))
       })
       .catch((cause) => {
         if ((cause as Error)?.name === "AbortError") {
@@ -218,6 +277,7 @@ export default function TradingDaysPage() {
             : "Something went wrong while loading trading day data."
         setError(message)
         setRows([])
+        setStatistics(null)
       })
       .finally(() => setLoading(false))
 
@@ -255,6 +315,29 @@ export default function TradingDaysPage() {
       return Math.min(previous + 1, lastPage)
     })
   }, [pagination])
+
+  const toggleDateSort = useCallback(() => {
+    setDateSort((previous) => (previous === "desc" ? "asc" : "desc"))
+  }, [])
+
+  const clearDateFilter = useCallback(() => {
+    setDateFilter("")
+  }, [])
+
+  const filteredRows = useMemo(() => {
+    const base = dateFilter ? rows.filter((row) => row.tradingDate === dateFilter) : rows
+    const sorted = [...base]
+
+    sorted.sort((a, b) =>
+      dateSort === "asc"
+        ? a.tradingDate.localeCompare(b.tradingDate)
+        : b.tradingDate.localeCompare(a.tradingDate),
+    )
+
+    return sorted
+  }, [rows, dateFilter, dateSort])
+
+  const hasDateFilter = dateFilter.trim().length > 0
 
   const formatDate = (value: string) => {
     try {
@@ -325,6 +408,156 @@ export default function TradingDaysPage() {
   const canGoNext = pagination ? currentPage < pagination.lastPage : false
   const canGoPrevious = currentPage > 1
 
+  const renderTableRows = () =>
+    filteredRows.map((row) => {
+      const symbolData = orderedVisibleSymbols.map((symbol) => ({
+        symbol,
+        data: row.symbols[symbol] ?? { close: null, changePercent: null },
+      }))
+
+      return (
+        <tr key={row.tradingDate} className="bg-background">
+          <td className="whitespace-nowrap px-4 py-3 font-medium">{formatDate(row.tradingDate)}</td>
+          <td className="whitespace-nowrap px-4 py-3">
+            {formatCloseWithChange(row.close, row.changePercent)}
+          </td>
+          {symbolData.map(({ symbol, data }) => (
+            <td key={symbol} className="whitespace-nowrap px-4 py-3">
+              {formatPriceWithChange(data.close ?? null, data.changePercent ?? null)}
+            </td>
+          ))}
+        </tr>
+      )
+    })
+
+  const renderTableContent = () => {
+    if (error) {
+      return (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      )
+    }
+
+    if (loading) {
+      return <div className="py-10 text-center text-sm text-muted-foreground">Loading trading day data...</div>
+    }
+
+    if (rows.length === 0) {
+      return <div className="py-10 text-center text-sm text-muted-foreground">No trading day records available.</div>
+    }
+
+    if (filteredRows.length === 0) {
+      return <div className="py-10 text-center text-sm text-muted-foreground">No trading days match the selected date.</div>
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="trading-date-filter" className="text-sm font-medium">
+                Filter by date
+              </label>
+              <Input
+                id="trading-date-filter"
+                type="date"
+                value={dateFilter}
+                onChange={(event) => setDateFilter(event.target.value)}
+                className="h-9 w-44"
+              />
+            </div>
+            {hasDateFilter ? (
+              <Button type="button" variant="ghost" size="sm" onClick={clearDateFilter}>
+                Clear
+              </Button>
+            ) : null}
+          </div>
+          <PaginationControls />
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted/60">
+              <tr>
+                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={toggleDateSort}
+                    className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  >
+                    <span>Trading Date</span>
+                    {renderSortIcon()}
+                    <span className="sr-only">Toggle trading date sort</span>
+                  </button>
+                </th>
+                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  IHSG (%CHG)
+                </th>
+                {orderedVisibleSymbols.map((symbol) => (
+                  <th
+                    key={symbol}
+                    className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  >
+                    {symbol} (%CHG)
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">{renderTableRows()}</tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  const renderSortIcon = () => {
+    if (dateSort === "asc") {
+      return <ArrowUp className="h-3.5 w-3.5" aria-hidden />
+    }
+
+    return <ArrowDown className="h-3.5 w-3.5" aria-hidden />
+  }
+
+  const PaginationControls = ({ className }: { className?: string }) => {
+    if (!pagination || rows.length === 0) {
+      return null
+    }
+
+    return (
+      <div
+        className={cn(
+          "flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between",
+          className,
+        )}
+      >
+        <div>
+          Page {pagination.currentPage} of {pagination.lastPage}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={goToPreviousPage}
+            disabled={!canGoPrevious}
+          >
+            Previous
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={goToNextPage}
+            disabled={!canGoNext}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -335,6 +568,51 @@ export default function TradingDaysPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {statistics ? (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-lg border bg-muted/40 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Total Valid Trading Days
+                </p>
+                <p className="mt-1 text-2xl font-semibold">
+                  {statistics.totalValidTradingDays.toLocaleString("en-US")}
+                </p>
+              </div>
+              <div className="rounded-lg border bg-muted/40 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Highest IHSG % Change
+                </p>
+                {statistics.highestChange ? (
+                  <div className="mt-1 space-y-1 text-sm">
+                    <p className="font-semibold tabular-nums">
+                      {statistics.highestChange.changePercent > 0 ? "+" : ""}
+                      {percentFormatter.format(statistics.highestChange.changePercent)}%
+                    </p>
+                    <p className="text-muted-foreground">{formatDate(statistics.highestChange.date)}</p>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-sm text-muted-foreground">Not enough data</p>
+                )}
+              </div>
+              <div className="rounded-lg border bg-muted/40 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Lowest IHSG % Change
+                </p>
+                {statistics.lowestChange ? (
+                  <div className="mt-1 space-y-1 text-sm">
+                    <p className="font-semibold tabular-nums">
+                      {statistics.lowestChange.changePercent > 0 ? "+" : ""}
+                      {percentFormatter.format(statistics.lowestChange.changePercent)}%
+                    </p>
+                    <p className="text-muted-foreground">{formatDate(statistics.lowestChange.date)}</p>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-sm text-muted-foreground">Not enough data</p>
+                )}
+              </div>
+            </div>
+          ) : null}
+
           {symbols.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium">Symbols</span>
@@ -363,82 +641,8 @@ export default function TradingDaysPage() {
             </div>
           ) : null}
 
-          {error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-              {error}
-            </div>
-          ) : loading ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">
-              Loading trading day data...
-            </div>
-          ) : rows.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">
-              No trading day records available.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-sm">
-                <thead className="bg-muted/60">
-                  <tr>
-                    <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Trading Date
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      IHSG (%Change)
-                    </th>
-                    {orderedVisibleSymbols.map((symbol) => (
-                      <th
-                        key={symbol}
-                        className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-                      >
-                        {symbol} Close (%Change)
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {rows.map((row) => {
-                    const symbolData = orderedVisibleSymbols.map((symbol) => ({
-                      symbol,
-                      data: row.symbols[symbol] ?? { close: null, changePercent: null },
-                    }))
-
-                    return (
-                      <tr key={row.tradingDate} className="bg-background">
-                        <td className="whitespace-nowrap px-4 py-3 font-medium">
-                          {formatDate(row.tradingDate)}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3">
-                          {formatCloseWithChange(row.close, row.changePercent)}
-                        </td>
-                        {symbolData.map(({ symbol, data }) => (
-                          <td key={symbol} className="whitespace-nowrap px-4 py-3">
-                            {formatPriceWithChange(data.close ?? null, data.changePercent ?? null)}
-                          </td>
-                        ))}
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {pagination && rows.length > 0 ? (
-            <div className="flex flex-col gap-2 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                Page {pagination.currentPage} of {pagination.lastPage}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={goToPreviousPage} disabled={!canGoPrevious}>
-                  Previous
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={goToNextPage} disabled={!canGoNext}>
-                  Next
-                </Button>
-              </div>
-            </div>
-          ) : null}
+          {renderTableContent()}
+          <PaginationControls className="border-t pt-4" />
         </CardContent>
       </Card>
     </div>
