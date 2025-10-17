@@ -163,11 +163,12 @@ class AssetMetrics
             $close = (float) ($bar['close'] ?? 0.0);
 
             if ($mode === 'weekly') {
-                if ($prevClose === null) {
-                    $tr = abs($close - $low);
-                } else {
-                    $tr = max(abs($high - $prevClose), abs($close - $low));
+                $components = [$high - $low];
+                if ($prevClose !== null) {
+                    $components[] = abs($high - $prevClose);
+                    $components[] = abs($low - $prevClose);
                 }
+                $tr = max($components);
             } else {
                 $tr = $high - $low;
                 if ($prevClose !== null) {
