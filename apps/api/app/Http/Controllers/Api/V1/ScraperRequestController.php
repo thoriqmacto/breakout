@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\ApiResponse;
 use App\Http\Resources\ScraperRequestResource;
+use App\Models\ScraperRequest;
 use Illuminate\Http\Request;
 
 class ScraperRequestController extends ApiController
@@ -59,5 +60,21 @@ class ScraperRequestController extends ApiController
             'Scraper request saved successfully',
             201
         );
+    }
+
+    /**
+     * Remove the specified scraper request from storage.
+     */
+    public function destroy(Request $request, ScraperRequest $scraperRequest)
+    {
+        $user = $request->user();
+
+        if (!$user || $scraperRequest->user_id !== $user->id) {
+            return ApiResponse::error('Saved command not found.', 404);
+        }
+
+        $scraperRequest->delete();
+
+        return ApiResponse::success(null, 'Saved command deleted successfully.');
     }
 }
