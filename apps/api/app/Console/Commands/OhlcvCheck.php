@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
+use App\Services\CsvBars;
 use App\Services\OhlcvIntegrityChecker;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class OhlcvCheck extends Command
 {
@@ -12,7 +14,8 @@ class OhlcvCheck extends Command
         {symbol? : Asset symbol to check}
         {--all : Check all configured index symbols}
         {--from= : Restrict the check to start at this YYYY-MM-DD date}
-        {--to= : Restrict the check to end at this YYYY-MM-DD date}';
+        {--to= : Restrict the check to end at this YYYY-MM-DD date}
+        {--resolve= : Resolve detected issues (supported: extra-bars)}';
 
     protected $description = 'Check OHLCV bar integrity for assets.';
 
@@ -25,9 +28,24 @@ class OhlcvCheck extends Command
     {
         $from = $this->option('from') ?: null;
         $to = $this->option('to') ?: null;
+        $resolve = $this->option('resolve') ?: null;
+
+        if ($resolve !== null) {
+            $resolve = strtolower((string) $resolve);
+            $supported = ['extra-bars'];
+            if (!in_array($resolve, $supported, true)) {
+                $this->error(sprintf(
+                    'Unknown resolve option "%s". Supported values: %s',
+                    $resolve,
+                    implode(', ', $supported)
+                ));
+
+                return self::INVALID;
+            }
+        }
 
         if ($this->option('all')) {
-            return $this->checkAllConfiguredSymbols($from, $to);
+            return $this->checkAllConfiguredSymbols($from, $to, $resolve);
         }
 
         $symbol = $this->argument('symbol');
@@ -37,7 +55,7 @@ class OhlcvCheck extends Command
             return self::INVALID;
         }
 
-        $result = $this->checkSymbol(strtoupper((string) $symbol), $from, $to);
+        $result = $this->checkSymbol(strtoupper((string) $symbol), $from, $to, $resolve);
         if ($result === null) {
             return self::FAILURE;
         }
@@ -45,7 +63,7 @@ class OhlcvCheck extends Command
         return $result ? self::SUCCESS : self::FAILURE;
     }
 
-    private function checkAllConfiguredSymbols(?string $from, ?string $to): int
+    private function checkAllConfiguredSymbols(?string $from, ?string $to, ?string $resolve): int
     {
         $symbols = array_map('strtoupper', config('csv.index_symbols', []));
         if ($symbols === []) {
@@ -56,7 +74,7 @@ class OhlcvCheck extends Command
 
         $hadIssues = false;
         foreach ($symbols as $symbol) {
-            $result = $this->checkSymbol($symbol, $from, $to);
+            $result = $this->checkSymbol($symbol, $from, $to, $resolve);
             if ($result !== true) {
                 $hadIssues = true;
             }
@@ -65,7 +83,7 @@ class OhlcvCheck extends Command
         return $hadIssues ? self::FAILURE : self::SUCCESS;
     }
 
-    private function checkSymbol(string $symbol, ?string $from, ?string $to): ?bool
+    private function checkSymbol(string $symbol, ?string $from, ?string $to, ?string $resolve): ?bool
     {
         /** @var Asset|null $asset */
         $asset = Asset::query()->where('symbol', $symbol)->first();
@@ -77,6 +95,16 @@ class OhlcvCheck extends Command
         }
 
         $report = $this->checker->checkAsset($asset, $from, $to);
+
+        if ($resolve === 'extra-bars' && !empty($report['extra_bars'])) {
+            $this->newLine();
+            $this->info(sprintf('Resolving extra bars for %s...', $symbol));
+            $this->resolveExtraBars($asset, $report['extra_bars']);
+            $report = $this->checker->checkAsset($asset, $from, $to);
+        } elseif ($resolve === 'extra-bars') {
+            $this->newLine();
+            $this->info(sprintf('No extra bars to resolve for %s.', $symbol));
+        }
 
         $this->displayReport($report);
 
@@ -92,7 +120,11 @@ class OhlcvCheck extends Command
         $this->info(sprintf('Asset %s (#%d)', $report['symbol'] ?? 'N/A', $report['asset_id']));
         $this->line(sprintf('  Range: %s → %s', $report['range_start'] ?? '-', $report['range_end'] ?? '-'));
         $this->line(sprintf('  First/Last bar: %s / %s', $report['first_bar'] ?? '-', $report['last_bar'] ?? '-'));
-        $this->line(sprintf('  Global coverage: %s → %s', $report['global_first_bar'] ?? '-', $report['global_last_bar'] ?? '-'));
+        $this->line(sprintf(
+            '  Global coverage: %s → %s',
+            $report['global_first_bar'] ?? '-',
+            $report['global_last_bar'] ?? '-'
+        ));
         $this->line(sprintf(
             '  Rows: %d total (%d unique) vs %d trading days',
             $report['total_rows'] ?? 0,
@@ -102,11 +134,19 @@ class OhlcvCheck extends Command
         $this->line(sprintf('  Trading days covered: %d', $report['actual_trading_days'] ?? 0));
 
         if (!empty($report['missing_trading_days'])) {
-            $this->warn('  Missing trading days: ' . implode(', ', $report['missing_trading_days']));
+            $this->warn(sprintf(
+                '  Missing trading days (%d): %s',
+                count($report['missing_trading_days']),
+                implode(', ', $report['missing_trading_days'])
+            ));
         }
 
         if (!empty($report['extra_bars'])) {
-            $this->warn('  Extra bars: ' . implode(', ', $report['extra_bars']));
+            $this->warn(sprintf(
+                '  Extra bars (%d): %s',
+                count($report['extra_bars']),
+                implode(', ', $report['extra_bars'])
+            ));
         }
 
         if (!empty($report['duplicate_bars'])) {
@@ -115,5 +155,59 @@ class OhlcvCheck extends Command
 
         $status = ($report['is_consistent'] ?? false) ? '<fg=green>PASSED</>' : '<fg=red>FAILED</>';
         $this->line(sprintf('  Consistency: %s', $status));
+    }
+
+    private function resolveExtraBars(Asset $asset, array $extraBars): void
+    {
+        $dates = array_values(array_unique(array_filter(
+            $extraBars,
+            static fn ($date): bool => is_string($date) && $date !== ''
+        )));
+
+        if ($dates === []) {
+            $this->info('  No valid extra bar dates found to resolve.');
+
+            return;
+        }
+
+        sort($dates);
+
+        $deleted = DB::table('price_bars')
+            ->where('asset_id', $asset->id)
+            ->whereIn('date', $dates)
+            ->delete();
+
+        $this->info(sprintf('  Removed %d bar(s) from database for %s.', $deleted, $asset->symbol));
+
+        $csvDir = (string) config('csv.seed_dir');
+        if ($csvDir === '') {
+            $this->warn('  CSV seed directory not configured; skipping CSV cleanup.');
+
+            return;
+        }
+
+        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . strtoupper($asset->symbol) . '.csv';
+
+        if (!is_file($csvPath)) {
+            $this->warn(sprintf('  CSV seed file not found for %s at %s; skipping CSV cleanup.', $asset->symbol, $csvPath));
+
+            return;
+        }
+
+        $rows = CsvBars::read($csvPath);
+        $beforeCount = count($rows);
+
+        foreach ($dates as $date) {
+            unset($rows[$date]);
+        }
+
+        $removedFromCsv = $beforeCount - count($rows);
+
+        if ($removedFromCsv > 0) {
+            CsvBars::write($csvPath, $rows);
+            $this->info(sprintf('  Removed %d row(s) from CSV seed file for %s.', $removedFromCsv, $asset->symbol));
+        } else {
+            $this->warn(sprintf('  No matching rows found in CSV seed file for %s.', $asset->symbol));
+        }
     }
 }
