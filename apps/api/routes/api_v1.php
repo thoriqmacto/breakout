@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
+use App\Http\Controllers\Api\V1\TradingDayController;
 
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Assets
@@ -39,4 +40,7 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::post('scraper-requests', [ScraperRequestController::class, 'store']);
     Route::delete('scraper-requests/{scraperRequest}', [ScraperRequestController::class, 'destroy'])
         ->whereNumber('scraperRequest');
+
+    // Trading days overview
+    Route::get('trading-days', [TradingDayController::class, 'index']);
 });
