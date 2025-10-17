@@ -4,9 +4,12 @@ namespace App\Console\Commands;
 
 use App\Models\Asset;
 use App\Services\CsvBars;
+use App\Services\DbBars;
 use App\Services\OhlcvIntegrityChecker;
+use App\Services\StockbitExodusClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class OhlcvCheck extends Command
 {
@@ -15,11 +18,14 @@ class OhlcvCheck extends Command
         {--all : Check all configured index symbols}
         {--from= : Restrict the check to start at this YYYY-MM-DD date}
         {--to= : Restrict the check to end at this YYYY-MM-DD date}
-        {--resolve= : Resolve detected issues (supported: extra-bars)}';
+        {--resolve= : Resolve detected issues (supported: extra-bars, missing-days)}';
 
     protected $description = 'Check OHLCV bar integrity for assets.';
 
-    public function __construct(private readonly OhlcvIntegrityChecker $checker)
+    public function __construct(
+        private readonly OhlcvIntegrityChecker $checker,
+        private readonly StockbitExodusClient $stockbit,
+    )
     {
         parent::__construct();
     }
@@ -32,7 +38,7 @@ class OhlcvCheck extends Command
 
         if ($resolve !== null) {
             $resolve = strtolower((string) $resolve);
-            $supported = ['extra-bars'];
+            $supported = ['extra-bars', 'missing-days'];
             if (!in_array($resolve, $supported, true)) {
                 $this->error(sprintf(
                     'Unknown resolve option "%s". Supported values: %s',
@@ -104,6 +110,16 @@ class OhlcvCheck extends Command
         } elseif ($resolve === 'extra-bars') {
             $this->newLine();
             $this->info(sprintf('No extra bars to resolve for %s.', $symbol));
+        }
+
+        if ($resolve === 'missing-days' && !empty($report['missing_trading_days'])) {
+            $this->newLine();
+            $this->info(sprintf('Resolving missing trading days for %s...', $symbol));
+            $this->resolveMissingDays($asset, $report['missing_trading_days']);
+            $report = $this->checker->checkAsset($asset, $from, $to);
+        } elseif ($resolve === 'missing-days') {
+            $this->newLine();
+            $this->info(sprintf('No missing trading days to resolve for %s.', $symbol));
         }
 
         $this->displayReport($report);
@@ -209,5 +225,248 @@ class OhlcvCheck extends Command
         } else {
             $this->warn(sprintf('  No matching rows found in CSV seed file for %s.', $asset->symbol));
         }
+    }
+
+    private function resolveMissingDays(Asset $asset, array $missingDays): void
+    {
+        $dates = array_values(array_unique(array_filter(
+            $missingDays,
+            static fn ($date): bool => is_string($date) && $date !== ''
+        )));
+
+        if ($dates === []) {
+            $this->info('  No valid missing trading day dates found to resolve.');
+
+            return;
+        }
+
+        sort($dates);
+
+        $period = (string) (config('stockbit.historical.period') ?? 'HS_PERIOD_DAILY');
+        if ($period === '') {
+            $period = 'HS_PERIOD_DAILY';
+        }
+
+        $limit = $this->resolvePositiveInt(config('stockbit.historical.limit')) ?? 1;
+        $page = $this->resolvePositiveInt(config('stockbit.historical.page')) ?? 1;
+
+        $bars = [];
+
+        foreach ($dates as $date) {
+            $response = $this->stockbit->historicalSummary($asset->symbol, $period, $date, $date, $limit, $page);
+
+            if (isset($response['error'])) {
+                $this->warn(sprintf(
+                    '  Unable to fetch OHLCV for %s on %s: %s (%s).',
+                    $asset->symbol,
+                    $date,
+                    $response['error'],
+                    $response['message'] ?? 'no message'
+                ));
+
+                continue;
+            }
+
+            $normalized = $this->normalizeHistoricalResponse($response);
+
+            if (!isset($normalized[$date])) {
+                $this->warn(sprintf(
+                    '  Stockbit did not return OHLCV data for %s on %s.',
+                    $asset->symbol,
+                    $date
+                ));
+
+                continue;
+            }
+
+            $bars[$date] = $normalized[$date];
+        }
+
+        if ($bars === []) {
+            $this->warn(sprintf('  No OHLCV data retrieved for %s.', $asset->symbol));
+
+            return;
+        }
+
+        $chunkSize = (int) config('csv.chunk_size', 200);
+        $dbBars = new DbBars($chunkSize, false);
+
+        foreach ($bars as $date => $ohlcv) {
+            $dbBars->add([
+                'asset_id' => $asset->id,
+                'date' => $date,
+                'open' => $ohlcv['open'],
+                'high' => $ohlcv['high'],
+                'low' => $ohlcv['low'],
+                'close' => $ohlcv['close'],
+                'volume' => $ohlcv['volume'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $dbBars->flush();
+
+        $this->info(sprintf('  Upserted %d bar(s) into database for %s.', count($bars), $asset->symbol));
+
+        $csvDir = (string) config('csv.seed_dir');
+        if ($csvDir === '') {
+            $this->warn('  CSV seed directory not configured; skipping CSV update.');
+
+            return;
+        }
+
+        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . strtoupper($asset->symbol) . '.csv';
+        $existing = CsvBars::read($csvPath);
+
+        foreach ($bars as $date => $ohlcv) {
+            $existing[$date] = [
+                'date' => $date,
+                'open' => $this->formatPrice($ohlcv['open'], 0),
+                'high' => $this->formatPrice($ohlcv['high'], 0),
+                'low' => $this->formatPrice($ohlcv['low'], 0),
+                'close' => $this->formatPrice($ohlcv['close'], 0),
+                'volume' => $ohlcv['volume'],
+            ];
+        }
+
+        CsvBars::write($csvPath, $existing);
+
+        $this->info(sprintf('  Upserted %d row(s) into CSV seed file for %s.', count($bars), $asset->symbol));
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     * @return array<string, array{open: float, high: float, low: float, close: float, volume: int}>
+     */
+    private function normalizeHistoricalResponse(array $response): array
+    {
+        $containers = [];
+
+        if (isset($response['data']) && is_array($response['data'])) {
+            $containers[] = $response['data'];
+        }
+
+        $containers[] = $response;
+
+        $rows = [];
+
+        foreach ($containers as $container) {
+            if (!is_array($container)) {
+                continue;
+            }
+
+            $items = [];
+
+            if (isset($container['result']) && is_array($container['result'])) {
+                $items = $container['result'];
+            } elseif (array_is_list($container)) {
+                $items = $container;
+            }
+
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+
+                $date = $this->normalizeHistoricalDate($item['date'] ?? null);
+                $open = $this->parseHistoricalPrice($item['open'] ?? null);
+                $high = $this->parseHistoricalPrice($item['high'] ?? null);
+                $low = $this->parseHistoricalPrice($item['low'] ?? null);
+                $close = $this->parseHistoricalPrice($item['close'] ?? null);
+                $volume = $this->parseHistoricalVolume($item['volume'] ?? null);
+
+                if ($date === null || $open === null || $high === null || $low === null || $close === null || $volume === null) {
+                    continue;
+                }
+
+                $rows[$date] = [
+                    'open' => $open,
+                    'high' => $high,
+                    'low' => $low,
+                    'close' => $close,
+                    'volume' => $volume,
+                ];
+            }
+        }
+
+        ksort($rows);
+
+        return $rows;
+    }
+
+    private function normalizeHistoricalDate(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse((string) $value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function parseHistoricalPrice(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $normalized = preg_replace('/[^0-9\-\.]/', '', str_replace(',', '', $value));
+
+        if ($normalized === '' || !is_numeric($normalized)) {
+            return null;
+        }
+
+        return (float) $normalized;
+    }
+
+    private function parseHistoricalVolume(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (int) round((float) $value);
+        }
+
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $normalized = preg_replace('/[^0-9]/', '', $value);
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        return (int) $normalized;
+    }
+
+    private function formatPrice(float $value, int $decimals): string
+    {
+        return number_format($value, $decimals, '.', '');
+    }
+
+    private function resolvePositiveInt(mixed $value): ?int
+    {
+        if (is_numeric($value)) {
+            $int = (int) $value;
+
+            return $int > 0 ? $int : null;
+        }
+
+        return null;
     }
 }
