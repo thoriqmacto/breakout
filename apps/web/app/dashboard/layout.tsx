@@ -3,7 +3,16 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState, type ReactNode } from "react"
-import { Bot, Boxes, FileText, LayoutDashboard, PanelLeft, PanelRight, Terminal } from "lucide-react"
+import {
+  Bot,
+  Boxes,
+  CalendarDays,
+  FileText,
+  LayoutDashboard,
+  PanelLeft,
+  PanelRight,
+  Terminal,
+} from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
@@ -27,6 +36,11 @@ const navigation: NavigationItem[] = [
     label: "Assets",
     href: "/dashboard/assets",
     icon: Boxes,
+  },
+  {
+    label: "Trading Days",
+    href: "/dashboard/trading-days",
+    icon: CalendarDays,
   },
   {
     label: "Scrapers",
