@@ -37,4 +37,6 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Scraper requests history
     Route::get('scraper-requests', [ScraperRequestController::class, 'index']);
     Route::post('scraper-requests', [ScraperRequestController::class, 'store']);
+    Route::delete('scraper-requests/{scraperRequest}', [ScraperRequestController::class, 'destroy'])
+        ->whereNumber('scraperRequest');
 });
