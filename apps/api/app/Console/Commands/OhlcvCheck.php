@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Services\CsvBars;
 use App\Services\DbBars;
 use App\Services\OhlcvIntegrityChecker;
+use App\Services\PythonRunner;
 use App\Services\StockbitExodusClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class OhlcvCheck extends Command
     public function __construct(
         private readonly OhlcvIntegrityChecker $checker,
         private readonly StockbitExodusClient $stockbit,
+        private readonly PythonRunner $python,
     )
     {
         parent::__construct();
@@ -276,6 +278,20 @@ class OhlcvCheck extends Command
                     $date
                 ));
 
+                $fallback = $this->fetchMissingDayFromPython($asset, $date);
+
+                if ($fallback === null) {
+                    $this->warn(sprintf(
+                        '  Skipping %s on %s because no fallback data was retrieved.',
+                        $asset->symbol,
+                        $date
+                    ));
+
+                    continue;
+                }
+
+                $bars[$date] = $fallback;
+
                 continue;
             }
 
@@ -333,6 +349,68 @@ class OhlcvCheck extends Command
         CsvBars::write($csvPath, $existing);
 
         $this->info(sprintf('  Upserted %d row(s) into CSV seed file for %s.', count($bars), $asset->symbol));
+    }
+
+    private function fetchMissingDayFromPython(Asset $asset, string $date): ?array
+    {
+        $symbol = strtoupper($asset->symbol);
+        $args = [
+            '--start=' . $date,
+            '--end=' . $date,
+            $symbol . '.JK',
+        ];
+
+        $result = $this->python->run('get_stocks.py', null, $args);
+
+        if (!$result['ok']) {
+            $message = trim($result['stderr'] ?: $result['stdout']);
+            $this->warn(sprintf(
+                '  Python get_stocks.py failed for %s on %s%s',
+                $symbol,
+                $date,
+                $message !== '' ? sprintf(': %s', $message) : '.'
+            ));
+
+            return null;
+        }
+
+        $csvPath = resource_path('python/csv/' . $symbol . '_PY.csv');
+
+        if (!is_file($csvPath)) {
+            $this->warn(sprintf(
+                '  Python fallback CSV not found for %s at %s.',
+                $symbol,
+                $csvPath
+            ));
+
+            return null;
+        }
+
+        $rows = CsvBars::read($csvPath);
+
+        if (!isset($rows[$date])) {
+            $this->warn(sprintf(
+                '  Python fallback did not contain OHLCV data for %s on %s.',
+                $symbol,
+                $date
+            ));
+
+            return null;
+        }
+
+        $this->info(sprintf(
+            '  Retrieved OHLCV data for %s on %s from python fallback.',
+            $symbol,
+            $date
+        ));
+
+        return [
+            'open' => (float) $rows[$date]['open'],
+            'high' => (float) $rows[$date]['high'],
+            'low' => (float) $rows[$date]['low'],
+            'close' => (float) $rows[$date]['close'],
+            'volume' => (int) $rows[$date]['volume'],
+        ];
     }
 
     /**
