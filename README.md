@@ -42,6 +42,27 @@ This repository contains the code for the **Breakout** API service. The project 
   php artisan asset:sync --eod
   ```
 
+## Updating Asset Data (step-by-step)
+The Laravel console already includes helpers for refreshing the trading calendar, syncing OHLCV data, and checking integrity. Run them in this order when updating datasets:
+
+1. **Refresh the trading day calendar** – keeps `trading_days` aligned with Yahoo Finance and updates the seeder:
+   ```bash
+   php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
+   ```
+   Adjust the `--from` / `--to` range as needed; rerunning is idempotent and will rewrite `database/seeders/data/trading_days.php` when new rows are found.
+
+2. **Sync OHLCV seeds and the database** – compare configured symbols to seed CSVs, optionally pull missing data via the Python scripts, and upsert bars into `price_bars`:
+   ```bash
+   php artisan asset:sync --check-python --run-python --import-csv --continue --chk-date=$(date +%F)
+   ```
+   Use `--eod` to auto-enable those options with today's date and to skip prompts. The command will also avoid running the Python downloader if Yahoo Finance reports that the latest IDX data is not yet available.
+
+3. **Verify and repair gaps or duplicates** – scan all configured symbols and optionally resolve issues:
+   ```bash
+   php artisan ohlcv:check --all --resolve=missing-days
+   ```
+   Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
+
 ## API
 A simple health check endpoint is available at `GET /api/ping`, which responds with `{ "ok": true }`
 
