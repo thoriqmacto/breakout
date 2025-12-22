@@ -155,8 +155,12 @@ export default function DashboardPage() {
   const [capitalInput, setCapitalInput] = useState("")
   const [lotSizeInput, setLotSizeInput] = useState("100")
   const [targetPriceInput, setTargetPriceInput] = useState("")
+  const [targetPercentInput, setTargetPercentInput] = useState("")
   const [stopPriceInput, setStopPriceInput] = useState("")
-  const [feePercentInput, setFeePercentInput] = useState("0")
+  const [stopPercentInput, setStopPercentInput] = useState("")
+  const [useSameFee, setUseSameFee] = useState(true)
+  const [buyFeePercentInput, setBuyFeePercentInput] = useState("0")
+  const [sellFeePercentInput, setSellFeePercentInput] = useState("0")
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -340,11 +344,37 @@ export default function DashboardPage() {
   const capitalAllocation = parseNumericInput(capitalInput)
   const lotSize = parseNumericInput(lotSizeInput)
   const targetPrice = parseNumericInput(targetPriceInput)
+  const targetPercent = parseNumericInput(targetPercentInput)
   const stopPrice = parseNumericInput(stopPriceInput)
-  const feePercent = parseNumericInput(feePercentInput)
+  const stopPercent = parseNumericInput(stopPercentInput)
+  const buyFeePercent = parseNumericInput(buyFeePercentInput)
+  const sellFeePercent = useSameFee ? buyFeePercent : parseNumericInput(sellFeePercentInput)
 
   const normalizedLotSize = Number.isFinite(lotSize) && lotSize > 0 ? lotSize : null
-  const feeRate = Number.isFinite(feePercent) && feePercent > 0 ? feePercent / 100 : 0
+  const buyFeeRate = Number.isFinite(buyFeePercent) && buyFeePercent > 0 ? buyFeePercent / 100 : 0
+  const sellFeeRate = Number.isFinite(sellFeePercent) && sellFeePercent > 0 ? sellFeePercent / 100 : 0
+  const targetPriceFromPercent =
+    Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(targetPercent)
+      ? Number((entryPrice * (1 + targetPercent / 100)).toFixed(2))
+      : null
+  const stopPriceFromPercent =
+    Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(stopPercent)
+      ? Number((entryPrice * (1 - stopPercent / 100)).toFixed(2))
+      : null
+  const targetPriceDisabled = targetPercentInput.trim().length > 0
+  const targetPercentDisabled = targetPriceInput.trim().length > 0
+  const stopPriceDisabled = stopPercentInput.trim().length > 0
+  const stopPercentDisabled = stopPriceInput.trim().length > 0
+  const targetPriceInputValue = targetPriceDisabled
+    ? targetPriceFromPercent !== null
+      ? targetPriceFromPercent.toString()
+      : ""
+    : targetPriceInput
+  const stopPriceInputValue = stopPriceDisabled
+    ? stopPriceFromPercent !== null
+      ? stopPriceFromPercent.toString()
+      : ""
+    : stopPriceInput
   const maxLots =
     Number.isFinite(entryPrice) && entryPrice > 0 &&
     Number.isFinite(capitalAllocation) && capitalAllocation > 0 &&
@@ -354,15 +384,17 @@ export default function DashboardPage() {
 
   const totalShares = maxLots !== null && normalizedLotSize !== null ? maxLots * normalizedLotSize : null
   const buyValue = totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 ? entryPrice * totalShares : null
-  const buyFee = buyValue !== null ? buyValue * feeRate : null
+  const buyFee = buyValue !== null ? buyValue * buyFeeRate : null
   const totalCostWithFee = buyValue !== null ? buyValue + (buyFee ?? 0) : null
+  const effectiveTargetPrice = Number.isFinite(targetPrice) ? targetPrice : targetPriceFromPercent
+  const effectiveStopPrice = Number.isFinite(stopPrice) ? stopPrice : stopPriceFromPercent
 
   const profitLossFromTarget =
-    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(targetPrice)
+    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(effectiveTargetPrice)
       ? (() => {
-          const gross = (targetPrice - entryPrice) * totalShares
-          const sellValue = targetPrice * totalShares
-          const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
+          const gross = (effectiveTargetPrice - entryPrice) * totalShares
+          const sellValue = effectiveTargetPrice * totalShares
+          const totalFees = buyFeeRate > 0 || sellFeeRate > 0 ? (buyValue ?? 0) * buyFeeRate + sellValue * sellFeeRate : 0
           const net = gross - totalFees
           const percent = totalCostWithFee && totalCostWithFee !== 0 ? (net / totalCostWithFee) * 100 : null
 
@@ -371,11 +403,11 @@ export default function DashboardPage() {
       : null
 
   const profitLossFromStop =
-    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(stopPrice)
+    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(effectiveStopPrice)
       ? (() => {
-          const gross = (stopPrice - entryPrice) * totalShares
-          const sellValue = stopPrice * totalShares
-          const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
+          const gross = (effectiveStopPrice - entryPrice) * totalShares
+          const sellValue = effectiveStopPrice * totalShares
+          const totalFees = buyFeeRate > 0 || sellFeeRate > 0 ? (buyValue ?? 0) * buyFeeRate + sellValue * sellFeeRate : 0
           const net = gross - totalFees
           const percent = totalCostWithFee && totalCostWithFee !== 0 ? (net / totalCostWithFee) * 100 : null
 
@@ -600,10 +632,30 @@ export default function DashboardPage() {
                     min="0"
                     step="0.01"
                     placeholder="Take-profit price"
-                    value={targetPriceInput}
+                    disabled={targetPriceDisabled}
+                    value={targetPriceInputValue}
                     onChange={(event) => setTargetPriceInput(event.target.value)}
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="target-percent">
+                    Target move (%)
+                  </label>
+                  <Input
+                    id="target-percent"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 8"
+                    disabled={targetPercentDisabled}
+                    value={targetPercentInput}
+                    onChange={(event) => setTargetPercentInput(event.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Fill either a price or percentage to auto-calc the other.</p>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground" htmlFor="stop-price">
                     Stop-loss price (optional)
@@ -615,29 +667,93 @@ export default function DashboardPage() {
                     min="0"
                     step="0.01"
                     placeholder="Protective stop"
-                    value={stopPriceInput}
+                    disabled={stopPriceDisabled}
+                    value={stopPriceInputValue}
                     onChange={(event) => setStopPriceInput(event.target.value)}
                   />
                 </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="fee-percent">
-                    Fee (% per side)
+                  <label className="text-sm font-medium text-foreground" htmlFor="stop-percent">
+                    Stop distance (%)
                   </label>
                   <Input
-                    id="fee-percent"
+                    id="stop-percent"
                     inputMode="decimal"
                     type="number"
                     min="0"
                     step="0.01"
-                    value={feePercentInput}
-                    onChange={(event) => setFeePercentInput(event.target.value)}
+                    placeholder="e.g. 5"
+                    disabled={stopPercentDisabled}
+                    value={stopPercentInput}
+                    onChange={(event) => setStopPercentInput(event.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">Entering a percentage locks the price field and vice versa.</p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Fees are applied to both buy and sell legs when calculating net P/L.
-                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Fees</p>
+                    <p className="text-xs text-muted-foreground">
+                      Use a single rate for both legs or specify separate buy/sell fees.
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground" htmlFor="use-same-fee">
+                    <input
+                      id="use-same-fee"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-border text-primary focus-visible:outline-none"
+                      checked={useSameFee}
+                      onChange={(event) => {
+                        setUseSameFee(event.target.checked)
+                        if (event.target.checked) {
+                          setSellFeePercentInput(buyFeePercentInput)
+                        }
+                      }}
+                    />
+                    Use same fee for buy & sell
+                  </label>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:items-end">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="buy-fee-percent">
+                      {useSameFee ? "Fee (% per side)" : "Buy fee (%)"}
+                    </label>
+                    <Input
+                      id="buy-fee-percent"
+                      inputMode="decimal"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={buyFeePercentInput}
+                      onChange={(event) => {
+                        setBuyFeePercentInput(event.target.value)
+                        if (useSameFee) {
+                          setSellFeePercentInput(event.target.value)
+                        }
+                      }}
+                    />
+                  </div>
+                  {!useSameFee ? (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground" htmlFor="sell-fee-percent">
+                        Sell fee (%)
+                      </label>
+                      <Input
+                        id="sell-fee-percent"
+                        inputMode="decimal"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={sellFeePercentInput}
+                        onChange={(event) => setSellFeePercentInput(event.target.value)}
+                      />
+                    </div>
+                  ) : null}
+                  <p className="text-xs text-muted-foreground lg:col-span-1">
+                    Fees are applied on both the buy and sell legs when estimating net P/L.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -670,7 +786,7 @@ export default function DashboardPage() {
                         {profitLossFromTarget ? (
                           <div className="space-y-1">
                             <p>
-                              Gross P/L at {formatIdr(targetPrice)}: {formatIdr(profitLossFromTarget.gross)}
+                              Gross P/L at {formatIdr(effectiveTargetPrice ?? 0)}: {formatIdr(profitLossFromTarget.gross)}
                             </p>
                             <p>
                               Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromTarget.net)}</span>
@@ -682,7 +798,7 @@ export default function DashboardPage() {
                             ) : null}
                           </div>
                         ) : (
-                          <p className="text-xs text-muted-foreground">Add a target price to estimate potential profit.</p>
+                          <p className="text-xs text-muted-foreground">Add a target price or percentage to estimate potential profit.</p>
                         )}
                       </div>
                       <div className="rounded-md bg-muted/40 p-3">
@@ -690,7 +806,7 @@ export default function DashboardPage() {
                         {profitLossFromStop ? (
                           <div className="space-y-1">
                             <p>
-                              Gross P/L at {formatIdr(stopPrice)}: {formatIdr(profitLossFromStop.gross)}
+                              Gross P/L at {formatIdr(effectiveStopPrice ?? 0)}: {formatIdr(profitLossFromStop.gross)}
                             </p>
                             <p>
                               Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromStop.net)}</span>
@@ -702,7 +818,7 @@ export default function DashboardPage() {
                             ) : null}
                           </div>
                         ) : (
-                          <p className="text-xs text-muted-foreground">Add a stop price to preview downside risk.</p>
+                          <p className="text-xs text-muted-foreground">Add a stop price or percentage to preview downside risk.</p>
                         )}
                       </div>
                     </div>
