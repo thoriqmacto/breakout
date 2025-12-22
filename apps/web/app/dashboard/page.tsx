@@ -149,6 +149,12 @@ export default function DashboardPage() {
       }
     | null
   >(null)
+  const [entryPriceInput, setEntryPriceInput] = useState("")
+  const [capitalInput, setCapitalInput] = useState("")
+  const [lotSizeInput, setLotSizeInput] = useState("100")
+  const [targetPriceInput, setTargetPriceInput] = useState("")
+  const [stopPriceInput, setStopPriceInput] = useState("")
+  const [feePercentInput, setFeePercentInput] = useState("0")
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -328,6 +334,49 @@ export default function DashboardPage() {
       ? closePrice - trailingPriceFromPercent
       : null
 
+  const entryPrice = parseNumericInput(entryPriceInput)
+  const capitalAllocation = parseNumericInput(capitalInput)
+  const lotSize = parseNumericInput(lotSizeInput)
+  const targetPrice = parseNumericInput(targetPriceInput)
+  const stopPrice = parseNumericInput(stopPriceInput)
+  const feePercent = parseNumericInput(feePercentInput)
+
+  const normalizedLotSize = Number.isFinite(lotSize) && lotSize > 0 ? lotSize : null
+  const feeRate = Number.isFinite(feePercent) && feePercent > 0 ? feePercent / 100 : 0
+  const maxLots =
+    Number.isFinite(entryPrice) && entryPrice > 0 &&
+    Number.isFinite(capitalAllocation) && capitalAllocation > 0 &&
+    normalizedLotSize !== null
+      ? Math.floor(capitalAllocation / (entryPrice * normalizedLotSize))
+      : null
+
+  const totalShares = maxLots !== null && normalizedLotSize !== null ? maxLots * normalizedLotSize : null
+  const buyValue = totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 ? entryPrice * totalShares : null
+  const buyFee = buyValue !== null ? buyValue * feeRate : null
+  const totalCostWithFee = buyValue !== null ? buyValue + (buyFee ?? 0) : null
+
+  const profitLossFromTarget =
+    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(targetPrice)
+      ? (() => {
+          const gross = (targetPrice - entryPrice) * totalShares
+          const sellValue = targetPrice * totalShares
+          const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
+          const net = gross - totalFees
+          return { gross, net }
+        })()
+      : null
+
+  const profitLossFromStop =
+    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(stopPrice)
+      ? (() => {
+          const gross = (stopPrice - entryPrice) * totalShares
+          const sellValue = stopPrice * totalShares
+          const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
+          const net = gross - totalFees
+          return { gross, net }
+        })()
+      : null
+
   const handleAtrCalculation = async () => {
     const trimmedSymbol = atrSymbol.trim().toUpperCase()
 
@@ -477,6 +526,181 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Position sizing &amp; P/L</CardTitle>
+            <CardDescription>
+              Quickly work out lots, share count, and potential profit or loss based on allocation and fees.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="entry-price">
+                    Entry price per share (IDR)
+                  </label>
+                  <Input
+                    id="entry-price"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 5125"
+                    value={entryPriceInput}
+                    onChange={(event) => setEntryPriceInput(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="capital">
+                    Capital allocation (IDR)
+                  </label>
+                  <Input
+                    id="capital"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    placeholder="Budget for this trade"
+                    value={capitalInput}
+                    onChange={(event) => setCapitalInput(event.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="lot-size">
+                    Unit per lot
+                  </label>
+                  <Input
+                    id="lot-size"
+                    inputMode="numeric"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={lotSizeInput}
+                    onChange={(event) => setLotSizeInput(event.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">IDX uses 100 shares per lot by default.</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="target-price">
+                    Target price (optional)
+                  </label>
+                  <Input
+                    id="target-price"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Take-profit price"
+                    value={targetPriceInput}
+                    onChange={(event) => setTargetPriceInput(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="stop-price">
+                    Stop-loss price (optional)
+                  </label>
+                  <Input
+                    id="stop-price"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Protective stop"
+                    value={stopPriceInput}
+                    onChange={(event) => setStopPriceInput(event.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="fee-percent">
+                    Fee (% per side)
+                  </label>
+                  <Input
+                    id="fee-percent"
+                    inputMode="decimal"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={feePercentInput}
+                    onChange={(event) => setFeePercentInput(event.target.value)}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Fees are applied to both buy and sell legs when calculating net P/L.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-dashed p-4 text-sm">
+              {maxLots !== null && normalizedLotSize !== null ? (
+                maxLots > 0 ? (
+                  <>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Lots to trade</p>
+                        <p className="text-lg font-semibold text-foreground">{maxLots.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">{totalShares?.toLocaleString()} shares in total.</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Cash required</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {totalCostWithFee !== null ? formatIdr(totalCostWithFee) : buyValue !== null ? formatIdr(buyValue) : "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {buyFee && buyFee > 0
+                            ? `Includes approximately ${formatIdr(buyFee)} in fees on entry.`
+                            : "No fees applied to the buy leg."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="rounded-md bg-muted/40 p-3">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Take profit</p>
+                        {profitLossFromTarget ? (
+                          <div className="space-y-1">
+                            <p>
+                              Gross P/L at {formatIdr(targetPrice)}: {formatIdr(profitLossFromTarget.gross)}
+                            </p>
+                            <p>
+                              Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromTarget.net)}</span>
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">Add a target price to estimate potential profit.</p>
+                        )}
+                      </div>
+                      <div className="rounded-md bg-muted/40 p-3">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Stop-loss</p>
+                        {profitLossFromStop ? (
+                          <div className="space-y-1">
+                            <p>
+                              Gross P/L at {formatIdr(stopPrice)}: {formatIdr(profitLossFromStop.gross)}
+                            </p>
+                            <p>
+                              Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromStop.net)}</span>
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">Add a stop price to preview downside risk.</p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p>You need more capital to purchase at least one lot with the current inputs.</p>
+                )
+              ) : (
+                <p>Provide an entry price, capital, and lot size to determine how many lots you can place.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Trailing stop calculator</CardTitle>
