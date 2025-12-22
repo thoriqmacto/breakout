@@ -73,6 +73,8 @@ const formatIdr = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value)
 
+const formatPercent = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(2)}%`
+
 const highlights = [
   {
     title: "Total Strategies",
@@ -362,7 +364,9 @@ export default function DashboardPage() {
           const sellValue = targetPrice * totalShares
           const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
           const net = gross - totalFees
-          return { gross, net }
+          const percent = totalCostWithFee && totalCostWithFee !== 0 ? (net / totalCostWithFee) * 100 : null
+
+          return { gross, net, percent }
         })()
       : null
 
@@ -373,7 +377,9 @@ export default function DashboardPage() {
           const sellValue = stopPrice * totalShares
           const totalFees = feeRate > 0 ? (buyValue ?? 0) * feeRate + sellValue * feeRate : 0
           const net = gross - totalFees
-          return { gross, net }
+          const percent = totalCostWithFee && totalCostWithFee !== 0 ? (net / totalCostWithFee) * 100 : null
+
+          return { gross, net, percent }
         })()
       : null
 
@@ -669,6 +675,11 @@ export default function DashboardPage() {
                             <p>
                               Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromTarget.net)}</span>
                             </p>
+                            {profitLossFromTarget.percent !== null ? (
+                              <p className="text-xs text-muted-foreground">
+                                Net return vs. cost: <span className="font-medium text-foreground">{formatPercent(profitLossFromTarget.percent)}</span>
+                              </p>
+                            ) : null}
                           </div>
                         ) : (
                           <p className="text-xs text-muted-foreground">Add a target price to estimate potential profit.</p>
@@ -684,6 +695,11 @@ export default function DashboardPage() {
                             <p>
                               Net after fees: <span className="font-medium text-foreground">{formatIdr(profitLossFromStop.net)}</span>
                             </p>
+                            {profitLossFromStop.percent !== null ? (
+                              <p className="text-xs text-muted-foreground">
+                                Net return vs. cost: <span className="font-medium text-foreground">{formatPercent(profitLossFromStop.percent)}</span>
+                              </p>
+                            ) : null}
                           </div>
                         ) : (
                           <p className="text-xs text-muted-foreground">Add a stop price to preview downside risk.</p>
