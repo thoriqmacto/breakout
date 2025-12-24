@@ -57,9 +57,13 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```
    Use `--eod` to auto-enable those options with today's date and to skip prompts. The command will also avoid running the Python downloader if Yahoo Finance reports that the latest IDX data is not yet available.
 
-3. **Verify and repair gaps or duplicates** – scan all configured symbols and optionally resolve issues:
+3. **Verify and repair gaps or duplicates** – scan configured symbols and optionally resolve issues:
    ```bash
    php artisan ohlcv:check --all --resolve=missing-days
+   ```
+   Provide a symbol to target a single asset instead of every configured index symbol:
+   ```bash
+   php artisan ohlcv:check INCO --resolve=missing-days
    ```
    Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
 
@@ -119,4 +123,3 @@ apps/
 
 ## Contributing
 Pull requests are welcome. Please ensure tests pass before submitting your contribution.
-
