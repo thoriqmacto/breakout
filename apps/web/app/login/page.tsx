@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { SESSION_EXPIRED_MESSAGE } from "@/lib/auth-client"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, loading, user } = useAuth()
+  const { login, loading, user, sessionStatus, clearSessionStatus } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -19,6 +20,13 @@ export default function LoginPage() {
       router.replace("/dashboard")
     }
   }, [loading, router, user])
+
+  useEffect(() => {
+    if (sessionStatus === "expired") {
+      setError(SESSION_EXPIRED_MESSAGE)
+      clearSessionStatus()
+    }
+  }, [clearSessionStatus, sessionStatus])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()

@@ -16,6 +16,16 @@ export type AuthResponse = {
   refresh_expires_at: string | null
 }
 
+export const SESSION_EXPIRED_MESSAGE =
+  "Your session has expired. Please sign in again with your credentials to continue."
+
+export class UnauthorizedError extends Error {
+  constructor(message: string = SESSION_EXPIRED_MESSAGE) {
+    super(message)
+    this.name = "UnauthorizedError"
+  }
+}
+
 export type LoginPayload = {
   email: string
   password: string
@@ -138,6 +148,10 @@ export async function fetchProfile(accessToken: string): Promise<AuthUser> {
       Authorization: `Bearer ${accessToken}`,
     },
   })
+
+  if (response.status === 401) {
+    throw new UnauthorizedError()
+  }
 
   if (!response.ok) {
     throw new Error("Unable to load profile information.")
