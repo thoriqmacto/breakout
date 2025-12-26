@@ -1,10 +1,10 @@
 # Breakout
 
-This repository contains the code for the **Breakout** API service. The project is structured as a multi-app monorepo. At present it includes a single Laravel application located in `apps/api`.
+This repository contains the code for **Breakout**, structured as a multi-app monorepo. It currently includes a Laravel API (`apps/api`) and a Next.js front-end (`apps/web`).
 
 ## Technology
 - PHP ^8.2 with Laravel ^12.0 as the web framework and tinker for interactive shells
-- JavaScript tooling managed with Vite and Tailwind via `package.json`
+- Next.js 15 with Tailwind CSS 4 for the front-end application
 
 ## Development
 1. Install PHP dependencies:
@@ -117,8 +117,20 @@ If `--trailing` is omitted, strategies run without a trailing stop.
 
 ## Repository Layout
 ```
-apps/
-  api/          Laravel API application
+.
+├── README.md
+└── apps/
+    ├── api/        Laravel API
+    │   ├── app/            Domain code (Models, Services, Console, etc.)
+    │   ├── routes/         API routes (api.php), console commands
+    │   ├── database/       Migrations, factories, seeders, seed data
+    │   ├── resources/      Blade views, language files
+    │   └── tests/          Feature and unit tests
+    └── web/        Next.js app
+        ├── app/            App Router routes and pages
+        ├── components/     Shared React components
+        ├── lib/            Utilities and helpers
+        └── public/         Static assets
 ```
 
 ## Contributing
