@@ -32,6 +32,8 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 })
 
 const DEFAULT_PAGE_SIZE = 30
+const MAX_VISIBLE_SYMBOLS = 13
+const VISIBLE_SYMBOLS_STORAGE_KEY = "tradingDaysVisibleSymbols"
 
 type TradingDaySymbolPayload = {
   close: number | null
@@ -163,6 +165,36 @@ const normalizeStatistics = (
   }
 }
 
+const sanitizeVisibleSymbols = (candidate: string[], available: string[]) =>
+  available.filter((symbol) => candidate.includes(symbol)).slice(0, MAX_VISIBLE_SYMBOLS)
+
+const areArraysEqual = (first: string[], second: string[]) =>
+  first.length === second.length && first.every((value, index) => value === second[index])
+
+const readStoredVisibleSymbols = (): string[] | null => {
+  if (typeof window === "undefined") {
+    return null
+  }
+
+  const raw = window.localStorage.getItem(VISIBLE_SYMBOLS_STORAGE_KEY)
+  if (!raw) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) {
+      return null
+    }
+
+    const sanitized = parsed.filter((value): value is string => typeof value === "string")
+    return sanitized.length > 0 ? sanitized : null
+  } catch (error) {
+    console.error("Unable to read stored trading day symbols", error)
+    return null
+  }
+}
+
 export default function TradingDaysPage() {
   const { accessToken } = useAuth()
   const [rows, setRows] = useState<TradingDayRow[]>([])
@@ -175,6 +207,8 @@ export default function TradingDaysPage() {
   const [statistics, setStatistics] = useState<TradingDayStatistics | null>(null)
   const [dateFilter, setDateFilter] = useState("")
   const [dateSort, setDateSort] = useState<"asc" | "desc">("desc")
+  const [refreshNonce, setRefreshNonce] = useState(0)
+  const [columnLimitMessage, setColumnLimitMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (symbols.length === 0) {
@@ -182,19 +216,38 @@ export default function TradingDaysPage() {
       return
     }
 
+    const stored = readStoredVisibleSymbols()
+    const fallbackSelection = symbols.slice(0, MAX_VISIBLE_SYMBOLS)
+
     setVisibleSymbols((previous) => {
-      if (previous.length === 0) {
-        return symbols
-      }
+      const sanitizedPrevious = sanitizeVisibleSymbols(previous, symbols)
+      const sanitizedStored = stored ? sanitizeVisibleSymbols(stored, symbols) : []
 
-      const filtered = previous.filter((symbol) => symbols.includes(symbol))
-      if (filtered.length === previous.length && filtered.length > 0) {
-        return filtered
-      }
+      const nextSelection =
+        sanitizedPrevious.length > 0
+          ? sanitizedPrevious
+          : sanitizedStored.length > 0
+            ? sanitizedStored
+            : fallbackSelection
 
-      return filtered.length > 0 ? filtered : symbols
+      return areArraysEqual(previous, nextSelection) ? previous : nextSelection
     })
   }, [symbols])
+
+  useEffect(() => {
+    if (symbols.length === 0 || typeof window === "undefined") {
+      return
+    }
+
+    const sanitizedSelection = sanitizeVisibleSymbols(visibleSymbols, symbols)
+    window.localStorage.setItem(VISIBLE_SYMBOLS_STORAGE_KEY, JSON.stringify(sanitizedSelection))
+  }, [symbols, visibleSymbols])
+
+  useEffect(() => {
+    if (visibleSymbols.length < MAX_VISIBLE_SYMBOLS && columnLimitMessage) {
+      setColumnLimitMessage(null)
+    }
+  }, [visibleSymbols, columnLimitMessage])
 
   useEffect(() => {
     if (!accessToken) {
@@ -278,18 +331,29 @@ export default function TradingDaysPage() {
     return () => {
       controller.abort()
     }
-  }, [accessToken, currentPage])
+  }, [accessToken, currentPage, refreshNonce])
 
   const toggleSymbol = useCallback(
     (symbol: string) => {
+      let blockedAddition = false
+
       setVisibleSymbols((previous) => {
         if (previous.includes(symbol)) {
           return previous.filter((value) => value !== symbol)
         }
 
+        if (previous.length >= MAX_VISIBLE_SYMBOLS) {
+          blockedAddition = true
+          return previous
+        }
+
         const next = [...previous, symbol]
-        return symbols.filter((value) => next.includes(value))
+        return sanitizeVisibleSymbols(next, symbols)
       })
+
+      setColumnLimitMessage(
+        blockedAddition ? `You can show up to ${MAX_VISIBLE_SYMBOLS} symbol columns at once.` : null,
+      )
     },
     [symbols],
   )
@@ -316,6 +380,10 @@ export default function TradingDaysPage() {
 
   const clearDateFilter = useCallback(() => {
     setDateFilter("")
+  }, [])
+
+  const refreshTradingDays = useCallback(() => {
+    setRefreshNonce((previous) => previous + 1)
   }, [])
 
   const filteredRows = useMemo(() => {
@@ -605,11 +673,18 @@ export default function TradingDaysPage() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="gap-1">
-          <CardTitle>Trading Days</CardTitle>
-          <CardDescription>
-            Review IHSG performance and key closing prices for recent trading sessions.
-          </CardDescription>
+        <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+          <div className="space-y-1">
+            <CardTitle>Trading Days</CardTitle>
+            <CardDescription>
+              Review IHSG performance and key closing prices for recent trading sessions.
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={refreshTradingDays} disabled={loading}>
+              Refresh data
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {statistics ? (
@@ -658,30 +733,39 @@ export default function TradingDaysPage() {
           ) : null}
 
           {symbols.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium">Symbols</span>
+            <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                {symbols.map((symbol) => {
-                  const isActive = orderedVisibleSymbols.includes(symbol)
-                  return (
-                    <button
-                      key={symbol}
-                      type="button"
-                      onClick={() => toggleSymbol(symbol)}
-                      className={cn(
-                        buttonVariants({
-                          variant: isActive ? "secondary" : "outline",
-                          size: "sm",
-                        }),
-                        "px-3",
-                      )}
-                      aria-pressed={isActive}
-                    >
-                      {symbol}
-                    </button>
-                  )
-                })}
+                <span className="text-sm font-medium">Symbols</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {symbols.map((symbol) => {
+                    const isActive = orderedVisibleSymbols.includes(symbol)
+                    return (
+                      <button
+                        key={symbol}
+                        type="button"
+                        onClick={() => toggleSymbol(symbol)}
+                        className={cn(
+                          buttonVariants({
+                            variant: isActive ? "secondary" : "outline",
+                            size: "sm",
+                          }),
+                          "px-3",
+                        )}
+                        aria-pressed={isActive}
+                        disabled={!isActive && orderedVisibleSymbols.length >= MAX_VISIBLE_SYMBOLS}
+                      >
+                        {symbol}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
+              <p className="text-xs text-muted-foreground">
+                Choose up to {MAX_VISIBLE_SYMBOLS} symbol columns. Your selection is saved as the default view.
+              </p>
+              {columnLimitMessage ? (
+                <p className="text-xs font-medium text-amber-600">{columnLimitMessage}</p>
+              ) : null}
             </div>
           ) : null}
 
