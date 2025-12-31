@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\StockbitTokenStore;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -14,7 +15,7 @@ class StockbitExodusClient
     public function __construct()
     {
         $cfg = config('stockbit');
-        $this->bearer = (string) ($cfg['bearer'] ?? '');
+        $this->bearer = $this->resolveBearer((string) ($cfg['bearer'] ?? ''));
         $this->defaults = $cfg['defaults'] ?? [];
 
         $this->http = new Client([
@@ -33,6 +34,19 @@ class StockbitExodusClient
     public function setBearer(string $bearer): void
     {
         $this->bearer = $bearer;
+    }
+
+    private function resolveBearer(string $configBearer): string
+    {
+        try {
+            /** @var StockbitTokenStore $store */
+            $store = app(StockbitTokenStore::class);
+            $stored = $store->get();
+
+            return $stored ?? $configBearer;
+        } catch (\Throwable) {
+            return $configBearer;
+        }
     }
 
     public function marketDetectors(

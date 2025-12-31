@@ -8,6 +8,7 @@ use App\Services\CsvUtilities;
 use App\Services\DbBars;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
+use App\Support\StockbitTokenStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -37,7 +38,7 @@ class ScrapeStockbit extends Command
      */
     private array $assetIds = [];
 
-    public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater): int
+    public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater, StockbitTokenStore $tokenStore): int
     {
         $fetchMarketDetector = (bool) $this->option('market-detector');
         $fetchHistorical = (bool) $this->option('historical');
@@ -79,27 +80,59 @@ class ScrapeStockbit extends Command
             $historicalPage = null;
         }
 
-        $bearer = config('stockbit.bearer');
+        $bearer = $tokenStore->get() ?: config('stockbit.bearer');
         $exp = StockbitExodusClient::jwtExpiresAt($bearer);
-        if ($exp && $exp < new \DateTimeImmutable('now')) {
-            $this->warn('Your STOCKBIT_BEARER seems expired.');
 
-            $newBearer = trim((string) $this->ask('Please enter a new bearer token (leave blank to cancel)'));
-            if ($newBearer === '') {
-                $this->error('No bearer token supplied. Exiting.');
+        if ($bearer === '' || $bearer === null) {
+            if ($this->input->isInteractive()) {
+                $bearer = trim((string) $this->ask('Enter Stockbit bearer token (leave blank to cancel)'));
+                if ($bearer === '') {
+                    $this->error('No bearer token supplied. Exiting.');
+
+                    return self::FAILURE;
+                }
+
+                config(['stockbit.bearer' => $bearer]);
+                $tokenStore->put($bearer);
+                $api->setBearer($bearer);
+                $exp = StockbitExodusClient::jwtExpiresAt($bearer);
+            } else {
+                $this->error('STOCKBIT_BEARER is missing. Run interactively to provide a token.');
 
                 return self::FAILURE;
             }
+        } elseif ($exp && $exp < new \DateTimeImmutable('now')) {
+            $this->warn('Your STOCKBIT_BEARER seems expired.');
 
-            config(['stockbit.bearer' => $newBearer]);
-            $api->setBearer($newBearer);
+            if ($this->input->isInteractive()) {
+                $newBearer = trim((string) $this->ask('Please enter a new bearer token (leave blank to cancel)'));
+                if ($newBearer === '') {
+                    $this->error('No bearer token supplied. Exiting.');
 
-            $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
-            if ($exp) {
-                $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+                    $tokenStore->forget();
+
+                    return self::FAILURE;
+                }
+
+                config(['stockbit.bearer' => $newBearer]);
+                $api->setBearer($newBearer);
+                $tokenStore->put($newBearer);
+
+                $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
+                if ($exp) {
+                    $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+                }
+            } else {
+                $this->error('STOCKBIT_BEARER is expired. Run interactively to refresh the token.');
+
+                return self::FAILURE;
             }
-        } elseif ($exp) {
-            $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+        } else {
+            $api->setBearer($bearer);
+
+            if ($exp) {
+                $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+            }
         }
 
         $argumentTickers = array_filter(
