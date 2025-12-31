@@ -14,6 +14,13 @@ use Tests\TestCase;
 
 class ScrapeStockbitCommandTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('stockbit.bearer', 'test-bearer-token');
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -34,7 +41,7 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.historical.limit', 50);
         config()->set('stockbit.historical.page', 3);
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->with('BBCA', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 50, null)
@@ -102,7 +109,7 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.save_disk', 'local');
         config()->set('stockbit.save_dir', 'broker_summary');
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->andReturn(['error' => 'http_500', 'message' => 'Server Error']);
@@ -135,7 +142,7 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.defaults.limit', 25);
         config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->with('TLKM', '2024-01-01', '2024-01-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
@@ -185,7 +192,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
         File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,90,95,85,92,100\n03/02/2024,120,125,115,122,2000\n");
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')->never();
         $mock->shouldReceive('tickerProfile')->never();
         $mock->shouldReceive('historicalSummary')
@@ -284,7 +291,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
         File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,90,95,85,92,100\n");
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')->never();
         $mock->shouldReceive('tickerProfile')->never();
         $mock->shouldReceive('historicalSummary')
@@ -345,7 +352,7 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.defaults.limit', 25);
         config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->with('ASII', '2024-03-01', '2024-03-05', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
@@ -418,7 +425,7 @@ class ScrapeStockbitCommandTest extends TestCase
         config()->set('stockbit.defaults.limit', 25);
         config()->set('stockbit.historical.period', 'HS_PERIOD_DAILY');
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')
             ->once()
             ->with('BBRI', '2024-02-01', '2024-02-02', 'TRANSACTION_TYPE_NET', 'MARKET_BOARD_REGULER', 'INVESTOR_TYPE_ALL', 25, null)
@@ -449,7 +456,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $profilePayload = ['data' => ['profile' => ['name' => 'Example']]];
         $syncedAt = Carbon::parse('2024-02-01 12:00:00');
 
-        $api = Mockery::mock(StockbitExodusClient::class);
+        $api = $this->makeStockbitMock();
         $api->shouldReceive('marketDetectors')->never();
         $api->shouldReceive('historicalSummary')->never();
         $api->shouldReceive('tickerProfile')
@@ -494,7 +501,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
         File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,100,110,90,105,1000\n");
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')->never();
         $mock->shouldReceive('historicalSummary')->never();
         $mock->shouldReceive('tickerProfile')->never();
@@ -653,7 +660,7 @@ class ScrapeStockbitCommandTest extends TestCase
         $originalCsv = File::exists($csvPath) ? File::get($csvPath) : null;
         File::put($csvPath, "Date,Open,High,Low,Close,Volume\n01/02/2024,100,110,90,105,1000\n");
 
-        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock = $this->makeStockbitMock();
         $mock->shouldReceive('marketDetectors')->never();
         $mock->shouldReceive('historicalSummary')->never();
         $mock->shouldReceive('tickerProfile')->never();
@@ -767,5 +774,13 @@ class ScrapeStockbitCommandTest extends TestCase
                 File::delete($csvPath);
             }
         }
+    }
+
+    private function makeStockbitMock()
+    {
+        $mock = Mockery::mock(StockbitExodusClient::class);
+        $mock->shouldReceive('setBearer')->withAnyArgs()->andReturnNull()->byDefault();
+
+        return $mock;
     }
 }

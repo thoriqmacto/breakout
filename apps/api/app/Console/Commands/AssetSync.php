@@ -10,6 +10,7 @@ use App\Services\DbBars;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use App\Services\PythonRunner;
+use App\Support\StockbitTokenStore;
 
 class AssetSync extends Command
 {
@@ -186,8 +187,19 @@ class AssetSync extends Command
         foreach ($indexSymbols as $symbol) {
             $csvPath = $seedDir . '/' . $symbol . '.csv';
             if (!is_file($csvPath)) {
-                // skip symbols without seed CSV
-                continue;
+                $this->info("Attempting to backfill missing CSV for {$symbol} from Stockbit…");
+                $from = Carbon::now()->subDays(14)->toDateString();
+                $to = Carbon::now()->toDateString();
+
+                if (!$this->fetchWithStockbit($symbol, $from, $to)) {
+                    $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt.");
+                    continue;
+                }
+
+                if (!is_file($csvPath)) {
+                    $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt.");
+                    continue;
+                }
             }
 
             // Ensure asset exists in DB
@@ -247,60 +259,67 @@ class AssetSync extends Command
             $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
             if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
-                if ($this->option('eod') && $yfinanceReady === false) {
-                    $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
-                    if ($yfinanceLatestDate) {
-                        $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
-                    }
-                    $this->warn($message);
-                    continue;
-                }
                 $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
                 $end    = $chkLatest ?: now()->toDateString();
-                $ticker = $symbol . '.JK';
+                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end);
+                $csvRows = CsvBars::read($csvPath);
+                $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
-                $this->call('python:run', [
-                    'script' => 'get_stocks.py',
-                    '--arg'  => ["--start={$start}", "--end={$end}", $ticker],
-                ]);
-
-                $pyFile = resource_path('python/csv/' . $symbol . '_PY.csv');
-                if (is_file($pyFile)) {
-                    $newRows = CsvBars::read($pyFile);
-                    if ($newRows !== []) {
-                        $existing = CsvBars::read($csvPath);
-                        $merged   = CsvBars::merge($existing, $newRows);
-                        CsvBars::write($csvPath, $merged);
-
-                        $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
-                        $existingDates = DB::table('price_bars')
-                            ->where('asset_id', $asset->id)
-                            ->pluck('date')
-                            ->all();
-                        $existingDates = array_flip($existingDates);
-
-                        $updBars = new DbBars($chunk, false);
-                        foreach ($newRows as $ymd => $row) {
-                            if (isset($existingDates[$ymd])) {
-                                continue;
-                            }
-
-                            $updBars->add([
-                                'asset_id'   => $asset->id,
-                                'date'       => $ymd,
-                                'open'       => $row['open'],
-                                'high'       => $row['high'],
-                                'low'        => $row['low'],
-                                'close'      => $row['close'],
-                                'volume'     => $row['volume'],
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
+                if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
+                    if ($this->option('eod') && $yfinanceReady === false) {
+                        $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
+                        if ($yfinanceLatestDate) {
+                            $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
                         }
-                        $updBars->flush();
+                        $this->warn($message);
+                        continue;
+                    }
 
-                        $csvRows = $merged;
-                        $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                    $ticker = $symbol . '.JK';
+
+                    $this->call('python:run', [
+                        'script' => 'get_stocks.py',
+                        '--arg'  => ["--start={$start}", "--end={$end}", $ticker],
+                    ]);
+
+                    $pyFile = resource_path('python/csv/' . $symbol . '_PY.csv');
+                    if (is_file($pyFile)) {
+                        $newRows = CsvBars::read($pyFile);
+                        if ($newRows !== []) {
+                            $existing = CsvBars::read($csvPath);
+                            $merged   = CsvBars::merge($existing, $newRows);
+                            CsvBars::write($csvPath, $merged);
+
+                            $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
+                            $existingDates = DB::table('price_bars')
+                                ->where('asset_id', $asset->id)
+                                ->pluck('date')
+                                ->all();
+                            $existingDates = array_flip($existingDates);
+
+                            $updBars = new DbBars($chunk, false);
+                            foreach ($newRows as $ymd => $row) {
+                                if (isset($existingDates[$ymd])) {
+                                    continue;
+                                }
+
+                                $updBars->add([
+                                    'asset_id'   => $asset->id,
+                                    'date'       => $ymd,
+                                    'open'       => $row['open'],
+                                    'high'       => $row['high'],
+                                    'low'        => $row['low'],
+                                    'close'      => $row['close'],
+                                    'volume'     => $row['volume'],
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                            $updBars->flush();
+
+                            $csvRows = $merged;
+                            $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                        }
                     }
                 }
             }
@@ -330,5 +349,43 @@ class AssetSync extends Command
         $this->table($headers, $rows);
 
         return Command::SUCCESS;
+    }
+
+    private function fetchWithStockbit(string $symbol, string $from, string $to): bool
+    {
+        if (!$this->stockbitTokenAvailable()) {
+            $this->warn("Skipping Stockbit fetch for {$symbol}; bearer token not configured.");
+
+            return false;
+        }
+
+        $result = $this->call('stockbit:scrape', [
+            'tickers' => [$symbol],
+            '--from' => $from,
+            '--to' => $to,
+            '--historical' => true,
+            '--no-profile-sync' => true,
+        ]);
+
+        if ($result !== Command::SUCCESS) {
+            $this->warn("Stockbit fetch failed for {$symbol}; falling back to yfinance if available.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function stockbitTokenAvailable(): bool
+    {
+        try {
+            /** @var StockbitTokenStore $store */
+            $store = app(StockbitTokenStore::class);
+            $bearer = $store->get() ?: config('stockbit.bearer');
+
+            return is_string($bearer) && $bearer !== '';
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }
