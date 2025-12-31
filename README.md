@@ -53,11 +53,15 @@ The Laravel console already includes helpers for refreshing the trading calendar
 
 2. **Sync OHLCV seeds and the database** – compare configured symbols to seed CSVs, optionally pull missing data via the Python scripts, and upsert bars into `price_bars`:
    ```bash
-   php artisan asset:sync --check-python --run-python --import-csv --continue --chk-date=$(date +%F)
+   php artisan asset:sync --eod
    ```
-   Use `--eod` to auto-enable those options with today's date and to skip prompts. The command will also avoid running the Python downloader if Yahoo Finance reports that the latest IDX data is not yet available.
+   This commands to auto-enable all required options with today's date and to skip prompts. The command will retrieve price data from Stockbit (Bearer token prompt required) and make Python downloader for Yahoo Finance as the backup.
 
 3. **Verify and repair gaps or duplicates** – scan configured symbols and optionally resolve issues:
+   ```bash
+   php artisan ohlcv:check --all
+   ```
+   Simply checking across all tickers integrity of historical data with detail reports for each tickers.
    ```bash
    php artisan ohlcv:check --all --resolve=missing-days
    ```
@@ -66,54 +70,6 @@ The Laravel console already includes helpers for refreshing the trading calendar
    php artisan ohlcv:check INCO --resolve=missing-days
    ```
    Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
-
-## API
-A simple health check endpoint is available at `GET /api/ping`, which responds with `{ "ok": true }`
-
-## Asset Metrics
-The API includes a service for computing basic metrics on asset price data, such as the
-average closing price and total traded volume. Metrics can be accessed through the
-`AssetMetrics` service or via the endpoint:
-
-```
-GET /api/v1/assets/{asset}/metrics
-```
-
-Example usage within code:
-
-```php
-use App\Models\Asset;
-use App\Services\AssetMetrics;
-
-$asset = Asset::first();
-$metrics = (new AssetMetrics())->forAsset($asset);
-```
-
-## Backtesting
-The `asset:backtest` Artisan command executes trading strategies over historical price data.
-
-Available strategies include:
-
-- BreakoutAtr
-- DonchianBreakout
-- RocMomentum
-- MovingAverageCrossover
-- RsiReversal
-- SupportResistanceBreakout
-
-Trailing stops can be enabled with the `--trailing` option.  
-Syntax: `--trailing=<type>:<value>[@strategy1,strategy2,...]`
-
-- Apply a 10% trailing stop to every strategy:
-  ```bash
-  php artisan asset:backtest --sym=AAA --strategy=DonchianBreakout --trailing=percent:0.10
-  ```
-- Apply a 2×ATR trailing stop only to MovingAverageCrossover and RsiReversal:
-  ```bash
-  php artisan asset:backtest --sym=AAA --compare --strategies=MovingAverageCrossover,RsiReversal --trailing=atr:2@MovingAverageCrossover,RsiReversal
-  ```
-
-If `--trailing` is omitted, strategies run without a trailing stop.
 
 ## Repository Layout
 ```
