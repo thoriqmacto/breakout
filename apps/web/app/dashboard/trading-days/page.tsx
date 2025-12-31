@@ -32,7 +32,7 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 })
 
 const DEFAULT_PAGE_SIZE = 30
-const MAX_VISIBLE_SYMBOLS = 13
+const MAX_VISIBLE_SYMBOLS = 11
 const VISIBLE_SYMBOLS_STORAGE_KEY = "tradingDaysVisibleSymbols"
 
 type TradingDaySymbolPayload = {
