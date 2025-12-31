@@ -30,6 +30,10 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::post('assets/metrics/update', [AssetController::class, 'updateMetrics'])
         ->name('assets.metrics.update');
 
+    Route::get('assets/{asset}/metrics', [AssetController::class, 'metricForAsset'])
+        ->whereNumber('asset')
+        ->name('assets.metrics.show');
+
     Route::apiResource('assets', AssetController::class);
 
     // Backtest

@@ -77,6 +77,37 @@ class AssetController extends ApiController
         ]);
     }
 
+    public function metricForAsset(Asset $asset)
+    {
+        $metric = Metric::where('asset_id', $asset->id)->first();
+
+        if (!$metric) {
+            return ApiResponse::error('Metrics not found for this asset.', 404);
+        }
+
+        return ApiResponse::success([
+            'metric' => [
+                'rank' => null,
+                'asset_id' => $metric->asset_id,
+                'symbol' => $metric->symbol,
+                'name' => $metric->name,
+                'close' => $metric->close,
+                'ma50' => $metric->ma50,
+                'ma100' => $metric->ma100,
+                'high20' => $metric->high20,
+                'high55' => $metric->high55,
+                'atr14' => $metric->atr14,
+                'roc13' => $metric->roc13,
+                'avg_vol20' => $metric->avg_vol20,
+                'vol_vs_avg20' => $metric->vol_vs_avg20,
+                'close_vs_high20' => $metric->close_vs_high20,
+                'close_vs_high55' => $metric->close_vs_high55,
+                'uptrend' => $metric->uptrend,
+                'bars' => $metric->bars,
+            ],
+        ]);
+    }
+
     public function updateMetrics()
     {
         $updates = 0;
