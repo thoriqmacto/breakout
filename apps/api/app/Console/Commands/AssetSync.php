@@ -251,7 +251,7 @@ class AssetSync extends Command
             if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
                 $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
                 $end    = $chkLatest ?: now()->toDateString();
-                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end);
+                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, false);
                 $csvRows = CsvBars::read($csvPath);
                 $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
