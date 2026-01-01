@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
+use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\TradingDayController;
 
@@ -35,6 +36,10 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('assets.metrics.show');
 
     Route::apiResource('assets', AssetController::class);
+
+    // Broker summary
+    Route::get('broker-summaries', [BrokerSummaryController::class, 'index'])
+        ->name('broker-summaries.index');
 
     // Backtest
     Route::get('backtest', [BacktestController::class, 'run']);
