@@ -13,7 +13,18 @@ class Portfolio extends Model
 
     protected $casts = [
         'id' => 'integer',
+        'year' => 'integer',
     ];
+
+    public function positionsForYear(?int $year = null): HasMany
+    {
+        $resolvedYear = $year ?? $this->year;
+
+        return $this->positions()->when(
+            $resolvedYear,
+            fn ($query) => $query->whereYear('executed_at', $resolvedYear)
+        );
+    }
 
     public function positions(): HasMany
     {

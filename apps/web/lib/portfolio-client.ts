@@ -4,8 +4,11 @@ export type PortfolioRecord = {
   id: number
   name: string
   base_ccy: string
+  remarks: string | null
+  year: number | null
   positions_count?: number
   positions?: PositionRecord[]
+  asset_summaries?: AssetSummary[]
 }
 
 export type PositionRecord = {
@@ -17,28 +20,55 @@ export type PositionRecord = {
     symbol: string
     name: string
   }
-  side: "long" | "short"
+  side: "entry" | "exit"
   qty_shares: number
+  price: number
+  fee_rate: number
+  fee_value: number
   avg_price: number
-  entry_date: string | null
-  trail: number | null
-  status: "open" | "closed"
-  notional_value?: number
+  executed_at: string | null
+  value?: number
+}
+
+export type AssetSummary = {
+  asset: {
+    id: number
+    symbol: string
+    name: string
+  } | null
+  entry: {
+    min_price: number | null
+    max_price: number | null
+    total_shares: number
+    average_price: number | null
+    value: number
+  }
+  exit: {
+    min_price: number | null
+    max_price: number | null
+    total_shares: number
+    average_price: number | null
+    value: number
+    pl_percent: number | null
+    pl_value: number
+    pl_flag: "profit" | "loss" | "breakeven"
+  }
 }
 
 export type PortfolioPayload = {
   name: string
   baseCcy: string
+  remarks?: string
+  year?: number
 }
 
 export type PositionPayload = {
   assetId: number
-  side: "long" | "short"
+  side: "entry" | "exit"
   qtyShares: number
-  avgPrice: number
-  entryDate: string
-  trail?: number | null
-  status?: "open" | "closed"
+  price: number
+  feeRate?: number
+  executedAt: string
 }
 
 type FetchOptions = {
@@ -88,6 +118,8 @@ export async function createPortfolio(accessToken: string, payload: PortfolioPay
     body: JSON.stringify({
       name: payload.name,
       base_ccy: payload.baseCcy,
+      remarks: payload.remarks ?? null,
+      year: payload.year ?? null,
     }),
   })
 
@@ -111,6 +143,8 @@ export async function updatePortfolio(
     body: JSON.stringify({
       ...(payload.name ? { name: payload.name } : {}),
       ...(payload.baseCcy ? { base_ccy: payload.baseCcy } : {}),
+      ...(payload.remarks !== undefined ? { remarks: payload.remarks } : {}),
+      ...(payload.year ? { year: payload.year } : {}),
     }),
   })
 
@@ -141,10 +175,9 @@ function buildPositionPayload(payload: PositionPayload): Record<string, string |
     asset_id: payload.assetId,
     side: payload.side,
     qty_shares: payload.qtyShares,
-    avg_price: payload.avgPrice,
-    entry_date: payload.entryDate,
-    trail: payload.trail ?? null,
-    ...(payload.status ? { status: payload.status } : {}),
+    price: payload.price,
+    fee_rate: payload.feeRate ?? 0,
+    executed_at: payload.executedAt,
   }
 }
 

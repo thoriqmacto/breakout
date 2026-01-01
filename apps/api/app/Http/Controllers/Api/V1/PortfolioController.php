@@ -26,6 +26,8 @@ class PortfolioController extends ApiController
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'base_ccy' => ['required', 'string', 'max:10'],
+            'remarks' => ['nullable', 'string', 'max:255'],
+            'year' => ['nullable', 'integer', 'between:1900,3000'],
         ]);
 
         if ($validator->fails()) {
@@ -49,6 +51,8 @@ class PortfolioController extends ApiController
         $validator = Validator::make($request->all(), [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'base_ccy' => ['sometimes', 'required', 'string', 'max:10'],
+            'remarks' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'year' => ['sometimes', 'nullable', 'integer', 'between:1900,3000'],
         ]);
 
         if ($validator->fails()) {
