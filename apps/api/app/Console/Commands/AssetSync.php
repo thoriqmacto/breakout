@@ -73,7 +73,7 @@ class AssetSync extends Command
             $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
             $to = Carbon::now()->toDateString();
             foreach ($missing as $sym) {
-                if ($this->fetchWithStockbit($sym, $from, $to)) {
+                if ($this->fetchWithStockbit($sym, $from, $to, false)) {
                     $this->info("Stockbit CSV backfill complete for {$sym}.");
                 }
             }
@@ -182,7 +182,7 @@ class AssetSync extends Command
                 $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
                 $to = Carbon::now()->toDateString();
 
-                if (!$this->fetchWithStockbit($symbol, $from, $to)) {
+                if (!$this->fetchWithStockbit($symbol, $from, $to, false)) {
                     $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt. Python fallback will be used if available.");
                 }
 
@@ -360,7 +360,7 @@ class AssetSync extends Command
         return Command::SUCCESS;
     }
 
-    private function fetchWithStockbit(string $symbol, string $from, string $to): bool
+    private function fetchWithStockbit(string $symbol, string $from, string $to, bool $isNotProfile): bool
     {
         if (!$this->stockbitTokenAvailable()) {
             $this->warn("Skipping Stockbit fetch for {$symbol}; bearer token not configured.");
@@ -373,7 +373,7 @@ class AssetSync extends Command
             '--from' => $from,
             '--to' => $to,
             '--historical' => true,
-            '--no-profile-sync' => true,
+            '--no-profile-sync' => $isNotProfile,
         ]);
 
         if ($result !== Command::SUCCESS) {
