@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { ArrowLeft, ExternalLink, Info } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
@@ -32,12 +32,37 @@ type LatestPrice = {
   volume: number | null
 }
 
+type AddressPayload = {
+  office?: string
+  phone?: string
+  email?: string[]
+  website?: string
+}
+
+type HistoryPayload = {
+  board?: string
+  date?: string
+  price?: string | number
+  free_float?: string | number
+  administrative_bureau?: string
+  underwriters?: string[]
+}
+
 type AssetDetail = {
   id: number
   symbol: string
   name: string
   lot_size: number | null
   tick_size: number | null
+  sector?: string | null
+  float?: number | string | null
+  ipo_price?: number | string | null
+  ipo_date?: string | null
+  marketcap?: number | string | null
+  background?: string | null
+  history?: HistoryPayload | null
+  address?: AddressPayload[] | null
+  profile_synced_at?: string | null
   latest_price?: LatestPrice | null
 }
 
@@ -62,15 +87,55 @@ const ratioFormatter = new Intl.NumberFormat("en-US", {
 })
 
 const formatNumber = (
-  value: number | null | undefined,
+  value: number | string | null | undefined,
   formatter: Intl.NumberFormat,
   options: { suffix?: string } = {},
 ) => {
-  if (value === null || value === undefined || Number.isNaN(value)) {
+  if (value === null || value === undefined) {
     return "—"
   }
 
-  return `${formatter.format(value)}${options.suffix ?? ""}`
+  const numericValue = typeof value === "string" ? Number.parseFloat(value.replace(/[^0-9.\-]/g, "")) : value
+  if (Number.isNaN(numericValue)) {
+    return "—"
+  }
+
+  return `${formatter.format(numericValue)}${options.suffix ?? ""}`
+}
+
+const compactNumberFormatter = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+})
+
+const formatPercent = (value: number | string | null | undefined) => {
+  if (value === null || value === undefined) {
+    return "—"
+  }
+
+  const percentValue =
+    typeof value === "string" && value.trim().endsWith("%")
+      ? Number.parseFloat(value.replace("%", ""))
+      : value
+
+  if (percentValue === null || Number.isNaN(percentValue as number)) {
+    return typeof value === "string" ? value : "—"
+  }
+
+  return `${ratioFormatter.format(percentValue as number)}%`
+}
+
+const formatDateString = (value: string | null | undefined) => {
+  if (!value) {
+    return "—"
+  }
+
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return value
+  }
+
+  return parsed.toLocaleDateString("en-US", { dateStyle: "medium" })
 }
 
 export default function AssetDetailPage() {
@@ -243,39 +308,53 @@ export default function AssetDetailPage() {
               <CardTitle className="text-xl">
                 {asset ? `${asset.symbol} · ${asset.name}` : "Asset overview"}
               </CardTitle>
-              <CardDescription>Core attributes sourced directly from the assets table.</CardDescription>
+              <CardDescription>Core attributes sourced from the assets table and profile seeders.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Symbol</p>
-              <p className="text-lg font-semibold text-foreground">{asset?.symbol ?? "—"}</p>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <KeyValue label="Symbol" value={asset?.symbol ?? "—"} />
+              <KeyValue label="Name" value={asset?.name ?? "—"} />
+              <KeyValue label="Sector" value={asset?.sector ?? "—"} />
+              <KeyValue label="Float" value={formatPercent(asset?.float)} />
+              <KeyValue label="Market cap" value={formatNumber(asset?.marketcap, compactNumberFormatter)} />
+              <KeyValue
+                label="Latest close"
+                value={formatNumber(latestClose, priceFormatter)}
+                hint={asset?.latest_price?.date ? `As of ${asset.latest_price.date}` : undefined}
+              />
+              <KeyValue label="Lot size" value={formatNumber(asset?.lot_size ?? null, integerFormatter)} />
+              <KeyValue label="Tick size" value={formatNumber(asset?.tick_size ?? null, priceFormatter)} />
+              <KeyValue label="IPO price" value={formatNumber(asset?.ipo_price, priceFormatter)} />
+              <KeyValue label="IPO date" value={formatDateString(asset?.ipo_date)} />
+              <KeyValue label="Free float" value={formatPercent(asset?.history?.free_float)} />
+              <KeyValue label="Listing board" value={asset?.history?.board ?? "—"} />
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Name</p>
-              <p className="text-lg font-semibold text-foreground">{asset?.name ?? "—"}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Lot size</p>
-              <p className="text-lg font-semibold text-foreground">
-                {formatNumber(asset?.lot_size ?? null, integerFormatter)}
+
+            {asset?.address?.[0] ? <AddressBlock address={asset.address[0]} /> : null}
+
+            {asset?.history ? (
+              <ExpandableSection title="Listing details">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <KeyValue label="Listing date" value={formatDateString(asset.history.date)} />
+                  <KeyValue label="Offer price" value={formatNumber(asset.history.price, priceFormatter)} />
+                  <KeyValue label="Underwriters" value={asset.history.underwriters?.join(", ") ?? "—"} />
+                  <KeyValue label="Registrar" value={asset.history.administrative_bureau ?? "—"} />
+                </div>
+              </ExpandableSection>
+            ) : null}
+
+            <ExpandableSection title="Background" defaultExpanded={false} isTextual>
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {asset?.background ?? "No background information available."}
               </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Tick size</p>
-              <p className="text-lg font-semibold text-foreground">
-                {formatNumber(asset?.tick_size ?? null, priceFormatter)}
+            </ExpandableSection>
+
+            {asset?.profile_synced_at ? (
+              <p className="text-xs text-muted-foreground">
+                Profile last synced {formatDateString(asset.profile_synced_at)}.
               </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Latest close</p>
-              <p className="text-lg font-semibold text-foreground">
-                {formatNumber(latestClose, priceFormatter)}
-              </p>
-              {asset?.latest_price?.date ? (
-                <p className="text-xs text-muted-foreground">As of {asset.latest_price.date}</p>
-              ) : null}
-            </div>
+            ) : null}
           </CardContent>
           {assetLoading ? (
             <div className="px-6 pb-6 text-sm text-muted-foreground">Loading asset details…</div>
@@ -362,6 +441,83 @@ function MetricItem({ label, value }: { label: string; value: string }) {
     <div className="rounded-md border bg-muted/40 p-3">
       <p className="text-xs uppercase text-muted-foreground">{label}</p>
       <p className="text-lg font-semibold text-foreground">{value}</p>
+    </div>
+  )
+}
+
+function KeyValue({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-xs uppercase text-muted-foreground">{label}</p>
+      <p className="break-words text-base font-semibold leading-tight text-foreground">{value}</p>
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+    </div>
+  )
+}
+
+function AddressBlock({ address }: { address: AddressPayload }) {
+  return (
+    <div className="rounded-md border bg-muted/40 p-3">
+      <p className="text-xs uppercase text-muted-foreground">Registered office</p>
+      <p className="mt-1 text-sm font-medium leading-relaxed text-foreground">
+        {address.office ?? "—"}
+      </p>
+      <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+        {address.phone ? <p>Phone: {address.phone}</p> : null}
+        {address.email?.length ? <p>Email: {address.email.join(", ")}</p> : null}
+        {address.website ? (
+          <p>
+            Website:{" "}
+            <a
+              className="text-primary underline-offset-2 hover:underline"
+              href={address.website}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {address.website}
+            </a>
+          </p>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+function ExpandableSection({
+  title,
+  children,
+  defaultExpanded = true,
+  isTextual = false,
+}: {
+  title: string
+  children: ReactNode
+  defaultExpanded?: boolean
+  isTextual?: boolean
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded)
+
+  return (
+    <div className="space-y-2 rounded-md border border-dashed border-border/60 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium text-foreground">{title}</p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-mr-2 h-8 px-2 text-xs"
+          onClick={() => setExpanded((prev) => !prev)}
+        >
+          {expanded ? "Hide" : "Show"}
+        </Button>
+      </div>
+      {expanded ? (
+        <div className={isTextual ? "text-sm text-foreground/90" : "text-sm text-foreground"}>
+          {children}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Compact view enabled. Select &quot;Show&quot; to see more details.
+        </p>
+      )}
     </div>
   )
 }
