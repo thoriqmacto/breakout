@@ -13,7 +13,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
-import { loadPortfolioState, summarizePortfolio, type PortfolioSummary } from "@/lib/portfolio-storage"
+import { fetchPortfolios, type PositionRecord } from "@/lib/portfolio-client"
+import { formatIdr } from "@/lib/currency"
 
 const parseNumericInput = (value: string) => {
   if (!value?.trim()) {
@@ -65,14 +66,6 @@ const applyIdxTickRule = (price: number) => {
 
   return Number(adjusted.toFixed(2))
 }
-
-const formatIdr = (value: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value)
 
 const formatPercent = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(2)}%`
 
@@ -144,7 +137,13 @@ export default function DashboardPage() {
   const [useSameFee, setUseSameFee] = useState(true)
   const [buyFeePercentInput, setBuyFeePercentInput] = useState("0")
   const [sellFeePercentInput, setSellFeePercentInput] = useState("0")
-  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null)
+  const [portfolioSummary, setPortfolioSummary] = useState<{
+    totalPositions: number
+    openPositions: number
+    closedPositions: number
+    totalNotional: number
+  } | null>(null)
+  const [portfolioSummaryError, setPortfolioSummaryError] = useState<string | null>(null)
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -164,17 +163,60 @@ export default function DashboardPage() {
   }, [symbol])
 
   useEffect(() => {
-    const synchronizePortfolioSummary = () => {
-      setPortfolioSummary(summarizePortfolio(loadPortfolioState()))
+    if (!accessToken) {
+      setPortfolioSummary(null)
+      setPortfolioSummaryError("Sign in to view portfolio activity.")
+      return
     }
 
-    synchronizePortfolioSummary()
-    window.addEventListener("storage", synchronizePortfolioSummary)
+    let isCancelled = false
+
+    const loadPortfolioSummary = async () => {
+      try {
+        const portfolios = await fetchPortfolios(accessToken, { includePositions: true })
+        const first = portfolios[0]
+
+        if (!first || !first.positions) {
+          if (!isCancelled) {
+            setPortfolioSummary(null)
+            setPortfolioSummaryError("No portfolio data available.")
+          }
+          return
+        }
+
+        const positions: PositionRecord[] = first.positions
+        const totalPositions = positions.length
+        const openPositions = positions.filter((item) => item.status === "open").length
+        const closedPositions = totalPositions - openPositions
+        const totalNotional = positions.reduce(
+          (sum, position) => sum + (position.notional_value ?? position.qty_shares * position.avg_price),
+          0,
+        )
+
+        if (!isCancelled) {
+          setPortfolioSummary({ totalPositions, openPositions, closedPositions, totalNotional })
+          setPortfolioSummaryError(null)
+        }
+      } catch (cause) {
+        if (isCancelled) {
+          return
+        }
+
+        const message =
+          cause instanceof Error && cause.message
+            ? cause.message
+            : "Unable to load portfolio activity."
+        setPortfolioSummary(null)
+        setPortfolioSummaryError(message)
+      }
+    }
+
+    loadPortfolioSummary()
 
     return () => {
-      window.removeEventListener("storage", synchronizePortfolioSummary)
+      isCancelled = true
     }
-  }, [])
+  }, [accessToken])
 
   const highlights = useMemo(
     () => [
@@ -191,16 +233,14 @@ export default function DashboardPage() {
       {
         title: "Portfolio Status",
         value: portfolioSummary
-          ? `${portfolioSummary.activePositions} active positions · ${portfolioSummary.totalGroups} groups`
-          : "Loading...",
+          ? `${portfolioSummary.openPositions} open · ${portfolioSummary.totalPositions} total`
+          : portfolioSummaryError ?? "Loading portfolio activity...",
         description: portfolioSummary
-          ? `Primary: ${portfolioSummary.primaryCount}, Secondary: ${portfolioSummary.secondaryCount} · Vendors: ${portfolioSummary.totalVendors}${
-              portfolioSummary.latestChange ? ` · Updated ${portfolioSummary.latestChange}` : ""
-            } · Value: ${formatIdr(portfolioSummary.totalValue)}`
-          : "Loading portfolio activity...",
+          ? `Closed: ${portfolioSummary.closedPositions} · Notional: ${formatIdr(portfolioSummary.totalNotional)}`
+          : portfolioSummaryError ?? "Loading portfolio activity...",
       },
     ],
-    [portfolioSummary],
+    [portfolioSummary, portfolioSummaryError],
   )
 
   useEffect(() => {
