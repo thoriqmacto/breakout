@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Ban, CheckCircle2, Edit, Plus, RefreshCcw, Save, Trash2, Undo2 } from "lucide-react"
+import { Ban, CheckCircle2, Edit, Loader2, RefreshCcw, Save, Trash2 } from "lucide-react"
 
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,54 +13,58 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import {
-  createGroup,
-  createVendor,
-  getDefaultPortfolioState,
-  loadPortfolioState,
-  normalizeCurrency,
-  persistPortfolioState,
-  summarizePortfolio,
-  upsertGroupName,
-  upsertVendorName,
-  type PortfolioHolding,
-  type PortfolioState,
-  type PortfolioVendor,
-} from "@/lib/portfolio-storage"
+  createPortfolio,
+  createPosition,
+  deletePosition,
+  fetchPortfolios,
+  updatePosition,
+  type PortfolioRecord,
+  type PositionPayload,
+  type PositionRecord,
+} from "@/lib/portfolio-client"
+import { formatIdr } from "@/lib/currency"
 
-type HoldingFormState = {
-  id: string
+type AssetOption = {
+  id: number
   symbol: string
   name: string
-  shares: string
-  averageCost: string
-  targetPrice: string
-  notes: string
-  groupId: string
-  vendorId: string
-  openedAt: string
-  isClosed: boolean
 }
 
-const emptyForm = (): HoldingFormState => ({
-  id: "",
-  symbol: "",
-  name: "",
-  shares: "",
-  averageCost: "",
-  targetPrice: "",
-  notes: "",
-  groupId: "",
-  vendorId: "",
-  openedAt: new Date().toISOString().split("T")[0],
-  isClosed: false,
+type FormState = {
+  positionId: number | null
+  assetId: string
+  side: "long" | "short"
+  qtyShares: string
+  avgPrice: string
+  entryDate: string
+  trail: string
+  status: "open" | "closed"
+}
+
+type PortfolioSummary = {
+  totalPositions: number
+  openPositions: number
+  closedPositions: number
+  totalNotional: number
+}
+
+type AssetIndexResponse = AssetOption[]
+
+const toDateInputValue = (value?: string | null) =>
+  value ? value.slice(0, 10) : new Date().toISOString().split("T")[0]
+
+const emptyForm = (): FormState => ({
+  positionId: null,
+  assetId: "",
+  side: "long",
+  qtyShares: "",
+  avgPrice: "",
+  entryDate: toDateInputValue(),
+  trail: "",
+  status: "open",
 })
-
-const textAreaStyles =
-  "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-
-const selectStyles =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 
 const parseNumber = (value: string) => {
   if (!value.trim()) return Number.NaN
@@ -68,288 +73,326 @@ const parseNumber = (value: string) => {
   return Number.isNaN(parsed) ? Number.NaN : parsed
 }
 
-const toDateInputValue = (value: string) => (value ? value.slice(0, 10) : new Date().toISOString().split("T")[0])
-
 export default function PortfolioPage() {
-  const [portfolio, setPortfolio] = useState<PortfolioState>(() => loadPortfolioState())
-  const [holdingForm, setHoldingForm] = useState<HoldingFormState>(emptyForm)
-  const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null)
+  const { accessToken } = useAuth()
+  const [portfolio, setPortfolio] = useState<PortfolioRecord | null>(null)
+  const [positions, setPositions] = useState<PositionRecord[]>([])
+  const [assets, setAssets] = useState<AssetOption[]>([])
+  const [loading, setLoading] = useState(false)
+  const [assetsLoading, setAssetsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
-  const [newGroupName, setNewGroupName] = useState("")
-  const [groupDrafts, setGroupDrafts] = useState<Record<string, string>>({})
-  const [newVendorName, setNewVendorName] = useState("")
-  const [vendorDrafts, setVendorDrafts] = useState<Record<string, string>>({})
+  const [saving, setSaving] = useState(false)
+  const [statusUpdatingId, setStatusUpdatingId] = useState<number | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [formState, setFormState] = useState<FormState>(emptyForm)
 
   useEffect(() => {
-    setPortfolio(loadPortfolioState())
-  }, [])
+    if (!accessToken) {
+      return
+    }
+
+    const controller = new AbortController()
+    setAssetsLoading(true)
+
+    fetch(buildApiUrl("/v1/assets"), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const payload = await parseJson<ApiResponse<AssetIndexResponse>>(response)
+
+        if (!response.ok) {
+          const message =
+            (payload && "message" in payload && payload.message) || "Unable to load assets."
+          throw new Error(typeof message === "string" ? message : "Unable to load assets.")
+        }
+
+        if (!payload || payload.status !== "success" || !Array.isArray(payload.data)) {
+          throw new Error("Unexpected response from the assets API.")
+        }
+
+        const normalized = payload.data
+          .map((asset) => ({
+            id: asset.id,
+            symbol: asset.symbol,
+            name: asset.name,
+          }))
+          .sort((a, b) => a.symbol.localeCompare(b.symbol))
+
+        setAssets(normalized)
+      })
+      .catch((cause) => {
+        if ((cause as Error)?.name === "AbortError") {
+          return
+        }
+
+        const message =
+          cause instanceof Error && cause.message
+            ? cause.message
+            : "Something went wrong while loading assets."
+        setError(message)
+      })
+      .finally(() => setAssetsLoading(false))
+
+    return () => controller.abort()
+  }, [accessToken])
 
   useEffect(() => {
-    persistPortfolioState(portfolio)
-    setGroupDrafts(
-      Object.fromEntries(portfolio.groups.map((group) => [group.id, group.name] satisfies [string, string])),
+    if (!accessToken) {
+      return
+    }
+
+    const loadPortfolio = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const records = await fetchPortfolios(accessToken, { includePositions: true })
+        if (records.length === 0) {
+          const created = await createPortfolio(accessToken, {
+            name: "Primary Portfolio",
+            baseCcy: "IDR",
+          })
+          setPortfolio({ ...created, positions: [] })
+          setPositions([])
+          return
+        }
+
+        const primary = records[0]
+        setPortfolio(primary)
+        setPositions(primary.positions ?? [])
+      } catch (cause) {
+        const message =
+          cause instanceof Error && cause.message
+            ? cause.message
+            : "Unable to load portfolio data."
+        setError(message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPortfolio()
+  }, [accessToken])
+
+  useEffect(() => {
+    if (formState.assetId || assets.length === 0) {
+      return
+    }
+
+    setFormState((previous) => ({
+      ...previous,
+      assetId: String(assets[0].id),
+    }))
+  }, [assets, formState.assetId])
+
+  const summary = useMemo<PortfolioSummary>(() => {
+    const totalPositions = positions.length
+    const openPositions = positions.filter((position) => position.status === "open").length
+    const closedPositions = totalPositions - openPositions
+    const totalNotional = positions.reduce(
+      (sum, position) => sum + (position.notional_value ?? position.qty_shares * position.avg_price),
+      0,
     )
-    setVendorDrafts(
-      Object.fromEntries(portfolio.vendors.map((vendor) => [vendor.id, vendor.name] satisfies [string, string])),
-    )
-  }, [portfolio])
 
-  useEffect(() => {
-    setHoldingForm((previous) => {
-      const nextGroupId = previous.groupId || portfolio.groups[0]?.id || ""
-      const nextVendorId = previous.vendorId || portfolio.vendors[0]?.id || ""
+    return { totalPositions, openPositions, closedPositions, totalNotional }
+  }, [positions])
 
-      if (nextGroupId === previous.groupId && nextVendorId === previous.vendorId) {
-        return previous
-      }
-
-      return {
-        ...previous,
-        groupId: nextGroupId,
-        vendorId: nextVendorId,
-      }
-    })
-  }, [holdingForm.groupId, holdingForm.vendorId, portfolio.groups, portfolio.vendors])
-
-  const defaultSymbolLookup = useMemo(
-    () => new Map(getDefaultPortfolioState().holdings.map((holding) => [holding.symbol, holding.name])),
-    [],
-  )
-
-  const symbolLookup = useMemo(() => {
-    const lookup = new Map(defaultSymbolLookup)
-    portfolio.holdings.forEach((holding) => {
-      lookup.set(holding.symbol, holding.name)
-    })
-    return lookup
-  }, [defaultSymbolLookup, portfolio.holdings])
-
-  useEffect(() => {
-    const trimmedSymbol = holdingForm.symbol.trim().toUpperCase()
-    if (!trimmedSymbol) return
-
-    const knownName = symbolLookup.get(trimmedSymbol)
-    if (!knownName) return
-
-    setHoldingForm((previous) => {
-      if (previous.name.trim()) {
-        return previous
-      }
-
-      return {
-        ...previous,
-        symbol: trimmedSymbol,
-        name: knownName,
-      }
-    })
-  }, [holdingForm.symbol, symbolLookup])
-
-  const summary = useMemo(() => summarizePortfolio(portfolio), [portfolio])
-  const primaryGroup = portfolio.groups.find((group) => group.id === "primary")
-  const secondaryGroup = portfolio.groups.find((group) => group.id === "secondary")
-  const vendorLookup = useMemo(
-    () => new Map(portfolio.vendors.map((vendor) => [vendor.id, vendor] satisfies [string, PortfolioVendor])),
-    [portfolio.vendors],
+  const sortedPositions = useMemo(
+    () =>
+      [...positions].sort((a, b) => {
+        const dateA = a.entry_date ? Date.parse(a.entry_date) : 0
+        const dateB = b.entry_date ? Date.parse(b.entry_date) : 0
+        return dateB - dateA
+      }),
+    [positions],
   )
 
   const resetForm = () => {
-    setHoldingForm((current) => ({
+    setFormState((current) => ({
       ...emptyForm(),
-      groupId: portfolio.groups[0]?.id ?? current.groupId ?? "",
-      vendorId: portfolio.vendors[0]?.id ?? current.vendorId ?? "",
-      openedAt: toDateInputValue(new Date().toISOString()),
+      assetId: current.assetId || (assets[0]?.id ? String(assets[0].id) : ""),
     }))
-    setEditingHoldingId(null)
     setFormError(null)
   }
 
-  const startEditHolding = (holding: PortfolioHolding) => {
-    setHoldingForm({
-      id: holding.id,
-      symbol: holding.symbol,
-      name: holding.name,
-      shares: holding.shares.toString(),
-      averageCost: holding.averageCost.toString(),
-      targetPrice: holding.targetPrice !== null ? holding.targetPrice.toString() : "",
-      notes: holding.notes,
-      groupId: holding.groupId,
-      vendorId: holding.vendorId,
-      openedAt: toDateInputValue(holding.openedAt),
-      isClosed: holding.isClosed,
+  const startEdit = (position: PositionRecord) => {
+    setFormState({
+      positionId: position.id,
+      assetId: String(position.asset_id),
+      side: position.side,
+      qtyShares: String(position.qty_shares),
+      avgPrice: String(position.avg_price),
+      entryDate: toDateInputValue(position.entry_date),
+      trail: position.trail !== null ? String(position.trail) : "",
+      status: position.status,
     })
-    setEditingHoldingId(holding.id)
     setFormError(null)
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setFormError(null)
 
-    const symbol = holdingForm.symbol.trim().toUpperCase()
-    const name = holdingForm.name.trim()
-    const groupId = holdingForm.groupId.trim()
-    const vendorId = holdingForm.vendorId.trim()
-    const openedAtInput = holdingForm.openedAt.trim()
-    const shares = parseNumber(holdingForm.shares)
-    const averageCost = parseNumber(holdingForm.averageCost)
-    const targetPrice = holdingForm.targetPrice.trim() ? parseNumber(holdingForm.targetPrice) : null
-    const notes = holdingForm.notes.trim()
-    const isClosed = holdingForm.isClosed
-    const openedAtDate = openedAtInput ? new Date(openedAtInput) : null
-    const openedAt = openedAtDate && Number.isFinite(openedAtDate.getTime()) ? openedAtDate.toISOString() : null
-
-    if (!symbol || !name || !groupId || !vendorId) {
-      setFormError("Symbol, name, group, and OTS vendor are required.")
+    if (!accessToken || !portfolio) {
+      setFormError("You must be signed in to manage positions.")
       return
     }
 
-    if (!openedAt) {
-      setFormError("Please provide when the position was opened.")
+    const assetId = Number.parseInt(formState.assetId, 10)
+    const qtyShares = parseNumber(formState.qtyShares)
+    const avgPrice = parseNumber(formState.avgPrice)
+    const trail = formState.trail.trim() ? parseNumber(formState.trail) : null
+    const entryDate = formState.entryDate.trim()
+
+    if (!Number.isInteger(assetId) || assetId <= 0) {
+      setFormError("Select a valid asset.")
       return
     }
 
-    if (!Number.isFinite(shares) || shares <= 0) {
-      setFormError("Shares must be a positive number.")
+    if (!Number.isFinite(qtyShares) || qtyShares <= 0) {
+      setFormError("Quantity must be a positive number.")
       return
     }
 
-    if (!Number.isFinite(averageCost) || averageCost <= 0) {
-      setFormError("Average cost must be a positive number.")
+    if (!Number.isFinite(avgPrice) || avgPrice <= 0) {
+      setFormError("Average price must be a positive number.")
       return
     }
 
-    if (targetPrice !== null && (!Number.isFinite(targetPrice) || targetPrice <= 0)) {
-      setFormError("Target price must be empty or a positive number.")
+    if (!entryDate) {
+      setFormError("Entry date is required.")
       return
     }
 
-    const existing = editingHoldingId
-      ? portfolio.holdings.find((holding) => holding.id === editingHoldingId)
-      : null
-
-    const payload: PortfolioHolding = {
-      id: existing?.id ?? crypto.randomUUID(),
-      symbol,
-      name,
-      shares,
-      averageCost,
-      targetPrice: targetPrice ?? null,
-      notes,
-      groupId,
-      vendorId,
-      openedAt,
-      isClosed,
-      closedAt: isClosed ? existing?.closedAt ?? new Date().toISOString() : null,
-      createdAt: existing?.createdAt ?? new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    const payload: PositionPayload = {
+      assetId,
+      side: formState.side,
+      qtyShares,
+      avgPrice,
+      entryDate,
+      trail: trail === null ? null : trail,
+      status: formState.status,
     }
 
-    setPortfolio((previous) => ({
-      ...previous,
-      holdings: existing
-        ? previous.holdings.map((holding) => (holding.id === existing.id ? payload : holding))
-        : [...previous.holdings, payload],
-    }))
+    setSaving(true)
 
-    resetForm()
-  }
+    try {
+      if (formState.positionId) {
+        const updated = await updatePosition(accessToken, portfolio.id, formState.positionId, payload)
+        setPositions((previous) => previous.map((item) => (item.id === updated.id ? updated : item)))
+      } else {
+        const created = await createPosition(accessToken, portfolio.id, payload)
+        setPositions((previous) => [...previous, created])
+      }
 
-  const handleDeleteHolding = (id: string) => {
-    setPortfolio((previous) => ({
-      ...previous,
-      holdings: previous.holdings.filter((holding) => holding.id !== id),
-    }))
-
-    if (editingHoldingId === id) {
       resetForm()
+    } catch (cause) {
+      const message =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Unable to save position. Please try again."
+      setFormError(message)
+    } finally {
+      setSaving(false)
     }
   }
 
-  const handleGroupNameChange = (groupId: string, name: string) => {
-    setGroupDrafts((previous) => ({
-      ...previous,
-      [groupId]: name,
-    }))
-  }
-
-  const handleSaveGroupName = (groupId: string) => {
-    const nextName = (groupDrafts[groupId] ?? "").trim()
-    if (!nextName) {
+  const handleDelete = async (position: PositionRecord) => {
+    if (!accessToken || !portfolio) {
+      setError("You must be signed in to delete positions.")
       return
     }
 
-    setPortfolio((previous) => ({
-      ...previous,
-      groups: upsertGroupName(previous.groups, groupId, nextName),
-    }))
+    setDeletingId(position.id)
+
+    try {
+      await deletePosition(accessToken, portfolio.id, position.id)
+      setPositions((previous) => previous.filter((item) => item.id !== position.id))
+      if (formState.positionId === position.id) {
+        resetForm()
+      }
+    } catch (cause) {
+      const message =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Unable to delete position. Please try again."
+      setError(message)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
-  const handleCreateGroup = () => {
-    const trimmed = newGroupName.trim()
-    if (!trimmed) {
+  const handleStatusChange = async (position: PositionRecord, nextStatus: PositionRecord["status"]) => {
+    if (!accessToken || !portfolio) {
+      setError("You must be signed in to update positions.")
       return
     }
 
-    setPortfolio((previous) => ({
-      ...previous,
-      groups: [...previous.groups, createGroup(previous.groups, trimmed)],
-    }))
-    setNewGroupName("")
-  }
+    setStatusUpdatingId(position.id)
 
-  const handleVendorNameChange = (vendorId: string, name: string) => {
-    setVendorDrafts((previous) => ({
-      ...previous,
-      [vendorId]: name,
-    }))
-  }
+    try {
+      const updated = await updatePosition(accessToken, portfolio.id, position.id, {
+        assetId: position.asset_id,
+        side: position.side,
+        qtyShares: position.qty_shares,
+        avgPrice: position.avg_price,
+        entryDate: position.entry_date ?? toDateInputValue(),
+        trail: position.trail,
+        status: nextStatus,
+      })
 
-  const handleSaveVendorName = (vendorId: string) => {
-    const nextName = (vendorDrafts[vendorId] ?? "").trim()
-    if (!nextName) {
-      return
+      setPositions((previous) => previous.map((item) => (item.id === updated.id ? updated : item)))
+      if (formState.positionId === position.id) {
+        setFormState((prev) => ({ ...prev, status: nextStatus }))
+      }
+    } catch (cause) {
+      const message =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Unable to update position status. Please try again."
+      setError(message)
+    } finally {
+      setStatusUpdatingId(null)
     }
-
-    setPortfolio((previous) => ({
-      ...previous,
-      vendors: upsertVendorName(previous.vendors, vendorId, nextName),
-    }))
   }
 
-  const handleCreateVendor = () => {
-    const trimmed = newVendorName.trim()
-    if (!trimmed) {
-      return
-    }
+  const refreshData = async () => {
+    if (!accessToken) return
 
-    setPortfolio((previous) => ({
-      ...previous,
-      vendors: [...previous.vendors, createVendor(previous.vendors, trimmed)],
-    }))
-    setNewVendorName("")
+    setLoading(true)
+    setError(null)
+
+    try {
+      const records = await fetchPortfolios(accessToken, { includePositions: true })
+      if (records.length > 0) {
+        setPortfolio(records[0])
+        setPositions(records[0].positions ?? [])
+      }
+    } catch (cause) {
+      const message =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Unable to refresh portfolio data."
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleToggleHoldingClosed = (holding: PortfolioHolding, closed: boolean) => {
-    setPortfolio((previous) => ({
-      ...previous,
-      holdings: previous.holdings.map((item) =>
-        item.id === holding.id
-          ? {
-              ...item,
-              isClosed: closed,
-              closedAt: closed ? item.closedAt ?? new Date().toISOString() : null,
-              updatedAt: new Date().toISOString(),
-            }
-          : item,
-      ),
-    }))
-
-    if (editingHoldingId === holding.id) {
-      setHoldingForm((current) => ({
-        ...current,
-        isClosed: closed,
-      }))
-    }
+  if (!accessToken) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
+          Sign in to view and manage your portfolio.
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -360,519 +403,346 @@ export default function PortfolioPage() {
             Portfolio
           </div>
           <p className="text-sm text-muted-foreground">
-            Track and organize your stock positions by group, add updates, and keep notes per position.
+            Manage your live portfolio with data stored on the backend.
           </p>
         </div>
-
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="button" variant="secondary" className="gap-2" onClick={refreshData} disabled={loading}>
+            {loading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <RefreshCcw className="size-4" aria-hidden />}
+            Refresh
+          </Button>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Total positions</CardTitle>
-              <CardDescription>All tracked entries (open and closed).</CardDescription>
+              <CardDescription>All tracked entries.</CardDescription>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{summary.totalPositions}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Active positions</CardTitle>
-              <CardDescription>Open positions currently tracked.</CardDescription>
+              <CardTitle className="text-lg">Open positions</CardTitle>
+              <CardDescription>Currently active positions.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.activePositions}</CardContent>
+            <CardContent className="text-2xl font-semibold">{summary.openPositions}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Total value</CardTitle>
-              <CardDescription>Shares multiplied by average cost.</CardDescription>
+              <CardTitle className="text-lg">Closed positions</CardTitle>
+              <CardDescription>Positions marked as closed.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{normalizeCurrency(summary.totalValue)}</CardContent>
+            <CardContent className="text-2xl font-semibold">{summary.closedPositions}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Groups</CardTitle>
-              <CardDescription>Organize positions by priority.</CardDescription>
+              <CardTitle className="text-lg">Total notional</CardTitle>
+              <CardDescription>Quantity × average price.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.totalGroups}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">OTS vendors</CardTitle>
-              <CardDescription>Saved online trading systems.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.totalVendors}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{primaryGroup?.name ?? "Primary"}</CardTitle>
-              <CardDescription>Core positions count.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.primaryCount}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{secondaryGroup?.name ?? "Secondary"}</CardTitle>
-              <CardDescription>Rotational or satellite picks.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.secondaryCount}</CardContent>
+            <CardContent className="text-2xl font-semibold">{formatIdr(summary.totalNotional)}</CardContent>
           </Card>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)]">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{editingHoldingId ? "Update position" : "Add a position"}</CardTitle>
-              <CardDescription>
-                Capture share count, average cost, vendor, and notes for each position in your portfolio.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="symbol">
-                      Symbol
-                    </label>
-                    <Input
-                      id="symbol"
-                      value={holdingForm.symbol}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, symbol: event.target.value }))}
-                      placeholder="e.g., BBCA"
-                      required
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="name">
-                      Company name
-                    </label>
-                    <Input
-                      id="name"
-                      value={holdingForm.name}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, name: event.target.value }))}
-                      placeholder="Bank Central Asia"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="shares">
-                      Shares
-                    </label>
-                    <Input
-                      id="shares"
-                      inputMode="decimal"
-                      value={holdingForm.shares}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, shares: event.target.value }))}
-                      placeholder="1200"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="average-cost">
-                      Average cost (IDR)
-                    </label>
-                    <Input
-                      id="average-cost"
-                      inputMode="decimal"
-                      value={holdingForm.averageCost}
-                      onChange={(event) =>
-                        setHoldingForm((previous) => ({ ...previous, averageCost: event.target.value }))
-                      }
-                      placeholder="8750"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="target-price">
-                      Target price (optional)
-                    </label>
-                    <Input
-                      id="target-price"
-                      inputMode="decimal"
-                      value={holdingForm.targetPrice}
-                      onChange={(event) =>
-                        setHoldingForm((previous) => ({ ...previous, targetPrice: event.target.value }))
-                      }
-                      placeholder="9500"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="group">
-                      Group
-                    </label>
-                    <select
-                      id="group"
-                      className={selectStyles}
-                      value={holdingForm.groupId}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, groupId: event.target.value }))}
-                    >
-                      {portfolio.groups.map((group) => (
-                        <option key={group.id} value={group.id}>
-                          {group.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="vendor">
-                      OTS vendor
-                    </label>
-                    <select
-                      id="vendor"
-                      className={selectStyles}
-                      value={holdingForm.vendorId}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, vendorId: event.target.value }))}
-                    >
-                      {portfolio.vendors.map((vendor) => (
-                        <option key={vendor.id} value={vendor.id}>
-                          {vendor.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="opened-at">
-                      Position date
-                    </label>
-                    <Input
-                      id="opened-at"
-                      type="date"
-                      value={holdingForm.openedAt}
-                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, openedAt: event.target.value }))}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-md border border-input/70 bg-muted/40 px-3 py-2">
-                  <input
-                    id="is-closed"
-                    type="checkbox"
-                    className="size-4 accent-primary"
-                    checked={holdingForm.isClosed}
-                    onChange={(event) => setHoldingForm((previous) => ({ ...previous, isClosed: event.target.checked }))}
-                  />
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium" htmlFor="is-closed">
-                      Mark as sold
-                    </label>
-                    <p className="text-xs text-muted-foreground">
-                      Closed positions are kept for history but removed from active totals.
-                    </p>
-                  </div>
-                </div>
-
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)]">
+        <Card>
+          <CardHeader>
+            <CardTitle>{formState.positionId ? "Update position" : "Add a position"}</CardTitle>
+            <CardDescription>
+              Store positions against your backend portfolio. Assets and quantities are validated before saving.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="notes">
-                    Notes
+                  <label className="text-sm font-medium" htmlFor="asset">
+                    Asset
                   </label>
-                  <textarea
-                    id="notes"
-                    className={textAreaStyles}
-                    value={holdingForm.notes}
-                    onChange={(event) => setHoldingForm((previous) => ({ ...previous, notes: event.target.value }))}
-                    placeholder="Why you're in this position, key catalysts, or risk controls."
-                  />
-                </div>
-
-                {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button type="submit" className="gap-2">
-                    {editingHoldingId ? (
-                      <>
-                        <Save className="size-4" aria-hidden />
-                        Save changes
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="size-4" aria-hidden />
-                        Add position
-                      </>
-                    )}
-                  </Button>
-                  {editingHoldingId ? (
-                    <Button type="button" variant="ghost" onClick={resetForm} className="gap-2">
-                      <RefreshCcw className="size-4" aria-hidden />
-                      Reset
-                    </Button>
+                  <select
+                    id="asset"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={formState.assetId}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, assetId: event.target.value }))
+                    }
+                    disabled={assetsLoading || assets.length === 0}
+                  >
+                    {assets.map((asset) => (
+                      <option key={asset.id} value={asset.id}>
+                        {asset.symbol} · {asset.name}
+                      </option>
+                    ))}
+                  </select>
+                  {assetsLoading ? (
+                    <p className="text-xs text-muted-foreground">Loading assets…</p>
+                  ) : null}
+                  {assets.length === 0 && !assetsLoading ? (
+                    <p className="text-xs text-destructive">
+                      No assets available. Add assets first to create positions.
+                    </p>
                   ) : null}
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Groups</CardTitle>
-              <CardDescription>
-                Start with Primary and Secondary, and rename or add groups that fit your strategy.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                {portfolio.groups.map((group) => (
-                  <div key={group.id} className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center">
-                    <div className="flex-1 space-y-1">
-                      <label className="text-xs uppercase text-muted-foreground" htmlFor={`group-${group.id}`}>
-                        {group.id === "primary" || group.id === "secondary" ? "Default group" : "Custom group"}
-                      </label>
-                      <Input
-                        id={`group-${group.id}`}
-                        value={groupDrafts[group.id] ?? group.name}
-                        onChange={(event) => handleGroupNameChange(group.id, event.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Last updated {new Date(group.updatedAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 self-start sm:self-center">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => handleSaveGroupName(group.id)}
-                      >
-                        <Save className="size-4" aria-hidden />
-                        Save
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 rounded-md border bg-muted/60 p-3">
-                <p className="text-sm font-medium">Add a group</p>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    placeholder="e.g., Income, Momentum"
-                    value={newGroupName}
-                    onChange={(event) => setNewGroupName(event.target.value)}
-                  />
-                  <Button type="button" className="gap-2 sm:w-40" onClick={handleCreateGroup}>
-                    <Plus className="size-4" aria-hidden />
-                    Add group
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Primary and Secondary are created for you. Add more if you need extra buckets.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>OTS vendors</CardTitle>
-              <CardDescription>Save the online trading systems you use most often.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                {portfolio.vendors.map((vendor) => (
-                  <div
-                    key={vendor.id}
-                    className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="side">
+                    Side
+                  </label>
+                  <select
+                    id="side"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={formState.side}
+                    onChange={(event) =>
+                      setFormState((previous) => ({
+                        ...previous,
+                        side: event.target.value as FormState["side"],
+                      }))
+                    }
                   >
-                    <div className="flex-1 space-y-1">
-                      <label className="text-xs uppercase text-muted-foreground" htmlFor={`vendor-${vendor.id}`}>
-                        Saved vendor
-                      </label>
-                      <Input
-                        id={`vendor-${vendor.id}`}
-                        value={vendorDrafts[vendor.id] ?? vendor.name}
-                        onChange={(event) => handleVendorNameChange(vendor.id, event.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Last updated {new Date(vendor.updatedAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 self-start sm:self-center">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => handleSaveVendorName(vendor.id)}
-                      >
-                        <Save className="size-4" aria-hidden />
-                        Save
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 rounded-md border bg-muted/60 p-3">
-                <p className="text-sm font-medium">Add an OTS vendor</p>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    placeholder="e.g., Broker A, Mobile OTS"
-                    value={newVendorName}
-                    onChange={(event) => setNewVendorName(event.target.value)}
-                  />
-                  <Button type="button" className="gap-2 sm:w-40" onClick={handleCreateVendor}>
-                    <Plus className="size-4" aria-hidden />
-                    Add vendor
-                  </Button>
+                    <option value="long">Long</option>
+                    <option value="short">Short</option>
+                  </select>
                 </div>
-                <p className="text-xs text-muted-foreground">Vendors appear in the position form dropdown.</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Positions</CardTitle>
-                <CardDescription>Review, edit, or remove your portfolio entries.</CardDescription>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="qty-shares">
+                    Quantity (shares)
+                  </label>
+                  <Input
+                    id="qty-shares"
+                    inputMode="decimal"
+                    value={formState.qtyShares}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, qtyShares: event.target.value }))
+                    }
+                    placeholder="1200"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="avg-price">
+                    Average price
+                  </label>
+                  <Input
+                    id="avg-price"
+                    inputMode="decimal"
+                    value={formState.avgPrice}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, avgPrice: event.target.value }))
+                    }
+                    placeholder="8750"
+                    required
+                  />
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">
-                {summary.latestChange ? `Updated ${summary.latestChange}` : "No updates yet"}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="entry-date">
+                    Entry date
+                  </label>
+                  <Input
+                    id="entry-date"
+                    type="date"
+                    value={formState.entryDate}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, entryDate: event.target.value }))
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="trail">
+                    Trail (optional)
+                  </label>
+                  <Input
+                    id="trail"
+                    inputMode="decimal"
+                    value={formState.trail}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, trail: event.target.value }))
+                    }
+                    placeholder="0"
+                  />
+                </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {portfolio.groups.map((group) => {
-                const positionsForGroup = portfolio.holdings.filter((holding) => holding.groupId === group.id)
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium" htmlFor="status">
+                  Status
+                </label>
+                <select
+                  id="status"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formState.status}
+                  onChange={(event) =>
+                    setFormState((previous) => ({
+                      ...previous,
+                      status: event.target.value as FormState["status"],
+                    }))
+                  }
+                >
+                  <option value="open">Open</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="submit" className="gap-2" disabled={saving || assets.length === 0}>
+                  {saving ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Save className="size-4" aria-hidden />}
+                  {formState.positionId ? "Save changes" : "Add position"}
+                </Button>
+                {formState.positionId ? (
+                  <Button type="button" variant="ghost" onClick={resetForm} className="gap-2">
+                    <RefreshCcw className="size-4" aria-hidden />
+                    Cancel edit
+                  </Button>
+                ) : null}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="space-y-4">
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Positions</CardTitle>
+              <CardDescription>View and manage positions saved to the API.</CardDescription>
+            </div>
+            {loading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                Loading…
+              </div>
+            ) : null}
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sortedPositions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No positions yet. Add one to get started.</p>
+            ) : (
+              sortedPositions.map((position) => {
+                const assetLabel = position.asset
+                  ? `${position.asset.symbol} · ${position.asset.name}`
+                  : `Asset #${position.asset_id}`
 
                 return (
-                  <div key={group.id} className="space-y-2 rounded-lg border p-3">
+                  <div
+                    key={position.id}
+                    className="rounded-md border bg-background/80 p-3 shadow-sm transition hover:border-primary/50"
+                  >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm font-semibold">{group.name}</p>
+                        <p className="text-base font-semibold leading-tight">{assetLabel}</p>
                         <p className="text-xs text-muted-foreground">
-                          {positionsForGroup.length} {positionsForGroup.length === 1 ? "position" : "positions"}
+                          Entry {position.entry_date ? new Date(position.entry_date).toLocaleDateString() : "—"}
                         </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant={position.status === "closed" ? "outline" : "secondary"}
+                          size="sm"
+                          className="gap-1"
+                          onClick={() =>
+                            handleStatusChange(position, position.status === "open" ? "closed" : "open")
+                          }
+                          disabled={statusUpdatingId === position.id}
+                        >
+                          {statusUpdatingId === position.id ? (
+                            <Loader2 className="size-4 animate-spin" aria-hidden />
+                          ) : position.status === "closed" ? (
+                            <>
+                              <CheckCircle2 className="size-4" aria-hidden />
+                              Mark open
+                            </>
+                          ) : (
+                            <>
+                              <Ban className="size-4" aria-hidden />
+                              Mark closed
+                            </>
+                          )}
+                        </Button>
+                        <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEdit(position)}>
+                          <Edit className="size-4" aria-hidden />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1 text-destructive hover:text-destructive"
+                          onClick={() => handleDelete(position)}
+                          disabled={deletingId === position.id}
+                        >
+                          {deletingId === position.id ? (
+                            <Loader2 className="size-4 animate-spin" aria-hidden />
+                          ) : (
+                            <Trash2 className="size-4" aria-hidden />
+                          )}
+                          Remove
+                        </Button>
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      {positionsForGroup.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No positions added yet.</p>
-                      ) : (
-                        positionsForGroup.map((holding) => (
-                          <div
-                            key={holding.id}
-                            className="rounded-md border bg-background/80 p-3 shadow-sm transition hover:border-primary/50"
-                          >
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                              <div>
-                                <p className="text-base font-semibold leading-tight">
-                                  {holding.symbol} <span className="text-sm text-muted-foreground">· {holding.name}</span>
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Updated {new Date(holding.updatedAt).toLocaleString()}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant={holding.isClosed ? "outline" : "secondary"}
-                                  size="sm"
-                                  className="gap-1"
-                                  onClick={() => handleToggleHoldingClosed(holding, !holding.isClosed)}
-                                >
-                                  {holding.isClosed ? (
-                                    <>
-                                      <Undo2 className="size-4" aria-hidden />
-                                      Mark active
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle2 className="size-4" aria-hidden />
-                                      Mark sold
-                                    </>
-                                  )}
-                                </Button>
-                                <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEditHolding(holding)}>
-                                  <Edit className="size-4" aria-hidden />
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="gap-1 text-destructive hover:text-destructive"
-                                  onClick={() => handleDeleteHolding(holding.id)}
-                                >
-                                  <Trash2 className="size-4" aria-hidden />
-                                  Remove
-                                </Button>
-                              </div>
-                            </div>
+                    <dl className="mt-3 grid gap-3 sm:grid-cols-4">
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Side</dt>
+                        <dd className="font-medium capitalize">{position.side}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Quantity</dt>
+                        <dd className="font-medium">{position.qty_shares.toLocaleString("en-US")}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Average price</dt>
+                        <dd className="font-medium">{formatIdr(position.avg_price)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Notional</dt>
+                        <dd className="font-medium">
+                          {formatIdr(position.notional_value ?? position.qty_shares * position.avg_price)}
+                        </dd>
+                      </div>
+                    </dl>
 
-                            <dl className="mt-3 grid gap-3 sm:grid-cols-4">
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Shares</dt>
-                                <dd className="font-medium">{holding.shares.toLocaleString("en-US")}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Average cost</dt>
-                                <dd className="font-medium">{normalizeCurrency(holding.averageCost)}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Total value</dt>
-                                <dd className="font-medium">{normalizeCurrency(holding.shares * holding.averageCost)}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Target price</dt>
-                                <dd className="font-medium">
-                                  {holding.targetPrice !== null ? normalizeCurrency(holding.targetPrice) : "—"}
-                                </dd>
-                              </div>
-                            </dl>
-
-                            <dl className="mt-3 grid gap-3 sm:grid-cols-3">
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">OTS vendor</dt>
-                                <dd className="font-medium">{vendorLookup.get(holding.vendorId)?.name ?? "Unknown vendor"}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Position date</dt>
-                                <dd className="font-medium">{new Date(holding.openedAt).toLocaleDateString()}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-xs uppercase text-muted-foreground">Status</dt>
-                                <dd className="flex items-center gap-2 font-medium">
-                                  {holding.isClosed ? (
-                                    <>
-                                      <Ban className="size-4 text-destructive" aria-hidden />
-                                      Sold {holding.closedAt ? `on ${new Date(holding.closedAt).toLocaleDateString()}` : ""}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle2 className="size-4 text-emerald-500" aria-hidden />
-                                      Active
-                                    </>
-                                  )}
-                                </dd>
-                              </div>
-                            </dl>
-
-                            {holding.notes ? (
-                              <p className="mt-2 rounded-md bg-muted/60 p-2 text-sm text-muted-foreground">
-                                {holding.notes}
-                              </p>
-                            ) : null}
-                          </div>
-                        ))
-                      )}
-                    </div>
+                    <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Entry date</dt>
+                        <dd className="font-medium">
+                          {position.entry_date ? new Date(position.entry_date).toLocaleDateString() : "—"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Trail</dt>
+                        <dd className="font-medium">
+                          {position.trail !== null ? position.trail.toLocaleString("en-US") : "—"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs uppercase text-muted-foreground">Status</dt>
+                        <dd className="flex items-center gap-2 font-medium">
+                          {position.status === "closed" ? (
+                            <>
+                              <Ban className="size-4 text-destructive" aria-hidden />
+                              Closed
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="size-4 text-emerald-500" aria-hidden />
+                              Open
+                            </>
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
                   </div>
                 )
-              })}
-            </CardContent>
-          </Card>
-        </div>
+              })
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
