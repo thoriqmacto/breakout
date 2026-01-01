@@ -33,7 +33,7 @@ class AssetSync extends Command
      *
      * @var string
      */
-    protected $description = 'Synchronize historical price to DB and CSV from python API';
+    protected $description = 'Synchronize historical prices prioritizing Stockbit scrape with python/yfinance as fallback';
 
     /**
      * Execute the console command.
@@ -42,53 +42,19 @@ class AssetSync extends Command
     {
         $this->info($this->description);
 
+        $checkedYfinance = false;
         $yfinanceReady = null;
         $yfinanceLatestDate = null;
+        $stockbitBackfillDays = (int) config('stockbit.backfill_days', 14);
+        $eodDate = null;
 
         if ($this->option('eod')) {
-            $today = Carbon::now()->toDateString();
+            $eodDate = Carbon::now()->toDateString();
             $this->input->setOption('check-python', true);
             $this->input->setOption('run-python', true);
             $this->input->setOption('import-csv', true);
             $this->input->setOption('continue', true);
-            $this->input->setOption('chk-date', $today);
-
-            $this->info('Checking latest IDX data availability from yfinance ...');
-
-            try {
-                /** @var PythonRunner $runner */
-                $runner = app(PythonRunner::class);
-                $response = $runner->run('get_stocks.py', null, [
-                    '--check-latest',
-                    '--latest-symbol=^JKSE',
-                    "--latest-date={$today}",
-                ]);
-
-                if ($response['ok'] && is_array($response['json'])) {
-                    $yfinanceLatestDate = $response['json']['latest_date'] ?? null;
-                    $yfinanceReady = (bool) ($response['json']['is_available'] ?? false);
-
-                    if ($yfinanceReady) {
-                        $this->info('Latest IDX data on yfinance is available.');
-                    } else {
-                        $message = 'Latest IDX data on yfinance is not available yet.';
-                        if ($yfinanceLatestDate) {
-                            $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
-                        }
-                        $this->warn($message);
-                    }
-                } else {
-                    $yfinanceReady = null;
-                    $this->warn('Unable to determine latest IDX data availability from yfinance.');
-                }
-            } catch (\Throwable $e) {
-                $yfinanceReady = null;
-                $this->warn('Failed to check yfinance latest data: ' . $e->getMessage());
-            }
-
-            if ($yfinanceReady === false) {
-                $this->input->setOption('run-python', false);
-            }
+            $this->input->setOption('chk-date', $eodDate);
         }
 
         $indexSymbols = config('csv.index_symbols', []);
@@ -103,76 +69,100 @@ class AssetSync extends Command
         if (!empty($missing)) {
             $this->warn('CSV seed files missing for: ' . implode(', ', $missing));
 
-            // Offer to check python csv directory for missing files
-            $checkPython = $this->option('check-python') ??
-                           $this->confirm('Check python csv folder for these assets?', false);
-            if ($checkPython) {
-                $pyDir = resource_path('python/csv');
-
-                $found     = [];
-                $missingPy = [];
-                foreach ($missing as $sym) {
-                    $pyFile = $pyDir . '/' . $sym . '_PY.csv';
-                    if (is_file($pyFile)) {
-                        $found[$sym] = $pyFile;
-                    } else {
-                        $missingPy[] = $sym;
-                        $this->warn("Python csv not found for {$sym}");
-                    }
-                }
-
-                if (!empty($missingPy)) {
-                    $tickFile = resource_path('python/tickers.txt');
-
-                    // Reset tickers file so it only contains the newly missing symbols
-                    $tickers = array_map(fn($sym) => $sym . '.JK', $missingPy);
-                    file_put_contents($tickFile, implode(PHP_EOL, $tickers) . PHP_EOL);
-
-                    $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
-
-                    $runPython = $this->option('run-python') ??
-                                 $this->confirm('Run python get_stocks.py now?', false);
-                    if ($runPython) {
-                        if ($this->option('eod') && $yfinanceReady === false) {
-                            $this->warn('Skipping python download because latest IDX data is not available yet.');
-                        } else {
-                            $this->call('python:run', ['script' => 'get_stocks.py']);
-                        }
-                    } else {
-                        $this->warn('No python code to run.');
-                    }
-                }
-
-                if (!empty($found)) {
-                    $this->info('Found python csv files:');
-                    foreach ($found as $sym => $file) {
-                        $this->line('- ' . $sym . ': ' . basename($file));
-                    }
-
-                    $importCsv = $this->option('import-csv') ??
-                                 $this->confirm('Import these csv files into the seed directory?', false);
-                    if ($importCsv) {
-                        foreach ($found as $sym => $pyFile) {
-                            $rows = CsvBars::read($pyFile);
-                            if ($rows !== []) {
-                                $dest = $seedDir . '/' . $sym . '.csv';
-                                $existing = CsvBars::read($dest);
-                                $merged = CsvBars::merge($existing, $rows);
-                                CsvBars::write($dest, $merged);
-                                $this->info('Seed file written: ' . basename($dest));
-                            } else {
-                                $this->warn("No data in python csv for {$sym}");
-                            }
-                        }
-
-                        // Re-scan seed directory after attempting to import
-                        $seedFiles = glob($seedDir . '/*.csv') ?: [];
-                        $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
-                        $missing = array_diff($indexSymbols, $csvSymbols);
-                    }
+            $this->info('Attempting to backfill missing CSV from Stockbit first ...');
+            $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
+            $to = Carbon::now()->toDateString();
+            foreach ($missing as $sym) {
+                if ($this->fetchWithStockbit($sym, $from, $to)) {
+                    $this->info("Stockbit CSV backfill complete for {$sym}.");
                 }
             }
-        } else{
+
+            // Refresh missing after Stockbit attempt
+            $seedFiles = glob($seedDir . '/*.csv') ?: [];
+            $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
+            $missing = array_diff($indexSymbols, $csvSymbols);
+
+            if (!empty($missing)) {
+                // Offer to check python csv directory for missing files
+                $checkPython = $this->option('check-python') ??
+                               $this->confirm('Check python csv folder for these assets?', false);
+                if ($checkPython) {
+                    $pyDir = resource_path('python/csv');
+
+                    $found     = [];
+                    $missingPy = [];
+                    foreach ($missing as $sym) {
+                        $pyFile = $pyDir . '/' . $sym . '_PY.csv';
+                        if (is_file($pyFile)) {
+                            $found[$sym] = $pyFile;
+                        } else {
+                            $missingPy[] = $sym;
+                            $this->warn("Python csv not found for {$sym}; Stockbit backfill may be required.");
+                        }
+                    }
+
+                    if (!empty($missingPy)) {
+                        $tickFile = resource_path('python/tickers.txt');
+
+                        // Reset tickers file so it only contains the newly missing symbols
+                        $tickers = array_map(fn($sym) => $sym . '.JK', $missingPy);
+                        file_put_contents($tickFile, implode(PHP_EOL, $tickers) . PHP_EOL);
+
+                        $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
+
+                        $runPython = $this->option('run-python') ??
+                                     $this->confirm('Run python get_stocks.py now?', false);
+                        if ($runPython) {
+                            if ($this->option('eod')) {
+                                $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
+                                if ($yfinanceReady === false) {
+                                    $this->warn('Skipping python download because latest IDX data is not available yet.');
+                                    $runPython = false;
+                                }
+                            }
+
+                            if ($runPython) {
+                                $this->call('python:run', ['script' => 'get_stocks.py']);
+                            } else {
+                                $this->warn('No python code to run.');
+                            }
+                        }
+                    }
+
+                    if (!empty($found)) {
+                        $this->info('Found python csv files:');
+                        foreach ($found as $sym => $file) {
+                            $this->line('- ' . $sym . ': ' . basename($file));
+                        }
+
+                        $importCsv = $this->option('import-csv') ??
+                                     $this->confirm('Import these csv files into the seed directory?', false);
+                        if ($importCsv) {
+                            foreach ($found as $sym => $pyFile) {
+                                $rows = CsvBars::read($pyFile);
+                                if ($rows !== []) {
+                                    $dest = $seedDir . '/' . $sym . '.csv';
+                                    $existing = CsvBars::read($dest);
+                                    $merged = CsvBars::merge($existing, $rows);
+                                    CsvBars::write($dest, $merged);
+                                    $this->info('Seed file written: ' . basename($dest));
+                                } else {
+                                    $this->warn("No data in python csv for {$sym}");
+                                }
+                            }
+
+                            // Re-scan seed directory after attempting to import
+                            $seedFiles = glob($seedDir . '/*.csv') ?: [];
+                            $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
+                            $missing = array_diff($indexSymbols, $csvSymbols);
+                        }
+                    }
+                }
+            } else {
+                $this->comment('Stockbit backfill completed missing CSV files.');
+            }
+        } else {
             $this->comment('Tickers in config and seed files aligned.');
         }
 
@@ -189,12 +179,11 @@ class AssetSync extends Command
             $csvPath = $seedDir . '/' . $symbol . '.csv';
             if (!is_file($csvPath)) {
                 $this->info("Attempting to backfill missing CSV for {$symbol} from Stockbit…");
-                $from = Carbon::now()->subDays(14)->toDateString();
+                $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
                 $to = Carbon::now()->toDateString();
 
                 if (!$this->fetchWithStockbit($symbol, $from, $to)) {
-                    $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt.");
-                    continue;
+                    $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt. Python fallback will be used if available.");
                 }
 
                 if (!is_file($csvPath)) {
@@ -267,13 +256,16 @@ class AssetSync extends Command
                 $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
                 if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
-                    if ($this->option('eod') && $yfinanceReady === false) {
-                        $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
-                        if ($yfinanceLatestDate) {
-                            $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                    if ($this->option('eod')) {
+                        $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
+                        if ($yfinanceReady === false) {
+                            $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
+                            if ($yfinanceLatestDate) {
+                                $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                            }
+                            $this->warn($message);
+                            continue;
                         }
-                        $this->warn($message);
-                        continue;
                     }
 
                     $ticker = $symbol . '.JK';
@@ -346,6 +338,8 @@ class AssetSync extends Command
             try {
                 /** @var BrokerSummaryImporter $importer */
                 $importer = app(BrokerSummaryImporter::class);
+                $disk = config('stockbit.save_disk');
+                $jsonDir = config('stockbit.save_dir');
                 $summary = $importer->importFromDisk($disk, $jsonDir);
 
                 $fileCount = $summary['file_count'] ?? 0;
@@ -401,6 +395,51 @@ class AssetSync extends Command
             return is_string($bearer) && $bearer !== '';
         } catch (\Throwable) {
             return false;
+        }
+    }
+
+    private function ensureYfinanceChecked(
+        bool &$checked,
+        ?bool &$yfinanceReady,
+        ?string &$yfinanceLatestDate,
+        string $latestDate
+    ): void {
+        if ($checked) {
+            return;
+        }
+
+        $checked = true;
+        $this->info('Checking latest IDX data availability from python/yfinance fallback ...');
+
+        try {
+            /** @var PythonRunner $runner */
+            $runner = app(PythonRunner::class);
+            $response = $runner->run('get_stocks.py', null, [
+                '--check-latest',
+                '--latest-symbol=^JKSE',
+                "--latest-date={$latestDate}",
+            ]);
+
+            if ($response['ok'] && is_array($response['json'])) {
+                $yfinanceLatestDate = $response['json']['latest_date'] ?? null;
+                $yfinanceReady = (bool) ($response['json']['is_available'] ?? false);
+
+                if ($yfinanceReady) {
+                    $this->info('Latest IDX data on yfinance is available.');
+                } else {
+                    $message = 'Latest IDX data on yfinance is not available yet.';
+                    if ($yfinanceLatestDate) {
+                        $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                    }
+                    $this->warn($message);
+                }
+            } else {
+                $yfinanceReady = null;
+                $this->warn('Unable to determine latest IDX data availability from yfinance.');
+            }
+        } catch (\Throwable $e) {
+            $yfinanceReady = null;
+            $this->warn('Failed to check yfinance latest data: ' . $e->getMessage());
         }
     }
 }
