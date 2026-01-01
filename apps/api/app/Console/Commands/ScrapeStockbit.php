@@ -8,6 +8,7 @@ use App\Services\CsvUtilities;
 use App\Services\DbBars;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
+use App\Support\AssetList;
 use App\Support\StockbitTokenStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -20,7 +21,7 @@ class ScrapeStockbit extends Command
 {
     protected $signature = 'stockbit:scrape
         {tickers?* : One or more tickers, e.g. INCO ANTM BRIS}
-        {--all : Process all tickers configured in csv.index_symbols}
+        {--all : Process all tickers stored in the assets table}
         {--market-detector : Fetch market detector data for the provided tickers}
         {--historical : Fetch historical data for the provided tickers}
         {--from= : YYYY-MM-DD (default: IPO date if available, otherwise 14 days ago)}
@@ -143,17 +144,7 @@ class ScrapeStockbit extends Command
         $configuredTickers = [];
 
         if ($this->option('all')) {
-            $configuredTickers = config('csv.index_symbols', []);
-
-            if (!is_array($configuredTickers)) {
-                $this->warn('The csv.index_symbols configuration is missing or invalid.');
-                $configuredTickers = [];
-            }
-
-            $configuredTickers = array_filter(
-                $configuredTickers,
-                static fn ($symbol) => is_string($symbol) && $symbol !== ''
-            );
+            $configuredTickers = AssetList::symbols();
         }
 
         $tickers = array_values(array_unique(array_merge($argumentTickers, $configuredTickers)));
@@ -1124,19 +1115,10 @@ class ScrapeStockbit extends Command
             return $allowed;
         }
 
-        $configured = config('csv.index_symbols', []);
-
-        if (!is_array($configured)) {
-            $configured = [];
-        }
-
+        $configured = AssetList::symbols();
         $normalized = [];
 
         foreach ($configured as $symbol) {
-            if (!is_string($symbol)) {
-                continue;
-            }
-
             $normalizedSymbol = strtoupper(trim($symbol));
 
             if ($normalizedSymbol === '') {

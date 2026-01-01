@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use App\Services\PythonRunner;
 use App\Services\BrokerSummaryImporter;
 use App\Support\StockbitTokenStore;
+use App\Support\AssetList;
 
 class AssetSync extends Command
 {
@@ -57,7 +58,7 @@ class AssetSync extends Command
             $this->input->setOption('chk-date', $eodDate);
         }
 
-        $indexSymbols = config('csv.index_symbols', []);
+        $indexSymbols = AssetList::symbols();
         $seedDir = config('csv.seed_dir');
 
         // Collect CSV files available in seed directory

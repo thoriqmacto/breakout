@@ -18,7 +18,12 @@ class TradingDaysControllerTest extends TestCase
         Sanctum::actingAs(User::factory()->create(), ['*']);
 
         $configuredSymbols = ['ACES', 'ADRO', 'AKRA', 'AMMN', 'ANTM', 'ASII'];
-        config()->set('csv.index_symbols', $configuredSymbols);
+        foreach ($configuredSymbols as $symbol) {
+            Asset::query()->create([
+                'symbol' => $symbol,
+                'name' => $symbol,
+            ]);
+        }
 
         $indexCloses = [
             '2024-01-02' => 7000.0,
@@ -34,10 +39,7 @@ class TradingDaysControllerTest extends TestCase
         }
 
         foreach ($configuredSymbols as $offset => $symbol) {
-            $asset = Asset::query()->create([
-                'symbol' => $symbol,
-                'name' => $symbol,
-            ]);
+            $asset = Asset::query()->where('symbol', $symbol)->firstOrFail();
 
             $base = 100 + ($offset * 5);
             foreach (array_keys($indexCloses) as $dateIndex => $date) {
