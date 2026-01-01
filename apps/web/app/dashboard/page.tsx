@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useAuth } from "@/components/auth-provider"
 import {
@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
+import { loadPortfolioState, summarizePortfolio, type PortfolioSummary } from "@/lib/portfolio-storage"
 
 const parseNumericInput = (value: string) => {
   if (!value?.trim()) {
@@ -74,24 +75,6 @@ const formatIdr = (value: number) =>
   }).format(value)
 
 const formatPercent = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(2)}%`
-
-const highlights = [
-  {
-    title: "Total Strategies",
-    value: "6",
-    description: "Configured breakout strategies currently monitored.",
-  },
-  {
-    title: "Open Alerts",
-    value: "12",
-    description: "Signals awaiting analyst review across all assets.",
-  },
-  {
-    title: "Last Sync",
-    value: "3m ago",
-    description: "Time since the asset metrics pipeline completed.",
-  },
-]
 
 type LatestPriceRecord = {
   id: number
@@ -161,6 +144,7 @@ export default function DashboardPage() {
   const [useSameFee, setUseSameFee] = useState(true)
   const [buyFeePercentInput, setBuyFeePercentInput] = useState("0")
   const [sellFeePercentInput, setSellFeePercentInput] = useState("0")
+  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null)
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -178,6 +162,46 @@ export default function DashboardPage() {
       window.clearTimeout(timeoutId)
     }
   }, [symbol])
+
+  useEffect(() => {
+    const synchronizePortfolioSummary = () => {
+      setPortfolioSummary(summarizePortfolio(loadPortfolioState()))
+    }
+
+    synchronizePortfolioSummary()
+    window.addEventListener("storage", synchronizePortfolioSummary)
+
+    return () => {
+      window.removeEventListener("storage", synchronizePortfolioSummary)
+    }
+  }, [])
+
+  const highlights = useMemo(
+    () => [
+      {
+        title: "Total Strategies",
+        value: "6",
+        description: "Configured breakout strategies currently monitored.",
+      },
+      {
+        title: "Open Alerts",
+        value: "12",
+        description: "Signals awaiting analyst review across all assets.",
+      },
+      {
+        title: "Portfolio Status",
+        value: portfolioSummary
+          ? `${portfolioSummary.totalHoldings} holdings · ${portfolioSummary.totalGroups} groups`
+          : "Loading...",
+        description: portfolioSummary
+          ? `Primary: ${portfolioSummary.primaryCount}, Secondary: ${portfolioSummary.secondaryCount}${
+              portfolioSummary.latestChange ? ` · Updated ${portfolioSummary.latestChange}` : ""
+            }`
+          : "Loading portfolio activity...",
+      },
+    ],
+    [portfolioSummary],
+  )
 
   useEffect(() => {
     if (!debouncedSymbol) {

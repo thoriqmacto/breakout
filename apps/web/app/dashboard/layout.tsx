@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   PanelLeft,
   PanelRight,
+  Briefcase,
   Terminal,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
@@ -36,6 +37,11 @@ const navigation: NavigationItem[] = [
     label: "Assets",
     href: "/dashboard/assets",
     icon: Boxes,
+  },
+  {
+    label: "Portfolio",
+    href: "/dashboard/portfolio",
+    icon: Briefcase,
   },
   {
     label: "Trading Days",
