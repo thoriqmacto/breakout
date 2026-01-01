@@ -8,6 +8,7 @@ use App\Services\DbBars;
 use App\Services\OhlcvIntegrityChecker;
 use App\Services\PythonRunner;
 use App\Services\StockbitExodusClient;
+use App\Support\AssetList;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -80,9 +81,9 @@ class OhlcvCheck extends Command
 
     private function checkAllConfiguredSymbols(?string $from, ?string $to, ?string $resolve, bool $forceDelete): int
     {
-        $symbols = array_map('strtoupper', config('csv.index_symbols', []));
+        $symbols = AssetList::symbols();
         if ($symbols === []) {
-            $this->error('No index symbols configured in csv.index_symbols.');
+            $this->error('No assets found to check.');
 
             return self::FAILURE;
         }

@@ -50,9 +50,8 @@ class OhlcvCheckCommandTest extends TestCase
 
     public function test_checks_all_symbols_from_configuration(): void
     {
-        config()->set('csv.index_symbols', ['INCO', 'ACES']);
-
         $asset = Asset::create(['symbol' => 'INCO', 'name' => 'Vale Indonesia']);
+        Asset::create(['symbol' => 'ACES', 'name' => 'Astra Otoparts']);
 
         $start = Carbon::parse('2024-01-01');
         for ($i = 0; $i < 3; $i++) {
@@ -73,7 +72,6 @@ class OhlcvCheckCommandTest extends TestCase
         $this->artisan('ohlcv:check', ['--all' => true])
             ->expectsOutputToContain('Asset INCO (#' . $asset->id . ')')
             ->expectsOutputToContain('  Consistency: <fg=green>PASSED</>')
-            ->expectsOutputToContain('Asset not found for symbol: ACES')
             ->assertExitCode(1);
     }
 }

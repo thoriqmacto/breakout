@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\Price;
 use App\Models\TradingDay;
 use Illuminate\Http\Request;
+use App\Support\AssetList;
 
 class TradingDayController extends ApiController
 {
@@ -164,10 +165,9 @@ class TradingDayController extends ApiController
 
     private function defaultSymbols(): array
     {
-        $configured = config('csv.index_symbols', []);
-
-        if (is_array($configured) && $configured !== []) {
-            return array_values(array_unique(array_map(fn ($symbol) => strtoupper((string) $symbol), $configured)));
+        $configured = AssetList::symbols();
+        if ($configured !== []) {
+            return $configured;
         }
 
         return self::FALLBACK_SYMBOLS;

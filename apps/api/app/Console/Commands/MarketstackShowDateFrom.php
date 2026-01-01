@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\SymbolDate;
+use App\Support\AssetList;
 
 /**
  * Display latest date per JII symbol and the chosen date_from value.
@@ -16,7 +17,7 @@ class MarketstackShowDateFrom extends Command
 
     public function handle(): int
     {
-        $baseSymbols = config('csv.index_symbols', []);
+        $baseSymbols = AssetList::symbols();
         $latestDates = [];
         $chkLatest   = $this->option('chk-latest');
 

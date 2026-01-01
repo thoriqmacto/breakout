@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use App\Services\CsvBars;
 use App\Services\SymbolDate;
 use App\Services\DbBars;
+use App\Support\AssetList;
 
 /**
  * php artisan marketstack:fetch-jii --limit=1000 --chunk=200 --csv
@@ -52,7 +53,11 @@ class MarketstackFetchJii extends Command
         $chkLatest  = $this->option('chk-latest');
         $csvDir     = config('csv.seed_dir');
 
-        $baseSymbols    = config('csv.index_symbols', []);
+        $baseSymbols    = AssetList::symbols();
+        if ($baseSymbols === []) {
+            $this->warn('No assets found. Add assets before running this command.');
+            return self::FAILURE;
+        }
         $symbolsToFetch = [];
         $csvRows        = [];
         $latestDates    = [];

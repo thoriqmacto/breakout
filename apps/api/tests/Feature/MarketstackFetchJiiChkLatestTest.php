@@ -15,13 +15,13 @@ class MarketstackFetchJiiChkLatestTest extends TestCase
         putenv('MARKETSTACK_KEY=test-key');
         $_ENV['MARKETSTACK_KEY'] = 'test-key';
 
-        config(['csv.index_symbols' => ['AAA']]);
         $csvDir = database_path('seeders/data/test-historical');
         if (!is_dir($csvDir)) {
             mkdir($csvDir, 0755, true);
         }
         file_put_contents($csvDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,2,1,2,100\n");
         config(['csv.seed_dir' => $csvDir]);
+        \App\Models\Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         Http::fake();
 

@@ -76,13 +76,13 @@ class LatestPricesTest extends TestCase
 
     public function test_asset_sync_fetches_missing_data_when_outdated(): void
     {
-        config(['csv.index_symbols' => ['AAA']]);
         $seedDir = database_path('seeders/data/test-sync');
         if (!is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
         file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
         config(['csv.seed_dir' => $seedDir]);
+        Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
         if (!is_dir($pyDir)) {
@@ -106,13 +106,13 @@ class LatestPricesTest extends TestCase
     {
         Carbon::setTestNow('2024-01-03');
 
-        config(['csv.index_symbols' => ['AAA']]);
         $seedDir = database_path('seeders/data/test-eod');
         if (!is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
         file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
         config(['csv.seed_dir' => $seedDir]);
+        Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
         if (!is_dir($pyDir)) {
