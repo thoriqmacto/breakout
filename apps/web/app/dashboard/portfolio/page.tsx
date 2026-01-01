@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Edit, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
+import { Ban, CheckCircle2, Edit, Plus, RefreshCcw, Save, Trash2, Undo2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,13 +14,17 @@ import {
 import { Input } from "@/components/ui/input"
 import {
   createGroup,
+  createVendor,
+  getDefaultPortfolioState,
   loadPortfolioState,
   normalizeCurrency,
   persistPortfolioState,
   summarizePortfolio,
   upsertGroupName,
+  upsertVendorName,
   type PortfolioHolding,
   type PortfolioState,
+  type PortfolioVendor,
 } from "@/lib/portfolio-storage"
 
 type HoldingFormState = {
@@ -32,6 +36,9 @@ type HoldingFormState = {
   targetPrice: string
   notes: string
   groupId: string
+  vendorId: string
+  openedAt: string
+  isClosed: boolean
 }
 
 const emptyForm = (): HoldingFormState => ({
@@ -43,6 +50,9 @@ const emptyForm = (): HoldingFormState => ({
   targetPrice: "",
   notes: "",
   groupId: "",
+  vendorId: "",
+  openedAt: new Date().toISOString().split("T")[0],
+  isClosed: false,
 })
 
 const textAreaStyles =
@@ -58,6 +68,8 @@ const parseNumber = (value: string) => {
   return Number.isNaN(parsed) ? Number.NaN : parsed
 }
 
+const toDateInputValue = (value: string) => (value ? value.slice(0, 10) : new Date().toISOString().split("T")[0])
+
 export default function PortfolioPage() {
   const [portfolio, setPortfolio] = useState<PortfolioState>(() => loadPortfolioState())
   const [holdingForm, setHoldingForm] = useState<HoldingFormState>(emptyForm)
@@ -65,6 +77,8 @@ export default function PortfolioPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [newGroupName, setNewGroupName] = useState("")
   const [groupDrafts, setGroupDrafts] = useState<Record<string, string>>({})
+  const [newVendorName, setNewVendorName] = useState("")
+  const [vendorDrafts, setVendorDrafts] = useState<Record<string, string>>({})
 
   useEffect(() => {
     setPortfolio(loadPortfolioState())
@@ -75,21 +89,75 @@ export default function PortfolioPage() {
     setGroupDrafts(
       Object.fromEntries(portfolio.groups.map((group) => [group.id, group.name] satisfies [string, string])),
     )
+    setVendorDrafts(
+      Object.fromEntries(portfolio.vendors.map((vendor) => [vendor.id, vendor.name] satisfies [string, string])),
+    )
+  }, [portfolio])
 
-    if (!holdingForm.groupId && portfolio.groups.length > 0) {
-      setHoldingForm((previous) => ({
+  useEffect(() => {
+    setHoldingForm((previous) => {
+      const nextGroupId = previous.groupId || portfolio.groups[0]?.id || ""
+      const nextVendorId = previous.vendorId || portfolio.vendors[0]?.id || ""
+
+      if (nextGroupId === previous.groupId && nextVendorId === previous.vendorId) {
+        return previous
+      }
+
+      return {
         ...previous,
-        groupId: portfolio.groups[0]?.id ?? "",
-      }))
-    }
-  }, [portfolio, holdingForm.groupId])
+        groupId: nextGroupId,
+        vendorId: nextVendorId,
+      }
+    })
+  }, [holdingForm.groupId, holdingForm.vendorId, portfolio.groups, portfolio.vendors])
+
+  const defaultSymbolLookup = useMemo(
+    () => new Map(getDefaultPortfolioState().holdings.map((holding) => [holding.symbol, holding.name])),
+    [],
+  )
+
+  const symbolLookup = useMemo(() => {
+    const lookup = new Map(defaultSymbolLookup)
+    portfolio.holdings.forEach((holding) => {
+      lookup.set(holding.symbol, holding.name)
+    })
+    return lookup
+  }, [defaultSymbolLookup, portfolio.holdings])
+
+  useEffect(() => {
+    const trimmedSymbol = holdingForm.symbol.trim().toUpperCase()
+    if (!trimmedSymbol) return
+
+    const knownName = symbolLookup.get(trimmedSymbol)
+    if (!knownName) return
+
+    setHoldingForm((previous) => {
+      if (previous.name.trim()) {
+        return previous
+      }
+
+      return {
+        ...previous,
+        symbol: trimmedSymbol,
+        name: knownName,
+      }
+    })
+  }, [holdingForm.symbol, symbolLookup])
 
   const summary = useMemo(() => summarizePortfolio(portfolio), [portfolio])
+  const primaryGroup = portfolio.groups.find((group) => group.id === "primary")
+  const secondaryGroup = portfolio.groups.find((group) => group.id === "secondary")
+  const vendorLookup = useMemo(
+    () => new Map(portfolio.vendors.map((vendor) => [vendor.id, vendor] satisfies [string, PortfolioVendor])),
+    [portfolio.vendors],
+  )
 
   const resetForm = () => {
     setHoldingForm((current) => ({
       ...emptyForm(),
       groupId: portfolio.groups[0]?.id ?? current.groupId ?? "",
+      vendorId: portfolio.vendors[0]?.id ?? current.vendorId ?? "",
+      openedAt: toDateInputValue(new Date().toISOString()),
     }))
     setEditingHoldingId(null)
     setFormError(null)
@@ -105,6 +173,9 @@ export default function PortfolioPage() {
       targetPrice: holding.targetPrice !== null ? holding.targetPrice.toString() : "",
       notes: holding.notes,
       groupId: holding.groupId,
+      vendorId: holding.vendorId,
+      openedAt: toDateInputValue(holding.openedAt),
+      isClosed: holding.isClosed,
     })
     setEditingHoldingId(holding.id)
     setFormError(null)
@@ -117,13 +188,23 @@ export default function PortfolioPage() {
     const symbol = holdingForm.symbol.trim().toUpperCase()
     const name = holdingForm.name.trim()
     const groupId = holdingForm.groupId.trim()
+    const vendorId = holdingForm.vendorId.trim()
+    const openedAtInput = holdingForm.openedAt.trim()
     const shares = parseNumber(holdingForm.shares)
     const averageCost = parseNumber(holdingForm.averageCost)
     const targetPrice = holdingForm.targetPrice.trim() ? parseNumber(holdingForm.targetPrice) : null
     const notes = holdingForm.notes.trim()
+    const isClosed = holdingForm.isClosed
+    const openedAtDate = openedAtInput ? new Date(openedAtInput) : null
+    const openedAt = openedAtDate && Number.isFinite(openedAtDate.getTime()) ? openedAtDate.toISOString() : null
 
-    if (!symbol || !name || !groupId) {
-      setFormError("Symbol, name, and group are required.")
+    if (!symbol || !name || !groupId || !vendorId) {
+      setFormError("Symbol, name, group, and OTS vendor are required.")
+      return
+    }
+
+    if (!openedAt) {
+      setFormError("Please provide when the position was opened.")
       return
     }
 
@@ -155,6 +236,10 @@ export default function PortfolioPage() {
       targetPrice: targetPrice ?? null,
       notes,
       groupId,
+      vendorId,
+      openedAt,
+      isClosed,
+      closedAt: isClosed ? existing?.closedAt ?? new Date().toISOString() : null,
       createdAt: existing?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -212,6 +297,61 @@ export default function PortfolioPage() {
     setNewGroupName("")
   }
 
+  const handleVendorNameChange = (vendorId: string, name: string) => {
+    setVendorDrafts((previous) => ({
+      ...previous,
+      [vendorId]: name,
+    }))
+  }
+
+  const handleSaveVendorName = (vendorId: string) => {
+    const nextName = (vendorDrafts[vendorId] ?? "").trim()
+    if (!nextName) {
+      return
+    }
+
+    setPortfolio((previous) => ({
+      ...previous,
+      vendors: upsertVendorName(previous.vendors, vendorId, nextName),
+    }))
+  }
+
+  const handleCreateVendor = () => {
+    const trimmed = newVendorName.trim()
+    if (!trimmed) {
+      return
+    }
+
+    setPortfolio((previous) => ({
+      ...previous,
+      vendors: [...previous.vendors, createVendor(previous.vendors, trimmed)],
+    }))
+    setNewVendorName("")
+  }
+
+  const handleToggleHoldingClosed = (holding: PortfolioHolding, closed: boolean) => {
+    setPortfolio((previous) => ({
+      ...previous,
+      holdings: previous.holdings.map((item) =>
+        item.id === holding.id
+          ? {
+              ...item,
+              isClosed: closed,
+              closedAt: closed ? item.closedAt ?? new Date().toISOString() : null,
+              updatedAt: new Date().toISOString(),
+            }
+          : item,
+      ),
+    }))
+
+    if (editingHoldingId === holding.id) {
+      setHoldingForm((current) => ({
+        ...current,
+        isClosed: closed,
+      }))
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-3">
@@ -220,35 +360,56 @@ export default function PortfolioPage() {
             Portfolio
           </div>
           <p className="text-sm text-muted-foreground">
-            Track and organize your stock positions by group, add updates, and keep notes per holding.
+            Track and organize your stock positions by group, add updates, and keep notes per position.
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Total Holdings</CardTitle>
-              <CardDescription>Active stocks tracked in your list.</CardDescription>
+              <CardTitle className="text-lg">Total positions</CardTitle>
+              <CardDescription>All tracked entries (open and closed).</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.totalHoldings}</CardContent>
+            <CardContent className="text-2xl font-semibold">{summary.totalPositions}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Active positions</CardTitle>
+              <CardDescription>Open positions currently tracked.</CardDescription>
+            </CardHeader>
+            <CardContent className="text-2xl font-semibold">{summary.activePositions}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Total value</CardTitle>
+              <CardDescription>Shares multiplied by average cost.</CardDescription>
+            </CardHeader>
+            <CardContent className="text-2xl font-semibold">{normalizeCurrency(summary.totalValue)}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Groups</CardTitle>
-              <CardDescription>Organize holdings by priority.</CardDescription>
+              <CardDescription>Organize positions by priority.</CardDescription>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{summary.totalGroups}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Primary</CardTitle>
+              <CardTitle className="text-lg">OTS vendors</CardTitle>
+              <CardDescription>Saved online trading systems.</CardDescription>
+            </CardHeader>
+            <CardContent className="text-2xl font-semibold">{summary.totalVendors}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">{primaryGroup?.name ?? "Primary"}</CardTitle>
               <CardDescription>Core positions count.</CardDescription>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{summary.primaryCount}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Secondary</CardTitle>
+              <CardTitle className="text-lg">{secondaryGroup?.name ?? "Secondary"}</CardTitle>
               <CardDescription>Rotational or satellite picks.</CardDescription>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{summary.secondaryCount}</CardContent>
@@ -260,9 +421,9 @@ export default function PortfolioPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{editingHoldingId ? "Update holding" : "Add a holding"}</CardTitle>
+              <CardTitle>{editingHoldingId ? "Update position" : "Add a position"}</CardTitle>
               <CardDescription>
-                Capture share count, average cost, and notes for each symbol in your portfolio.
+                Capture share count, average cost, vendor, and notes for each position in your portfolio.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -360,6 +521,56 @@ export default function PortfolioPage() {
                   </div>
                 </div>
 
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="vendor">
+                      OTS vendor
+                    </label>
+                    <select
+                      id="vendor"
+                      className={selectStyles}
+                      value={holdingForm.vendorId}
+                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, vendorId: event.target.value }))}
+                    >
+                      {portfolio.vendors.map((vendor) => (
+                        <option key={vendor.id} value={vendor.id}>
+                          {vendor.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="opened-at">
+                      Position date
+                    </label>
+                    <Input
+                      id="opened-at"
+                      type="date"
+                      value={holdingForm.openedAt}
+                      onChange={(event) => setHoldingForm((previous) => ({ ...previous, openedAt: event.target.value }))}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-md border border-input/70 bg-muted/40 px-3 py-2">
+                  <input
+                    id="is-closed"
+                    type="checkbox"
+                    className="size-4 accent-primary"
+                    checked={holdingForm.isClosed}
+                    onChange={(event) => setHoldingForm((previous) => ({ ...previous, isClosed: event.target.checked }))}
+                  />
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium" htmlFor="is-closed">
+                      Mark as sold
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Closed positions are kept for history but removed from active totals.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium" htmlFor="notes">
                     Notes
@@ -369,7 +580,7 @@ export default function PortfolioPage() {
                     className={textAreaStyles}
                     value={holdingForm.notes}
                     onChange={(event) => setHoldingForm((previous) => ({ ...previous, notes: event.target.value }))}
-                    placeholder="Why you're holding this stock, key catalysts, or risk controls."
+                    placeholder="Why you're in this position, key catalysts, or risk controls."
                   />
                 </div>
 
@@ -385,7 +596,7 @@ export default function PortfolioPage() {
                     ) : (
                       <>
                         <Plus className="size-4" aria-hidden />
-                        Add holding
+                        Add position
                       </>
                     )}
                   </Button>
@@ -459,13 +670,72 @@ export default function PortfolioPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>OTS vendors</CardTitle>
+              <CardDescription>Save the online trading systems you use most often.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                {portfolio.vendors.map((vendor) => (
+                  <div
+                    key={vendor.id}
+                    className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="flex-1 space-y-1">
+                      <label className="text-xs uppercase text-muted-foreground" htmlFor={`vendor-${vendor.id}`}>
+                        Saved vendor
+                      </label>
+                      <Input
+                        id={`vendor-${vendor.id}`}
+                        value={vendorDrafts[vendor.id] ?? vendor.name}
+                        onChange={(event) => handleVendorNameChange(vendor.id, event.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Last updated {new Date(vendor.updatedAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-center">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleSaveVendorName(vendor.id)}
+                      >
+                        <Save className="size-4" aria-hidden />
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2 rounded-md border bg-muted/60 p-3">
+                <p className="text-sm font-medium">Add an OTS vendor</p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    placeholder="e.g., Broker A, Mobile OTS"
+                    value={newVendorName}
+                    onChange={(event) => setNewVendorName(event.target.value)}
+                  />
+                  <Button type="button" className="gap-2 sm:w-40" onClick={handleCreateVendor}>
+                    <Plus className="size-4" aria-hidden />
+                    Add vendor
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">Vendors appear in the position form dropdown.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-4">
           <Card>
             <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle>Holdings</CardTitle>
+                <CardTitle>Positions</CardTitle>
                 <CardDescription>Review, edit, or remove your portfolio entries.</CardDescription>
               </div>
               <div className="text-sm text-muted-foreground">
@@ -474,7 +744,7 @@ export default function PortfolioPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {portfolio.groups.map((group) => {
-                const holdingsForGroup = portfolio.holdings.filter((holding) => holding.groupId === group.id)
+                const positionsForGroup = portfolio.holdings.filter((holding) => holding.groupId === group.id)
 
                 return (
                   <div key={group.id} className="space-y-2 rounded-lg border p-3">
@@ -482,16 +752,16 @@ export default function PortfolioPage() {
                       <div>
                         <p className="text-sm font-semibold">{group.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {holdingsForGroup.length} {holdingsForGroup.length === 1 ? "holding" : "holdings"}
+                          {positionsForGroup.length} {positionsForGroup.length === 1 ? "position" : "positions"}
                         </p>
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      {holdingsForGroup.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No holdings added yet.</p>
+                      {positionsForGroup.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No positions added yet.</p>
                       ) : (
-                        holdingsForGroup.map((holding) => (
+                        positionsForGroup.map((holding) => (
                           <div
                             key={holding.id}
                             className="rounded-md border bg-background/80 p-3 shadow-sm transition hover:border-primary/50"
@@ -506,6 +776,24 @@ export default function PortfolioPage() {
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
+                                <Button
+                                  variant={holding.isClosed ? "outline" : "secondary"}
+                                  size="sm"
+                                  className="gap-1"
+                                  onClick={() => handleToggleHoldingClosed(holding, !holding.isClosed)}
+                                >
+                                  {holding.isClosed ? (
+                                    <>
+                                      <Undo2 className="size-4" aria-hidden />
+                                      Mark active
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="size-4" aria-hidden />
+                                      Mark sold
+                                    </>
+                                  )}
+                                </Button>
                                 <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEditHolding(holding)}>
                                   <Edit className="size-4" aria-hidden />
                                   Edit
@@ -522,7 +810,7 @@ export default function PortfolioPage() {
                               </div>
                             </div>
 
-                            <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+                            <dl className="mt-3 grid gap-3 sm:grid-cols-4">
                               <div>
                                 <dt className="text-xs uppercase text-muted-foreground">Shares</dt>
                                 <dd className="font-medium">{holding.shares.toLocaleString("en-US")}</dd>
@@ -532,9 +820,40 @@ export default function PortfolioPage() {
                                 <dd className="font-medium">{normalizeCurrency(holding.averageCost)}</dd>
                               </div>
                               <div>
+                                <dt className="text-xs uppercase text-muted-foreground">Total value</dt>
+                                <dd className="font-medium">{normalizeCurrency(holding.shares * holding.averageCost)}</dd>
+                              </div>
+                              <div>
                                 <dt className="text-xs uppercase text-muted-foreground">Target price</dt>
                                 <dd className="font-medium">
                                   {holding.targetPrice !== null ? normalizeCurrency(holding.targetPrice) : "—"}
+                                </dd>
+                              </div>
+                            </dl>
+
+                            <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+                              <div>
+                                <dt className="text-xs uppercase text-muted-foreground">OTS vendor</dt>
+                                <dd className="font-medium">{vendorLookup.get(holding.vendorId)?.name ?? "Unknown vendor"}</dd>
+                              </div>
+                              <div>
+                                <dt className="text-xs uppercase text-muted-foreground">Position date</dt>
+                                <dd className="font-medium">{new Date(holding.openedAt).toLocaleDateString()}</dd>
+                              </div>
+                              <div>
+                                <dt className="text-xs uppercase text-muted-foreground">Status</dt>
+                                <dd className="flex items-center gap-2 font-medium">
+                                  {holding.isClosed ? (
+                                    <>
+                                      <Ban className="size-4 text-destructive" aria-hidden />
+                                      Sold {holding.closedAt ? `on ${new Date(holding.closedAt).toLocaleDateString()}` : ""}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="size-4 text-emerald-500" aria-hidden />
+                                      Active
+                                    </>
+                                  )}
                                 </dd>
                               </div>
                             </dl>

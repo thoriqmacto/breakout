@@ -191,12 +191,12 @@ export default function DashboardPage() {
       {
         title: "Portfolio Status",
         value: portfolioSummary
-          ? `${portfolioSummary.totalHoldings} holdings · ${portfolioSummary.totalGroups} groups`
+          ? `${portfolioSummary.activePositions} active positions · ${portfolioSummary.totalGroups} groups`
           : "Loading...",
         description: portfolioSummary
-          ? `Primary: ${portfolioSummary.primaryCount}, Secondary: ${portfolioSummary.secondaryCount}${
+          ? `Primary: ${portfolioSummary.primaryCount}, Secondary: ${portfolioSummary.secondaryCount} · Vendors: ${portfolioSummary.totalVendors}${
               portfolioSummary.latestChange ? ` · Updated ${portfolioSummary.latestChange}` : ""
-            }`
+            } · Value: ${formatIdr(portfolioSummary.totalValue)}`
           : "Loading portfolio activity...",
       },
     ],

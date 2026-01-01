@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
+use App\Http\Controllers\Api\V1\PortfolioController;
+use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\TradingDayController;
 
@@ -52,4 +54,17 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
 
     // Trading days overview
     Route::get('trading-days', [TradingDayController::class, 'index']);
+
+    // Portfolios & positions
+    Route::apiResource('portfolios', PortfolioController::class);
+    Route::get('portfolios/{portfolio}/positions', [PositionController::class, 'index'])
+        ->name('portfolios.positions.index');
+    Route::post('portfolios/{portfolio}/positions', [PositionController::class, 'store'])
+        ->name('portfolios.positions.store');
+    Route::get('portfolios/{portfolio}/positions/{position}', [PositionController::class, 'show'])
+        ->name('portfolios.positions.show');
+    Route::put('portfolios/{portfolio}/positions/{position}', [PositionController::class, 'update'])
+        ->name('portfolios.positions.update');
+    Route::delete('portfolios/{portfolio}/positions/{position}', [PositionController::class, 'destroy'])
+        ->name('portfolios.positions.destroy');
 });
