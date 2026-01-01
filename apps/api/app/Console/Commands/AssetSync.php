@@ -10,6 +10,7 @@ use App\Services\DbBars;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use App\Services\PythonRunner;
+use App\Services\BrokerSummaryImporter;
 use App\Support\StockbitTokenStore;
 
 class AssetSync extends Command
@@ -339,6 +340,20 @@ class AssetSync extends Command
             $rows[] = $row;
 
             $i++;
+        }
+
+        if ($this->option('eod')) {
+            try {
+                /** @var BrokerSummaryImporter $importer */
+                $importer = app(BrokerSummaryImporter::class);
+                $summary = $importer->importFromDisk($disk, $jsonDir);
+
+                $fileCount = $summary['file_count'] ?? 0;
+                $rowCount = $summary['row_count'] ?? 0;
+                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
+            } catch (\Throwable $exception) {
+                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+            }
         }
 
         $headers = ['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
