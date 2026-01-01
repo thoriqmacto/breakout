@@ -13,7 +13,8 @@ class PositionController extends ApiController
 {
     public function index(Portfolio $portfolio)
     {
-        $positions = $portfolio->positions()->with('asset')->get();
+        $year = request()->integer('year') ?? $portfolio->year;
+        $positions = $portfolio->positionsForYear($year)->with('asset')->get();
 
         return ApiResponse::success(PositionResource::collection($positions));
     }
@@ -78,12 +79,11 @@ class PositionController extends ApiController
 
         return [
             'asset_id' => [$required, 'exists:assets,id'],
-            'side' => [$required, 'in:long,short'],
+            'side' => [$required, 'in:entry,exit'],
             'qty_shares' => [$required, 'numeric', 'min:0.0001'],
-            'avg_price' => [$required, 'numeric', 'min:0'],
-            'entry_date' => [$required, 'date'],
-            'trail' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['sometimes', 'in:open,closed'],
+            'price' => [$required, 'numeric', 'min:0'],
+            'fee_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'executed_at' => [$required, 'date'],
         ];
     }
 
@@ -96,15 +96,26 @@ class PositionController extends ApiController
      */
     protected function preparePayload(array $input, Portfolio $portfolio, ?Position $position = null): array
     {
+        $side = isset($input['side']) ? strtolower($input['side']) : $position?->side;
+        $qty = isset($input['qty_shares']) ? (float) $input['qty_shares'] : $position?->qty_shares;
+        $price = isset($input['price']) ? (float) $input['price'] : $position?->price;
+        $feeRate = isset($input['fee_rate']) ? (float) $input['fee_rate'] : ($position?->fee_rate ?? 0.0);
+        $side ??= 'entry';
+
+        $feeMultiplier = $side === 'exit' ? 1 - ($feeRate / 100) : 1 + ($feeRate / 100);
+        $avgPrice = $price !== null ? $price * $feeMultiplier : $position?->avg_price;
+        $feeValue = $price !== null && $qty !== null ? $qty * $price * ($feeRate / 100) : ($position?->fee_value ?? 0);
+
         return [
             'asset_id' => $input['asset_id'] ?? $position?->asset_id,
             'portfolio_id' => $portfolio->id,
-            'side' => isset($input['side']) ? strtolower($input['side']) : $position?->side,
-            'qty_shares' => isset($input['qty_shares']) ? (float) $input['qty_shares'] : $position?->qty_shares,
-            'avg_price' => isset($input['avg_price']) ? (float) $input['avg_price'] : $position?->avg_price,
-            'entry_date' => $input['entry_date'] ?? $position?->entry_date?->toDateString(),
-            'trail' => array_key_exists('trail', $input) ? $input['trail'] : $position?->trail,
-            'status' => strtolower($input['status'] ?? ($position?->status ?? 'open')),
+            'side' => $side,
+            'qty_shares' => $qty,
+            'price' => $price,
+            'fee_rate' => $feeRate,
+            'fee_value' => $feeValue,
+            'avg_price' => $avgPrice,
+            'executed_at' => $input['executed_at'] ?? $position?->executed_at?->toDateString(),
         ];
     }
 }

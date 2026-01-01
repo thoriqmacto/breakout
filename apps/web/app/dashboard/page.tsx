@@ -138,10 +138,11 @@ export default function DashboardPage() {
   const [buyFeePercentInput, setBuyFeePercentInput] = useState("0")
   const [sellFeePercentInput, setSellFeePercentInput] = useState("0")
   const [portfolioSummary, setPortfolioSummary] = useState<{
-    totalPositions: number
-    openPositions: number
-    closedPositions: number
-    totalNotional: number
+    totalTrades: number
+    uniqueAssets: number
+    entryValue: number
+    exitValue: number
+    realizedPl: number
   } | null>(null)
   const [portfolioSummaryError, setPortfolioSummaryError] = useState<string | null>(null)
 
@@ -176,7 +177,7 @@ export default function DashboardPage() {
         const portfolios = await fetchPortfolios(accessToken, { includePositions: true })
         const first = portfolios[0]
 
-        if (!first || !first.positions) {
+        if (!first) {
           if (!isCancelled) {
             setPortfolioSummary(null)
             setPortfolioSummaryError("No portfolio data available.")
@@ -184,17 +185,20 @@ export default function DashboardPage() {
           return
         }
 
-        const positions: PositionRecord[] = first.positions
-        const totalPositions = positions.length
-        const openPositions = positions.filter((item) => item.status === "open").length
-        const closedPositions = totalPositions - openPositions
-        const totalNotional = positions.reduce(
-          (sum, position) => sum + (position.notional_value ?? position.qty_shares * position.avg_price),
-          0,
-        )
+        const positions: PositionRecord[] = first.positions ?? []
+        const assetSummaries = first.asset_summaries ?? []
+        const entryValue = assetSummaries.reduce((sum, item) => sum + (item.entry.value ?? 0), 0)
+        const exitValue = assetSummaries.reduce((sum, item) => sum + (item.exit.value ?? 0), 0)
+        const realizedPl = exitValue - entryValue
 
         if (!isCancelled) {
-          setPortfolioSummary({ totalPositions, openPositions, closedPositions, totalNotional })
+          setPortfolioSummary({
+            totalTrades: positions.length,
+            uniqueAssets: assetSummaries.length,
+            entryValue,
+            exitValue,
+            realizedPl,
+          })
           setPortfolioSummaryError(null)
         }
       } catch (cause) {
@@ -233,10 +237,10 @@ export default function DashboardPage() {
       {
         title: "Portfolio Status",
         value: portfolioSummary
-          ? `${portfolioSummary.openPositions} open · ${portfolioSummary.totalPositions} total`
+          ? `${portfolioSummary.uniqueAssets} assets · ${portfolioSummary.totalTrades} trades`
           : portfolioSummaryError ?? "Loading portfolio activity...",
         description: portfolioSummary
-          ? `Closed: ${portfolioSummary.closedPositions} · Notional: ${formatIdr(portfolioSummary.totalNotional)}`
+          ? `Entry: ${formatIdr(portfolioSummary.entryValue)} · Exit: ${formatIdr(portfolioSummary.exitValue)} · P/L: ${formatIdr(portfolioSummary.realizedPl)}`
           : portfolioSummaryError ?? "Loading portfolio activity...",
       },
     ],

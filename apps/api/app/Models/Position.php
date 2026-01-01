@@ -16,9 +16,11 @@ class Position extends Model
         'portfolio_id' => 'integer',
         'asset_id' => 'integer',
         'qty_shares' => 'float',
+        'price' => 'float',
+        'fee_rate' => 'float',
+        'fee_value' => 'float',
         'avg_price' => 'float',
-        'trail' => 'float',
-        'entry_date' => 'date',
+        'executed_at' => 'date',
     ];
 
     public function portfolio(): BelongsTo

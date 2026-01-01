@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Ban, CheckCircle2, Edit, Loader2, RefreshCcw, Save, Trash2 } from "lucide-react"
+import { Edit, Loader2, RefreshCcw, Save, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
@@ -35,19 +35,19 @@ type AssetOption = {
 type FormState = {
   positionId: number | null
   assetId: string
-  side: "long" | "short"
+  side: "entry" | "exit"
   qtyShares: string
-  avgPrice: string
-  entryDate: string
-  trail: string
-  status: "open" | "closed"
+  price: string
+  feeRate: string
+  executedAt: string
 }
 
 type PortfolioSummary = {
-  totalPositions: number
-  openPositions: number
-  closedPositions: number
-  totalNotional: number
+  totalTrades: number
+  uniqueAssets: number
+  totalEntryValue: number
+  totalExitValue: number
+  realizedPl: number
 }
 
 type AssetIndexResponse = AssetOption[]
@@ -58,12 +58,11 @@ const toDateInputValue = (value?: string | null) =>
 const emptyForm = (): FormState => ({
   positionId: null,
   assetId: "",
-  side: "long",
+  side: "entry",
   qtyShares: "",
-  avgPrice: "",
-  entryDate: toDateInputValue(),
-  trail: "",
-  status: "open",
+  price: "",
+  feeRate: "",
+  executedAt: toDateInputValue(),
 })
 
 const parseNumber = (value: string) => {
@@ -73,17 +72,27 @@ const parseNumber = (value: string) => {
   return Number.isNaN(parsed) ? Number.NaN : parsed
 }
 
+const formatNullableIdr = (value?: number | null) => {
+  if (value === null || value === undefined) return "—"
+  return formatIdr(value)
+}
+
+const formatNullableNumber = (value?: number | null) => {
+  if (value === null || value === undefined) return "—"
+  return value.toLocaleString("en-US", { maximumFractionDigits: 4 })
+}
+
 export default function PortfolioPage() {
   const { accessToken } = useAuth()
   const [portfolio, setPortfolio] = useState<PortfolioRecord | null>(null)
   const [positions, setPositions] = useState<PositionRecord[]>([])
+  const [assetSummaries, setAssetSummaries] = useState<PortfolioRecord["asset_summaries"]>([])
   const [assets, setAssets] = useState<AssetOption[]>([])
   const [loading, setLoading] = useState(false)
   const [assetsLoading, setAssetsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [statusUpdatingId, setStatusUpdatingId] = useState<number | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [formState, setFormState] = useState<FormState>(emptyForm)
 
@@ -157,15 +166,19 @@ export default function PortfolioPage() {
           const created = await createPortfolio(accessToken, {
             name: "Primary Portfolio",
             baseCcy: "IDR",
+            remarks: "Primary",
+            year: new Date().getFullYear(),
           })
-          setPortfolio({ ...created, positions: [] })
+          setPortfolio({ ...created, positions: [], asset_summaries: [] })
           setPositions([])
+          setAssetSummaries([])
           return
         }
 
         const primary = records[0]
         setPortfolio(primary)
         setPositions(primary.positions ?? [])
+        setAssetSummaries(primary.asset_summaries ?? [])
       } catch (cause) {
         const message =
           cause instanceof Error && cause.message
@@ -192,22 +205,21 @@ export default function PortfolioPage() {
   }, [assets, formState.assetId])
 
   const summary = useMemo<PortfolioSummary>(() => {
-    const totalPositions = positions.length
-    const openPositions = positions.filter((position) => position.status === "open").length
-    const closedPositions = totalPositions - openPositions
-    const totalNotional = positions.reduce(
-      (sum, position) => sum + (position.notional_value ?? position.qty_shares * position.avg_price),
-      0,
-    )
+    const totalTrades = positions.length
+    const uniqueAssets = assetSummaries?.length ?? 0
+    const totalEntryValue =
+      assetSummaries?.reduce((sum, item) => sum + (item.entry.value ?? 0), 0) ?? 0
+    const totalExitValue = assetSummaries?.reduce((sum, item) => sum + (item.exit.value ?? 0), 0) ?? 0
+    const realizedPl = totalExitValue - totalEntryValue
 
-    return { totalPositions, openPositions, closedPositions, totalNotional }
-  }, [positions])
+    return { totalTrades, uniqueAssets, totalEntryValue, totalExitValue, realizedPl }
+  }, [assetSummaries, positions])
 
   const sortedPositions = useMemo(
     () =>
       [...positions].sort((a, b) => {
-        const dateA = a.entry_date ? Date.parse(a.entry_date) : 0
-        const dateB = b.entry_date ? Date.parse(b.entry_date) : 0
+        const dateA = a.executed_at ? Date.parse(a.executed_at) : 0
+        const dateB = b.executed_at ? Date.parse(b.executed_at) : 0
         return dateB - dateA
       }),
     [positions],
@@ -227,10 +239,9 @@ export default function PortfolioPage() {
       assetId: String(position.asset_id),
       side: position.side,
       qtyShares: String(position.qty_shares),
-      avgPrice: String(position.avg_price),
-      entryDate: toDateInputValue(position.entry_date),
-      trail: position.trail !== null ? String(position.trail) : "",
-      status: position.status,
+      price: String(position.price),
+      feeRate: String(position.fee_rate ?? ""),
+      executedAt: toDateInputValue(position.executed_at),
     })
     setFormError(null)
   }
@@ -246,9 +257,9 @@ export default function PortfolioPage() {
 
     const assetId = Number.parseInt(formState.assetId, 10)
     const qtyShares = parseNumber(formState.qtyShares)
-    const avgPrice = parseNumber(formState.avgPrice)
-    const trail = formState.trail.trim() ? parseNumber(formState.trail) : null
-    const entryDate = formState.entryDate.trim()
+    const price = parseNumber(formState.price)
+    const feeRate = formState.feeRate.trim() ? parseNumber(formState.feeRate) : 0
+    const executedAt = formState.executedAt.trim()
 
     if (!Number.isInteger(assetId) || assetId <= 0) {
       setFormError("Select a valid asset.")
@@ -260,13 +271,18 @@ export default function PortfolioPage() {
       return
     }
 
-    if (!Number.isFinite(avgPrice) || avgPrice <= 0) {
-      setFormError("Average price must be a positive number.")
+    if (!Number.isFinite(price) || price <= 0) {
+      setFormError("Price must be a positive number.")
       return
     }
 
-    if (!entryDate) {
-      setFormError("Entry date is required.")
+    if (!Number.isFinite(feeRate) || feeRate < 0) {
+      setFormError("Fee rate must be zero or a positive number.")
+      return
+    }
+
+    if (!executedAt) {
+      setFormError("Execution date is required.")
       return
     }
 
@@ -274,10 +290,9 @@ export default function PortfolioPage() {
       assetId,
       side: formState.side,
       qtyShares,
-      avgPrice,
-      entryDate,
-      trail: trail === null ? null : trail,
-      status: formState.status,
+      price,
+      feeRate: Number.isFinite(feeRate) ? feeRate : undefined,
+      executedAt,
     }
 
     setSaving(true)
@@ -291,6 +306,7 @@ export default function PortfolioPage() {
         setPositions((previous) => [...previous, created])
       }
 
+      await refreshData()
       resetForm()
     } catch (cause) {
       const message =
@@ -314,6 +330,7 @@ export default function PortfolioPage() {
     try {
       await deletePosition(accessToken, portfolio.id, position.id)
       setPositions((previous) => previous.filter((item) => item.id !== position.id))
+      await refreshData()
       if (formState.positionId === position.id) {
         resetForm()
       }
@@ -328,40 +345,6 @@ export default function PortfolioPage() {
     }
   }
 
-  const handleStatusChange = async (position: PositionRecord, nextStatus: PositionRecord["status"]) => {
-    if (!accessToken || !portfolio) {
-      setError("You must be signed in to update positions.")
-      return
-    }
-
-    setStatusUpdatingId(position.id)
-
-    try {
-      const updated = await updatePosition(accessToken, portfolio.id, position.id, {
-        assetId: position.asset_id,
-        side: position.side,
-        qtyShares: position.qty_shares,
-        avgPrice: position.avg_price,
-        entryDate: position.entry_date ?? toDateInputValue(),
-        trail: position.trail,
-        status: nextStatus,
-      })
-
-      setPositions((previous) => previous.map((item) => (item.id === updated.id ? updated : item)))
-      if (formState.positionId === position.id) {
-        setFormState((prev) => ({ ...prev, status: nextStatus }))
-      }
-    } catch (cause) {
-      const message =
-        cause instanceof Error && cause.message
-          ? cause.message
-          : "Unable to update position status. Please try again."
-      setError(message)
-    } finally {
-      setStatusUpdatingId(null)
-    }
-  }
-
   const refreshData = async () => {
     if (!accessToken) return
 
@@ -373,6 +356,11 @@ export default function PortfolioPage() {
       if (records.length > 0) {
         setPortfolio(records[0])
         setPositions(records[0].positions ?? [])
+        setAssetSummaries(records[0].asset_summaries ?? [])
+      } else {
+        setPortfolio(null)
+        setPositions([])
+        setAssetSummaries([])
       }
     } catch (cause) {
       const message =
@@ -416,31 +404,31 @@ export default function PortfolioPage() {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Total positions</CardTitle>
-              <CardDescription>All tracked entries.</CardDescription>
+              <CardTitle className="text-lg">Total trades</CardTitle>
+              <CardDescription>Entries and exits recorded.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.totalPositions}</CardContent>
+            <CardContent className="text-2xl font-semibold">{summary.totalTrades}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Open positions</CardTitle>
-              <CardDescription>Currently active positions.</CardDescription>
+              <CardTitle className="text-lg">Assets tracked</CardTitle>
+              <CardDescription>Unique assets in this portfolio.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.openPositions}</CardContent>
+            <CardContent className="text-2xl font-semibold">{summary.uniqueAssets}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Closed positions</CardTitle>
-              <CardDescription>Positions marked as closed.</CardDescription>
+              <CardTitle className="text-lg">Entry value</CardTitle>
+              <CardDescription>Net of entry fees.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.closedPositions}</CardContent>
+            <CardContent className="text-2xl font-semibold">{formatIdr(summary.totalEntryValue)}</CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Total notional</CardTitle>
-              <CardDescription>Quantity × average price.</CardDescription>
+              <CardTitle className="text-lg">Realized P/L</CardTitle>
+              <CardDescription>Exit value minus entry value.</CardDescription>
             </CardHeader>
-            <CardContent className="text-2xl font-semibold">{formatIdr(summary.totalNotional)}</CardContent>
+            <CardContent className="text-2xl font-semibold">{formatIdr(summary.realizedPl)}</CardContent>
           </Card>
         </div>
       </div>
@@ -448,10 +436,8 @@ export default function PortfolioPage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)]">
         <Card>
           <CardHeader>
-            <CardTitle>{formState.positionId ? "Update position" : "Add a position"}</CardTitle>
-            <CardDescription>
-              Store positions against your backend portfolio. Assets and quantities are validated before saving.
-            </CardDescription>
+            <CardTitle>{formState.positionId ? "Update trade" : "Add a trade"}</CardTitle>
+            <CardDescription>Record entries and exits with fees applied automatically.</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -499,8 +485,8 @@ export default function PortfolioPage() {
                       }))
                     }
                   >
-                    <option value="long">Long</option>
-                    <option value="short">Short</option>
+                    <option value="entry">Entry</option>
+                    <option value="exit">Exit</option>
                   </select>
                 </div>
               </div>
@@ -522,15 +508,15 @@ export default function PortfolioPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="avg-price">
-                    Average price
+                  <label className="text-sm font-medium" htmlFor="price">
+                    Execution price
                   </label>
                   <Input
-                    id="avg-price"
+                    id="price"
                     inputMode="decimal"
-                    value={formState.avgPrice}
+                    value={formState.price}
                     onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, avgPrice: event.target.value }))
+                      setFormState((previous) => ({ ...previous, price: event.target.value }))
                     }
                     placeholder="8750"
                     required
@@ -540,53 +526,34 @@ export default function PortfolioPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="entry-date">
-                    Entry date
+                  <label className="text-sm font-medium" htmlFor="executed-at">
+                    Execution date
                   </label>
                   <Input
-                    id="entry-date"
+                    id="executed-at"
                     type="date"
-                    value={formState.entryDate}
+                    value={formState.executedAt}
                     onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, entryDate: event.target.value }))
+                      setFormState((previous) => ({ ...previous, executedAt: event.target.value }))
                     }
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="trail">
-                    Trail (optional)
+                  <label className="text-sm font-medium" htmlFor="fee-rate">
+                    Trading fee (%)
                   </label>
                   <Input
-                    id="trail"
+                    id="fee-rate"
                     inputMode="decimal"
-                    value={formState.trail}
+                    value={formState.feeRate}
                     onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, trail: event.target.value }))
+                      setFormState((previous) => ({ ...previous, feeRate: event.target.value }))
                     }
-                    placeholder="0"
+                    placeholder="0.2"
                   />
+                  <p className="text-xs text-muted-foreground">Fees increase entry prices and reduce exit prices.</p>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="status">
-                  Status
-                </label>
-                <select
-                  id="status"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={formState.status}
-                  onChange={(event) =>
-                    setFormState((previous) => ({
-                      ...previous,
-                      status: event.target.value as FormState["status"],
-                    }))
-                  }
-                >
-                  <option value="open">Open</option>
-                  <option value="closed">Closed</option>
-                </select>
               </div>
 
               {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
@@ -610,8 +577,8 @@ export default function PortfolioPage() {
         <Card className="space-y-4">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle>Positions</CardTitle>
-              <CardDescription>View and manage positions saved to the API.</CardDescription>
+              <CardTitle>Trades</CardTitle>
+              <CardDescription>View and manage executed entries and exits.</CardDescription>
             </div>
             {loading ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -622,12 +589,13 @@ export default function PortfolioPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {sortedPositions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No positions yet. Add one to get started.</p>
+              <p className="text-sm text-muted-foreground">No trades yet. Add one to get started.</p>
             ) : (
               sortedPositions.map((position) => {
                 const assetLabel = position.asset
                   ? `${position.asset.symbol} · ${position.asset.name}`
                   : `Asset #${position.asset_id}`
+                const tradeValue = position.value ?? position.qty_shares * position.avg_price
 
                 return (
                   <div
@@ -638,33 +606,11 @@ export default function PortfolioPage() {
                       <div>
                         <p className="text-base font-semibold leading-tight">{assetLabel}</p>
                         <p className="text-xs text-muted-foreground">
-                          Entry {position.entry_date ? new Date(position.entry_date).toLocaleDateString() : "—"}
+                          {position.executed_at ? new Date(position.executed_at).toLocaleDateString() : "—"} ·{" "}
+                          {position.side === "exit" ? "Exit" : "Entry"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant={position.status === "closed" ? "outline" : "secondary"}
-                          size="sm"
-                          className="gap-1"
-                          onClick={() =>
-                            handleStatusChange(position, position.status === "open" ? "closed" : "open")
-                          }
-                          disabled={statusUpdatingId === position.id}
-                        >
-                          {statusUpdatingId === position.id ? (
-                            <Loader2 className="size-4 animate-spin" aria-hidden />
-                          ) : position.status === "closed" ? (
-                            <>
-                              <CheckCircle2 className="size-4" aria-hidden />
-                              Mark open
-                            </>
-                          ) : (
-                            <>
-                              <Ban className="size-4" aria-hidden />
-                              Mark closed
-                            </>
-                          )}
-                        </Button>
                         <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEdit(position)}>
                           <Edit className="size-4" aria-hidden />
                           Edit
@@ -696,45 +642,27 @@ export default function PortfolioPage() {
                         <dd className="font-medium">{position.qty_shares.toLocaleString("en-US")}</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Average price</dt>
-                        <dd className="font-medium">{formatIdr(position.avg_price)}</dd>
+                        <dt className="text-xs uppercase text-muted-foreground">Execution price</dt>
+                        <dd className="font-medium">{formatIdr(position.price)}</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Notional</dt>
-                        <dd className="font-medium">
-                          {formatIdr(position.notional_value ?? position.qty_shares * position.avg_price)}
-                        </dd>
+                        <dt className="text-xs uppercase text-muted-foreground">Net price (incl. fee)</dt>
+                        <dd className="font-medium">{formatIdr(position.avg_price)}</dd>
                       </div>
                     </dl>
 
                     <dl className="mt-3 grid gap-3 sm:grid-cols-3">
                       <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Entry date</dt>
-                        <dd className="font-medium">
-                          {position.entry_date ? new Date(position.entry_date).toLocaleDateString() : "—"}
-                        </dd>
+                        <dt className="text-xs uppercase text-muted-foreground">Trading fee</dt>
+                        <dd className="font-medium">{position.fee_rate.toLocaleString("en-US", { maximumFractionDigits: 4 })}%</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Trail</dt>
-                        <dd className="font-medium">
-                          {position.trail !== null ? position.trail.toLocaleString("en-US") : "—"}
-                        </dd>
+                        <dt className="text-xs uppercase text-muted-foreground">Fee value</dt>
+                        <dd className="font-medium">{formatIdr(position.fee_value)}</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Status</dt>
-                        <dd className="flex items-center gap-2 font-medium">
-                          {position.status === "closed" ? (
-                            <>
-                              <Ban className="size-4 text-destructive" aria-hidden />
-                              Closed
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle2 className="size-4 text-emerald-500" aria-hidden />
-                              Open
-                            </>
-                          )}
-                        </dd>
+                        <dt className="text-xs uppercase text-muted-foreground">Trade value</dt>
+                        <dd className="font-medium">{formatIdr(tradeValue)}</dd>
                       </div>
                     </dl>
                   </div>
@@ -744,6 +672,115 @@ export default function PortfolioPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="space-y-4">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Portfolio assets</CardTitle>
+            <CardDescription>
+              Unique assets with consolidated entry and exit summaries{portfolio?.year ? ` for ${portfolio.year}` : ""}.
+            </CardDescription>
+          </div>
+          {portfolio?.remarks ? (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              {portfolio.remarks}
+            </span>
+          ) : null}
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {assetSummaries && assetSummaries.length > 0 ? (
+            assetSummaries.map((summary, index) => {
+              const label = summary.asset
+                ? `${summary.asset.symbol} · ${summary.asset.name}`
+                : "Unspecified asset"
+              const key = summary.asset?.id ?? `asset-${index}`
+              const plTone =
+                summary.exit.pl_flag === "profit"
+                  ? "text-emerald-600 bg-emerald-50"
+                  : summary.exit.pl_flag === "loss"
+                    ? "text-destructive bg-destructive/10"
+                    : "text-muted-foreground bg-muted"
+
+              return (
+                <div key={key} className="rounded-md border bg-background/80 p-3 shadow-sm">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-base font-semibold leading-tight">{label}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Entry value {formatNullableIdr(summary.entry.value)} · Exit value{" "}
+                        {formatNullableIdr(summary.exit.value)}
+                      </p>
+                    </div>
+                    <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${plTone}`}>
+                      {summary.exit.pl_flag}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-md border bg-muted/20 p-3">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">Entry summary</p>
+                      <dl className="mt-2 space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Min / Max price</dt>
+                          <dd className="font-medium">
+                            {formatNullableIdr(summary.entry.min_price)} / {formatNullableIdr(summary.entry.max_price)}
+                          </dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Total shares</dt>
+                          <dd className="font-medium">{summary.entry.total_shares.toLocaleString("en-US")}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Average price</dt>
+                          <dd className="font-medium">{formatNullableIdr(summary.entry.average_price)}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Entry value</dt>
+                          <dd className="font-medium">{formatNullableIdr(summary.entry.value)}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                    <div className="rounded-md border bg-muted/20 p-3">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">Exit summary</p>
+                      <dl className="mt-2 space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Min / Max price</dt>
+                          <dd className="font-medium">
+                            {formatNullableIdr(summary.exit.min_price)} / {formatNullableIdr(summary.exit.max_price)}
+                          </dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Total shares</dt>
+                          <dd className="font-medium">{summary.exit.total_shares.toLocaleString("en-US")}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Average price</dt>
+                          <dd className="font-medium">{formatNullableIdr(summary.exit.average_price)}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Exit value</dt>
+                          <dd className="font-medium">{formatNullableIdr(summary.exit.value)}</dd>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">P/L</dt>
+                          <dd className="font-medium">
+                            {formatNullableIdr(summary.exit.pl_value)}{" "}
+                            <span className="text-xs text-muted-foreground">
+                              ({formatNullableNumber(summary.exit.pl_percent)}%)
+                            </span>
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground">No asset-level summaries yet.</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

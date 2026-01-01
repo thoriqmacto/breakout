@@ -25,11 +25,12 @@ class PositionResource extends JsonResource
             }),
             'side' => $this->side,
             'qty_shares' => $this->qty_shares,
+            'price' => $this->price,
+            'fee_rate' => $this->fee_rate,
+            'fee_value' => $this->fee_value,
             'avg_price' => $this->avg_price,
-            'entry_date' => $this->entry_date?->toDateString(),
-            'trail' => $this->trail,
-            'status' => $this->status,
-            'notional_value' => $this->qty_shares * $this->avg_price,
+            'executed_at' => $this->executed_at?->toDateString(),
+            'value' => $this->qty_shares * $this->avg_price,
         ];
     }
 }
