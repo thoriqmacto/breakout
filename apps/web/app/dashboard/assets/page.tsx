@@ -12,6 +12,7 @@ import {
   type AssetMetricApiRow,
   type AssetMetricRow,
 } from "@/lib/asset-metrics"
+import { AddAssetButton } from "@/components/add-asset-button"
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
@@ -783,6 +784,12 @@ export default function AssetsMetricsPage() {
           Review ticker rankings sourced from the <code className="rounded bg-muted px-1 py-0.5">asset:metrics --all</code> command without
           leaving the dashboard.
         </p>
+        <div className="flex flex-wrap items-center gap-2 pt-2">
+          <AddAssetButton />
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link href="/dashboard/assets/settings">Asset Setting</Link>
+          </Button>
+        </div>
       </div>
       {content}
     </div>

@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Edit, Loader2, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
+import { AddAssetButton } from "@/components/add-asset-button"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -99,6 +100,22 @@ export default function PortfolioPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [creatingPortfolio, setCreatingPortfolio] = useState(false)
   const [formState, setFormState] = useState<FormState>(emptyForm)
+
+  const handleAssetCreated = useCallback(
+    (asset: AssetOption) => {
+      setAssets((previous) => {
+        const filtered = previous.filter((item) => item.id !== asset.id)
+        const next = [...filtered, asset].sort((a, b) => a.symbol.localeCompare(b.symbol))
+        return next
+      })
+
+      setFormState((previous) => ({
+        ...previous,
+        assetId: String(asset.id),
+      }))
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!accessToken) {
@@ -657,23 +674,28 @@ export default function PortfolioPage() {
                       <select
                         id="asset"
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={formState.assetId}
-                        onChange={(event) =>
-                          setFormState((previous) => ({ ...previous, assetId: event.target.value }))
-                        }
-                        disabled={assetsLoading || assets.length === 0}
-                      >
-                        {assets.map((asset) => (
-                          <option key={asset.id} value={asset.id}>
-                            {asset.symbol} · {asset.name}
-                          </option>
-                        ))}
-                      </select>
-                      {assetsLoading ? (
-                        <p className="text-xs text-muted-foreground">Loading assets…</p>
-                      ) : null}
-                      {assets.length === 0 && !assetsLoading ? (
-                        <p className="text-xs text-destructive">
+                    value={formState.assetId}
+                    onChange={(event) =>
+                      setFormState((previous) => ({ ...previous, assetId: event.target.value }))
+                    }
+                    disabled={assetsLoading || assets.length === 0}
+                  >
+                    {assets.map((asset) => (
+                      <option key={asset.id} value={asset.id}>
+                        {asset.symbol} · {asset.name}
+                      </option>
+                    ))}
+                  </select>
+                  <AddAssetButton
+                    className="pt-1"
+                    buttonVariant="outline"
+                    onCreated={(asset) => handleAssetCreated({ id: asset.id, symbol: asset.symbol, name: asset.name })}
+                  />
+                  {assetsLoading ? (
+                    <p className="text-xs text-muted-foreground">Loading assets…</p>
+                  ) : null}
+                  {assets.length === 0 && !assetsLoading ? (
+                    <p className="text-xs text-destructive">
                           No assets available. Add assets first to create positions.
                         </p>
                       ) : null}

@@ -128,4 +128,25 @@ class LatestPricesTest extends TestCase
         $this->assertDatabaseCount('price_bars', 3);
         $this->assertDatabaseHas('price_bars', ['date' => '2024-01-03']);
     }
+
+    public function test_asset_sync_skips_assets_with_price_sync_disabled(): void
+    {
+        $seedDir = database_path('seeders/data/test-disabled-sync');
+        if (!is_dir($seedDir)) {
+            mkdir($seedDir, 0755, true);
+        }
+        file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
+        config(['csv.seed_dir' => $seedDir]);
+
+        Asset::create([
+            'symbol' => 'AAA',
+            'name' => 'Asset AAA',
+            'sync_price' => false,
+        ]);
+
+        $this->artisan('asset:sync', ['--continue' => true, '--chk-date' => '2024-01-02'])
+            ->assertExitCode(0);
+
+        $this->assertDatabaseCount('price_bars', 0);
+    }
 }

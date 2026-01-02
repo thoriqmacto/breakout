@@ -56,6 +56,9 @@ class BrokerSummaryImporter
             }
 
             $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
+            if (!$asset->sync_broker_summary) {
+                continue;
+            }
             $timestamp = now();
             $payload = [];
 

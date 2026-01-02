@@ -33,6 +33,9 @@ class Asset extends Model {
         'listing_information' => 'array',
         'ticker_profile_payload' => 'array',
         'profile_synced_at' => 'datetime',
+        'sync_price' => 'boolean',
+        'sync_profile' => 'boolean',
+        'sync_broker_summary' => 'boolean',
     ];
 
     public function prices()

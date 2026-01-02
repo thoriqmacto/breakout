@@ -37,6 +37,9 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->whereNumber('asset')
         ->name('assets.metrics.show');
 
+    Route::post('assets/sync-settings', [AssetController::class, 'updateSyncSettings'])
+        ->name('assets.sync-settings');
+
     Route::apiResource('assets', AssetController::class);
 
     // Broker summary
