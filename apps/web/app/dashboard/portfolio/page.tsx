@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Edit, Loader2, RefreshCcw, Save, Trash2 } from "lucide-react"
+import { Edit, Loader2, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
@@ -84,16 +84,20 @@ const formatNullableNumber = (value?: number | null) => {
 
 export default function PortfolioPage() {
   const { accessToken } = useAuth()
+  const [portfolios, setPortfolios] = useState<PortfolioRecord[]>([])
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null)
   const [portfolio, setPortfolio] = useState<PortfolioRecord | null>(null)
   const [positions, setPositions] = useState<PositionRecord[]>([])
   const [assetSummaries, setAssetSummaries] = useState<PortfolioRecord["asset_summaries"]>([])
   const [assets, setAssets] = useState<AssetOption[]>([])
   const [loading, setLoading] = useState(false)
+  const [portfoliosLoading, setPortfoliosLoading] = useState(false)
   const [assetsLoading, setAssetsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [creatingPortfolio, setCreatingPortfolio] = useState(false)
   const [formState, setFormState] = useState<FormState>(emptyForm)
 
   useEffect(() => {
@@ -156,41 +160,51 @@ export default function PortfolioPage() {
       return
     }
 
-    const loadPortfolio = async () => {
+    let isCancelled = false
+
+    const loadPortfolios = async () => {
+      setPortfoliosLoading(true)
       setLoading(true)
       setError(null)
 
       try {
         const records = await fetchPortfolios(accessToken, { includePositions: true })
-        if (records.length === 0) {
-          const created = await createPortfolio(accessToken, {
-            name: "Primary Portfolio",
-            baseCcy: "IDR",
-            remarks: "Primary",
-            year: new Date().getFullYear(),
-          })
-          setPortfolio({ ...created, positions: [], asset_summaries: [] })
-          setPositions([])
-          setAssetSummaries([])
+        if (isCancelled) return
+        setPortfolios(records)
+        setSelectedPortfolioId((currentSelectedId) => {
+          if (records.length === 0) {
+            return null
+          }
+
+          if (currentSelectedId && records.some((item) => item.id === currentSelectedId)) {
+            return currentSelectedId
+          }
+
+          return records[0].id
+        })
+      } catch (cause) {
+        if (isCancelled) {
           return
         }
 
-        const primary = records[0]
-        setPortfolio(primary)
-        setPositions(primary.positions ?? [])
-        setAssetSummaries(primary.asset_summaries ?? [])
-      } catch (cause) {
         const message =
           cause instanceof Error && cause.message
             ? cause.message
             : "Unable to load portfolio data."
         setError(message)
       } finally {
-        setLoading(false)
+        if (!isCancelled) {
+          setPortfoliosLoading(false)
+          setLoading(false)
+        }
       }
     }
 
-    loadPortfolio()
+    loadPortfolios()
+
+    return () => {
+      isCancelled = true
+    }
   }, [accessToken])
 
   useEffect(() => {
@@ -203,6 +217,13 @@ export default function PortfolioPage() {
       assetId: String(assets[0].id),
     }))
   }, [assets, formState.assetId])
+
+  useEffect(() => {
+    const current = portfolios.find((item) => item.id === selectedPortfolioId) ?? null
+    setPortfolio(current ?? null)
+    setPositions(current?.positions ?? [])
+    setAssetSummaries(current?.asset_summaries ?? [])
+  }, [portfolios, selectedPortfolioId])
 
   const summary = useMemo<PortfolioSummary>(() => {
     const totalTrades = positions.length
@@ -345,7 +366,7 @@ export default function PortfolioPage() {
     }
   }
 
-  const refreshData = async () => {
+  const refreshData = async (preferredPortfolioId?: number) => {
     if (!accessToken) return
 
     setLoading(true)
@@ -353,15 +374,27 @@ export default function PortfolioPage() {
 
     try {
       const records = await fetchPortfolios(accessToken, { includePositions: true })
-      if (records.length > 0) {
-        setPortfolio(records[0])
-        setPositions(records[0].positions ?? [])
-        setAssetSummaries(records[0].asset_summaries ?? [])
-      } else {
+      setPortfolios(records)
+
+      if (records.length === 0) {
         setPortfolio(null)
         setPositions([])
         setAssetSummaries([])
+        setSelectedPortfolioId(null)
+        return
       }
+
+      const targetId = preferredPortfolioId && records.some((item) => item.id === preferredPortfolioId)
+        ? preferredPortfolioId
+        : selectedPortfolioId && records.some((item) => item.id === selectedPortfolioId)
+          ? selectedPortfolioId
+          : records[0].id
+
+      setSelectedPortfolioId(targetId)
+      const current = records.find((item) => item.id === targetId) ?? null
+      setPortfolio(current)
+      setPositions(current?.positions ?? [])
+      setAssetSummaries(current?.asset_summaries ?? [])
     } catch (cause) {
       const message =
         cause instanceof Error && cause.message
@@ -370,6 +403,36 @@ export default function PortfolioPage() {
       setError(message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCreatePortfolio = async () => {
+    if (!accessToken) {
+      setError("Sign in to create a portfolio.")
+      return
+    }
+
+    setCreatingPortfolio(true)
+    setError(null)
+
+    try {
+      const nextIndex = portfolios.length + 1
+      const created = await createPortfolio(accessToken, {
+        name: `Portfolio ${nextIndex}`,
+        baseCcy: "IDR",
+        remarks: "",
+        year: new Date().getFullYear(),
+      })
+
+      await refreshData(created.id)
+    } catch (cause) {
+      const message =
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Unable to create portfolio."
+      setError(message)
+    } finally {
+      setCreatingPortfolio(false)
     }
   }
 
@@ -391,396 +454,413 @@ export default function PortfolioPage() {
             Portfolio
           </div>
           <p className="text-sm text-muted-foreground">
-            Manage your live portfolio with data stored on the backend.
+            View all portfolios, then drill into one to manage trades and positions.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="button" variant="secondary" className="gap-2" onClick={refreshData} disabled={loading}>
+          <Button type="button" variant="secondary" className="gap-2" onClick={() => refreshData()} disabled={loading}>
             {loading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <RefreshCcw className="size-4" aria-hidden />}
             Refresh
           </Button>
+          <Button type="button" className="gap-2" onClick={handleCreatePortfolio} disabled={creatingPortfolio}>
+            {creatingPortfolio ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Plus className="size-4" aria-hidden />}
+            New portfolio
+          </Button>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Total trades</CardTitle>
-              <CardDescription>Entries and exits recorded.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.totalTrades}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Assets tracked</CardTitle>
-              <CardDescription>Unique assets in this portfolio.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{summary.uniqueAssets}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Entry value</CardTitle>
-              <CardDescription>Net of entry fees.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{formatIdr(summary.totalEntryValue)}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Realized P/L</CardTitle>
-              <CardDescription>Exit value minus entry value.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">{formatIdr(summary.realizedPl)}</CardContent>
-          </Card>
-        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{formState.positionId ? "Update trade" : "Add a trade"}</CardTitle>
-            <CardDescription>Record entries and exits with fees applied automatically.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="asset">
-                    Asset
-                  </label>
-                  <select
-                    id="asset"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={formState.assetId}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, assetId: event.target.value }))
-                    }
-                    disabled={assetsLoading || assets.length === 0}
-                  >
-                    {assets.map((asset) => (
-                      <option key={asset.id} value={asset.id}>
-                        {asset.symbol} · {asset.name}
-                      </option>
-                    ))}
-                  </select>
-                  {assetsLoading ? (
-                    <p className="text-xs text-muted-foreground">Loading assets…</p>
-                  ) : null}
-                  {assets.length === 0 && !assetsLoading ? (
-                    <p className="text-xs text-destructive">
-                      No assets available. Add assets first to create positions.
-                    </p>
-                  ) : null}
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="side">
-                    Side
-                  </label>
-                  <select
-                    id="side"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={formState.side}
-                    onChange={(event) =>
-                      setFormState((previous) => ({
-                        ...previous,
-                        side: event.target.value as FormState["side"],
-                      }))
-                    }
-                  >
-                    <option value="entry">Entry</option>
-                    <option value="exit">Exit</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="qty-shares">
-                    Quantity (shares)
-                  </label>
-                  <Input
-                    id="qty-shares"
-                    inputMode="decimal"
-                    value={formState.qtyShares}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, qtyShares: event.target.value }))
-                    }
-                    placeholder="1200"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="price">
-                    Execution price
-                  </label>
-                  <Input
-                    id="price"
-                    inputMode="decimal"
-                    value={formState.price}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, price: event.target.value }))
-                    }
-                    placeholder="8750"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="executed-at">
-                    Execution date
-                  </label>
-                  <Input
-                    id="executed-at"
-                    type="date"
-                    value={formState.executedAt}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, executedAt: event.target.value }))
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium" htmlFor="fee-rate">
-                    Trading fee (%)
-                  </label>
-                  <Input
-                    id="fee-rate"
-                    inputMode="decimal"
-                    value={formState.feeRate}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, feeRate: event.target.value }))
-                    }
-                    placeholder="0.2"
-                  />
-                  <p className="text-xs text-muted-foreground">Fees increase entry prices and reduce exit prices.</p>
-                </div>
-              </div>
-
-              {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
-
-              <div className="flex flex-wrap items-center gap-3">
-                <Button type="submit" className="gap-2" disabled={saving || assets.length === 0}>
-                  {saving ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Save className="size-4" aria-hidden />}
-                  {formState.positionId ? "Save changes" : "Add position"}
-                </Button>
-                {formState.positionId ? (
-                  <Button type="button" variant="ghost" onClick={resetForm} className="gap-2">
-                    <RefreshCcw className="size-4" aria-hidden />
-                    Cancel edit
-                  </Button>
-                ) : null}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card className="space-y-4">
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle>Trades</CardTitle>
-              <CardDescription>View and manage executed entries and exits.</CardDescription>
-            </div>
-            {loading ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-                Loading…
-              </div>
-            ) : null}
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {sortedPositions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No trades yet. Add one to get started.</p>
-            ) : (
-              sortedPositions.map((position) => {
-                const assetLabel = position.asset
-                  ? `${position.asset.symbol} · ${position.asset.name}`
-                  : `Asset #${position.asset_id}`
-                const tradeValue = position.value ?? position.qty_shares * position.avg_price
-
-                return (
-                  <div
-                    key={position.id}
-                    className="rounded-md border bg-background/80 p-3 shadow-sm transition hover:border-primary/50"
-                  >
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-base font-semibold leading-tight">{assetLabel}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {position.executed_at ? new Date(position.executed_at).toLocaleDateString() : "—"} ·{" "}
-                          {position.side === "exit" ? "Exit" : "Entry"}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEdit(position)}>
-                          <Edit className="size-4" aria-hidden />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-1 text-destructive hover:text-destructive"
-                          onClick={() => handleDelete(position)}
-                          disabled={deletingId === position.id}
-                        >
-                          {deletingId === position.id ? (
-                            <Loader2 className="size-4 animate-spin" aria-hidden />
-                          ) : (
-                            <Trash2 className="size-4" aria-hidden />
-                          )}
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-
-                    <dl className="mt-3 grid gap-3 sm:grid-cols-4">
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Side</dt>
-                        <dd className="font-medium capitalize">{position.side}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Quantity</dt>
-                        <dd className="font-medium">{position.qty_shares.toLocaleString("en-US")}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Execution price</dt>
-                        <dd className="font-medium">{formatIdr(position.price)}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Net price (incl. fee)</dt>
-                        <dd className="font-medium">{formatIdr(position.avg_price)}</dd>
-                      </div>
-                    </dl>
-
-                    <dl className="mt-3 grid gap-3 sm:grid-cols-3">
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Trading fee</dt>
-                        <dd className="font-medium">{position.fee_rate.toLocaleString("en-US", { maximumFractionDigits: 4 })}%</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Fee value</dt>
-                        <dd className="font-medium">{formatIdr(position.fee_value)}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs uppercase text-muted-foreground">Trade value</dt>
-                        <dd className="font-medium">{formatIdr(tradeValue)}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                )
-              })
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="space-y-4">
+      <Card>
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Portfolio assets</CardTitle>
-            <CardDescription>
-              Unique assets with consolidated entry and exit summaries{portfolio?.year ? ` for ${portfolio.year}` : ""}.
-            </CardDescription>
+            <CardTitle>Portfolios</CardTitle>
+            <CardDescription>Choose a portfolio to view its assets and trades.</CardDescription>
           </div>
-          {portfolio?.remarks ? (
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              {portfolio.remarks}
-            </span>
+          {portfoliosLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+              Loading…
+            </div>
           ) : null}
         </CardHeader>
-        <CardContent className="space-y-3">
-          {assetSummaries && assetSummaries.length > 0 ? (
-            assetSummaries.map((summary, index) => {
-              const label = summary.asset
-                ? `${summary.asset.symbol} · ${summary.asset.name}`
-                : "Unspecified asset"
-              const key = summary.asset?.id ?? `asset-${index}`
-              const plTone =
-                summary.exit.pl_flag === "profit"
-                  ? "text-emerald-600 bg-emerald-50"
-                  : summary.exit.pl_flag === "loss"
-                    ? "text-destructive bg-destructive/10"
-                    : "text-muted-foreground bg-muted"
-
-              return (
-                <div key={key} className="rounded-md border bg-background/80 p-3 shadow-sm">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-base font-semibold leading-tight">{label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Entry value {formatNullableIdr(summary.entry.value)} · Exit value{" "}
-                        {formatNullableIdr(summary.exit.value)}
-                      </p>
-                    </div>
-                    <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${plTone}`}>
-                      {summary.exit.pl_flag}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-md border bg-muted/20 p-3">
-                      <p className="text-xs font-semibold uppercase text-muted-foreground">Entry summary</p>
-                      <dl className="mt-2 space-y-2 text-sm">
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Min / Max price</dt>
-                          <dd className="font-medium">
-                            {formatNullableIdr(summary.entry.min_price)} / {formatNullableIdr(summary.entry.max_price)}
-                          </dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Total shares</dt>
-                          <dd className="font-medium">{summary.entry.total_shares.toLocaleString("en-US")}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Average price</dt>
-                          <dd className="font-medium">{formatNullableIdr(summary.entry.average_price)}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Entry value</dt>
-                          <dd className="font-medium">{formatNullableIdr(summary.entry.value)}</dd>
-                        </div>
-                      </dl>
-                    </div>
-                    <div className="rounded-md border bg-muted/20 p-3">
-                      <p className="text-xs font-semibold uppercase text-muted-foreground">Exit summary</p>
-                      <dl className="mt-2 space-y-2 text-sm">
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Min / Max price</dt>
-                          <dd className="font-medium">
-                            {formatNullableIdr(summary.exit.min_price)} / {formatNullableIdr(summary.exit.max_price)}
-                          </dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Total shares</dt>
-                          <dd className="font-medium">{summary.exit.total_shares.toLocaleString("en-US")}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Average price</dt>
-                          <dd className="font-medium">{formatNullableIdr(summary.exit.average_price)}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Exit value</dt>
-                          <dd className="font-medium">{formatNullableIdr(summary.exit.value)}</dd>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">P/L</dt>
-                          <dd className="font-medium">
-                            {formatNullableIdr(summary.exit.pl_value)}{" "}
-                            <span className="text-xs text-muted-foreground">
-                              ({formatNullableNumber(summary.exit.pl_percent)}%)
-                            </span>
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </div>
-                </div>
-              )
-            })
+        <CardContent>
+          {portfolios.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No portfolios found. Create one to get started.</p>
           ) : (
-            <p className="text-sm text-muted-foreground">No asset-level summaries yet.</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs uppercase text-muted-foreground">
+                    <th className="px-3 py-2 font-medium">Name</th>
+                    <th className="px-3 py-2 font-medium">Base CCY</th>
+                    <th className="px-3 py-2 font-medium">Year</th>
+                    <th className="px-3 py-2 font-medium">Assets</th>
+                    <th className="px-3 py-2 font-medium">Trades</th>
+                    <th className="px-3 py-2 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {portfolios.map((item) => {
+                    const isSelected = item.id === selectedPortfolioId
+                    const tradesCount = item.positions?.length ?? item.positions_count ?? 0
+                    const assetsCount = item.asset_summaries?.length ?? 0
+
+                    return (
+                      <tr key={item.id} className={`border-b ${isSelected ? "bg-primary/5" : ""}`}>
+                        <td className="px-3 py-2 text-sm font-medium">
+                          <div>{item.name}</div>
+                          {item.remarks ? (
+                            <p className="text-xs text-muted-foreground">{item.remarks}</p>
+                          ) : null}
+                        </td>
+                        <td className="px-3 py-2 text-sm">{item.base_ccy}</td>
+                        <td className="px-3 py-2 text-sm">{item.year ?? "—"}</td>
+                        <td className="px-3 py-2 text-sm">{assetsCount}</td>
+                        <td className="px-3 py-2 text-sm">{tradesCount}</td>
+                        <td className="px-3 py-2 text-right">
+                          <Button
+                            variant={isSelected ? "secondary" : "outline"}
+                            size="sm"
+                            onClick={() => setSelectedPortfolioId(item.id)}
+                            disabled={loading}
+                          >
+                            {isSelected ? "Selected" : "View details"}
+                          </Button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
+
+      {portfolio ? (
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Total trades</CardTitle>
+                <CardDescription>Entries and exits recorded.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-2xl font-semibold">{summary.totalTrades}</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Assets tracked</CardTitle>
+                <CardDescription>Unique assets in this portfolio.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-2xl font-semibold">{summary.uniqueAssets}</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Entry value</CardTitle>
+                <CardDescription>Net of entry fees.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-2xl font-semibold">{formatIdr(summary.totalEntryValue)}</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Realized P/L</CardTitle>
+                <CardDescription>Exit value minus entry value.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-2xl font-semibold">{formatIdr(summary.realizedPl)}</CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Portfolio assets</CardTitle>
+                <CardDescription>
+                  Unique assets with consolidated entry and exit summaries{portfolio.year ? ` for ${portfolio.year}` : ""}.
+                </CardDescription>
+              </div>
+              {portfolio.remarks ? (
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  {portfolio.remarks}
+                </span>
+              ) : null}
+            </CardHeader>
+            <CardContent>
+              {assetSummaries && assetSummaries.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs uppercase text-muted-foreground">
+                        <th className="px-3 py-2 font-medium">Asset</th>
+                        <th className="px-3 py-2 font-medium text-right">Entry shares</th>
+                        <th className="px-3 py-2 font-medium text-right">Entry value</th>
+                        <th className="px-3 py-2 font-medium text-right">Exit shares</th>
+                        <th className="px-3 py-2 font-medium text-right">Exit value</th>
+                        <th className="px-3 py-2 font-medium text-right">P/L</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assetSummaries.map((item, index) => {
+                        const label = item.asset
+                          ? `${item.asset.symbol} · ${item.asset.name}`
+                          : "Unspecified asset"
+                        const key = item.asset?.id ?? `asset-${index}`
+
+                        return (
+                          <tr key={key} className="border-b">
+                            <td className="px-3 py-2 text-sm font-medium">
+                              <div>{label}</div>
+                              <p className="text-xs text-muted-foreground">
+                                Min/Max {formatNullableIdr(item.entry.min_price)} / {formatNullableIdr(item.entry.max_price)}
+                              </p>
+                            </td>
+                            <td className="px-3 py-2 text-right text-sm">{item.entry.total_shares.toLocaleString("en-US")}</td>
+                            <td className="px-3 py-2 text-right text-sm">{formatNullableIdr(item.entry.value)}</td>
+                            <td className="px-3 py-2 text-right text-sm">{item.exit.total_shares.toLocaleString("en-US")}</td>
+                            <td className="px-3 py-2 text-right text-sm">{formatNullableIdr(item.exit.value)}</td>
+                            <td className="px-3 py-2 text-right text-sm">
+                              <div className="font-medium">{formatNullableIdr(item.exit.pl_value)}</div>
+                              <div className="text-xs text-muted-foreground">{formatNullableNumber(item.exit.pl_percent)}%</div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No asset-level summaries yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="space-y-4">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Trades</CardTitle>
+                <CardDescription>View, add, and edit executed entries and exits.</CardDescription>
+              </div>
+              {loading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  Updating…
+                </div>
+              ) : null}
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-md border bg-muted/30 p-4">
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="asset">
+                        Asset
+                      </label>
+                      <select
+                        id="asset"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={formState.assetId}
+                        onChange={(event) =>
+                          setFormState((previous) => ({ ...previous, assetId: event.target.value }))
+                        }
+                        disabled={assetsLoading || assets.length === 0}
+                      >
+                        {assets.map((asset) => (
+                          <option key={asset.id} value={asset.id}>
+                            {asset.symbol} · {asset.name}
+                          </option>
+                        ))}
+                      </select>
+                      {assetsLoading ? (
+                        <p className="text-xs text-muted-foreground">Loading assets…</p>
+                      ) : null}
+                      {assets.length === 0 && !assetsLoading ? (
+                        <p className="text-xs text-destructive">
+                          No assets available. Add assets first to create positions.
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="side">
+                        Side
+                      </label>
+                      <select
+                        id="side"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={formState.side}
+                        onChange={(event) =>
+                          setFormState((previous) => ({
+                            ...previous,
+                            side: event.target.value as FormState["side"],
+                          }))
+                        }
+                      >
+                        <option value="entry">Entry</option>
+                        <option value="exit">Exit</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="qty-shares">
+                        Quantity (shares)
+                      </label>
+                      <Input
+                        id="qty-shares"
+                        inputMode="decimal"
+                        value={formState.qtyShares}
+                        onChange={(event) =>
+                          setFormState((previous) => ({ ...previous, qtyShares: event.target.value }))
+                        }
+                        placeholder="1200"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="price">
+                        Execution price
+                      </label>
+                      <Input
+                        id="price"
+                        inputMode="decimal"
+                        value={formState.price}
+                        onChange={(event) =>
+                          setFormState((previous) => ({ ...previous, price: event.target.value }))
+                        }
+                        placeholder="8750"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="executed-at">
+                        Execution date
+                      </label>
+                      <Input
+                        id="executed-at"
+                        type="date"
+                        value={formState.executedAt}
+                        onChange={(event) =>
+                          setFormState((previous) => ({ ...previous, executedAt: event.target.value }))
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="fee-rate">
+                        Trading fee (%)
+                      </label>
+                      <Input
+                        id="fee-rate"
+                        inputMode="decimal"
+                        value={formState.feeRate}
+                        onChange={(event) =>
+                          setFormState((previous) => ({ ...previous, feeRate: event.target.value }))
+                        }
+                        placeholder="0.2"
+                      />
+                      <p className="text-xs text-muted-foreground">Fees increase entry prices and reduce exit prices.</p>
+                    </div>
+                  </div>
+
+                  {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button type="submit" className="gap-2" disabled={saving || assets.length === 0}>
+                      {saving ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Save className="size-4" aria-hidden />}
+                      {formState.positionId ? "Save changes" : "Add position"}
+                    </Button>
+                    {formState.positionId ? (
+                      <Button type="button" variant="ghost" onClick={resetForm} className="gap-2">
+                        <RefreshCcw className="size-4" aria-hidden />
+                        Cancel edit
+                      </Button>
+                    ) : null}
+                  </div>
+                </form>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-xs uppercase text-muted-foreground">
+                      <th className="px-3 py-2 font-medium">Date</th>
+                      <th className="px-3 py-2 font-medium">Asset</th>
+                      <th className="px-3 py-2 font-medium">Side</th>
+                      <th className="px-3 py-2 font-medium text-right">Quantity</th>
+                      <th className="px-3 py-2 font-medium text-right">Execution price</th>
+                      <th className="px-3 py-2 font-medium text-right">Fee (%)</th>
+                      <th className="px-3 py-2 font-medium text-right">Net price</th>
+                      <th className="px-3 py-2 font-medium text-right">Trade value</th>
+                      <th className="px-3 py-2 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedPositions.length === 0 ? (
+                      <tr>
+                        <td className="px-3 py-4 text-sm text-muted-foreground" colSpan={9}>
+                          No trades yet. Add one to get started.
+                        </td>
+                      </tr>
+                    ) : (
+                      sortedPositions.map((position) => {
+                        const assetLabel = position.asset
+                          ? `${position.asset.symbol} · ${position.asset.name}`
+                          : `Asset #${position.asset_id}`
+                        const tradeValue = position.value ?? position.qty_shares * position.avg_price
+
+                        return (
+                          <tr key={position.id} className="border-b">
+                            <td className="px-3 py-2 text-sm">
+                              {position.executed_at ? new Date(position.executed_at).toLocaleDateString() : "—"}
+                            </td>
+                            <td className="px-3 py-2 text-sm font-medium">{assetLabel}</td>
+                            <td className="px-3 py-2 text-sm capitalize">{position.side}</td>
+                            <td className="px-3 py-2 text-right text-sm">{position.qty_shares.toLocaleString("en-US")}</td>
+                            <td className="px-3 py-2 text-right text-sm">{formatIdr(position.price)}</td>
+                            <td className="px-3 py-2 text-right text-sm">{position.fee_rate.toLocaleString("en-US", { maximumFractionDigits: 4 })}%</td>
+                            <td className="px-3 py-2 text-right text-sm">{formatIdr(position.avg_price)}</td>
+                            <td className="px-3 py-2 text-right text-sm">{formatIdr(tradeValue)}</td>
+                            <td className="px-3 py-2 text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button variant="secondary" size="sm" className="gap-1" onClick={() => startEdit(position)}>
+                                  <Edit className="size-4" aria-hidden />
+                                  Edit
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="gap-1 text-destructive hover:text-destructive"
+                                  onClick={() => handleDelete(position)}
+                                  disabled={deletingId === position.id}
+                                >
+                                  {deletingId === position.id ? (
+                                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                                  ) : (
+                                    <Trash2 className="size-4" aria-hidden />
+                                  )}
+                                  Remove
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="py-6 text-sm text-muted-foreground">
+            Select a portfolio above to view its details and manage trades.
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
