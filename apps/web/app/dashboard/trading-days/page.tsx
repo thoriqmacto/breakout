@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { AddAssetButton } from "@/components/add-asset-button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { cn } from "@/lib/utils"
 import { ArrowDown, ArrowUp } from "lucide-react"
@@ -681,6 +682,11 @@ export default function TradingDaysPage() {
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
+            <AddAssetButton
+              buttonVariant="outline"
+              buttonSize="sm"
+              onCreated={refreshTradingDays}
+            />
             <Button type="button" variant="outline" size="sm" onClick={refreshTradingDays} disabled={loading}>
               Refresh data
             </Button>

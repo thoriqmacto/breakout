@@ -11,9 +11,15 @@ class AssetList
      *
      * @return array<int, string>
      */
-    public static function symbols(): array
+    public static function symbols(bool $onlyPriceSync = false): array
     {
-        return Asset::query()
+        $query = Asset::query();
+
+        if ($onlyPriceSync) {
+            $query->where('sync_price', true);
+        }
+
+        return $query
             ->orderBy('symbol')
             ->pluck('symbol')
             ->map(fn ($symbol) => strtoupper((string) $symbol))

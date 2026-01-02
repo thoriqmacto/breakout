@@ -58,7 +58,21 @@ class AssetSync extends Command
             $this->input->setOption('chk-date', $eodDate);
         }
 
-        $indexSymbols = AssetList::symbols();
+        $assetSettings = Asset::query()
+            ->orderBy('symbol')
+            ->get(['id', 'symbol', 'sync_price', 'sync_profile'])
+            ->keyBy(fn ($asset) => strtoupper((string) $asset->symbol));
+
+        $shouldSyncProfile = static function (string $symbol) use ($assetSettings): bool {
+            $asset = $assetSettings->get(strtoupper($symbol));
+            if (!$asset) {
+                return true;
+            }
+
+            return (bool) $asset->sync_profile;
+        };
+
+        $indexSymbols = AssetList::symbols(true);
         $seedDir = config('csv.seed_dir');
 
         // Collect CSV files available in seed directory
@@ -74,7 +88,7 @@ class AssetSync extends Command
             $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
             $to = Carbon::now()->toDateString();
             foreach ($missing as $sym) {
-                if ($this->fetchWithStockbit($sym, $from, $to, false)) {
+                if ($this->fetchWithStockbit($sym, $from, $to, !$shouldSyncProfile($sym))) {
                     $this->info("Stockbit CSV backfill complete for {$sym}.");
                 }
             }
@@ -183,7 +197,7 @@ class AssetSync extends Command
                 $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
                 $to = Carbon::now()->toDateString();
 
-                if (!$this->fetchWithStockbit($symbol, $from, $to, false)) {
+                if (!$this->fetchWithStockbit($symbol, $from, $to, !$shouldSyncProfile($symbol))) {
                     $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt. Python fallback will be used if available.");
                 }
 
@@ -252,7 +266,7 @@ class AssetSync extends Command
             if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
                 $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
                 $end    = $chkLatest ?: now()->toDateString();
-                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, false);
+                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, !$shouldSyncProfile($symbol));
                 $csvRows = CsvBars::read($csvPath);
                 $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 

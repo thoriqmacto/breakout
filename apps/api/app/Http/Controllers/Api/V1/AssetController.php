@@ -108,6 +108,40 @@ class AssetController extends ApiController
         ]);
     }
 
+    public function updateSyncSettings(Request $request)
+    {
+        $payload = $request->validate([
+            'assets' => 'required|array',
+            'assets.*.id' => 'required|integer|exists:assets,id',
+            'assets.*.sync_price' => 'required|boolean',
+            'assets.*.sync_profile' => 'required|boolean',
+            'assets.*.sync_broker_summary' => 'required|boolean',
+        ]);
+
+        $assetsPayload = $payload['assets'] ?? [];
+        $updatedAssets = [];
+
+        foreach ($assetsPayload as $row) {
+            $asset = Asset::find($row['id']);
+            if (!$asset) {
+                continue;
+            }
+
+            $asset->update([
+                'sync_price' => (bool) $row['sync_price'],
+                'sync_profile' => (bool) $row['sync_profile'],
+                'sync_broker_summary' => (bool) $row['sync_broker_summary'],
+            ]);
+
+            $updatedAssets[] = AssetResource::make($asset->fresh());
+        }
+
+        return ApiResponse::success(
+            ['assets' => $updatedAssets],
+            'Asset sync settings updated.'
+        );
+    }
+
     public function updateMetrics()
     {
         $updates = 0;
@@ -203,7 +237,16 @@ class AssetController extends ApiController
             'name' => 'required|string',
             'lot_size' => 'nullable|numeric',
             'tick_size' => 'nullable|numeric',
+            'sync_price' => 'sometimes|boolean',
+            'sync_profile' => 'sometimes|boolean',
+            'sync_broker_summary' => 'sometimes|boolean',
         ]);
+
+        foreach (['sync_price', 'sync_profile', 'sync_broker_summary'] as $flag) {
+            if ($request->has($flag)) {
+                $data[$flag] = $request->boolean($flag);
+            }
+        }
 
         $asset = Asset::create($data);
 
@@ -247,7 +290,16 @@ class AssetController extends ApiController
             'name' => 'sometimes|required|string',
             'lot_size' => 'nullable|numeric',
             'tick_size' => 'nullable|numeric',
+            'sync_price' => 'sometimes|boolean',
+            'sync_profile' => 'sometimes|boolean',
+            'sync_broker_summary' => 'sometimes|boolean',
         ]);
+
+        foreach (['sync_price', 'sync_profile', 'sync_broker_summary'] as $flag) {
+            if ($request->has($flag)) {
+                $data[$flag] = $request->boolean($flag);
+            }
+        }
 
         $asset->update($data);
 
