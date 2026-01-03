@@ -1,0 +1,628 @@
+{
+    "symbol": "ARCI",
+    "name": "Archi Indonesia Tbk",
+    "address": [
+        {
+            "id": "1000003352",
+            "email": [
+                "corsec@archimining.com"
+            ],
+            "fax": "+62 21 576 1720",
+            "npwp": "03.088.742.6-063.000",
+            "phone": "+62 21 576 1719",
+            "website": "www.archiindonesia.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:41+07:00",
+            "value": "<td colspan='4'>Menara Rajawali, Lantai 19\nJl. DR Ide Anak Agung Gde Agung Lot #5.1\nKawasan Mega Kuningan\nJakarta Selatan 12950, Indonesia\n\n        \t\t  \t\t\tPhone: +62 21 576 1719\n        \t\t  \t\t\tFax: +62 21 576 1720\n                            NPWP: 03.088.742.6-063.000\n        \t\t  \t\t\tEmail: corsec@archimining.com\n        \t\t  \t\t\tWebsite: www.archiindonesia.com\n\n        \t  \t\t\t</td>",
+            "office": "Menara Rajawali, Lantai 19 Jl. DR Ide Anak Agung Gde Agung Lot #5.1 Kawasan Mega Kuningan Jakarta Selatan 12950, Indonesia"
+        }
+    ],
+    "background": "Archi Indonesia Tbk. (ARCI) telah menjadi salah satu produsen emas terbesar di Indonesia dan Asia Tenggara. Sejak berdiri tahun 2010, saat ini ARCI telah mampu melakukan pemrosesan lebih dari 8 ton emas per tahun.\n\nARCI memiliki sejarah panjang yang membanggakan dalam pelaksanaan eksplorasi, penemuan, pengembangan, dan kegiatan operasional. Setahun setelah resmi berdiri, ARCI melakukan penuangan emas pertama di Proyek Toka Tidung, di bawah PT Meares Soputan Mining (MSM) dan PT Tondano Nusajaya (TTN). Pada tahun 2014, ARCI memegang 100% saham MSM dan TTN melalui akuisisi Archipelago Resources Pte Ltd dari Archipelago Resources Plc.\n\nMelalui Proyek Toka, ARCI mengelola tambang terbuka untuk mineral emas dan perak berskala menengah di Minahasa Utara dan Bitung, Sulawesi Utara, Indonesia. Dalam keberlangsungannya, Proyek Toka mengedepankan efisiensi biaya tinggi dan kegiatan operasional yang berkelanjutan.\n\nKeberhasilan ARCI dari waktu ke waktu tidak lepas dari kehadiran tim manajemen dan teknisi senior perusahaan yang memiliki pengalaman luas di industri eksplorasi dan produksi emas serta mineral. Pemegang saham kami, PT Rajawali Corpora, juga telah berperan besar dalam pertumbuhan dan perkembangan ARCI sejak tahun 2009. Rajawali telah membantu ARCI dalam menjalin hubungan baik dengan pemangku kebijakan, hingga Proyek Toka berproduksi di waktu yang tepat.\n\nKeberlangsungan bisnis kami selalu menjunjung tinggi tata kelola perusahaan yang baik serta Keselamatan dan Kesehatan Kerja. Kami turut berkontribusi terhadap pengelolaan lingkungan dan pengembangan masyarakat di sekitar wilayah operasional ARCI.\n\nARCI juga terus melakukan ekspansi bisnis, dengan memperkenalkan Lotus Archi (PT Elang Mulia Abadi Sempurna) sebagai usaha hilir, melengkapi barisan luar biasa dari anak perusahaan lainnya: PT Karya Kreasi Mulia, PT Jasa Pertambangan Perkasa, dan PT Geopersada Mulia Abadi. Ekspansi bisnis baru ini sejalan dengan visi dari ARCI, untuk menjadi perusahaan pertambangan emas terintegrasi di Asia Tenggara.\n",
+    "history": {
+        "amount": "2,794 B",
+        "board": "Papan Pengembangan",
+        "date": "28 Jun 2021",
+        "price": "750",
+        "registrar": "",
+        "shares": "3,725,250,000",
+        "underwriters": [
+            "PT. UOB Kay Hian Sekuritas",
+            "PT. Credit Suisse Sekuritas Indonesia",
+            "PT. Citigroup Sekuritas Indonesia",
+            "PT. Mandiri Sekuritas",
+            "PT. BNI Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "15.08%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13833879",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Abed Nego"
+            }
+        ],
+        "director": [
+            {
+                "id": "13833876",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Hidayat Dwiputro Sulaksono "
+            },
+            {
+                "id": "13833875",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Christian Emanuel David Sompie"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13833882",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Jhoni Ginting "
+            },
+            {
+                "id": "13833881",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Hamid Awaluddin"
+            },
+            {
+                "id": "13833880",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Dr. Ir. Bambang Setiawan"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13833877",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Kenneth Ronald Kennedy Crichton "
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13833874",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Rudy Suhendra"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [
+            {
+                "id": "13833878",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2025-07-09T09:36:47+07:00",
+                "value": "Rizki Indrakusuma "
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12536625",
+            "key": "",
+            "lastupdate": "2021-12-28T14:03:41+07:00",
+            "value": "{\"name\":\"Harry Margatan Sopandi\",\"phone\":\"+62 21 576 1719\",\"email\":\"corsec@archimining.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "72.983%",
+            "name": "PT RAJAWALI CORPORA",
+            "value": "18.14 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "15.08%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "3.75 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "11.937%",
+            "name": "PT RAJAWALI KAPITAL EMAS",
+            "value": "2.97 B",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "Archipelago Resources Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "9062702"
+        },
+        {
+            "company": "PT Meares Soputan Mining",
+            "percentage": "100%",
+            "types": "Pertambangan emas",
+            "value": "364510093"
+        },
+        {
+            "company": "PT Tambang Tondano Nusajaya",
+            "percentage": "100%",
+            "types": "Pertambangan emas",
+            "value": "258785221"
+        },
+        {
+            "company": "PT Karya Kreasi Mulia",
+            "percentage": "99.00%",
+            "types": "Jasa tambang",
+            "value": "2746293"
+        },
+        {
+            "company": "PT Elang Mulia Abadi Sempurna",
+            "percentage": "51.00%",
+            "types": "Perdagangan dan pengolahan emas",
+            "value": "4295403"
+        },
+        {
+            "company": "PT Jasa Pertambangan Perkasa",
+            "percentage": "99.00%",
+            "types": "Jasa tambang",
+            "value": "263045"
+        },
+        {
+            "company": "Archipelago Resources Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "9062702"
+        },
+        {
+            "company": "PT Meares Soputan Mining",
+            "percentage": "100%",
+            "types": "Pertambangan emas",
+            "value": "364510093"
+        },
+        {
+            "company": "PT Tambang Tondano Nusajaya",
+            "percentage": "100%",
+            "types": "Pertambangan emas",
+            "value": "258785221"
+        },
+        {
+            "company": "PT Karya Kreasi Mulia",
+            "percentage": "99.00%",
+            "types": "Jasa tambang",
+            "value": "2746293"
+        },
+        {
+            "company": "PT Elang Mulia Abadi Sempurna",
+            "percentage": "51.00%",
+            "types": "Perdagangan dan pengolahan emas",
+            "value": "4295403"
+        },
+        {
+            "company": "PT Jasa Pertambangan Perkasa",
+            "percentage": "99.00%",
+            "types": "Jasa tambang",
+            "value": "263045"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "30 Nov 2025",
+            "total_share": "44,339",
+            "change": 4979,
+            "change_formatted": "(+4,979)"
+        },
+        {
+            "shareholder_date": "31 Oct 2025",
+            "total_share": "39,358",
+            "change": 22149,
+            "change_formatted": "(+22,149)"
+        },
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "17,209",
+            "change": 5390,
+            "change_formatted": "(+5,390)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "11,819",
+            "change": 700,
+            "change_formatted": "(+700)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "11,119",
+            "change": 210,
+            "change_formatted": "(+210)"
+        },
+        {
+            "shareholder_date": "30 Jun 2025",
+            "total_share": "10,909",
+            "change": 1076,
+            "change_formatted": "(+1,076)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2021-06-28T00:00:00+07:00",
+    "ipo_price": 750,
+    "float": 15.08,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000003352",
+                "email": [
+                    "corsec@archimining.com"
+                ],
+                "fax": "+62 21 576 1720",
+                "npwp": "03.088.742.6-063.000",
+                "phone": "+62 21 576 1719",
+                "website": "www.archiindonesia.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:41+07:00",
+                "value": "<td colspan='4'>Menara Rajawali, Lantai 19\nJl. DR Ide Anak Agung Gde Agung Lot #5.1\nKawasan Mega Kuningan\nJakarta Selatan 12950, Indonesia\n\n        \t\t  \t\t\tPhone: +62 21 576 1719\n        \t\t  \t\t\tFax: +62 21 576 1720\n                            NPWP: 03.088.742.6-063.000\n        \t\t  \t\t\tEmail: corsec@archimining.com\n        \t\t  \t\t\tWebsite: www.archiindonesia.com\n\n        \t  \t\t\t</td>",
+                "office": "Menara Rajawali, Lantai 19 Jl. DR Ide Anak Agung Gde Agung Lot #5.1 Kawasan Mega Kuningan Jakarta Selatan 12950, Indonesia"
+            }
+        ],
+        "background": "Archi Indonesia Tbk. (ARCI) telah menjadi salah satu produsen emas terbesar di Indonesia dan Asia Tenggara. Sejak berdiri tahun 2010, saat ini ARCI telah mampu melakukan pemrosesan lebih dari 8 ton emas per tahun.\n\nARCI memiliki sejarah panjang yang membanggakan dalam pelaksanaan eksplorasi, penemuan, pengembangan, dan kegiatan operasional. Setahun setelah resmi berdiri, ARCI melakukan penuangan emas pertama di Proyek Toka Tidung, di bawah PT Meares Soputan Mining (MSM) dan PT Tondano Nusajaya (TTN). Pada tahun 2014, ARCI memegang 100% saham MSM dan TTN melalui akuisisi Archipelago Resources Pte Ltd dari Archipelago Resources Plc.\n\nMelalui Proyek Toka, ARCI mengelola tambang terbuka untuk mineral emas dan perak berskala menengah di Minahasa Utara dan Bitung, Sulawesi Utara, Indonesia. Dalam keberlangsungannya, Proyek Toka mengedepankan efisiensi biaya tinggi dan kegiatan operasional yang berkelanjutan.\n\nKeberhasilan ARCI dari waktu ke waktu tidak lepas dari kehadiran tim manajemen dan teknisi senior perusahaan yang memiliki pengalaman luas di industri eksplorasi dan produksi emas serta mineral. Pemegang saham kami, PT Rajawali Corpora, juga telah berperan besar dalam pertumbuhan dan perkembangan ARCI sejak tahun 2009. Rajawali telah membantu ARCI dalam menjalin hubungan baik dengan pemangku kebijakan, hingga Proyek Toka berproduksi di waktu yang tepat.\n\nKeberlangsungan bisnis kami selalu menjunjung tinggi tata kelola perusahaan yang baik serta Keselamatan dan Kesehatan Kerja. Kami turut berkontribusi terhadap pengelolaan lingkungan dan pengembangan masyarakat di sekitar wilayah operasional ARCI.\n\nARCI juga terus melakukan ekspansi bisnis, dengan memperkenalkan Lotus Archi (PT Elang Mulia Abadi Sempurna) sebagai usaha hilir, melengkapi barisan luar biasa dari anak perusahaan lainnya: PT Karya Kreasi Mulia, PT Jasa Pertambangan Perkasa, dan PT Geopersada Mulia Abadi. Ekspansi bisnis baru ini sejalan dengan visi dari ARCI, untuk menjadi perusahaan pertambangan emas terintegrasi di Asia Tenggara.\n",
+        "history": {
+            "amount": "2,794 B",
+            "board": "Papan Pengembangan",
+            "date": "28 Jun 2021",
+            "price": "750",
+            "registrar": "",
+            "shares": "3,725,250,000",
+            "underwriters": [
+                "PT. UOB Kay Hian Sekuritas",
+                "PT. Credit Suisse Sekuritas Indonesia",
+                "PT. Citigroup Sekuritas Indonesia",
+                "PT. Mandiri Sekuritas",
+                "PT. BNI Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "15.08%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13833879",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Abed Nego"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13833876",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Hidayat Dwiputro Sulaksono "
+                },
+                {
+                    "id": "13833875",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Christian Emanuel David Sompie"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13833882",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Jhoni Ginting "
+                },
+                {
+                    "id": "13833881",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Hamid Awaluddin"
+                },
+                {
+                    "id": "13833880",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Dr. Ir. Bambang Setiawan"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13833877",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Kenneth Ronald Kennedy Crichton "
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13833874",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Rudy Suhendra"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [
+                {
+                    "id": "13833878",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2025-07-09T09:36:47+07:00",
+                    "value": "Rizki Indrakusuma "
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12536625",
+                "key": "",
+                "lastupdate": "2021-12-28T14:03:41+07:00",
+                "value": "{\"name\":\"Harry Margatan Sopandi\",\"phone\":\"+62 21 576 1719\",\"email\":\"corsec@archimining.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "72.983%",
+                "name": "PT RAJAWALI CORPORA",
+                "value": "18.14 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "15.08%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "3.75 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "11.937%",
+                "name": "PT RAJAWALI KAPITAL EMAS",
+                "value": "2.97 B",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "Archipelago Resources Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "9062702"
+            },
+            {
+                "company": "PT Meares Soputan Mining",
+                "percentage": "100%",
+                "types": "Pertambangan emas",
+                "value": "364510093"
+            },
+            {
+                "company": "PT Tambang Tondano Nusajaya",
+                "percentage": "100%",
+                "types": "Pertambangan emas",
+                "value": "258785221"
+            },
+            {
+                "company": "PT Karya Kreasi Mulia",
+                "percentage": "99.00%",
+                "types": "Jasa tambang",
+                "value": "2746293"
+            },
+            {
+                "company": "PT Elang Mulia Abadi Sempurna",
+                "percentage": "51.00%",
+                "types": "Perdagangan dan pengolahan emas",
+                "value": "4295403"
+            },
+            {
+                "company": "PT Jasa Pertambangan Perkasa",
+                "percentage": "99.00%",
+                "types": "Jasa tambang",
+                "value": "263045"
+            },
+            {
+                "company": "Archipelago Resources Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "9062702"
+            },
+            {
+                "company": "PT Meares Soputan Mining",
+                "percentage": "100%",
+                "types": "Pertambangan emas",
+                "value": "364510093"
+            },
+            {
+                "company": "PT Tambang Tondano Nusajaya",
+                "percentage": "100%",
+                "types": "Pertambangan emas",
+                "value": "258785221"
+            },
+            {
+                "company": "PT Karya Kreasi Mulia",
+                "percentage": "99.00%",
+                "types": "Jasa tambang",
+                "value": "2746293"
+            },
+            {
+                "company": "PT Elang Mulia Abadi Sempurna",
+                "percentage": "51.00%",
+                "types": "Perdagangan dan pengolahan emas",
+                "value": "4295403"
+            },
+            {
+                "company": "PT Jasa Pertambangan Perkasa",
+                "percentage": "99.00%",
+                "types": "Jasa tambang",
+                "value": "263045"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "30 Nov 2025",
+                "total_share": "44,339",
+                "change": 4979,
+                "change_formatted": "(+4,979)"
+            },
+            {
+                "shareholder_date": "31 Oct 2025",
+                "total_share": "39,358",
+                "change": 22149,
+                "change_formatted": "(+22,149)"
+            },
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "17,209",
+                "change": 5390,
+                "change_formatted": "(+5,390)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "11,819",
+                "change": 700,
+                "change_formatted": "(+700)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "11,119",
+                "change": 210,
+                "change_formatted": "(+210)"
+            },
+            {
+                "shareholder_date": "30 Jun 2025",
+                "total_share": "10,909",
+                "change": 1076,
+                "change_formatted": "(+1,076)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2026-01-03T09:06:46+00:00"
+}
