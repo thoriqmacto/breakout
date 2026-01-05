@@ -52,6 +52,8 @@ export type AssetSummary = {
     pl_percent: number | null
     pl_value: number
     pl_flag: "profit" | "loss" | "breakeven"
+    latest_close: number | null
+    latest_close_date: string | null
   }
 }
 

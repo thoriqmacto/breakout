@@ -51,13 +51,26 @@ class PortfolioResource extends JsonResource
 
         return $positions->groupBy('asset_id')->map(function ($assetPositions) {
             $asset = $assetPositions->first()?->asset;
+            $latestClose = $asset?->latestPriceRecord?->close;
+            $latestCloseDate = $asset?->latestPriceRecord?->date?->toDateString();
+
             $entryTrades = $assetPositions->where('side', 'entry');
             $exitTrades = $assetPositions->where('side', 'exit');
 
             $entryShares = $entryTrades->sum('qty_shares');
             $entryValue = $entryTrades->sum(fn ($trade) => $trade->qty_shares * $trade->avg_price);
+
             $exitShares = $exitTrades->sum('qty_shares');
             $exitValue = $exitTrades->sum(fn ($trade) => $trade->qty_shares * $trade->avg_price);
+            $exitAverage = $exitShares > 0 ? $exitValue / $exitShares : null;
+
+            // When there are no exit trades yet, mark the position to market using the latest close.
+            if ($exitShares === 0 && $latestClose !== null && $entryShares > 0) {
+                $exitShares = $entryShares;
+                $exitValue = $latestClose * $entryShares;
+                $exitAverage = $latestClose;
+            }
+
             $plValue = $exitValue - $entryValue;
             $plFlag = $plValue > 0 ? 'profit' : ($plValue < 0 ? 'loss' : 'breakeven');
 
@@ -75,14 +88,16 @@ class PortfolioResource extends JsonResource
                     'value' => $entryValue,
                 ],
                 'exit' => [
-                    'min_price' => $exitTrades->min('price'),
-                    'max_price' => $exitTrades->max('price'),
+                    'min_price' => $exitTrades->isEmpty() ? $latestClose : $exitTrades->min('price'),
+                    'max_price' => $exitTrades->isEmpty() ? $latestClose : $exitTrades->max('price'),
                     'total_shares' => $exitShares,
-                    'average_price' => $exitShares > 0 ? $exitValue / $exitShares : null,
+                    'average_price' => $exitAverage,
                     'value' => $exitValue,
                     'pl_percent' => $entryValue > 0 ? ($plValue / $entryValue) * 100 : null,
                     'pl_value' => $plValue,
                     'pl_flag' => $plFlag,
+                    'latest_close' => $latestClose,
+                    'latest_close_date' => $latestCloseDate,
                 ],
             ];
         })->values()->all();

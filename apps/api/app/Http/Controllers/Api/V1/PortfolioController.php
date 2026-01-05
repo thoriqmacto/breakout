@@ -15,7 +15,9 @@ class PortfolioController extends ApiController
         $query = Portfolio::query()->withCount('positions');
 
         if ($this->include('positions')) {
-            $query->with(['positions' => fn ($builder) => $builder->with('asset')]);
+            $query->with([
+                'positions' => fn ($builder) => $builder->with(['asset.latestPriceRecord']),
+            ]);
         }
 
         return ApiResponse::success(PortfolioResource::collection($query->get()));
@@ -41,7 +43,9 @@ class PortfolioController extends ApiController
 
     public function show(Portfolio $portfolio)
     {
-        $portfolio->loadMissing(['positions.asset'])->loadCount('positions');
+        $portfolio
+            ->loadMissing(['positions.asset.latestPriceRecord'])
+            ->loadCount('positions');
 
         return ApiResponse::success(new PortfolioResource($portfolio));
     }
