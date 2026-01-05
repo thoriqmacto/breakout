@@ -89,6 +89,9 @@ const formatNullableDate = (value?: string | null) => {
   return Number.isNaN(parsed.getTime()) ? "—" : parsed.toLocaleDateString("en-US")
 }
 
+const getPositionStatus = (entryShares: number, exitShares: number) =>
+  entryShares === exitShares ? "CLOSE" : "OPEN"
+
 export default function PortfolioPage() {
   const { accessToken } = useAuth()
   const [portfolios, setPortfolios] = useState<PortfolioRecord[]>([])
@@ -613,6 +616,7 @@ export default function PortfolioPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b text-left text-xs uppercase text-muted-foreground">
+                        <th className="px-3 py-2 font-medium">Status</th>
                         <th className="px-3 py-2 font-medium">Asset</th>
                         <th className="px-3 py-2 font-medium">Entry summary</th>
                         <th className="px-3 py-2 font-medium">Exit summary</th>
@@ -624,15 +628,29 @@ export default function PortfolioPage() {
                           ? `${item.asset.symbol} · ${item.asset.name}`
                           : "Unspecified asset"
                         const key = item.asset?.id ?? `asset-${index}`
-                        const plBadgeClasses =
-                          item.exit.pl_flag === "profit"
+                        const status = getPositionStatus(item.entry.total_shares, item.exit.total_shares)
+                        const hasExitTrades = item.exit.total_shares > 0
+                        const plBadgeClasses = hasExitTrades
+                          ? item.exit.pl_flag === "profit"
                             ? "bg-emerald-100 text-emerald-700"
                             : item.exit.pl_flag === "loss"
                               ? "bg-red-100 text-red-700"
                               : "bg-amber-100 text-amber-700"
+                          : "bg-muted text-muted-foreground"
 
                         return (
                           <tr key={key} className="border-b align-top">
+                            <td className="px-3 py-3 text-sm font-semibold uppercase">
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] tracking-wide ${
+                                  status === "CLOSE"
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-amber-100 text-amber-800"
+                                }`}
+                              >
+                                {status}
+                              </span>
+                            </td>
                             <td className="px-3 py-3 text-sm font-medium">
                               <div>{label}</div>
                               <div className="text-xs text-muted-foreground">
@@ -657,28 +675,44 @@ export default function PortfolioPage() {
                             <td className="px-3 py-3 text-sm">
                               <div className="text-xs text-muted-foreground">Min/Max price</div>
                               <div className="font-medium">
-                                {formatNullableIdr(item.exit.min_price)} / {formatNullableIdr(item.exit.max_price)}
+                                {hasExitTrades ? (
+                                  <>
+                                    {formatNullableIdr(item.exit.min_price)} / {formatNullableIdr(item.exit.max_price)}
+                                  </>
+                                ) : (
+                                  "—"
+                                )}
                               </div>
                               <div className="mt-2 text-xs text-muted-foreground">Total shares</div>
-                              <div className="font-medium">{item.exit.total_shares.toLocaleString("en-US")}</div>
+                              <div className="font-medium">
+                                {hasExitTrades ? item.exit.total_shares.toLocaleString("en-US") : "—"}
+                              </div>
                               <div className="mt-2 text-xs text-muted-foreground">Avg exit price</div>
-                              <div className="font-medium">{formatNullableIdr(item.exit.average_price)}</div>
+                              <div className="font-medium">
+                                {hasExitTrades ? formatNullableIdr(item.exit.average_price) : "—"}
+                              </div>
                               <div className="mt-2 text-xs text-muted-foreground">Exit value</div>
-                              <div className="font-medium">{formatNullableIdr(item.exit.value)}</div>
+                              <div className="font-medium">
+                                {hasExitTrades ? formatNullableIdr(item.exit.value) : "—"}
+                              </div>
                               <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                                 <span>P/L</span>
                                 <span
                                   className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${plBadgeClasses}`}
                                 >
-                                  {item.exit.pl_flag}
+                                  {hasExitTrades ? item.exit.pl_flag : "—"}
                                 </span>
                               </div>
-                              <div className="font-medium">
-                                {formatNullableIdr(item.exit.pl_value)}{" "}
-                                <span className="text-xs text-muted-foreground">
-                                  ({formatNullableNumber(item.exit.pl_percent)}%)
-                                </span>
-                              </div>
+                              {hasExitTrades ? (
+                                <div className="font-medium">
+                                  {formatNullableIdr(item.exit.pl_value)}{" "}
+                                  <span className="text-xs text-muted-foreground">
+                                    ({formatNullableNumber(item.exit.pl_percent)}%)
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="font-medium">—</div>
+                              )}
                             </td>
                           </tr>
                         )
