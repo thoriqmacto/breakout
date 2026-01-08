@@ -27,7 +27,11 @@ class AssetSync extends Command
         {--import-csv : Import found python csv files into seed folder}
         {--continue : Skip confirmation before latest-data check}
         {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}
-        {--eod : Confirm all prompts and use today for chk-date}';
+        {--eod : Confirm all prompts and use today for chk-date}
+        {--broker-summary : Fetch broker summary data from Stockbit}
+        {--broker-summary-from= : Broker summary start date (YYYY-MM-DD)}
+        {--broker-summary-to= : Broker summary end date (YYYY-MM-DD)}
+        {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}';
 
     /**
      * The console command description.
@@ -56,11 +60,18 @@ class AssetSync extends Command
             $this->input->setOption('import-csv', true);
             $this->input->setOption('continue', true);
             $this->input->setOption('chk-date', $eodDate);
+            $this->input->setOption('broker-summary', true);
+            if (!$this->option('broker-summary-from')) {
+                $this->input->setOption('broker-summary-from', $eodDate);
+            }
+            if (!$this->option('broker-summary-to')) {
+                $this->input->setOption('broker-summary-to', $eodDate);
+            }
         }
 
         $assetSettings = Asset::query()
             ->orderBy('symbol')
-            ->get(['id', 'symbol', 'sync_price', 'sync_profile'])
+            ->get(['id', 'symbol', 'sync_price', 'sync_profile', 'sync_broker_summary'])
             ->keyBy(fn ($asset) => strtoupper((string) $asset->symbol));
 
         $shouldSyncProfile = static function (string $symbol) use ($assetSettings): bool {
@@ -184,6 +195,29 @@ class AssetSync extends Command
         if (!$this->option('continue') &&
             !$this->confirm('Continue checking latest data anyway?', false)) {
             return Command::FAILURE;
+        }
+
+        $brokerSummaryRequested = (bool) $this->option('broker-summary');
+        if ($brokerSummaryRequested) {
+            $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
+                $this->option('broker-summary-tickers') ?? [],
+                $indexSymbols,
+                $assetSettings
+            );
+
+            if ($brokerSummarySymbols === []) {
+                $this->warn('No broker summary tickers matched the sync settings.');
+            } else {
+                $from = $this->option('broker-summary-from');
+                $to = $this->option('broker-summary-to');
+                [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
+
+                if ($fromDate && $toDate) {
+                    $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                } else {
+                    $this->warn('Skipping broker summary fetch; invalid date range provided.');
+                }
+            }
         }
 
         // Upsert missing bars from CSV into DB for each symbol
@@ -349,7 +383,7 @@ class AssetSync extends Command
             $i++;
         }
 
-        if ($this->option('eod')) {
+        if ($brokerSummaryRequested) {
             try {
                 /** @var BrokerSummaryImporter $importer */
                 $importer = app(BrokerSummaryImporter::class);
@@ -398,6 +432,78 @@ class AssetSync extends Command
         }
 
         return true;
+    }
+
+    /**
+     * @param array<int, string> $requested
+     * @param array<int, string> $defaults
+     * @param \Illuminate\Support\Collection $assetSettings
+     * @return array<int, string>
+     */
+    private function resolveBrokerSummarySymbols(array $requested, array $defaults, $assetSettings): array
+    {
+        $symbols = $requested !== [] ? $requested : $defaults;
+        $symbols = array_values(array_unique(array_map('strtoupper', $symbols)));
+
+        $filtered = [];
+
+        foreach ($symbols as $symbol) {
+            $asset = $assetSettings->get($symbol);
+            if ($asset && !$asset->sync_broker_summary) {
+                $this->line("Skipping broker summary for {$symbol}; sync disabled.");
+                continue;
+            }
+
+            $filtered[] = $symbol;
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * @return array{0:?string,1:?string}
+     */
+    private function normalizeBrokerSummaryRange(?string $from, ?string $to): array
+    {
+        $fallback = Carbon::now()->toDateString();
+        $from = $from ?: $fallback;
+        $to = $to ?: $from;
+
+        try {
+            $fromDate = Carbon::parse($from)->toDateString();
+            $toDate = Carbon::parse($to)->toDateString();
+        } catch (\Throwable) {
+            return [null, null];
+        }
+
+        if (Carbon::parse($fromDate)->greaterThan(Carbon::parse($toDate))) {
+            return [null, null];
+        }
+
+        return [$fromDate, $toDate];
+    }
+
+    /**
+     * @param array<int, string> $symbols
+     */
+    private function fetchBrokerSummaries(array $symbols, string $from, string $to): void
+    {
+        if (!$this->stockbitTokenAvailable()) {
+            $this->warn('Skipping broker summary fetch; bearer token not configured.');
+            return;
+        }
+
+        $result = $this->call('stockbit:scrape', [
+            'tickers' => $symbols,
+            '--from' => $from,
+            '--to' => $to,
+            '--market-detector' => true,
+            '--no-profile-sync' => true,
+        ]);
+
+        if ($result !== Command::SUCCESS) {
+            $this->warn('Broker summary fetch failed.');
+        }
     }
 
     private function stockbitTokenAvailable(): bool
