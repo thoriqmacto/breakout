@@ -29,6 +29,7 @@ class AssetSync extends Command
         {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}
         {--eod : Confirm all prompts and use today for chk-date}
         {--broker-summary : Fetch broker summary data from Stockbit}
+        {--broker-summary-import-only : Skip fetching broker summary data and only import from disk}
         {--broker-summary-from= : Broker summary start date (YYYY-MM-DD)}
         {--broker-summary-to= : Broker summary end date (YYYY-MM-DD)}
         {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}';
@@ -198,24 +199,27 @@ class AssetSync extends Command
         }
 
         $brokerSummaryRequested = (bool) $this->option('broker-summary');
+        $brokerSummaryImportOnly = (bool) $this->option('broker-summary-import-only');
         if ($brokerSummaryRequested) {
-            $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
-                $this->option('broker-summary-tickers') ?? [],
-                $indexSymbols,
-                $assetSettings
-            );
+            if (!$brokerSummaryImportOnly) {
+                $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
+                    $this->option('broker-summary-tickers') ?? [],
+                    $indexSymbols,
+                    $assetSettings
+                );
 
-            if ($brokerSummarySymbols === []) {
-                $this->warn('No broker summary tickers matched the sync settings.');
-            } else {
-                $from = $this->option('broker-summary-from');
-                $to = $this->option('broker-summary-to');
-                [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
-
-                if ($fromDate && $toDate) {
-                    $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                if ($brokerSummarySymbols === []) {
+                    $this->warn('No broker summary tickers matched the sync settings.');
                 } else {
-                    $this->warn('Skipping broker summary fetch; invalid date range provided.');
+                    $from = $this->option('broker-summary-from');
+                    $to = $this->option('broker-summary-to');
+                    [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
+
+                    if ($fromDate && $toDate) {
+                        $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                    } else {
+                        $this->warn('Skipping broker summary fetch; invalid date range provided.');
+                    }
                 }
             }
         }
