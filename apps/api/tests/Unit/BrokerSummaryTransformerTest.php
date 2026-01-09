@@ -53,6 +53,29 @@ class BrokerSummaryTransformerTest extends TestCase
         $this->assertSame(400.0, $rows[2]['net_value']);
     }
 
+    public function test_prefers_data_from_date_when_present(): void
+    {
+        $payload = [
+            'data' => [
+                'from' => '2024-02-01',
+                'broker_summary' => [
+                    'brokers_buy' => [
+                        [
+                            'netbs_broker_code' => 'AB',
+                            'netbs_date' => '2024-02-03',
+                            'bval' => 500,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $rows = BrokerSummaryTransformer::toRows('BBCA', $payload);
+
+        $this->assertCount(1, $rows);
+        $this->assertSame('2024-02-01', $rows[0]['date']);
+    }
+
     public function test_skips_entries_without_required_fields(): void
     {
         $rows = BrokerSummaryTransformer::toRows('BBCA', [

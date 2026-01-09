@@ -12,13 +12,17 @@ final class BrokerSummaryTransformer
         $rows = [];
 
         $candidates = self::extractCandidates($json);
+        $defaultDate = self::extractSummaryFromDate($json);
 
         foreach ($candidates as $entry) {
             if (!is_array($entry)) {
                 continue;
             }
 
-            $date   = self::firstNonEmpty($entry, ['date', 'trading_date', 'traded_at', 'day', 'session_date', 'netbs_date']) ?? '';
+            $date   = $defaultDate ?? (self::firstNonEmpty(
+                $entry,
+                ['date', 'trading_date', 'traded_at', 'day', 'session_date', 'netbs_date']
+            ) ?? '');
             $broker = self::firstNonEmpty($entry, ['broker', 'broker_code', 'code', 'brokerName', 'netbs_broker_code']) ?? '';
 
             $buy   = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy', 'bval']));
@@ -70,6 +74,7 @@ final class BrokerSummaryTransformer
         }
 
         $transactionType = self::extractTransactionType($json, $summary, $transactionType);
+        $defaultDate = self::extractSummaryFromDate($json, $summary);
 
         $byBroker = [];
 
@@ -81,7 +86,8 @@ final class BrokerSummaryTransformer
                 }
 
                 $broker = (string) ($entry['netbs_broker_code'] ?? $entry['broker_code'] ?? $entry['broker'] ?? '');
-                $date = self::normalizeDate((string) ($entry['netbs_date'] ?? $entry['date'] ?? ''));
+                $date = $defaultDate
+                    ?? self::normalizeDate((string) ($entry['netbs_date'] ?? $entry['date'] ?? ''));
                 if ($broker === '' || $date === '') {
                     continue;
                 }
@@ -107,7 +113,8 @@ final class BrokerSummaryTransformer
                 }
 
                 $broker = (string) ($entry['netbs_broker_code'] ?? $entry['broker_code'] ?? $entry['broker'] ?? '');
-                $date = self::normalizeDate((string) ($entry['netbs_date'] ?? $entry['date'] ?? ''));
+                $date = $defaultDate
+                    ?? self::normalizeDate((string) ($entry['netbs_date'] ?? $entry['date'] ?? ''));
                 if ($broker === '' || $date === '') {
                     continue;
                 }
@@ -261,6 +268,29 @@ final class BrokerSummaryTransformer
         }
 
         return [];
+    }
+
+    /**
+     * @param array<string, mixed> $summary
+     */
+    private static function extractSummaryFromDate(array $json, array $summary = []): ?string
+    {
+        $candidates = [
+            $summary['from'] ?? null,
+            $summary['from_date'] ?? null,
+            $json['data']['from'] ?? null,
+            $json['data']['from_date'] ?? null,
+            $json['from'] ?? null,
+            $json['from_date'] ?? null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && trim($candidate) !== '') {
+                return self::normalizeDate($candidate);
+            }
+        }
+
+        return null;
     }
 
     /**
