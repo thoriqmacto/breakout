@@ -11,27 +11,18 @@ final class BrokerSummaryTransformer
     {
         $rows = [];
 
-        $candidates = [];
-        if (isset($json['data']) && is_array($json['data'])) {
-            $candidates = $json['data'];
-        } elseif (isset($json['items']) && is_array($json['items'])) {
-            $candidates = $json['items'];
-        } elseif (isset($json['result']) && is_array($json['result'])) {
-            $candidates = $json['result'];
-        } elseif (array_is_list($json)) {
-            $candidates = $json;
-        }
+        $candidates = self::extractCandidates($json);
 
         foreach ($candidates as $entry) {
             if (!is_array($entry)) {
                 continue;
             }
 
-            $date   = self::firstNonEmpty($entry, ['date', 'trading_date', 'traded_at', 'day', 'session_date']) ?? '';
-            $broker = self::firstNonEmpty($entry, ['broker', 'broker_code', 'code', 'brokerName']) ?? '';
+            $date   = self::firstNonEmpty($entry, ['date', 'trading_date', 'traded_at', 'day', 'session_date', 'netbs_date']) ?? '';
+            $broker = self::firstNonEmpty($entry, ['broker', 'broker_code', 'code', 'brokerName', 'netbs_broker_code']) ?? '';
 
-            $buy   = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy']));
-            $sell  = self::num(self::firstNonEmpty($entry, ['sell_value', 'sellValue', 'total_sell', 'sell']));
+            $buy   = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy', 'bval']));
+            $sell  = self::num(self::firstNonEmpty($entry, ['sell_value', 'sellValue', 'total_sell', 'sell', 'sval']));
             $net   = self::num(self::firstNonEmpty($entry, ['net_value', 'netValue', 'net']));
 
             if (($buy === null || $sell === null) && isset($entry['values']) && is_array($entry['values'])) {
@@ -66,6 +57,79 @@ final class BrokerSummaryTransformer
         }
 
         return $rows;
+    }
+
+    private static function extractCandidates(array $json): array
+    {
+        $brokerSummary = self::extractBrokerSummaryEntries($json);
+        if ($brokerSummary !== []) {
+            return $brokerSummary;
+        }
+
+        if (isset($json['data']) && is_array($json['data'])) {
+            return $json['data'];
+        }
+
+        if (isset($json['items']) && is_array($json['items'])) {
+            return $json['items'];
+        }
+
+        if (isset($json['result']) && is_array($json['result'])) {
+            return $json['result'];
+        }
+
+        if (array_is_list($json)) {
+            return $json;
+        }
+
+        return [];
+    }
+
+    private static function extractBrokerSummaryEntries(array $json): array
+    {
+        if (
+            !isset($json['data'])
+            || !is_array($json['data'])
+            || !isset($json['data']['broker_summary'])
+            || !is_array($json['data']['broker_summary'])
+        ) {
+            return [];
+        }
+
+        $summary = $json['data']['broker_summary'];
+        $entries = [];
+
+        if (isset($summary['brokers_buy']) && is_array($summary['brokers_buy'])) {
+            foreach ($summary['brokers_buy'] as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+
+                $entries[] = [
+                    'netbs_broker_code' => $entry['netbs_broker_code'] ?? null,
+                    'netbs_date' => $entry['netbs_date'] ?? null,
+                    'bval' => $entry['bval'] ?? $entry['bvalv'] ?? null,
+                    'sval' => 0,
+                ];
+            }
+        }
+
+        if (isset($summary['brokers_sell']) && is_array($summary['brokers_sell'])) {
+            foreach ($summary['brokers_sell'] as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+
+                $entries[] = [
+                    'netbs_broker_code' => $entry['netbs_broker_code'] ?? null,
+                    'netbs_date' => $entry['netbs_date'] ?? null,
+                    'bval' => 0,
+                    'sval' => isset($entry['sval']) ? abs((float) $entry['sval']) : ($entry['svalv'] ?? null),
+                ];
+            }
+        }
+
+        return $entries;
     }
 
     private static function firstNonEmpty(array $entry, array $keys): mixed
