@@ -142,6 +142,10 @@ class BrokerSummaryImporter
                 $transactionType,
             );
             if ($bandarDetector !== null && $bandarDetector['from_date'] && $bandarDetector['to_date']) {
+                $metricsJson = $bandarDetector['metrics_json'];
+                if (is_array($metricsJson)) {
+                    $metricsJson = json_encode($metricsJson);
+                }
                 BandarDetectorSummary::upsert(
                     [[
                         'asset_id' => $asset->id,
@@ -155,7 +159,7 @@ class BrokerSummaryImporter
                         'value' => $bandarDetector['value'],
                         'volume' => $bandarDetector['volume'],
                         'average_price' => $bandarDetector['average_price'],
-                        'metrics_json' => $bandarDetector['metrics_json'],
+                        'metrics_json' => $metricsJson,
                         'created_at' => $timestamp,
                         'updated_at' => $timestamp,
                     ]],
