@@ -21,6 +21,7 @@ class BrokerSummaryImportTest extends TestCase
 
         $payload = [
             'data' => [
+                'from' => '2024-04-03',
                 'broker_summary' => [
                     'transaction_type' => 'TRANSACTION_TYPE_NET',
                     'brokers_buy' => [
@@ -85,7 +86,7 @@ class BrokerSummaryImportTest extends TestCase
 
         $this->assertDatabaseHas('broker_summary_facts', [
             'asset_id' => $assetId,
-            'trade_date' => '2024-04-01',
+            'trade_date' => '2024-04-03',
             'broker_code' => 'AB',
             'transaction_type' => 'TRANSACTION_TYPE_NET',
             'broker_type' => 'Lokal',
@@ -99,7 +100,7 @@ class BrokerSummaryImportTest extends TestCase
 
         $this->assertDatabaseHas('broker_summary_facts', [
             'asset_id' => $assetId,
-            'trade_date' => '2024-04-02',
+            'trade_date' => '2024-04-03',
             'broker_code' => 'CD',
             'transaction_type' => 'TRANSACTION_TYPE_NET',
             'buy_value' => 0.00,
@@ -109,7 +110,7 @@ class BrokerSummaryImportTest extends TestCase
 
         $this->assertDatabaseHas('broksums', [
             'asset_id' => $assetId,
-            'date' => '2024-04-01',
+            'date' => '2024-04-03',
             'broker' => 'AB',
             'net_value' => 600.00,
             'buy_value' => 1000.00,
@@ -118,7 +119,7 @@ class BrokerSummaryImportTest extends TestCase
 
         $this->assertDatabaseHas('broksums', [
             'asset_id' => $assetId,
-            'date' => '2024-04-02',
+            'date' => '2024-04-03',
             'broker' => 'CD',
         ]);
 
