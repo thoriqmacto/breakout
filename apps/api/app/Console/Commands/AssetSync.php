@@ -213,11 +213,6 @@ class AssetSync extends Command
             $this->comment('Tickers in config and seed files aligned.');
         }
 
-        if (!$this->option('continue') &&
-            !$this->confirm('Continue checking latest data anyway?', false)) {
-            return Command::FAILURE;
-        }
-
         if ($brokerSummaryRequested) {
             if (!$brokerSummaryImportOnly) {
                 $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
@@ -240,6 +235,27 @@ class AssetSync extends Command
                     }
                 }
             }
+        }
+
+        if ($brokerSummaryRequested) {
+            try {
+                /** @var BrokerSummaryImporter $importer */
+                $importer = app(BrokerSummaryImporter::class);
+                $disk = config('stockbit.save_disk');
+                $jsonDir = config('stockbit.save_dir');
+                $summary = $importer->importFromDisk($disk, $jsonDir);
+
+                $fileCount = $summary['file_count'] ?? 0;
+                $rowCount = $summary['row_count'] ?? 0;
+                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
+            } catch (\Throwable $exception) {
+                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+            }
+        }
+
+        if (!$this->option('continue') &&
+            !$this->confirm('Continue checking latest data anyway?', false)) {
+            return Command::FAILURE;
         }
 
         // Upsert missing bars from CSV into DB for each symbol
@@ -303,130 +319,116 @@ class AssetSync extends Command
 
         $dbBars->flush();
 
-        // Ask user for a custom date to check against latest data
-        $chkLatest = $this->option('chk-date');
-        $showIsLatest = (bool) $chkLatest;
-        if (!$chkLatest && $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
-            $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
-            $showIsLatest = true;
-        }
+        if(!$this->option('continue')){
+            // Ask user for a custom date to check against latest data
+            $chkLatest = $this->option('chk-date');
+            $showIsLatest = (bool) $chkLatest;
+            if (!$chkLatest && $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
+                $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
+                $showIsLatest = true;
+            }
 
-        // After syncing, display latest data from CSV and DB for each symbol
-        $rows = [];
-        $i = 1;
-        foreach ($indexSymbols as $symbol) {
-            $csvPath = $seedDir . '/' . $symbol . '.csv';
-            $csvRows = CsvBars::read($csvPath);
-            $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
-
-            if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
-                $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
-                $end    = $chkLatest ?: now()->toDateString();
-                $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, !$shouldSyncProfile($symbol));
+            // After syncing, display latest data from CSV and DB for each symbol
+            $rows = [];
+            $i = 1;
+            foreach ($indexSymbols as $symbol) {
+                $csvPath = $seedDir . '/' . $symbol . '.csv';
                 $csvRows = CsvBars::read($csvPath);
                 $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
-                if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
-                    if ($this->option('eod')) {
-                        $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
-                        if ($yfinanceReady === false) {
-                            $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
-                            if ($yfinanceLatestDate) {
-                                $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
-                            }
-                            $this->warn($message);
-                            continue;
-                        }
-                    }
+                if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
+                    $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
+                    $end    = $chkLatest ?: now()->toDateString();
+                    $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, !$shouldSyncProfile($symbol));
+                    $csvRows = CsvBars::read($csvPath);
+                    $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
-                    $ticker = $symbol . '.JK';
-
-                    $this->call('python:run', [
-                        'script' => 'get_stocks.py',
-                        '--arg'  => ["--start={$start}", "--end={$end}", $ticker],
-                    ]);
-
-                    $pyFile = resource_path('python/csv/' . $symbol . '_PY.csv');
-                    if (is_file($pyFile)) {
-                        $newRows = CsvBars::read($pyFile);
-                        if ($newRows !== []) {
-                            $existing = CsvBars::read($csvPath);
-                            $merged   = CsvBars::merge($existing, $newRows);
-                            CsvBars::write($csvPath, $merged);
-
-                            $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
-                            $existingDates = DB::table('price_bars')
-                                ->where('asset_id', $asset->id)
-                                ->pluck('date')
-                                ->all();
-                            $existingDates = array_flip($existingDates);
-
-                            $updBars = new DbBars($chunk, false);
-                            foreach ($newRows as $ymd => $row) {
-                                if (isset($existingDates[$ymd])) {
-                                    continue;
+                    if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
+                        if ($this->option('eod')) {
+                            $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
+                            if ($yfinanceReady === false) {
+                                $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
+                                if ($yfinanceLatestDate) {
+                                    $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
                                 }
-
-                                $updBars->add([
-                                    'asset_id'   => $asset->id,
-                                    'date'       => $ymd,
-                                    'open'       => $row['open'],
-                                    'high'       => $row['high'],
-                                    'low'        => $row['low'],
-                                    'close'      => $row['close'],
-                                    'volume'     => $row['volume'],
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ]);
+                                $this->warn($message);
+                                continue;
                             }
-                            $updBars->flush();
+                        }
 
-                            $csvRows = $merged;
-                            $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                        $ticker = $symbol . '.JK';
+
+                        $this->call('python:run', [
+                            'script' => 'get_stocks.py',
+                            '--arg'  => ["--start={$start}", "--end={$end}", $ticker],
+                        ]);
+
+                        $pyFile = resource_path('python/csv/' . $symbol . '_PY.csv');
+                        if (is_file($pyFile)) {
+                            $newRows = CsvBars::read($pyFile);
+                            if ($newRows !== []) {
+                                $existing = CsvBars::read($csvPath);
+                                $merged   = CsvBars::merge($existing, $newRows);
+                                CsvBars::write($csvPath, $merged);
+
+                                $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
+                                $existingDates = DB::table('price_bars')
+                                    ->where('asset_id', $asset->id)
+                                    ->pluck('date')
+                                    ->all();
+                                $existingDates = array_flip($existingDates);
+
+                                $updBars = new DbBars($chunk, false);
+                                foreach ($newRows as $ymd => $row) {
+                                    if (isset($existingDates[$ymd])) {
+                                        continue;
+                                    }
+
+                                    $updBars->add([
+                                        'asset_id'   => $asset->id,
+                                        'date'       => $ymd,
+                                        'open'       => $row['open'],
+                                        'high'       => $row['high'],
+                                        'low'        => $row['low'],
+                                        'close'      => $row['close'],
+                                        'volume'     => $row['volume'],
+                                        'created_at' => now(),
+                                        'updated_at' => now(),
+                                    ]);
+                                }
+                                $updBars->flush();
+
+                                $csvRows = $merged;
+                                $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                            }
                         }
                     }
                 }
+
+                $row = [
+                    $i,
+                    $symbol,
+                    $dates['csv'] ?? 'n/a',
+                    $dates['db'] ?? 'n/a',
+                    $dates['total'] ?? 'n/a',
+                ];
+
+                if ($showIsLatest) {
+                    $row[] = $dates['is_latest'] ?? 'no';
+                }
+
+                $rows[] = $row;
+
+                $i++;
             }
 
-            $row = [
-                $i,
-                $symbol,
-                $dates['csv'] ?? 'n/a',
-                $dates['db'] ?? 'n/a',
-                $dates['total'] ?? 'n/a',
-            ];
-
+            $headers = ['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
             if ($showIsLatest) {
-                $row[] = $dates['is_latest'] ?? 'no';
+                $headers[] = 'Is Latest?';
             }
 
-            $rows[] = $row;
-
-            $i++;
+            $this->table($headers, $rows);
         }
-
-        if ($brokerSummaryRequested) {
-            try {
-                /** @var BrokerSummaryImporter $importer */
-                $importer = app(BrokerSummaryImporter::class);
-                $disk = config('stockbit.save_disk');
-                $jsonDir = config('stockbit.save_dir');
-                $summary = $importer->importFromDisk($disk, $jsonDir);
-
-                $fileCount = $summary['file_count'] ?? 0;
-                $rowCount = $summary['row_count'] ?? 0;
-                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
-            } catch (\Throwable $exception) {
-                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
-            }
-        }
-
-        $headers = ['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
-        if ($showIsLatest) {
-            $headers[] = 'Is Latest?';
-        }
-
-        $this->table($headers, $rows);
 
         return Command::SUCCESS;
     }
