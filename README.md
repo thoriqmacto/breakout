@@ -71,6 +71,68 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```
    Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
 
+## Feature Extraction Usage
+Use the feature extraction command to persist daily OHLCV and broker metrics into `features_daily`.
+
+- Extract features for the latest trading day per asset:
+  ```bash
+  php artisan features:extract
+  ```
+- Extract features for a single symbol on a specific date:
+  ```bash
+  php artisan features:extract --symbol=BBCA --date=2025-01-31
+  ```
+- Extract features for a date range (inclusive):
+  ```bash
+  php artisan features:extract --from=2025-01-01 --to=2025-01-31
+  ```
+- Limit how many symbols are processed in a run:
+  ```bash
+  php artisan features:extract --limit=10
+  ```
+
+### Feature Extraction Glossary
+Below is a quick reference for the feature abbreviations emitted by `features:extract`, along with typical value ranges and meanings.
+
+**OHLCV-derived features**
+- `ret_1` — 1-day return `(close_t / close_{t-1}) - 1`. Range: -1.0+; 0 means unchanged, positive means up day, negative means down day.
+- `range_pct` — intraday range `(high - low) / close`. Range: 0.0+ (percentage as a ratio).
+- `close_pos` — close position within range `(close - low) / (high - low)`. Range: 0.0–1.0 (0 = closed at low, 1 = closed at high).
+- `body_to_range` — candle body size relative to range `abs(close - open) / (high - low)`. Range: 0.0–1.0.
+- `vol_ratio_20` — volume vs 20-day SMA `volume / SMA20(volume)`. Range: 0.0+ (1.0 = average volume).
+- `atr_pct` — 14-day ATR scaled by close `ATR14 / close`. Range: 0.0+ (percentage as a ratio).
+- `close_vs_ma20` — close vs 20-day SMA `(close / MA20) - 1`. Range: typically negative to positive; 0 means equal to MA20.
+- `ma20_slope` — slope of the last 5 points of the MA20 series. Range: unbounded; positive = rising MA20.
+- `breakout20` — 20-day high breakout flag. Range: 0 or 1 (1 = close above prior 20-day high).
+- `compression` — volatility compression flag (ATR% below its 10-day SMA). Range: 0 or 1.
+
+**Broker/flow features**
+- `has_broker` — indicates broker data exists for the day. Range: 0 or 1.
+- `turnover_value` — total traded value from Bandar detector. Range: 0.0+ (currency value).
+- `turnover_volume` — total traded volume from Bandar detector. Range: 0+ (shares).
+- `accdist_score` — accumulation/distribution score. Range: -1 (distribution), 0 (neutral/unknown), 1 (accumulation).
+- `avg_net_norm` — average net value normalized by turnover value. Range: roughly -1.0 to 1.0; can exceed in edge cases when metrics are noisy.
+- `avg5_net_norm` — 5-day average net value normalized by turnover value. Range: similar to `avg_net_norm`.
+- `top1_net_norm` / `top3_net_norm` / `top5_net_norm` / `top10_net_norm` — top-N net value normalized by turnover value. Range: typically -1.0 to 1.0; magnitude reflects dominance.
+- `buyer_count` — number of brokers with net buying. Range: 0+ (integer).
+- `seller_count` — number of brokers with net selling. Range: 0+ (integer).
+- `active_broker_count` — unique broker codes active that day. Range: 0+ (integer).
+- `buyer_hhi` / `seller_hhi` — Herfindahl–Hirschman Index on buyer/seller shares. Range: 0.0–1.0 (higher = more concentration).
+- `top1_sell_share` / `top3_sell_share` / `top5_sell_share` — share of total turnover contributed by top N net sellers. Range: 0.0–1.0.
+- `net_to_gross_ratio` — absolute average net vs total gross value. Range: 0.0–1.0.
+- `foreign_net_norm` / `local_net_norm` / `gov_net_norm` — net value by broker type normalized by turnover value. Range: typically -1.0 to 1.0; sign indicates net buy/sell.
+
+**Cross/derived signals**
+- `absorption_flag` — accumulation + bullish OHLCV setup. Range: 0 or 1.
+- `dist_breakdown` — distribution + weak OHLCV setup. Range: 0 or 1.
+- `stealth_acc` — accumulation + low-volatility setup. Range: 0 or 1.
+- `bandar_dist_hard` — strong distribution risk flag. Range: 0 or 1.
+- `valid_long_setup` — true when distribution flags are not triggered. Range: 0 or 1.
+
+**Labels**
+- `y_hit_5d` — classification label for +3.5% target within 5 trading days. Range: 1 (hit target), 0 (did not hit), null (insufficient data).
+- `dd_5d` — reserved placeholder for drawdown (currently null).
+
 ## Repository Layout
 ```
 .
