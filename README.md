@@ -71,6 +71,26 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```
    Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
 
+## Feature Extraction Usage
+Use the feature extraction command to persist daily OHLCV and broker metrics into `features_daily`.
+
+- Extract features for the latest trading day per asset:
+  ```bash
+  php artisan features:extract
+  ```
+- Extract features for a single symbol on a specific date:
+  ```bash
+  php artisan features:extract --symbol=BBCA --date=2025-01-31
+  ```
+- Extract features for a date range (inclusive):
+  ```bash
+  php artisan features:extract --from=2025-01-01 --to=2025-01-31
+  ```
+- Limit how many symbols are processed in a run:
+  ```bash
+  php artisan features:extract --limit=10
+  ```
+
 ## Repository Layout
 ```
 .
