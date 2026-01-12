@@ -59,20 +59,16 @@ class PortfolioResource extends JsonResource
 
             $entryShares = $entryTrades->sum('qty_shares');
             $entryValue = $entryTrades->sum(fn ($trade) => $trade->qty_shares * $trade->avg_price);
+            $entryAverage = $entryShares > 0 ? $entryValue / $entryShares : null;
 
             $exitShares = $exitTrades->sum('qty_shares');
             $exitValue = $exitTrades->sum(fn ($trade) => $trade->qty_shares * $trade->avg_price);
             $exitAverage = $exitShares > 0 ? $exitValue / $exitShares : null;
 
-            // When there are no exit trades yet, mark the position to market using the latest close.
-            if ($exitShares === 0 && $latestClose !== null && $entryShares > 0) {
-                $exitShares = $entryShares;
-                $exitValue = $latestClose * $entryShares;
-                $exitAverage = $latestClose;
-            }
-
-            $plValue = $exitValue - $entryValue;
-            $plFlag = $plValue > 0 ? 'profit' : ($plValue < 0 ? 'loss' : 'breakeven');
+            $matchedShares = min($entryShares, $exitShares);
+            $matchedEntryValue = $entryAverage === null ? 0 : $matchedShares * $entryAverage;
+            $plValue = $exitShares > 0 ? $exitValue - $matchedEntryValue : null;
+            $plFlag = $plValue === null ? null : ($plValue > 0 ? 'profit' : ($plValue < 0 ? 'loss' : 'breakeven'));
 
             return [
                 'asset' => $asset ? [
@@ -84,16 +80,16 @@ class PortfolioResource extends JsonResource
                     'min_price' => $entryTrades->min('price'),
                     'max_price' => $entryTrades->max('price'),
                     'total_shares' => $entryShares,
-                    'average_price' => $entryShares > 0 ? $entryValue / $entryShares : null,
+                    'average_price' => $entryAverage,
                     'value' => $entryValue,
                 ],
                 'exit' => [
-                    'min_price' => $exitTrades->isEmpty() ? $latestClose : $exitTrades->min('price'),
-                    'max_price' => $exitTrades->isEmpty() ? $latestClose : $exitTrades->max('price'),
+                    'min_price' => $exitTrades->min('price'),
+                    'max_price' => $exitTrades->max('price'),
                     'total_shares' => $exitShares,
                     'average_price' => $exitAverage,
                     'value' => $exitValue,
-                    'pl_percent' => $entryValue > 0 ? ($plValue / $entryValue) * 100 : null,
+                    'pl_percent' => $matchedEntryValue > 0 && $plValue !== null ? ($plValue / $matchedEntryValue) * 100 : null,
                     'pl_value' => $plValue,
                     'pl_flag' => $plFlag,
                     'latest_close' => $latestClose,
