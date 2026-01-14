@@ -17,7 +17,7 @@ class FeatureExtractCommand extends Command
         {--to= : Extract features ending at date (YYYY-MM-DD)}
         {--limit= : Limit number of assets processed}';
 
-    protected $description = 'Extract daily OHLCV and broker features for assets and persist them to features_daily.';
+    protected $description = 'Extract daily OHLCV and broker features (including PBAS) for assets and persist them to features_daily.';
 
     public function __construct(private readonly FeatureExtractionService $features)
     {

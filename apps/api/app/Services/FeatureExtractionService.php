@@ -67,6 +67,7 @@ class FeatureExtractionService
 
         $atrPctSeries = $this->atrPctSeries($highs, $lows, $closes, 14);
         $atrPctSma10 = $this->sma($atrPctSeries, 10);
+        $atrPctMedian = $this->median($atrPctSeries) ?? 0.0;
         $compression = $atrPctSma10 !== null && $atrPct < $atrPctSma10 ? 1 : 0;
 
         return [
@@ -76,6 +77,7 @@ class FeatureExtractionService
             'body_to_range' => $bodyToRange,
             'vol_ratio_20' => $volRatio20,
             'atr_pct' => $atrPct,
+            'atr_pct_median' => $atrPctMedian,
             'close_vs_ma20' => $closeVsMa20,
             'ma20_slope' => $ma20Slope,
             'breakout20' => $breakout20,
@@ -302,14 +304,23 @@ class FeatureExtractionService
             ->first();
 
         $ohlcvFeatures = $this->extractOhlcvFeatures($asset, $date, $bar);
+        $atrPctMedian = (float) ($ohlcvFeatures['atr_pct_median'] ?? 0.0);
+        unset($ohlcvFeatures['atr_pct_median']);
         $brokerFeatures = $this->extractBrokerFeatures($asset, $date, $transactionType);
         $crossFeatures = $this->extractCrossFeatures($brokerFeatures, $ohlcvFeatures);
         $label = $this->makeLabel($asset, $date);
+        $pbas = $this->computePreBreakoutAccumulationScore(
+            $ohlcvFeatures,
+            $brokerFeatures,
+            $crossFeatures,
+            $atrPctMedian
+        );
 
         return array_merge([
             'symbol' => $asset->symbol,
             'date' => $date->toDateString(),
         ], $ohlcvFeatures, $brokerFeatures, $crossFeatures, [
+            'pbas' => $pbas,
             'y_hit_5d' => $label,
             'dd_5d' => null,
         ]);
@@ -355,6 +366,7 @@ class FeatureExtractionService
             'body_to_range' => 0.0,
             'vol_ratio_20' => 0.0,
             'atr_pct' => 0.0,
+            'atr_pct_median' => 0.0,
             'close_vs_ma20' => 0.0,
             'ma20_slope' => 0.0,
             'breakout20' => 0,
@@ -480,6 +492,119 @@ class FeatureExtractionService
         }
 
         return $atrPctSeries;
+    }
+
+    private function median(array $values): ?float
+    {
+        $values = array_values(array_filter($values, static fn ($value): bool => is_numeric($value)));
+        $count = count($values);
+        if ($count === 0) {
+            return null;
+        }
+
+        sort($values, SORT_NUMERIC);
+        $mid = intdiv($count, 2);
+
+        if ($count % 2 === 0) {
+            return ((float) $values[$mid - 1] + (float) $values[$mid]) / 2;
+        }
+
+        return (float) $values[$mid];
+    }
+
+    /**
+     * @param array<string, float|int> $ohlcvFeatures
+     * @param array<string, float|int> $brokerFeatures
+     * @param array<string, bool> $crossFeatures
+     */
+    private function computePreBreakoutAccumulationScore(
+        array $ohlcvFeatures,
+        array $brokerFeatures,
+        array $crossFeatures,
+        float $atrPctMedian
+    ): int {
+        $score = 0;
+        $penalty = 0;
+
+        $stealthAcc = (int) ($crossFeatures['stealth_acc'] ?? false);
+        $compression = (int) ($ohlcvFeatures['compression'] ?? 0);
+        $volRatio20 = (float) ($ohlcvFeatures['vol_ratio_20'] ?? 0.0);
+        $accdistScore = (int) ($brokerFeatures['accdist_score'] ?? 0);
+
+        if ($stealthAcc === 1) {
+            $score += 30;
+        } elseif ($compression === 1 && $volRatio20 < 1.0) {
+            $score += 20;
+        } elseif ($accdistScore === 1) {
+            $score += 10;
+        }
+
+        $bandarDistHard = (int) ($crossFeatures['bandar_dist_hard'] ?? false);
+        $distBreakdown = (int) ($crossFeatures['dist_breakdown'] ?? false);
+
+        if ($bandarDistHard === 1) {
+            $penalty += 40;
+        } elseif ($distBreakdown === 1) {
+            $penalty += 25;
+        } elseif ($accdistScore === -1) {
+            $penalty += 15;
+        }
+
+        $breakout20 = (int) ($ohlcvFeatures['breakout20'] ?? 0);
+        $closeVsMa20 = (float) ($ohlcvFeatures['close_vs_ma20'] ?? 0.0);
+
+        if ($breakout20 === 0) {
+            if ($closeVsMa20 >= 0.005 && $closeVsMa20 <= 0.03) {
+                $score += 20;
+            } elseif ($closeVsMa20 > 0.03 && $closeVsMa20 <= 0.05) {
+                $score += 10;
+            }
+        }
+
+        if ($compression === 1) {
+            $score += 10;
+            $atrPct = (float) ($ohlcvFeatures['atr_pct'] ?? 0.0);
+            if ($atrPctMedian > 0.0 && $atrPct < $atrPctMedian) {
+                $score += 5;
+            }
+        }
+
+        if ($volRatio20 >= 0.6 && $volRatio20 <= 1.0) {
+            $score += 15;
+        } elseif ($volRatio20 > 1.0 && $volRatio20 <= 1.2) {
+            $score += 8;
+        }
+
+        $ma20Slope = (float) ($ohlcvFeatures['ma20_slope'] ?? 0.0);
+        if ($ma20Slope > 0 && $closeVsMa20 > 0) {
+            $score += 10;
+        } elseif ($ma20Slope > 0) {
+            $score += 5;
+        }
+
+        $closePos = (float) ($ohlcvFeatures['close_pos'] ?? 0.0);
+        if ($closePos >= 0.70) {
+            $score += 10;
+        } elseif ($closePos >= 0.55) {
+            $score += 6;
+        }
+
+        if ($breakout20 === 1) {
+            $penalty += 20;
+        }
+        if ($closeVsMa20 > 0.06) {
+            $penalty += 10;
+        }
+
+        $pbas = $score - $penalty;
+        if ($pbas < 0) {
+            return 0;
+        }
+        if ($pbas > 100) {
+            return 100;
+        }
+
+        return $pbas;
     }
 
     private function slope(array $series, int $lastN): float
