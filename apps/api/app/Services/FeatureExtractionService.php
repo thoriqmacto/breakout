@@ -13,6 +13,17 @@ class FeatureExtractionService
 {
     private const DEFAULT_LOOKBACK = 100;
     private const MIN_TICK = 0.0001;
+    private const PBAS_BROKER_LOOKBACK_DAYS = 10;
+    private const PBAS_BROKER_WEIGHT_CURRENT = 0.6;
+    private const PBAS_BROKER_WEIGHT_HISTORY = 0.4;
+    private const PBAS_BROKER_KEYS = [
+        'accdist_score',
+        'avg_net_norm',
+        'avg5_net_norm',
+        'top1_net_norm',
+        'top1_sell_share',
+        'seller_hhi',
+    ];
 
     /**
      * @return array<string, float|int>
@@ -307,11 +318,13 @@ class FeatureExtractionService
         $atrPctMedian = (float) ($ohlcvFeatures['atr_pct_median'] ?? 0.0);
         unset($ohlcvFeatures['atr_pct_median']);
         $brokerFeatures = $this->extractBrokerFeatures($asset, $date, $transactionType);
-        $crossFeatures = $this->extractCrossFeatures($brokerFeatures, $ohlcvFeatures);
+        $brokerHistory = $this->loadBrokerFeatureHistory($asset, $date, self::PBAS_BROKER_LOOKBACK_DAYS);
+        $brokerFeaturesForPbas = $this->blendBrokerFeatures($brokerFeatures, $brokerHistory);
+        $crossFeatures = $this->extractCrossFeatures($brokerFeaturesForPbas, $ohlcvFeatures);
         $label = $this->makeLabel($asset, $date);
         $pbas = $this->computePreBreakoutAccumulationScore(
             $ohlcvFeatures,
-            $brokerFeatures,
+            $brokerFeaturesForPbas,
             $crossFeatures,
             $atrPctMedian
         );
@@ -352,6 +365,78 @@ class FeatureExtractionService
             ->get();
 
         return $bars->sortBy('date')->values();
+    }
+
+    /**
+     * @return array<string, float>
+     */
+    private function loadBrokerFeatureHistory(Asset $asset, Carbon $date, int $lookback): array
+    {
+        $rows = DB::table('features_daily')
+            ->where('symbol', $asset->symbol)
+            ->whereDate('date', '<', $date->toDateString())
+            ->orderByDesc('date')
+            ->limit($lookback)
+            ->get(self::PBAS_BROKER_KEYS);
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $sums = array_fill_keys(self::PBAS_BROKER_KEYS, 0.0);
+        $counts = array_fill_keys(self::PBAS_BROKER_KEYS, 0);
+
+        foreach ($rows as $row) {
+            foreach (self::PBAS_BROKER_KEYS as $key) {
+                $value = $row->$key ?? null;
+                if ($value === null) {
+                    continue;
+                }
+                $sums[$key] += (float) $value;
+                $counts[$key]++;
+            }
+        }
+
+        $averages = [];
+        foreach (self::PBAS_BROKER_KEYS as $key) {
+            if (($counts[$key] ?? 0) > 0) {
+                $averages[$key] = $sums[$key] / $counts[$key];
+            }
+        }
+
+        return $averages;
+    }
+
+    /**
+     * @param array<string, float|int> $brokerFeatures
+     * @param array<string, float> $historyAverages
+     * @return array<string, float|int>
+     */
+    private function blendBrokerFeatures(array $brokerFeatures, array $historyAverages): array
+    {
+        if ($historyAverages === []) {
+            return $brokerFeatures;
+        }
+
+        $weightCurrent = self::PBAS_BROKER_WEIGHT_CURRENT;
+        $weightHistory = self::PBAS_BROKER_WEIGHT_HISTORY;
+        $blended = $brokerFeatures;
+
+        foreach ($historyAverages as $key => $avg) {
+            if (!array_key_exists($key, $brokerFeatures)) {
+                continue;
+            }
+            $current = (float) $brokerFeatures[$key];
+            $blended[$key] = $current * $weightCurrent + $avg * $weightHistory;
+        }
+
+        if (array_key_exists('accdist_score', $historyAverages)) {
+            $current = (float) ($brokerFeatures['accdist_score'] ?? 0);
+            $score = $current * $weightCurrent + $historyAverages['accdist_score'] * $weightHistory;
+            $blended['accdist_score'] = $score > 0.25 ? 1 : ($score < -0.25 ? -1 : 0);
+        }
+
+        return $blended;
     }
 
     /**
