@@ -319,11 +319,17 @@ class AssetSync extends Command
 
         $dbBars->flush();
 
-        if(!$this->option('continue')){
+        $shouldCheckLatest = !$this->option('continue') || $this->option('eod');
+
+        if ($shouldCheckLatest) {
             // Ask user for a custom date to check against latest data
             $chkLatest = $this->option('chk-date');
             $showIsLatest = (bool) $chkLatest;
-            if (!$chkLatest && $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)) {
+            if (
+                !$chkLatest &&
+                !$this->option('continue') &&
+                $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)
+            ) {
                 $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
                 $showIsLatest = true;
             }
