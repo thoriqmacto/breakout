@@ -92,10 +92,16 @@ class LatestPricesTest extends TestCase
 
         config(['python.bin' => '/bin/echo']);
 
+        foreach (['2024-01-01', '2024-01-02', '2024-01-03'] as $date) {
+            \DB::table('trading_days')->insert([
+                'date' => $date,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
         $this->artisan('asset:sync')
             ->expectsConfirmation('Continue checking latest data anyway?', 'yes')
-            ->expectsConfirmation('Do you have your own chk-date to compare with latest-date data?', 'yes')
-            ->expectsQuestion('Enter chk-date (YYYY-MM-DD)', '2024-01-03')
             ->assertExitCode(0);
 
         $this->assertDatabaseCount('price_bars', 3);
@@ -121,6 +127,12 @@ class LatestPricesTest extends TestCase
         file_put_contents($pyDir . '/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
 
         config(['python.bin' => '/bin/echo']);
+
+        \DB::table('trading_days')->insert([
+            'date' => '2024-01-03',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $this->artisan('asset:sync', ['--eod' => true])
             ->assertExitCode(0);
