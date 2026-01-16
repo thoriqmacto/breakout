@@ -56,20 +56,25 @@ class AssetSync extends Command
         $yfinanceLatestDate = null;
         $stockbitBackfillDays = (int) config('stockbit.backfill_days', 14);
         $eodDate = null;
+        $eodTradingDate = null;
 
         if ($this->option('eod')) {
             $eodDate = Carbon::now()->toDateString();
+            $eodTradingDate = $this->resolveLatestTradingDay($eodDate) ?? $eodDate;
+            if ($eodTradingDate !== $eodDate) {
+                $this->warn("Using {$eodTradingDate} as latest trading day for EOD checks.");
+            }
             $this->input->setOption('check-python', true);
             $this->input->setOption('run-python', true);
             $this->input->setOption('import-csv', true);
             $this->input->setOption('continue', true);
-            $this->input->setOption('chk-date', $eodDate);
+            $this->input->setOption('chk-date', $eodTradingDate);
             $this->input->setOption('broker-summary', true);
             if (!$this->option('broker-summary-from')) {
-                $this->input->setOption('broker-summary-from', $eodDate);
+                $this->input->setOption('broker-summary-from', $eodTradingDate);
             }
             if (!$this->option('broker-summary-to')) {
-                $this->input->setOption('broker-summary-to', $eodDate);
+                $this->input->setOption('broker-summary-to', $eodTradingDate);
             }
         }
 
@@ -165,7 +170,12 @@ class AssetSync extends Command
                                      $this->confirm('Run python get_stocks.py now?', false);
                         if ($runPython) {
                             if ($this->option('eod')) {
-                                $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
+                                $this->ensureYfinanceChecked(
+                                    $checkedYfinance,
+                                    $yfinanceReady,
+                                    $yfinanceLatestDate,
+                                    (string) ($eodTradingDate ?? $eodDate)
+                                );
                                 if ($yfinanceReady === false) {
                                     $this->warn('Skipping python download because latest IDX data is not available yet.');
                                     $runPython = false;
@@ -330,6 +340,14 @@ class AssetSync extends Command
             // Ask user for a custom date to check against latest data
             $chkLatest = $this->option('chk-date');
             $showIsLatest = (bool) $chkLatest;
+            if (!$chkLatest) {
+                $autoChkLatest = $this->resolveLatestTradingDay(Carbon::now()->toDateString());
+                if ($autoChkLatest) {
+                    $chkLatest = $autoChkLatest;
+                    $showIsLatest = true;
+                }
+            }
+
             if (
                 !$chkLatest &&
                 !$this->option('continue') &&
@@ -337,6 +355,14 @@ class AssetSync extends Command
             ) {
                 $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
                 $showIsLatest = true;
+            }
+
+            if ($chkLatest) {
+                $resolvedChkLatest = $this->resolveLatestTradingDay($chkLatest);
+                if ($resolvedChkLatest && $resolvedChkLatest !== $chkLatest) {
+                    $this->warn("Adjusted chk-date to latest trading day: {$resolvedChkLatest}.");
+                    $chkLatest = $resolvedChkLatest;
+                }
             }
 
             // After syncing, display latest data from CSV and DB for each symbol
@@ -356,7 +382,12 @@ class AssetSync extends Command
 
                     if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
                         if ($this->option('eod')) {
-                            $this->ensureYfinanceChecked($checkedYfinance, $yfinanceReady, $yfinanceLatestDate, (string) $eodDate);
+                            $this->ensureYfinanceChecked(
+                                $checkedYfinance,
+                                $yfinanceReady,
+                                $yfinanceLatestDate,
+                                (string) ($eodTradingDate ?? $eodDate)
+                            );
                             if ($yfinanceReady === false) {
                                 $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
                                 if ($yfinanceLatestDate) {
@@ -549,6 +580,30 @@ class AssetSync extends Command
             return TradingDay::query()
                 ->whereBetween('date', [$from, $to])
                 ->count();
+        }
+
+        return null;
+    }
+
+    private function resolveLatestTradingDay(string $date): ?string
+    {
+        if (Schema::hasTable('trading_calendar')) {
+            $row = TradingCalendarDay::query()
+                ->where('date', '<=', $date)
+                ->where('is_trading_day', true)
+                ->orderByDesc('date')
+                ->first(['date']);
+
+            return $row?->date?->toDateString();
+        }
+
+        if (Schema::hasTable('trading_days')) {
+            $row = TradingDay::query()
+                ->where('date', '<=', $date)
+                ->orderByDesc('date')
+                ->first(['date']);
+
+            return $row?->date?->toDateString();
         }
 
         return null;
