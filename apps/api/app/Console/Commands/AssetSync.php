@@ -13,6 +13,9 @@ use App\Services\PythonRunner;
 use App\Services\BrokerSummaryImporter;
 use App\Support\StockbitTokenStore;
 use App\Support\AssetList;
+use App\Models\TradingCalendarDay;
+use App\Models\TradingDay;
+use Illuminate\Support\Facades\Schema;
 
 class AssetSync extends Command
 {
@@ -229,7 +232,9 @@ class AssetSync extends Command
                     [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
 
                     if ($fromDate && $toDate) {
-                        $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                        if ($this->shouldFetchBrokerSummaries($fromDate, $toDate)) {
+                            $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                        }
                     } else {
                         $this->warn('Skipping broker summary fetch; invalid date range provided.');
                     }
@@ -511,6 +516,42 @@ class AssetSync extends Command
         }
 
         return [$fromDate, $toDate];
+    }
+
+    private function shouldFetchBrokerSummaries(string $from, string $to): bool
+    {
+        $tradingDayCount = $this->countTradingDaysInRange($from, $to);
+
+        if ($tradingDayCount === null) {
+            return true;
+        }
+
+        if ($tradingDayCount === 0) {
+            $range = $from === $to ? $from : "{$from} → {$to}";
+            $this->warn("Skipping broker summary fetch; no trading days in range ({$range}).");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function countTradingDaysInRange(string $from, string $to): ?int
+    {
+        if (Schema::hasTable('trading_calendar')) {
+            return TradingCalendarDay::query()
+                ->whereBetween('date', [$from, $to])
+                ->where('is_trading_day', true)
+                ->count();
+        }
+
+        if (Schema::hasTable('trading_days')) {
+            return TradingDay::query()
+                ->whereBetween('date', [$from, $to])
+                ->count();
+        }
+
+        return null;
     }
 
     /**
