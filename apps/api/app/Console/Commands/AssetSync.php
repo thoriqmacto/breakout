@@ -569,13 +569,6 @@ class AssetSync extends Command
 
     private function countTradingDaysInRange(string $from, string $to): ?int
     {
-        if (Schema::hasTable('trading_calendar')) {
-            return TradingCalendarDay::query()
-                ->whereBetween('date', [$from, $to])
-                ->where('is_trading_day', true)
-                ->count();
-        }
-
         if (Schema::hasTable('trading_days')) {
             return TradingDay::query()
                 ->whereBetween('date', [$from, $to])
