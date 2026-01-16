@@ -482,11 +482,11 @@ class AssetMetrics
     }
 
     /**
-     * True when latest close is above the 30-week moving average.
+     * True when latest close is above the 150-trading-day moving average.
      */
     public function isUptrend(): bool
     {
-        return $this->lastClose() > $this->movingAverageWeeks(30);
+        return $this->lastClose() > $this->movingAverageTradingDays(150);
     }
 
     /**
