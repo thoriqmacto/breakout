@@ -11,6 +11,7 @@ use App\Http\Resources\AssetResource;
 use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
 use App\Services\AssetMetrics;
+use App\Models\BandarDetectorSummary;
 use Illuminate\Support\Facades\DB;
 
 class AssetController extends ApiController
@@ -71,6 +72,7 @@ class AssetController extends ApiController
                 'uptrend' => $metric->uptrend,
                 'bars' => $metric->bars,
                 'pbas' => $metric->pbas,
+                'bavg' => $metric->bavg,
             ];
         }
 
@@ -107,6 +109,7 @@ class AssetController extends ApiController
                 'uptrend' => $metric->uptrend,
                 'bars' => $metric->bars,
                 'pbas' => $metric->pbas,
+                'bavg' => $metric->bavg,
             ],
         ]);
     }
@@ -193,6 +196,18 @@ class AssetController extends ApiController
                     ->orderByDesc('date')
                     ->value('pbas');
                 $pbas = $pbas === null ? null : (int) $pbas;
+                $latestDate = $prices->last()?->date;
+                $bavg = null;
+                if ($latestDate) {
+                    $bavg = BandarDetectorSummary::query()
+                        ->where('asset_id', $asset->id)
+                        ->whereNotNull('average_price')
+                        ->whereDate('from_date', '<=', $latestDate->toDateString())
+                        ->whereDate('to_date', '>=', $latestDate->toDateString())
+                        ->orderByDesc('from_date')
+                        ->value('average_price');
+                    $bavg = $bavg === null ? null : (float) $bavg;
+                }
 
                 Metric::updateOrCreate(
                     ['asset_id' => $asset->id],
@@ -213,6 +228,7 @@ class AssetController extends ApiController
                         'uptrend' => $metrics->isUptrend(),
                         'bars' => $metrics->barCount(),
                         'pbas' => $pbas,
+                        'bavg' => $bavg,
                         'sort_uptrend' => $metrics->isUptrend() ? 1 : 0,
                         'sort_roc13' => (float) ($roc13 ?? 0.0),
                         'sort_close_vs_high55' => (float) ($closeVsHigh55 ?? 0.0),

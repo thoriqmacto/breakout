@@ -86,6 +86,10 @@ const ratioFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 })
 
+const percentFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+})
+
 const formatNumber = (
   value: number | string | null | undefined,
   formatter: Intl.NumberFormat,
@@ -136,6 +140,25 @@ const formatDateString = (value: string | null | undefined) => {
   }
 
   return parsed.toLocaleDateString("en-US", { dateStyle: "medium" })
+}
+
+const formatBandarAverage = (bavg: number | null, close: number | null) => {
+  if (bavg === null || Number.isNaN(bavg) || bavg <= 0) {
+    return "—"
+  }
+
+  const formattedPrice = formatNumber(bavg, priceFormatter)
+  if (formattedPrice === "—" || close === null || Number.isNaN(close) || close <= 0) {
+    return formattedPrice
+  }
+
+  const diffPercent = ((close - bavg) / bavg) * 100
+  if (!Number.isFinite(diffPercent)) {
+    return formattedPrice
+  }
+
+  const sign = diffPercent >= 0 ? "+" : ""
+  return `${formattedPrice}(${sign}${percentFormatter.format(diffPercent)}%)`
 }
 
 export default function AssetDetailPage() {
@@ -411,6 +434,7 @@ export default function AssetDetailPage() {
               <MetricItem label="Close / 20wH" value={formatNumber(metric.closeVsHigh20, ratioFormatter)} />
               <MetricItem label="Close / 55wH" value={formatNumber(metric.closeVsHigh55, ratioFormatter)} />
               <MetricItem label="PBAS" value={formatNumber(metric.pbas, integerFormatter)} />
+              <MetricItem label="BAVG" value={formatBandarAverage(metric.bavg, metric.close)} />
               <MetricItem
                 label="Uptrend"
                 value={

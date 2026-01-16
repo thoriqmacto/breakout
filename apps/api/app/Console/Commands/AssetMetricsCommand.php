@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Asset;
 use App\Models\Metric;
 use App\Services\AssetMetrics;
+use App\Models\BandarDetectorSummary;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +25,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars', 'PBAS'];
+        $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars', 'PBAS', 'BAVG'];
         $rows = [];
         $persist = (bool) $this->option('persist');
         $persistedCount = 0;
@@ -40,6 +41,7 @@ class AssetMetricsCommand extends Command
             }
             $metrics = new AssetMetrics($bars);
             $totalBars = count($bars);
+            $latestDate = $bars[array_key_last($bars)]['date'] ?? null;
 
             $close = $metrics->lastClose();
             $closeRounded = round($close, 2);
@@ -63,6 +65,17 @@ class AssetMetricsCommand extends Command
                 ->orderByDesc('date')
                 ->value('pbas');
             $pbas = $pbas === null ? null : (int) $pbas;
+            $bavg = null;
+            if ($latestDate) {
+                $bavg = BandarDetectorSummary::query()
+                    ->where('asset_id', $asset->id)
+                    ->whereNotNull('average_price')
+                    ->whereDate('from_date', '<=', $latestDate)
+                    ->whereDate('to_date', '>=', $latestDate)
+                    ->orderByDesc('from_date')
+                    ->value('average_price');
+                $bavg = $bavg === null ? null : (float) $bavg;
+            }
 
             $rows[] = [
                 'symbol' => $symbol,
@@ -80,6 +93,7 @@ class AssetMetricsCommand extends Command
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
                 'bars' => $totalBars,
                 'pbas' => $pbas,
+                'bavg' => $bavg,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
                 'sort_roc13' => (float) $roc13,
                 'sort_close_vs_high55' => (float) $closeVsHigh55,
@@ -107,6 +121,7 @@ class AssetMetricsCommand extends Command
                         'uptrend' => $isUptrend,
                         'bars' => $totalBars,
                         'pbas' => $pbas,
+                        'bavg' => $bavg,
                         'sort_uptrend' => $isUptrend ? 1 : 0,
                         'sort_roc13' => (float) $roc13,
                         'sort_close_vs_high55' => (float) $closeVsHigh55,
@@ -162,6 +177,7 @@ class AssetMetricsCommand extends Command
                 $r['uptrend'],
                 $r['bars'],
                 $r['pbas'],
+                $r['bavg'],
             ];
         }
 

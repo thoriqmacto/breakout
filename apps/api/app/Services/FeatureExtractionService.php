@@ -13,7 +13,7 @@ class FeatureExtractionService
 {
     private const DEFAULT_LOOKBACK = 100;
     private const MIN_TICK = 0.0001;
-    private const PBAS_BROKER_LOOKBACK_DAYS = 10;
+    private const PBAS_BROKER_LOOKBACK_DAYS = 30;
     private const PBAS_BROKER_WEIGHT_CURRENT = 0.6;
     private const PBAS_BROKER_WEIGHT_HISTORY = 0.4;
     private const PBAS_BROKER_KEYS = [

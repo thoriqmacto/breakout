@@ -17,6 +17,7 @@ export type AssetMetricApiRow = {
   uptrend: boolean | string | number | null
   bars: number | string | null
   pbas: number | string | null
+  bavg: number | string | null
 }
 
 export type AssetMetricRow = {
@@ -38,6 +39,7 @@ export type AssetMetricRow = {
   uptrend: boolean | null
   bars: number | null
   pbas: number | null
+  bavg: number | null
 }
 
 export const parseNumericValue = (value: unknown): number | null => {
@@ -106,4 +108,5 @@ export const normalizeMetrics = (rows: AssetMetricApiRow[]): AssetMetricRow[] =>
     uptrend: parseBooleanValue(row.uptrend),
     bars: parseNumericValue(row.bars),
     pbas: parseNumericValue(row.pbas),
+    bavg: parseNumericValue(row.bavg),
   }))
