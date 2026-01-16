@@ -28,6 +28,10 @@ const ratioFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 })
 
+const percentFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+})
+
 type AssetMetricsResponse = {
   metrics?: AssetMetricApiRow[]
 }
@@ -50,6 +54,25 @@ const formatRatio = (value: number | null) => {
   }
 
   return ratioFormatter.format(value)
+}
+
+const formatBandarAverage = (bavg: number | null, close: number | null) => {
+  if (bavg === null || Number.isNaN(bavg) || bavg <= 0) {
+    return "—"
+  }
+
+  const formattedPrice = formatNumber(bavg, priceFormatter)
+  if (formattedPrice === "—" || close === null || Number.isNaN(close) || close <= 0) {
+    return formattedPrice
+  }
+
+  const diffPercent = ((close - bavg) / bavg) * 100
+  if (!Number.isFinite(diffPercent)) {
+    return formattedPrice
+  }
+
+  const sign = diffPercent >= 0 ? "+" : ""
+  return `${formattedPrice}(${sign}${percentFormatter.format(diffPercent)}%)`
 }
 
 type ColumnKey = keyof AssetMetricRow
@@ -224,6 +247,15 @@ const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
     getSortValue: (row) => row.pbas,
     getCopyValue: (row) => formatNumber(row.pbas, integerFormatter),
     render: (row) => formatNumber(row.pbas, integerFormatter),
+  },
+  {
+    key: "bavg",
+    label: "BAVG",
+    align: "right",
+    cellClassName: "tabular-nums",
+    getSortValue: (row) => row.bavg,
+    getCopyValue: (row) => formatBandarAverage(row.bavg, row.close),
+    render: (row) => formatBandarAverage(row.bavg, row.close),
   },
   {
     key: "uptrend",
