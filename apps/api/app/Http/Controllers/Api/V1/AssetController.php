@@ -42,7 +42,7 @@ class AssetController extends ApiController
     public function metricsIndex()
     {
         $metrics = Metric::orderByDesc('sort_uptrend')
-            ->orderByDesc('sort_roc13')
+            ->orderByDesc('pbas')
             ->orderByDesc('sort_close_vs_high55')
             ->orderByDesc('sort_close_vs_high20')
             ->orderByDesc('sort_vol_vs_avg20')
