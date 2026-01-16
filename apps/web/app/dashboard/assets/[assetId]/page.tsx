@@ -410,6 +410,7 @@ export default function AssetDetailPage() {
               <MetricItem label="Vol / Avg 20d" value={formatNumber(metric.volVsAvg20, ratioFormatter)} />
               <MetricItem label="Close / 20wH" value={formatNumber(metric.closeVsHigh20, ratioFormatter)} />
               <MetricItem label="Close / 55wH" value={formatNumber(metric.closeVsHigh55, ratioFormatter)} />
+              <MetricItem label="PBAS" value={formatNumber(metric.pbas, integerFormatter)} />
               <MetricItem
                 label="Uptrend"
                 value={

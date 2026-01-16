@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\Metric;
 use App\Services\AssetMetrics;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class AssetMetricsCommand extends Command
 {
@@ -23,7 +24,7 @@ class AssetMetricsCommand extends Command
             $symbols = array_map('trim', explode(',', (string) $input));
         }
 
-        $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars'];
+        $headers = ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars', 'PBAS'];
         $rows = [];
         $persist = (bool) $this->option('persist');
         $persistedCount = 0;
@@ -57,6 +58,11 @@ class AssetMetricsCommand extends Command
             $high55 = round($high55, 0);
             $isUptrend = $metrics->isUptrend();
             $atr14 = round($metrics->atr(14), 0);
+            $pbas = DB::table('features_daily')
+                ->where('symbol', $asset->symbol)
+                ->orderByDesc('date')
+                ->value('pbas');
+            $pbas = $pbas === null ? null : (int) $pbas;
 
             $rows[] = [
                 'symbol' => $symbol,
@@ -73,6 +79,7 @@ class AssetMetricsCommand extends Command
                 'close_vs_high55' => $closeVsHigh55,
                 'uptrend' => $isUptrend ? 'Yes' : 'No',
                 'bars' => $totalBars,
+                'pbas' => $pbas,
                 'sort_uptrend' => $isUptrend ? 1 : 0,
                 'sort_roc13' => (float) $roc13,
                 'sort_close_vs_high55' => (float) $closeVsHigh55,
@@ -99,6 +106,7 @@ class AssetMetricsCommand extends Command
                         'close_vs_high55' => $closeVsHigh55,
                         'uptrend' => $isUptrend,
                         'bars' => $totalBars,
+                        'pbas' => $pbas,
                         'sort_uptrend' => $isUptrend ? 1 : 0,
                         'sort_roc13' => (float) $roc13,
                         'sort_close_vs_high55' => (float) $closeVsHigh55,
@@ -153,6 +161,7 @@ class AssetMetricsCommand extends Command
                 $r['close_vs_high55'],
                 $r['uptrend'],
                 $r['bars'],
+                $r['pbas'],
             ];
         }
 

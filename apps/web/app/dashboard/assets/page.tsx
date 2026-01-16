@@ -217,6 +217,15 @@ const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
     render: (row) => formatRatio(row.closeVsHigh55),
   },
   {
+    key: "pbas",
+    label: "PBAS",
+    align: "right",
+    cellClassName: "tabular-nums",
+    getSortValue: (row) => row.pbas,
+    getCopyValue: (row) => formatNumber(row.pbas, integerFormatter),
+    render: (row) => formatNumber(row.pbas, integerFormatter),
+  },
+  {
     key: "uptrend",
     label: "Uptrend",
     align: "left",

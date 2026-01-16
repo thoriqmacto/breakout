@@ -11,6 +11,7 @@ use App\Http\Resources\AssetResource;
 use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
 use App\Services\AssetMetrics;
+use Illuminate\Support\Facades\DB;
 
 class AssetController extends ApiController
 {
@@ -69,6 +70,7 @@ class AssetController extends ApiController
                 'close_vs_high55' => $metric->close_vs_high55,
                 'uptrend' => $metric->uptrend,
                 'bars' => $metric->bars,
+                'pbas' => $metric->pbas,
             ];
         }
 
@@ -104,6 +106,7 @@ class AssetController extends ApiController
                 'close_vs_high55' => $metric->close_vs_high55,
                 'uptrend' => $metric->uptrend,
                 'bars' => $metric->bars,
+                'pbas' => $metric->pbas,
             ],
         ]);
     }
@@ -185,6 +188,11 @@ class AssetController extends ApiController
 
                 $closeVsHigh20 = $high20 > 0 ? round($close / $high20, 2) : null;
                 $closeVsHigh55 = $high55 > 0 ? round($close / $high55, 2) : null;
+                $pbas = DB::table('features_daily')
+                    ->where('symbol', $asset->symbol)
+                    ->orderByDesc('date')
+                    ->value('pbas');
+                $pbas = $pbas === null ? null : (int) $pbas;
 
                 Metric::updateOrCreate(
                     ['asset_id' => $asset->id],
@@ -204,6 +212,7 @@ class AssetController extends ApiController
                         'close_vs_high55' => $closeVsHigh55,
                         'uptrend' => $metrics->isUptrend(),
                         'bars' => $metrics->barCount(),
+                        'pbas' => $pbas,
                         'sort_uptrend' => $metrics->isUptrend() ? 1 : 0,
                         'sort_roc13' => (float) ($roc13 ?? 0.0),
                         'sort_close_vs_high55' => (float) ($closeVsHigh55 ?? 0.0),
