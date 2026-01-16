@@ -310,7 +310,7 @@ class AssetMetricsTest extends TestCase
         $this->assertEqualsWithDelta(25.0, $metrics->movingAverageTradingDays(150), 0.0001);
     }
 
-    public function test_is_uptrend_uses_weekly_average(): void
+    public function test_is_uptrend_uses_trading_day_average(): void
     {
         $today = new DateTimeImmutable('now');
         $currentMonday = $today->modify('monday this week');
@@ -333,23 +333,23 @@ class AssetMetricsTest extends TestCase
 
         $bars[] = [
             'date' => $currentMonday->format('Y-m-d'),
-            'open' => 120.0,
-            'high' => 120.0,
-            'low' => 120.0,
-            'close' => 120.0,
+            'open' => 210.0,
+            'high' => 210.0,
+            'low' => 210.0,
+            'close' => 210.0,
         ];
 
         $bars[] = [
             'date' => $currentMonday->add(new DateInterval('P1D'))->format('Y-m-d'),
-            'open' => 125.0,
-            'high' => 125.0,
-            'low' => 125.0,
-            'close' => 125.0,
+            'open' => 215.0,
+            'high' => 215.0,
+            'low' => 215.0,
+            'close' => 215.0,
         ];
 
         $metrics = new AssetMetrics($bars);
         $this->assertEqualsWithDelta(50.0, $metrics->movingAverageWeeks(30), 0.0001);
         $this->assertTrue($metrics->isUptrend());
-        $this->assertGreaterThan($metrics->lastClose(), $metrics->movingAverageTradingDays(150));
+        $this->assertLessThan($metrics->lastClose(), $metrics->movingAverageTradingDays(150));
     }
 }

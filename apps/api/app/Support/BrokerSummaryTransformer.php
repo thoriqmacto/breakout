@@ -434,6 +434,13 @@ final class BrokerSummaryTransformer
         }
 
         if (ctype_digit($date)) {
+            if (strlen($date) === 8) {
+                $parsed = \DateTimeImmutable::createFromFormat('Ymd', $date);
+                if ($parsed instanceof \DateTimeImmutable) {
+                    return $parsed->format('Y-m-d');
+                }
+            }
+
             $timestamp = (int) $date;
             if ($timestamp > 1_000_000_000_000) {
                 $timestamp = (int) round($timestamp / 1000);
