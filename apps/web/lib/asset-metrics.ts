@@ -16,6 +16,7 @@ export type AssetMetricApiRow = {
   close_vs_high55: number | string | null
   uptrend: boolean | string | number | null
   bars: number | string | null
+  pbas: number | string | null
 }
 
 export type AssetMetricRow = {
@@ -36,6 +37,7 @@ export type AssetMetricRow = {
   closeVsHigh55: number | null
   uptrend: boolean | null
   bars: number | null
+  pbas: number | null
 }
 
 export const parseNumericValue = (value: unknown): number | null => {
@@ -103,4 +105,5 @@ export const normalizeMetrics = (rows: AssetMetricApiRow[]): AssetMetricRow[] =>
     closeVsHigh55: parseNumericValue(row.close_vs_high55),
     uptrend: parseBooleanValue(row.uptrend),
     bars: parseNumericValue(row.bars),
+    pbas: parseNumericValue(row.pbas),
   }))
