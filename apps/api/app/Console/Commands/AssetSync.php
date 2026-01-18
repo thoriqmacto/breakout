@@ -128,7 +128,7 @@ class AssetSync extends Command
 
         // Compare config symbols with available CSV files
         $missing = array_diff($indexSymbols, $csvSymbols);
-        if (!empty($missing)) {
+        if (!empty($missing) && !$this->option('broker-summary')) {
             $this->warn('CSV seed files missing for: ' . implode(', ', $missing));
 
             $this->info('Attempting to backfill missing CSV from Stockbit first ...');
@@ -229,8 +229,6 @@ class AssetSync extends Command
             } else {
                 $this->comment('Stockbit backfill completed missing CSV files.');
             }
-        } else {
-            $this->comment('Tickers in config and seed files aligned.');
         }
 
         if ($brokerSummaryRequested) {
@@ -257,9 +255,7 @@ class AssetSync extends Command
                     }
                 }
             }
-        }
 
-        if ($brokerSummaryRequested) {
             try {
                 /** @var BrokerSummaryImporter $importer */
                 $importer = app(BrokerSummaryImporter::class);
@@ -275,8 +271,13 @@ class AssetSync extends Command
             }
         }
 
+        if ($this->option('broker-summary')){
+            return Command::FAILURE;
+        }
+
         if (!$this->option('continue') &&
-            !$this->confirm('Continue checking latest data anyway?', false)) {
+            !$this->confirm('Continue checking latest data anyway?', false)
+        ) {
             return Command::FAILURE;
         }
 
@@ -341,7 +342,7 @@ class AssetSync extends Command
 
         $dbBars->flush();
 
-        $shouldCheckLatest = !$this->option('continue') || $this->option('eod');
+        $shouldCheckLatest = !$this->option('continue') || $this->option('eod') || !$this->option('broker-summary');
 
         if ($shouldCheckLatest) {
             // Ask user for a custom date to check against latest data
