@@ -33,6 +33,7 @@ class AssetSync extends Command
         {--eod : Confirm all prompts and use today for chk-date}
         {--broker-summary : Fetch broker summary data from Stockbit}
         {--broker-summary-import-only : Skip fetching broker summary data and only import from disk}
+        {--broker-summary-date= : Broker summary single date (YYYY-MM-DD)}
         {--broker-summary-from= : Broker summary start date (YYYY-MM-DD)}
         {--broker-summary-to= : Broker summary end date (YYYY-MM-DD)}
         {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}';
@@ -76,6 +77,12 @@ class AssetSync extends Command
             if (!$this->option('broker-summary-to')) {
                 $this->input->setOption('broker-summary-to', $eodTradingDate);
             }
+        }
+
+        $brokerSummaryDate = $this->option('broker-summary-date');
+        if ($brokerSummaryDate) {
+            $this->input->setOption('broker-summary-from', $brokerSummaryDate);
+            $this->input->setOption('broker-summary-to', $brokerSummaryDate);
         }
 
         $assetSettings = Asset::query()
