@@ -38,6 +38,7 @@ class ScrapeStockbit extends Command
      * @var array<string, int>
      */
     private array $assetIds = [];
+    private bool $abortDueToUnauthorized = false;
 
     public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater, StockbitTokenStore $tokenStore): int
     {
@@ -153,6 +154,12 @@ class ScrapeStockbit extends Command
         foreach ($tickers as $symbol) {
             if (!$this->option('no-profile-sync')) {
                 $profileResponse = $api->tickerProfile($symbol);
+                if ($this->refreshBearerIfUnauthorized($profileResponse, $api, $tokenStore)) {
+                    if ($this->abortDueToUnauthorized) {
+                        return self::FAILURE;
+                    }
+                    $profileResponse = $api->tickerProfile($symbol);
+                }
                 $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
                 if (!$profileResult['ok']) {
                     $message = $profileResult['message'] ?? 'Unknown error';
@@ -202,6 +209,21 @@ class ScrapeStockbit extends Command
                         $limit,
                     );
 
+                    if ($this->refreshBearerIfUnauthorized($json, $api, $tokenStore)) {
+                        if ($this->abortDueToUnauthorized) {
+                            return self::FAILURE;
+                        }
+                        $json = $api->marketDetectors(
+                            $symbol,
+                            $fromString,
+                            $toString,
+                            $transactionType,
+                            $marketBoard,
+                            $investorType,
+                            $limit,
+                        );
+                    }
+
                     if (isset($json['error'])) {
                         $this->error("Error for broksum {$symbol}: {$json['error']} — {$json['message']}");
                         $chunkStart = $chunkEnd->copy()->addDay();
@@ -229,6 +251,22 @@ class ScrapeStockbit extends Command
                             $limit,
                             $nextPage,
                         );
+
+                        if ($this->refreshBearerIfUnauthorized($paginatedJson, $api, $tokenStore)) {
+                            if ($this->abortDueToUnauthorized) {
+                                return self::FAILURE;
+                            }
+                            $paginatedJson = $api->marketDetectors(
+                                $symbol,
+                                $fromString,
+                                $toString,
+                                $transactionType,
+                                $marketBoard,
+                                $investorType,
+                                $limit,
+                                $nextPage,
+                            );
+                        }
 
                         if (isset($paginatedJson['error'])) {
                             $this->warn(
@@ -298,6 +336,20 @@ class ScrapeStockbit extends Command
                         $historicalPage,
                     );
 
+                    if ($this->refreshBearerIfUnauthorized($historicalResponse, $api, $tokenStore)) {
+                        if ($this->abortDueToUnauthorized) {
+                            return self::FAILURE;
+                        }
+                        $historicalResponse = $api->historicalSummary(
+                            $symbol,
+                            $historicalPeriod,
+                            $fromString,
+                            $toString,
+                            $historicalLimit,
+                            $historicalPage,
+                        );
+                    }
+
                     if (isset($historicalResponse['error'])) {
                         $this->logHistoricalError($symbol, $chunkStart, $chunkEnd, $historicalResponse);
                         $chunkStart = $chunkEnd->copy()->addDay();
@@ -327,6 +379,20 @@ class ScrapeStockbit extends Command
                             $historicalLimit,
                             $historicalNextPage,
                         );
+
+                        if ($this->refreshBearerIfUnauthorized($paginatedHistorical, $api, $tokenStore)) {
+                            if ($this->abortDueToUnauthorized) {
+                                return self::FAILURE;
+                            }
+                            $paginatedHistorical = $api->historicalSummary(
+                                $symbol,
+                                $historicalPeriod,
+                                $fromString,
+                                $toString,
+                                $historicalLimit,
+                                $historicalNextPage,
+                            );
+                        }
 
                         if (isset($paginatedHistorical['error'])) {
                             $this->logHistoricalError($symbol, $chunkStart, $chunkEnd, $paginatedHistorical, $historicalNextPage);
@@ -370,7 +436,7 @@ class ScrapeStockbit extends Command
         }
 
         if ($this->option('eod')) {
-            $this->captureWatchlistSnapshot($api, $disk);
+            $this->captureWatchlistSnapshot($api, $disk, $tokenStore);
         }
 
         return self::SUCCESS;
@@ -643,7 +709,11 @@ class ScrapeStockbit extends Command
         }
     }
 
-    private function captureWatchlistSnapshot(StockbitExodusClient $api, string $disk): void
+    private function captureWatchlistSnapshot(
+        StockbitExodusClient $api,
+        string $disk,
+        StockbitTokenStore $tokenStore
+    ): void
     {
         $watchlistId = $this->option('watchlist-id') ?: config('stockbit.watchlist.id');
 
@@ -667,7 +737,7 @@ class ScrapeStockbit extends Command
         }
 
         if ($watchlist === null) {
-            $watchlist = $this->fetchWatchlistSnapshot($api, $watchlistId, $query);
+            $watchlist = $this->fetchWatchlistSnapshot($api, $watchlistId, $query, $tokenStore);
 
             if ($watchlist === null) {
                 return;
@@ -716,9 +786,20 @@ class ScrapeStockbit extends Command
      * @param array<string, mixed> $query
      * @return array<string, mixed>|null
      */
-    private function fetchWatchlistSnapshot(StockbitExodusClient $api, string $watchlistId, array $query): ?array
+    private function fetchWatchlistSnapshot(
+        StockbitExodusClient $api,
+        string $watchlistId,
+        array $query,
+        StockbitTokenStore $tokenStore
+    ): ?array
     {
         $watchlist = $api->watchlist($watchlistId, $query);
+        if ($this->refreshBearerIfUnauthorized($watchlist, $api, $tokenStore)) {
+            if ($this->abortDueToUnauthorized) {
+                return null;
+            }
+            $watchlist = $api->watchlist($watchlistId, $query);
+        }
 
         if (isset($watchlist['error'])) {
             $code = $watchlist['error'] ?? 'error';
@@ -738,6 +819,12 @@ class ScrapeStockbit extends Command
             }
 
             $column = $api->watchlistColumn($watchlistId, $itemId);
+            if ($this->refreshBearerIfUnauthorized($column, $api, $tokenStore)) {
+                if ($this->abortDueToUnauthorized) {
+                    return null;
+                }
+                $column = $api->watchlistColumn($watchlistId, $itemId);
+            }
 
             if (isset($column['error'])) {
                 $code = $column['error'] ?? 'error';
@@ -1034,6 +1121,45 @@ class ScrapeStockbit extends Command
         }
 
         return null;
+    }
+
+    private function refreshBearerIfUnauthorized(
+        array $response,
+        StockbitExodusClient $api,
+        StockbitTokenStore $tokenStore
+    ): bool {
+        if (($response['error'] ?? null) !== 'unauthorized') {
+            return false;
+        }
+
+        $this->warn('Stockbit bearer token rejected (401).');
+
+        if (!$this->input->isInteractive()) {
+            $this->error('STOCKBIT_BEARER is invalid. Run interactively to refresh the token.');
+            $this->abortDueToUnauthorized = true;
+
+            return false;
+        }
+
+        $newBearer = trim((string) $this->ask('Enter new Stockbit bearer token (leave blank to cancel)'));
+        if ($newBearer === '') {
+            $this->error('No bearer token supplied. Exiting.');
+            $tokenStore->forget();
+            $this->abortDueToUnauthorized = true;
+
+            return false;
+        }
+
+        config(['stockbit.bearer' => $newBearer]);
+        $api->setBearer($newBearer);
+        $tokenStore->put($newBearer);
+
+        $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
+        if ($exp) {
+            $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+        }
+
+        return true;
     }
 
     private function parsePrice(mixed $value): ?float
