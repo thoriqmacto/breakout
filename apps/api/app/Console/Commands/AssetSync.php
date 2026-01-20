@@ -104,24 +104,6 @@ class AssetSync extends Command
         $brokerSummaryImportOnly = (bool) $this->option('broker-summary-import-only');
         $brokerSummaryRequested = (bool) $this->option('broker-summary') || $brokerSummaryImportOnly;
 
-        if ($brokerSummaryImportOnly) {
-            try {
-                /** @var BrokerSummaryImporter $importer */
-                $importer = app(BrokerSummaryImporter::class);
-                $disk = config('stockbit.save_disk');
-                $jsonDir = config('stockbit.save_dir');
-                $summary = $importer->importFromDisk($disk, $jsonDir);
-
-                $fileCount = $summary['file_count'] ?? 0;
-                $rowCount = $summary['row_count'] ?? 0;
-                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
-            } catch (\Throwable $exception) {
-                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
-            }
-
-            return Command::SUCCESS;
-        }
-
         // Collect CSV files available in seed directory
         $seedFiles = glob($seedDir . '/*.csv') ?: [];
         $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
@@ -229,50 +211,6 @@ class AssetSync extends Command
             } else {
                 $this->comment('Stockbit backfill completed missing CSV files.');
             }
-        }
-
-        if ($brokerSummaryRequested) {
-            if (!$brokerSummaryImportOnly) {
-                $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
-                    $this->option('broker-summary-tickers') ?? [],
-                    $indexSymbols,
-                    $assetSettings
-                );
-
-                if ($brokerSummarySymbols === []) {
-                    $this->warn('No broker summary tickers matched the sync settings.');
-                } else {
-                    $from = $this->option('broker-summary-from');
-                    $to = $this->option('broker-summary-to');
-                    [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
-
-                    if ($fromDate && $toDate) {
-                        if ($this->shouldFetchBrokerSummaries($fromDate, $toDate)) {
-                            $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
-                        }
-                    } else {
-                        $this->warn('Skipping broker summary fetch; invalid date range provided.');
-                    }
-                }
-            }
-
-            try {
-                /** @var BrokerSummaryImporter $importer */
-                $importer = app(BrokerSummaryImporter::class);
-                $disk = config('stockbit.save_disk');
-                $jsonDir = config('stockbit.save_dir');
-                $summary = $importer->importFromDisk($disk, $jsonDir);
-
-                $fileCount = $summary['file_count'] ?? 0;
-                $rowCount = $summary['row_count'] ?? 0;
-                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
-            } catch (\Throwable $exception) {
-                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
-            }
-        }
-
-        if (!$this->option('eod') && $this->option('broker-summary')){
-            return Command::FAILURE;
         }
 
         if (!$this->option('continue') &&
@@ -478,6 +416,68 @@ class AssetSync extends Command
             }
 
             $this->table($headers, $rows);
+        }
+
+        if ($brokerSummaryImportOnly) {
+            try {
+                /** @var BrokerSummaryImporter $importer */
+                $importer = app(BrokerSummaryImporter::class);
+                $disk = config('stockbit.save_disk');
+                $jsonDir = config('stockbit.save_dir');
+                $summary = $importer->importFromDisk($disk, $jsonDir);
+
+                $fileCount = $summary['file_count'] ?? 0;
+                $rowCount = $summary['row_count'] ?? 0;
+                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
+            } catch (\Throwable $exception) {
+                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+            }
+
+            return Command::SUCCESS;
+        }
+
+        if ($brokerSummaryRequested) {
+            if (!$brokerSummaryImportOnly) {
+                $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
+                    $this->option('broker-summary-tickers') ?? [],
+                    $indexSymbols,
+                    $assetSettings
+                );
+
+                if ($brokerSummarySymbols === []) {
+                    $this->warn('No broker summary tickers matched the sync settings.');
+                } else {
+                    $from = $this->option('broker-summary-from');
+                    $to = $this->option('broker-summary-to');
+                    [$fromDate, $toDate] = $this->normalizeBrokerSummaryRange($from, $to);
+
+                    if ($fromDate && $toDate) {
+                        if ($this->shouldFetchBrokerSummaries($fromDate, $toDate)) {
+                            $this->fetchBrokerSummaries($brokerSummarySymbols, $fromDate, $toDate);
+                        }
+                    } else {
+                        $this->warn('Skipping broker summary fetch; invalid date range provided.');
+                    }
+                }
+            }
+
+            try {
+                /** @var BrokerSummaryImporter $importer */
+                $importer = app(BrokerSummaryImporter::class);
+                $disk = config('stockbit.save_disk');
+                $jsonDir = config('stockbit.save_dir');
+                $summary = $importer->importFromDisk($disk, $jsonDir);
+
+                $fileCount = $summary['file_count'] ?? 0;
+                $rowCount = $summary['row_count'] ?? 0;
+                $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
+            } catch (\Throwable $exception) {
+                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+            }
+        }
+
+        if (!$this->option('eod') && $this->option('broker-summary')){
+            return Command::FAILURE;
         }
 
         return Command::SUCCESS;
