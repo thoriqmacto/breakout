@@ -271,7 +271,7 @@ class AssetSync extends Command
             }
         }
 
-        if ($this->option('broker-summary')){
+        if (!$this->option('eod') && $this->option('broker-summary')){
             return Command::FAILURE;
         }
 
