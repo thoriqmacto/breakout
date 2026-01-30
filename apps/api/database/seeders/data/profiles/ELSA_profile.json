@@ -1,0 +1,616 @@
+{
+    "symbol": "ELSA",
+    "name": "Elnusa Tbk",
+    "address": [
+        {
+            "id": "147",
+            "email": [
+                "corporate@elnusa.co.id"
+            ],
+            "fax": "(021) 788-30883",
+            "npwp": "01.000.050.3-051.000",
+            "phone": "(021) 788-30850",
+            "website": "www.elnusa.co.id",
+            "key": "",
+            "lastupdate": "2022-04-13T16:32:14+07:00",
+            "value": "<td colspan='4'>Graha Elnusa, Jl. TB Simatupang Kav. 1B, Jakarta 12560\n\n        \t\t  \t\t\tPhone: (021) 788-30850\n        \t\t  \t\t\tFax: (021) 788-30883\n                            NPWP: 01.000.050.3-051.000\n        \t\t  \t\t\tEmail: corporate@elnusa.co.id\n        \t\t  \t\t\tWebsite: www.elnusa.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Graha Elnusa, Jl. TB Simatupang Kav. 1B, Jakarta 12560"
+        }
+    ],
+    "background": "PT. Elnusa Tbk (ELSA) bergerak dalam bidang jasa hulu migas dan melakukan investasi saham pada anak perusahaan dan perusahaan joint venture yang bergerak di beberapa industri, seperti layanan dukungan dan perdagangan upstream migas, layanan dan perdagangan downstream migas bumi dan jasa pengelolaan dan penyimpanan data perdagangan migas dan pengelolaan aset lapangan migas bumi. Perusahaan juga menyediakan barang dan jasa termasuk penyediaan dan pengelolaan ruang kantor untuk anak perusahaannya, pihak terkait dan pihak ketiga.",
+    "history": {
+        "amount": "584 B",
+        "board": "Papan Utama",
+        "date": "6 Feb 2008",
+        "price": "400",
+        "registrar": "",
+        "shares": "1,460,000,000",
+        "underwriters": [
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "42.59%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "15188938",
+                "key": "Commissioner",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "VITRI CAHYANINGSIH MALLARANGENG"
+            }
+        ],
+        "director": [
+            {
+                "id": "15188937",
+                "key": "Director",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "HERA HANDAYANI"
+            },
+            {
+                "id": "15188941",
+                "key": "Director",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "ARIEF PRASETYO HANDOYO"
+            },
+            {
+                "id": "15188940",
+                "key": "Director",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "NELWIN ALDRIANSYAH"
+            },
+            {
+                "id": "15188939",
+                "key": "Director",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "ANDRI HARIBOWO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "15188944",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "FARAZANDI FIDINANSYAH"
+            },
+            {
+                "id": "15188943",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "ABDUL HAKIM"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "15188942",
+                "key": "President Commissioner",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "PURWADI ARIANTO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "15188945",
+                "key": "President Director",
+                "lastupdate": "2025-08-26T17:57:09+07:00",
+                "value": "LITTA INDRIYA ARIESCA"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12539152",
+            "key": "",
+            "lastupdate": "2022-04-13T16:32:14+07:00",
+            "value": "{\"name\":\"Asmal Salam\",\"phone\":\"(021)78830850 \",\"email\":\"asalam@elnusa.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51.1034%",
+            "name": "PT PERTAMINA HULU ENERGI",
+            "value": "3.73 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "42.59%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "3.11 B",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "6.2278%",
+            "name": "HAIYANTO",
+            "value": "454.54 M",
+            "badges": [],
+            "id": "0"
+        },
+        {
+            "percentage": "0.0787%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "5.75 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "KSO Elnusa - Raga",
+            "percentage": "100%",
+            "types": "Jasa pemeliharaan mekanik",
+            "value": "55069"
+        },
+        {
+            "company": "PT Sigma Cipta Utama",
+            "percentage": "99.99%",
+            "types": "Manajemen Data, Tekhnologi Informasi dan telekomunikasi",
+            "value": "238330"
+        },
+        {
+            "company": "PT Elnusa Fabrikasi Konstruksi",
+            "percentage": "99.97%",
+            "types": "Jasa penguliran, perdagangan dan pabrikasi pipa",
+            "value": "236327"
+        },
+        {
+            "company": "PT Elnusa Petrofin",
+            "percentage": "99.99%",
+            "types": "SPBU, Depo, transportasi dan perdagangan BBM dan bahan kimia",
+            "value": "2335503"
+        },
+        {
+            "company": "PT Elnusa Patra Ritel",
+            "percentage": "0.00%",
+            "types": "SPBU Migas",
+            "value": "0"
+        },
+        {
+            "company": "PT Patra Nusa Data",
+            "percentage": "99.50%",
+            "types": "Jasa Perolehan dan pengelolaan data eksplorasi dan produksi migas",
+            "value": "145555"
+        },
+        {
+            "company": "PT Elnusa Trans Samudera",
+            "percentage": "99.99%",
+            "types": "Jasa penyewaan kapal laut dan agen perkapalan perusahaan pelayaran",
+            "value": "526102"
+        },
+        {
+            "company": "PT Elnusa Geosains Indonesia",
+            "percentage": "99.99%",
+            "types": "Jasa perdagangan dan pembangunan",
+            "value": "11874"
+        },
+        {
+            "company": "PT Elnusa Oilfield Services",
+            "percentage": "99.99%",
+            "types": "Jasa perdagangan dan perindustrian",
+            "value": "38978"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Dec 2025",
+            "total_share": "37,534",
+            "change": -51,
+            "change_formatted": "(-51)"
+        },
+        {
+            "shareholder_date": "30 Nov 2025",
+            "total_share": "37,585",
+            "change": -560,
+            "change_formatted": "(-560)"
+        },
+        {
+            "shareholder_date": "31 Oct 2025",
+            "total_share": "38,145",
+            "change": -520,
+            "change_formatted": "(-520)"
+        },
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "38,665",
+            "change": -1131,
+            "change_formatted": "(-1,131)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "39,796",
+            "change": -557,
+            "change_formatted": "(-557)"
+        },
+        {
+            "shareholder_date": "31 Jul 2025",
+            "total_share": "40,353",
+            "change": -2480,
+            "change_formatted": "(-2,480)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.0001%",
+            "name": "NELWIN ALDRIANSYAH",
+            "value": "10.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0"
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2008-02-06T00:00:00+07:00",
+    "ipo_price": 400,
+    "float": 42.59,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "147",
+                "email": [
+                    "corporate@elnusa.co.id"
+                ],
+                "fax": "(021) 788-30883",
+                "npwp": "01.000.050.3-051.000",
+                "phone": "(021) 788-30850",
+                "website": "www.elnusa.co.id",
+                "key": "",
+                "lastupdate": "2022-04-13T16:32:14+07:00",
+                "value": "<td colspan='4'>Graha Elnusa, Jl. TB Simatupang Kav. 1B, Jakarta 12560\n\n        \t\t  \t\t\tPhone: (021) 788-30850\n        \t\t  \t\t\tFax: (021) 788-30883\n                            NPWP: 01.000.050.3-051.000\n        \t\t  \t\t\tEmail: corporate@elnusa.co.id\n        \t\t  \t\t\tWebsite: www.elnusa.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Graha Elnusa, Jl. TB Simatupang Kav. 1B, Jakarta 12560"
+            }
+        ],
+        "background": "PT. Elnusa Tbk (ELSA) bergerak dalam bidang jasa hulu migas dan melakukan investasi saham pada anak perusahaan dan perusahaan joint venture yang bergerak di beberapa industri, seperti layanan dukungan dan perdagangan upstream migas, layanan dan perdagangan downstream migas bumi dan jasa pengelolaan dan penyimpanan data perdagangan migas dan pengelolaan aset lapangan migas bumi. Perusahaan juga menyediakan barang dan jasa termasuk penyediaan dan pengelolaan ruang kantor untuk anak perusahaannya, pihak terkait dan pihak ketiga.",
+        "history": {
+            "amount": "584 B",
+            "board": "Papan Utama",
+            "date": "6 Feb 2008",
+            "price": "400",
+            "registrar": "",
+            "shares": "1,460,000,000",
+            "underwriters": [
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "42.59%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "15188938",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "VITRI CAHYANINGSIH MALLARANGENG"
+                }
+            ],
+            "director": [
+                {
+                    "id": "15188937",
+                    "key": "Director",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "HERA HANDAYANI"
+                },
+                {
+                    "id": "15188941",
+                    "key": "Director",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "ARIEF PRASETYO HANDOYO"
+                },
+                {
+                    "id": "15188940",
+                    "key": "Director",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "NELWIN ALDRIANSYAH"
+                },
+                {
+                    "id": "15188939",
+                    "key": "Director",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "ANDRI HARIBOWO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "15188944",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "FARAZANDI FIDINANSYAH"
+                },
+                {
+                    "id": "15188943",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "ABDUL HAKIM"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "15188942",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "PURWADI ARIANTO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "15188945",
+                    "key": "President Director",
+                    "lastupdate": "2025-08-26T17:57:09+07:00",
+                    "value": "LITTA INDRIYA ARIESCA"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12539152",
+                "key": "",
+                "lastupdate": "2022-04-13T16:32:14+07:00",
+                "value": "{\"name\":\"Asmal Salam\",\"phone\":\"(021)78830850 \",\"email\":\"asalam@elnusa.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51.1034%",
+                "name": "PT PERTAMINA HULU ENERGI",
+                "value": "3.73 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "42.59%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "3.11 B",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "6.2278%",
+                "name": "HAIYANTO",
+                "value": "454.54 M",
+                "badges": [],
+                "id": "0"
+            },
+            {
+                "percentage": "0.0787%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "5.75 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "KSO Elnusa - Raga",
+                "percentage": "100%",
+                "types": "Jasa pemeliharaan mekanik",
+                "value": "55069"
+            },
+            {
+                "company": "PT Sigma Cipta Utama",
+                "percentage": "99.99%",
+                "types": "Manajemen Data, Tekhnologi Informasi dan telekomunikasi",
+                "value": "238330"
+            },
+            {
+                "company": "PT Elnusa Fabrikasi Konstruksi",
+                "percentage": "99.97%",
+                "types": "Jasa penguliran, perdagangan dan pabrikasi pipa",
+                "value": "236327"
+            },
+            {
+                "company": "PT Elnusa Petrofin",
+                "percentage": "99.99%",
+                "types": "SPBU, Depo, transportasi dan perdagangan BBM dan bahan kimia",
+                "value": "2335503"
+            },
+            {
+                "company": "PT Elnusa Patra Ritel",
+                "percentage": "0.00%",
+                "types": "SPBU Migas",
+                "value": "0"
+            },
+            {
+                "company": "PT Patra Nusa Data",
+                "percentage": "99.50%",
+                "types": "Jasa Perolehan dan pengelolaan data eksplorasi dan produksi migas",
+                "value": "145555"
+            },
+            {
+                "company": "PT Elnusa Trans Samudera",
+                "percentage": "99.99%",
+                "types": "Jasa penyewaan kapal laut dan agen perkapalan perusahaan pelayaran",
+                "value": "526102"
+            },
+            {
+                "company": "PT Elnusa Geosains Indonesia",
+                "percentage": "99.99%",
+                "types": "Jasa perdagangan dan pembangunan",
+                "value": "11874"
+            },
+            {
+                "company": "PT Elnusa Oilfield Services",
+                "percentage": "99.99%",
+                "types": "Jasa perdagangan dan perindustrian",
+                "value": "38978"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Dec 2025",
+                "total_share": "37,534",
+                "change": -51,
+                "change_formatted": "(-51)"
+            },
+            {
+                "shareholder_date": "30 Nov 2025",
+                "total_share": "37,585",
+                "change": -560,
+                "change_formatted": "(-560)"
+            },
+            {
+                "shareholder_date": "31 Oct 2025",
+                "total_share": "38,145",
+                "change": -520,
+                "change_formatted": "(-520)"
+            },
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "38,665",
+                "change": -1131,
+                "change_formatted": "(-1,131)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "39,796",
+                "change": -557,
+                "change_formatted": "(-557)"
+            },
+            {
+                "shareholder_date": "31 Jul 2025",
+                "total_share": "40,353",
+                "change": -2480,
+                "change_formatted": "(-2,480)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.0001%",
+                "name": "NELWIN ALDRIANSYAH",
+                "value": "10.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0"
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2026-01-29T14:50:29+00:00"
+}
