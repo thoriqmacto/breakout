@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('broker', 20);
             $table->decimal('net_value', 20, 2);
             $table->decimal('buy_value', 20, 2);
+            $table->decimal('buy_avg_price', 18, 6)->nullable();
             $table->decimal('sell_value', 20, 2);
             $table->timestamps();
 

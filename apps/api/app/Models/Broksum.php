@@ -15,6 +15,7 @@ class Broksum extends Model
         'broker',
         'net_value',
         'buy_value',
+        'buy_avg_price',
         'sell_value',
     ];
 
@@ -22,6 +23,7 @@ class Broksum extends Model
         'date' => 'date',
         'net_value' => 'float',
         'buy_value' => 'float',
+        'buy_avg_price' => 'float',
         'sell_value' => 'float',
     ];
 

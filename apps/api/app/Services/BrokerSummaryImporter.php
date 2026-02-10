@@ -97,6 +97,7 @@ class BrokerSummaryImporter
                     'broker' => $fact['broker_code'],
                     'net_value' => $fact['net_value'],
                     'buy_value' => $fact['buy_value'],
+                    'buy_avg_price' => $fact['buy_avg_price'],
                     'sell_value' => $fact['sell_value'],
                     'created_at' => $timestamp,
                     'updated_at' => $timestamp,
@@ -131,7 +132,7 @@ class BrokerSummaryImporter
                 Broksum::upsert(
                     $chunk,
                     ['asset_id', 'date', 'broker'],
-                    ['net_value', 'buy_value', 'sell_value', 'updated_at']
+                    ['net_value', 'buy_value', 'buy_avg_price', 'sell_value', 'updated_at']
                 );
             }
 
