@@ -7,6 +7,7 @@ import {
   Bot,
   Boxes,
   CalendarDays,
+  HandCoins,
   FileText,
   LayoutDashboard,
   PanelLeft,
@@ -47,6 +48,11 @@ const navigation: NavigationItem[] = [
     label: "Trading Days",
     href: "/dashboard/trading-days",
     icon: CalendarDays,
+  },
+  {
+    label: "Broker Summary",
+    href: "/dashboard/broker-summary",
+    icon: HandCoins,
   },
   {
     label: "Scrapers",
