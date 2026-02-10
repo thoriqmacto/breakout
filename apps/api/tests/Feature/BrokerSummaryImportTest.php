@@ -114,6 +114,7 @@ class BrokerSummaryImportTest extends TestCase
             'broker' => 'AB',
             'net_value' => 600.00,
             'buy_value' => 1000.00,
+            'buy_avg_price' => 10.5,
             'sell_value' => 400.00,
         ]);
 

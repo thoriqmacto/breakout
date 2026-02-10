@@ -19,6 +19,7 @@ type BroksumRow = {
   date: string
   broker: string
   buy_value: number | null
+  buy_avg_price: number | null
 }
 
 type BrokerSummaryApiResponse = {
@@ -147,7 +148,7 @@ const buildDailyRows = (
 
         return {
           broker: entry.broker,
-          avgBuyPrice: null,
+          avgBuyPrice: normalizeNumber(entry.buy_avg_price),
           totalValue: buyValue,
           percentage: ratio,
         }

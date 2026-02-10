@@ -21,6 +21,7 @@ class BroksumResource extends JsonResource
             'broker' => $this->broker,
             'net_value' => (float) $this->net_value,
             'buy_value' => (float) $this->buy_value,
+            'buy_avg_price' => $this->buy_avg_price !== null ? (float) $this->buy_avg_price : null,
             'sell_value' => (float) $this->sell_value,
         ];
     }

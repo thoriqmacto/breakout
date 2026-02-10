@@ -32,6 +32,7 @@ class BrokerSummaryApiTest extends TestCase
             'broker' => 'AB',
             'net_value' => 600,
             'buy_value' => 1000,
+            'buy_avg_price' => 10.5,
             'sell_value' => 400,
         ]);
 
@@ -41,6 +42,7 @@ class BrokerSummaryApiTest extends TestCase
             'broker' => 'CD',
             'net_value' => -100,
             'buy_value' => 700,
+            'buy_avg_price' => 9.25,
             'sell_value' => 800,
         ]);
 
@@ -50,6 +52,7 @@ class BrokerSummaryApiTest extends TestCase
             'broker' => 'CD',
             'net_value' => 100,
             'buy_value' => 500,
+            'buy_avg_price' => 8.5,
             'sell_value' => 400,
         ]);
 
@@ -60,6 +63,7 @@ class BrokerSummaryApiTest extends TestCase
             ->assertJsonPath('data.symbol', 'AAA')
             ->assertJsonCount(1, 'data.rows')
             ->assertJsonPath('data.rows.0.broker', 'CD')
-            ->assertJsonPath('data.rows.0.net_value', -100.0);
+            ->assertJsonPath('data.rows.0.net_value', -100.0)
+            ->assertJsonPath('data.rows.0.buy_avg_price', 9.25);
     }
 }
