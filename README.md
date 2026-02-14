@@ -57,6 +57,12 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```
    This commands to auto-enable all required options with today's date and to skip prompts. The command will retrieve price data from Stockbit (Bearer token prompt required) and make Python downloader for Yahoo Finance as the backup.
 
+   For a **single asset historical refresh**, use Stockbit scraper with `--historical` and rely on its default date window (IPO date to latest trading day):
+   ```bash
+   php artisan stockbit:scrape BBCA --historical
+   ```
+   Replace `BBCA` with your target symbol (for example `INCO` or `ANTM`).
+
 3. **Verify and repair gaps or duplicates** – scan configured symbols and optionally resolve issues:
    ```bash
    php artisan ohlcv:check --all
