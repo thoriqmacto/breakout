@@ -145,6 +145,8 @@ export default function DashboardPage() {
     realizedPl: number
   } | null>(null)
   const [portfolioSummaryError, setPortfolioSummaryError] = useState<string | null>(null)
+  const [positionValuePriceInput, setPositionValuePriceInput] = useState("")
+  const [positionValueLotsInput, setPositionValueLotsInput] = useState("")
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -606,6 +608,13 @@ export default function DashboardPage() {
       : null
 
   const atrSummarySymbol = atrResult?.symbol ?? atrSymbol.trim().toUpperCase()
+  const positionValuePrice = parseNumericInput(positionValuePriceInput)
+  const positionValueLots = parseNumericInput(positionValueLotsInput)
+  const positionValueSharesPerLot = normalizedLotSize ?? 100
+  const positionValueAmount =
+    Number.isFinite(positionValuePrice) && positionValuePrice > 0 && Number.isFinite(positionValueLots) && positionValueLots > 0
+      ? positionValuePrice * positionValueLots * positionValueSharesPerLot
+      : null
 
   return (
     <div className="space-y-8">
@@ -1122,118 +1131,179 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>ATR calculator</CardTitle>
-            <CardDescription>
-              Compute Average True Range (ATR) from AssetMetrics using daily or weekly price bars.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3 rounded-lg border border-dashed p-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="atr-symbol">
-                    Symbol
-                  </label>
-                  <Input
-                    id="atr-symbol"
-                    placeholder="e.g. BBCA"
-                    value={atrSymbol}
-                    onChange={(event) => {
-                      setAtrSymbol(event.target.value.toUpperCase())
-                      setAtrError(null)
-                    }}
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="atr-period">
-                    Lookback period
-                  </label>
-                  <Input
-                    id="atr-period"
-                    inputMode="numeric"
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={atrPeriodInput}
-                    onChange={(event) => {
-                      setAtrPeriodInput(event.target.value)
-                      setAtrError(null)
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="atr-interval">
-                    Interval
-                  </label>
-                  <select
-                    id="atr-interval"
-                    className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
-                    value={atrInterval}
-                    onChange={(event) => {
-                      setAtrInterval(event.target.value === "weekly" ? "weekly" : "daily")
-                      setAtrError(null)
-                    }}
-                  >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
-                </div>
-                <Button type="button" onClick={handleAtrCalculation} disabled={atrLoading || !atrSymbol.trim()}>
-                  {atrLoading ? "Computing..." : "Compute ATR"}
-                </Button>
-              </div>
-              <div className="min-h-[3.25rem] rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
-                {atrLoading ? (
-                  "Computing ATR with the AssetMetrics service..."
-                ) : atrError ? (
-                  <span className="text-destructive">{atrError}</span>
-                ) : atrResult ? (
-                  <span>
-                    ATR for <span className="font-medium text-foreground">{atrSummarySymbol}</span> ({" "}
-                    {atrResult.interval === "weekly" ? "weekly" : "daily"} {atrResult.period}) is {" "}
-                    <span className="font-medium text-foreground">{formatIdr(atrResult.atr)}</span>.
-                  </span>
-                ) : (
-                  "Enter a symbol, choose an interval, and click compute to retrieve ATR from AssetMetrics."
-                )}
-              </div>
-            </div>
-
-            {atrResult ? (
-              <div className="space-y-4 rounded-lg border border-dashed p-4 text-sm">
+        <div className="flex flex-col gap-4">
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>ATR calculator</CardTitle>
+              <CardDescription>
+                Compute Average True Range (ATR) from AssetMetrics using daily or weekly price bars.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3 rounded-lg border border-dashed p-4">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      ATR ({atrResult.interval === "weekly" ? "Weekly" : "Daily"})
-                    </p>
-                    <p className="text-lg font-semibold text-foreground">{formatIdr(atrResult.atr)}</p>
-                    {atrPercent !== null ? (
-                      <p className="text-xs text-muted-foreground">{atrPercent.toFixed(2)}% of the latest close.</p>
-                    ) : null}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="atr-symbol">
+                      Symbol
+                    </label>
+                    <Input
+                      id="atr-symbol"
+                      placeholder="e.g. BBCA"
+                      value={atrSymbol}
+                      onChange={(event) => {
+                        setAtrSymbol(event.target.value.toUpperCase())
+                        setAtrError(null)
+                      }}
+                      autoComplete="off"
+                    />
                   </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Latest close</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {atrResult.lastClose !== null ? formatIdr(atrResult.lastClose) : "—"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {atrResult.lastDate ? `As of ${atrResult.lastDate}` : "Close date unavailable."}
-                    </p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="atr-period">
+                      Lookback period
+                    </label>
+                    <Input
+                      id="atr-period"
+                      inputMode="numeric"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={atrPeriodInput}
+                      onChange={(event) => {
+                        setAtrPeriodInput(event.target.value)
+                        setAtrError(null)
+                      }}
+                    />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Computed over {atrResult.barCount.toLocaleString()} {atrResult.interval} bar
-                  {atrResult.barCount === 1 ? "" : "s"} using a {atrResult.period}-period lookback.
-                </p>
+                <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="atr-interval">
+                      Interval
+                    </label>
+                    <select
+                      id="atr-interval"
+                      className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+                      value={atrInterval}
+                      onChange={(event) => {
+                        setAtrInterval(event.target.value === "weekly" ? "weekly" : "daily")
+                        setAtrError(null)
+                      }}
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                    </select>
+                  </div>
+                  <Button type="button" onClick={handleAtrCalculation} disabled={atrLoading || !atrSymbol.trim()}>
+                    {atrLoading ? "Computing..." : "Compute ATR"}
+                  </Button>
+                </div>
+                <div className="min-h-[3.25rem] rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                  {atrLoading ? (
+                    "Computing ATR with the AssetMetrics service..."
+                  ) : atrError ? (
+                    <span className="text-destructive">{atrError}</span>
+                  ) : atrResult ? (
+                    <span>
+                      ATR for <span className="font-medium text-foreground">{atrSummarySymbol}</span> ({" "}
+                      {atrResult.interval === "weekly" ? "weekly" : "daily"} {atrResult.period}) is {" "}
+                      <span className="font-medium text-foreground">{formatIdr(atrResult.atr)}</span>.
+                    </span>
+                  ) : (
+                    "Enter a symbol, choose an interval, and click compute to retrieve ATR from AssetMetrics."
+                  )}
+                </div>
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
+
+              {atrResult ? (
+                <div className="space-y-4 rounded-lg border border-dashed p-4 text-sm">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        ATR ({atrResult.interval === "weekly" ? "Weekly" : "Daily"})
+                      </p>
+                      <p className="text-lg font-semibold text-foreground">{formatIdr(atrResult.atr)}</p>
+                      {atrPercent !== null ? (
+                        <p className="text-xs text-muted-foreground">{atrPercent.toFixed(2)}% of the latest close.</p>
+                      ) : null}
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Latest close</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {atrResult.lastClose !== null ? formatIdr(atrResult.lastClose) : "—"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {atrResult.lastDate ? `As of ${atrResult.lastDate}` : "Close date unavailable."}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Computed over {atrResult.barCount.toLocaleString()} {atrResult.interval} bar
+                    {atrResult.barCount === 1 ? "" : "s"} using a {atrResult.period}-period lookback.
+                  </p>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Position value calculator</CardTitle>
+              <CardDescription>
+                Estimate the cash value of a position from the current price and lot quantity.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3 rounded-lg border border-dashed p-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="position-value-price">
+                      Current price (IDR)
+                    </label>
+                    <Input
+                      id="position-value-price"
+                      inputMode="decimal"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 5250"
+                      value={positionValuePriceInput}
+                      onChange={(event) => setPositionValuePriceInput(event.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="position-value-lots">
+                      Lot quantity
+                    </label>
+                    <Input
+                      id="position-value-lots"
+                      inputMode="numeric"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g. 4"
+                      value={positionValueLotsInput}
+                      onChange={(event) => setPositionValueLotsInput(event.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                  {positionValueAmount !== null ? (
+                    <div className="space-y-1">
+                      <p>
+                        Position value: <span className="font-medium text-foreground">{formatIdr(positionValueAmount)}</span>
+                      </p>
+                      <p>
+                        {positionValueLots.toLocaleString()} lot × {positionValueSharesPerLot.toLocaleString()} shares × {formatIdr(positionValuePrice)}.
+                      </p>
+                    </div>
+                  ) : (
+                    <p>Enter a current price and lot quantity to calculate the position value.</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )
