@@ -1,0 +1,486 @@
+{
+    "symbol": "MBSS",
+    "name": "PT Mitrabahtera Segara Sejati Tbk",
+    "address": [
+        {
+            "id": "278",
+            "email": [
+                "corporate.secretary@mbss.co.id"
+            ],
+            "fax": "(021) 57944768",
+            "npwp": "01.641.151.4-054.000",
+            "phone": "(021) 57944766",
+            "website": "www.mbss.co.id",
+            "key": "",
+            "lastupdate": "2023-01-11T17:15:40+07:00",
+            "value": "",
+            "office": "Autograph Tower, Thamrin Nine Complex, Jl. MH. Thamrin No. 10, Tanah Abang, Jakarta 10230"
+        }
+    ],
+    "background": "PT. Mitrabahtera Segara Sejati Tbk (MBSS) bergerak dalam bidang penyediaan jasa pengiriman, baik kargo maupun penumpang, pengangkutan minyak dari kilang minyak, penyewaan kapal, biro pengiriman dari perusahaan pelayaran luar negeri, baik untuk pengiriman reguler maupun pengiriman non-reguler, dalam negeri dan luar negeri, agen pengiriman untuk perusahaan pelayaran, kapal tunda, penyewaan peralatan pengiriman dan pengiriman luar negeri. Perusahaan mulai beroperasi secara komersial pada tahun 1994. Perusahaan dimiliki oleh grup perusahaan yang dimiliki oleh PT. Indika Energy Tbk. \n",
+    "history": {
+        "amount": "280 B",
+        "board": "Papan Utama",
+        "date": "6 Apr 2011",
+        "price": "1,600",
+        "registrar": "",
+        "shares": "175,000,000",
+        "underwriters": [
+            "PT. OSK Nusadana Securities Indonesia",
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT. Datindo Entrycom",
+        "free_float": "17.50%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837781",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Wisma Bharuna"
+            },
+            {
+                "id": "13837782",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Andre"
+            }
+        ],
+        "director": [
+            {
+                "id": "13837779",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Susan Faustine"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13837783",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Kevin Evan Suandar"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13837780",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Armand Setiawan Tanudjaja"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13837778",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:33+07:00",
+                "value": "Zhang Hao"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12531031",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:34+07:00",
+            "value": "{\"name\":\"Emy Oktavia\",\"phone\":\"(021) 57944766 \",\"email\":\"corporate.secretary@mbss.co.id \"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "82.5%",
+            "name": "PT GALLEY ADHIKA ARNAWAMA",
+            "value": "1.44 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0"
+        },
+        {
+            "percentage": "17.5%",
+            "name": "MASYARAKAT",
+            "value": "306.26 M",
+            "badges": [],
+            "id": "0"
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Mitra Swire CTM",
+            "percentage": "70.00%",
+            "types": "Pelayaran",
+            "value": "20221644"
+        },
+        {
+            "company": "PT Mitra Hartono Sejati",
+            "percentage": "50.00%",
+            "types": "Pelayaran",
+            "value": "2099695"
+        },
+        {
+            "company": "Mitra Bahtera Segarasejati Pte Ltd",
+            "percentage": "100%",
+            "types": "Pelayaran",
+            "value": "52386"
+        },
+        {
+            "company": "PT Mitra Alam Segara Sejati",
+            "percentage": "60.00%",
+            "types": "Pelayaran",
+            "value": "13494867"
+        },
+        {
+            "company": "PT Transhipment Teknik Solusi",
+            "percentage": "99.00%",
+            "types": "Jasa",
+            "value": "327227"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        }
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Jan 2026",
+            "total_share": "6,348",
+            "change": 1413,
+            "change_formatted": "(+1,413)"
+        },
+        {
+            "shareholder_date": "31 Dec 2025",
+            "total_share": "4,935",
+            "change": 799,
+            "change_formatted": "(+799)"
+        },
+        {
+            "shareholder_date": "30 Nov 2025",
+            "total_share": "4,136",
+            "change": 177,
+            "change_formatted": "(+177)"
+        },
+        {
+            "shareholder_date": "31 Oct 2025",
+            "total_share": "3,959",
+            "change": 257,
+            "change_formatted": "(+257)"
+        },
+        {
+            "shareholder_date": "30 Sep 2025",
+            "total_share": "3,702",
+            "change": -226,
+            "change_formatted": "(-226)"
+        },
+        {
+            "shareholder_date": "31 Aug 2025",
+            "total_share": "3,928",
+            "change": 1003,
+            "change_formatted": "(+1,003)"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2011-04-06T00:00:00+07:00",
+    "ipo_price": 1600,
+    "float": 17.5,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "278",
+                "email": [
+                    "corporate.secretary@mbss.co.id"
+                ],
+                "fax": "(021) 57944768",
+                "npwp": "01.641.151.4-054.000",
+                "phone": "(021) 57944766",
+                "website": "www.mbss.co.id",
+                "key": "",
+                "lastupdate": "2023-01-11T17:15:40+07:00",
+                "value": "",
+                "office": "Autograph Tower, Thamrin Nine Complex, Jl. MH. Thamrin No. 10, Tanah Abang, Jakarta 10230"
+            }
+        ],
+        "background": "PT. Mitrabahtera Segara Sejati Tbk (MBSS) bergerak dalam bidang penyediaan jasa pengiriman, baik kargo maupun penumpang, pengangkutan minyak dari kilang minyak, penyewaan kapal, biro pengiriman dari perusahaan pelayaran luar negeri, baik untuk pengiriman reguler maupun pengiriman non-reguler, dalam negeri dan luar negeri, agen pengiriman untuk perusahaan pelayaran, kapal tunda, penyewaan peralatan pengiriman dan pengiriman luar negeri. Perusahaan mulai beroperasi secara komersial pada tahun 1994. Perusahaan dimiliki oleh grup perusahaan yang dimiliki oleh PT. Indika Energy Tbk. \n",
+        "history": {
+            "amount": "280 B",
+            "board": "Papan Utama",
+            "date": "6 Apr 2011",
+            "price": "1,600",
+            "registrar": "",
+            "shares": "175,000,000",
+            "underwriters": [
+                "PT. OSK Nusadana Securities Indonesia",
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT. Datindo Entrycom",
+            "free_float": "17.50%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837781",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Wisma Bharuna"
+                },
+                {
+                    "id": "13837782",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Andre"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837779",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Susan Faustine"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13837783",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Kevin Evan Suandar"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13837780",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Armand Setiawan Tanudjaja"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13837778",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:33+07:00",
+                    "value": "Zhang Hao"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12531031",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:34+07:00",
+                "value": "{\"name\":\"Emy Oktavia\",\"phone\":\"(021) 57944766 \",\"email\":\"corporate.secretary@mbss.co.id \"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "82.5%",
+                "name": "PT GALLEY ADHIKA ARNAWAMA",
+                "value": "1.44 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0"
+            },
+            {
+                "percentage": "17.5%",
+                "name": "MASYARAKAT",
+                "value": "306.26 M",
+                "badges": [],
+                "id": "0"
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Mitra Swire CTM",
+                "percentage": "70.00%",
+                "types": "Pelayaran",
+                "value": "20221644"
+            },
+            {
+                "company": "PT Mitra Hartono Sejati",
+                "percentage": "50.00%",
+                "types": "Pelayaran",
+                "value": "2099695"
+            },
+            {
+                "company": "Mitra Bahtera Segarasejati Pte Ltd",
+                "percentage": "100%",
+                "types": "Pelayaran",
+                "value": "52386"
+            },
+            {
+                "company": "PT Mitra Alam Segara Sejati",
+                "percentage": "60.00%",
+                "types": "Pelayaran",
+                "value": "13494867"
+            },
+            {
+                "company": "PT Transhipment Teknik Solusi",
+                "percentage": "99.00%",
+                "types": "Jasa",
+                "value": "327227"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            }
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Jan 2026",
+                "total_share": "6,348",
+                "change": 1413,
+                "change_formatted": "(+1,413)"
+            },
+            {
+                "shareholder_date": "31 Dec 2025",
+                "total_share": "4,935",
+                "change": 799,
+                "change_formatted": "(+799)"
+            },
+            {
+                "shareholder_date": "30 Nov 2025",
+                "total_share": "4,136",
+                "change": 177,
+                "change_formatted": "(+177)"
+            },
+            {
+                "shareholder_date": "31 Oct 2025",
+                "total_share": "3,959",
+                "change": 257,
+                "change_formatted": "(+257)"
+            },
+            {
+                "shareholder_date": "30 Sep 2025",
+                "total_share": "3,702",
+                "change": -226,
+                "change_formatted": "(-226)"
+            },
+            {
+                "shareholder_date": "31 Aug 2025",
+                "total_share": "3,928",
+                "change": 1003,
+                "change_formatted": "(+1,003)"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        }
+    },
+    "profile_synced_at": "2026-02-14T17:36:13+00:00"
+}
