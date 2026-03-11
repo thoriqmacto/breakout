@@ -30,6 +30,7 @@ class AssetSync extends Command
         {--import-csv : Import found python csv files into seed folder}
         {--continue : Skip confirmation before latest-data check}
         {--chk-date= : Custom date (YYYY-MM-DD) used for latest comparison}
+        {--historical-date= : Refresh and re-upsert historical data for a specific date (YYYY-MM-DD)}
         {--eod : Confirm all prompts and use today for chk-date}
         {--broker-summary : Fetch broker summary data from Stockbit}
         {--broker-summary-import-only : Skip fetching broker summary data and only import from disk}
@@ -103,6 +104,23 @@ class AssetSync extends Command
         $seedDir = config('csv.seed_dir');
         $brokerSummaryImportOnly = (bool) $this->option('broker-summary-import-only');
         $brokerSummaryRequested = (bool) $this->option('broker-summary') || $brokerSummaryImportOnly;
+
+        $historicalDateOption = $this->option('historical-date');
+        if (is_string($historicalDateOption) && trim($historicalDateOption) !== '') {
+            $historicalDate = $this->normalizeHistoricalDate($historicalDateOption);
+            if ($historicalDate === null) {
+                $this->error('Invalid --historical-date value. Use YYYY-MM-DD.');
+
+                return Command::FAILURE;
+            }
+
+            return $this->syncHistoricalDateForAllAssets(
+                $indexSymbols,
+                $seedDir,
+                $historicalDate,
+                $shouldSyncProfile
+            );
+        }
 
         // Collect CSV files available in seed directory
         $seedFiles = glob($seedDir . '/*.csv') ?: [];
@@ -506,6 +524,83 @@ class AssetSync extends Command
         }
 
         return true;
+    }
+
+    /**
+     * @param array<int, string> $symbols
+     */
+    private function syncHistoricalDateForAllAssets(
+        array $symbols,
+        string $seedDir,
+        string $historicalDate,
+        \Closure $shouldSyncProfile
+    ): int {
+        if ($symbols === []) {
+            $this->warn('No assets found with price sync enabled.');
+
+            return Command::SUCCESS;
+        }
+
+        $this->info("Refreshing historical data on {$historicalDate} for " . count($symbols) . ' assets.');
+
+        $chunk = (int) config('csv.chunk_size', 200);
+        $dbBars = new DbBars($chunk, false);
+        $synced = 0;
+        $missing = [];
+
+        foreach ($symbols as $symbol) {
+            $this->fetchWithStockbit($symbol, $historicalDate, $historicalDate, !$shouldSyncProfile($symbol));
+
+            $csvPath = $seedDir . '/' . $symbol . '.csv';
+            $rows = CsvBars::read($csvPath);
+            $row = $rows[$historicalDate] ?? null;
+
+            if ($row === null) {
+                $missing[] = $symbol;
+                continue;
+            }
+
+            $asset = Asset::firstOrCreate(
+                ['symbol' => $symbol],
+                ['name' => $symbol]
+            );
+
+            $dbBars->add([
+                'asset_id' => $asset->id,
+                'date' => $historicalDate,
+                'open' => $row['open'],
+                'high' => $row['high'],
+                'low' => $row['low'],
+                'close' => $row['close'],
+                'volume' => $row['volume'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $synced++;
+        }
+
+        $dbBars->flush();
+
+        $this->info("Re-upserted {$synced} asset bars for {$historicalDate}.");
+
+        if ($missing !== []) {
+            $this->warn('No historical row found for: ' . implode(', ', $missing));
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function normalizeHistoricalDate(?string $date): ?string
+    {
+        if (!is_string($date) || trim($date) === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($date)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**
