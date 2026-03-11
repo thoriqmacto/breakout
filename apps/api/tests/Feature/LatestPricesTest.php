@@ -161,4 +161,50 @@ class LatestPricesTest extends TestCase
 
         $this->assertDatabaseCount('price_bars', 0);
     }
+
+    public function test_asset_sync_historical_date_reupserts_specific_day_from_csv(): void
+    {
+        $seedDir = database_path('seeders/data/test-historical-date');
+        if (!is_dir($seedDir)) {
+            mkdir($seedDir, 0755, true);
+        }
+
+        file_put_contents(
+            $seedDir . '/AAA.csv',
+            "date,open,high,low,close,volume\n2024-01-02,11,12,10,15,1000\n"
+        );
+        config(['csv.seed_dir' => $seedDir]);
+
+        $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+        Price::create([
+            'asset_id' => $asset->id,
+            'date' => '2024-01-02',
+            'open' => 1,
+            'high' => 1,
+            'low' => 1,
+            'close' => 1,
+            'volume' => 1,
+        ]);
+
+        $this->artisan('asset:sync', ['--historical-date' => '2024-01-02'])
+            ->assertExitCode(0);
+
+        $this->assertDatabaseHas('price_bars', [
+            'asset_id' => $asset->id,
+            'date' => '2024-01-02',
+            'open' => 11,
+            'high' => 12,
+            'low' => 10,
+            'close' => 15,
+            'volume' => 1000,
+        ]);
+    }
+
+    public function test_asset_sync_historical_date_rejects_invalid_date(): void
+    {
+        Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
+
+        $this->artisan('asset:sync', ['--historical-date' => 'bad-date'])
+            ->assertExitCode(1);
+    }
 }
