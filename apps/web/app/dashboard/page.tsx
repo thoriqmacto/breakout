@@ -147,6 +147,18 @@ export default function DashboardPage() {
   const [portfolioSummaryError, setPortfolioSummaryError] = useState<string | null>(null)
   const [positionValuePriceInput, setPositionValuePriceInput] = useState("")
   const [positionValueLotsInput, setPositionValueLotsInput] = useState("")
+  const [averageTransactions, setAverageTransactions] = useState([
+    { id: 1, side: "buy" as const, price: "", lots: "" },
+    { id: 2, side: "buy" as const, price: "", lots: "" },
+    { id: 3, side: "buy" as const, price: "", lots: "" },
+    { id: 4, side: "buy" as const, price: "", lots: "" },
+    { id: 5, side: "buy" as const, price: "", lots: "" },
+  ])
+  const [positionCompareSymbol, setPositionCompareSymbol] = useState("")
+  const [positionCompareLoading, setPositionCompareLoading] = useState(false)
+  const [positionCompareError, setPositionCompareError] = useState<string | null>(null)
+  const [positionCompareClose, setPositionCompareClose] = useState<number | null>(null)
+  const [positionCompareDate, setPositionCompareDate] = useState<string | null>(null)
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -607,6 +619,81 @@ export default function DashboardPage() {
       ? (atrResult.atr / atrResult.lastClose) * 100
       : null
 
+  const handlePositionCompareLookup = async () => {
+    const trimmedSymbol = positionCompareSymbol.trim().toUpperCase()
+
+    if (!trimmedSymbol) {
+      setPositionCompareError("Enter an asset ticker to fetch the latest close.")
+      setPositionCompareClose(null)
+      setPositionCompareDate(null)
+      return
+    }
+
+    if (!accessToken) {
+      setPositionCompareError("Sign in to fetch the latest close price.")
+      setPositionCompareClose(null)
+      setPositionCompareDate(null)
+      return
+    }
+
+    setPositionCompareLoading(true)
+    setPositionCompareError(null)
+
+    try {
+      const response = await fetch(buildApiUrl(`/v1/assets/${encodeURIComponent(trimmedSymbol)}/latest-price`), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      const payload = await parseJson<ApiResponse<LatestPriceRecord>>(response)
+
+      if (response.status === 404) {
+        setPositionCompareError(`No latest close price found for ${trimmedSymbol}.`)
+        setPositionCompareClose(null)
+        setPositionCompareDate(null)
+        return
+      }
+
+      if (!response.ok) {
+        const message =
+          (payload && "message" in payload && typeof payload.message === "string" && payload.message) ||
+          "Unable to fetch the latest close price."
+
+        throw new Error(message)
+      }
+
+      if (!payload || payload.status !== "success" || !payload.data) {
+        throw new Error("Unexpected response from the asset API.")
+      }
+
+      const close =
+        typeof payload.data.close === "number"
+          ? payload.data.close
+          : Number.parseFloat(payload.data.close ? String(payload.data.close) : "")
+
+      if (!Number.isFinite(close) || close <= 0) {
+        setPositionCompareError(`Latest close price for ${trimmedSymbol} is unavailable.`)
+        setPositionCompareClose(null)
+        setPositionCompareDate(payload.data.date ?? null)
+        return
+      }
+
+      setPositionCompareClose(close)
+      setPositionCompareDate(payload.data.date ?? null)
+      setPositionCompareError(null)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to fetch the latest close price."
+      setPositionCompareError(message)
+      setPositionCompareClose(null)
+      setPositionCompareDate(null)
+    } finally {
+      setPositionCompareLoading(false)
+    }
+  }
+
   const atrSummarySymbol = atrResult?.symbol ?? atrSymbol.trim().toUpperCase()
   const positionValuePrice = parseNumericInput(positionValuePriceInput)
   const positionValueLots = parseNumericInput(positionValueLotsInput)
@@ -614,6 +701,92 @@ export default function DashboardPage() {
   const positionValueAmount =
     Number.isFinite(positionValuePrice) && positionValuePrice > 0 && Number.isFinite(positionValueLots) && positionValueLots > 0
       ? positionValuePrice * positionValueLots * positionValueSharesPerLot
+      : null
+
+  const averagePriceBreakdown = useMemo(() => {
+    const sharesPerLot = normalizedLotSize ?? 100
+    let openShares = 0
+    let openCost = 0
+    let buyValue = 0
+    let sellValue = 0
+    let realizedPl = 0
+    let ignoredSellShares = 0
+
+    averageTransactions.forEach((transaction) => {
+      const price = parseNumericInput(transaction.price)
+      const lots = parseNumericInput(transaction.lots)
+
+      if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(lots) || lots <= 0) {
+        return
+      }
+
+      const normalizedLots = Math.floor(lots)
+      if (normalizedLots <= 0) {
+        return
+      }
+
+      const shares = normalizedLots * sharesPerLot
+
+      if (transaction.side === "buy") {
+        openShares += shares
+        openCost += shares * price
+        buyValue += shares * price
+        return
+      }
+
+      if (openShares <= 0) {
+        ignoredSellShares += shares
+        return
+      }
+
+      const sharesToSell = Math.min(shares, openShares)
+      const averageOpenCost = openCost / openShares
+
+      realizedPl += sharesToSell * (price - averageOpenCost)
+      sellValue += sharesToSell * price
+      openShares -= sharesToSell
+      openCost -= sharesToSell * averageOpenCost
+
+      if (shares > sharesToSell) {
+        ignoredSellShares += shares - sharesToSell
+      }
+
+      if (openShares === 0) {
+        openCost = 0
+      }
+    })
+
+    if (buyValue <= 0 && sellValue <= 0 && openShares <= 0) {
+      return null
+    }
+
+    const openLots = sharesPerLot > 0 ? openShares / sharesPerLot : 0
+
+    return {
+      sharesPerLot,
+      openShares,
+      openLots,
+      openCost,
+      buyValue,
+      sellValue,
+      realizedPl,
+      ignoredSellShares,
+      averagePricePerShare: openShares > 0 ? openCost / openShares : null,
+      averageCostPerLot: openLots > 0 ? openCost / openLots : null,
+    }
+  }, [averageTransactions, normalizedLotSize])
+
+  const unrealizedPlValue =
+    averagePriceBreakdown &&
+    averagePriceBreakdown.openShares > 0 &&
+    averagePriceBreakdown.averagePricePerShare !== null &&
+    positionCompareClose !== null
+      ? (positionCompareClose - averagePriceBreakdown.averagePricePerShare) * averagePriceBreakdown.openShares
+      : null
+
+  const unrealizedPlPercent =
+    unrealizedPlValue !== null && averagePriceBreakdown && averagePriceBreakdown.openCost > 0
+      ? (unrealizedPlValue / averagePriceBreakdown.openCost) * 100
       : null
 
   return (
@@ -1298,6 +1471,180 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <p>Enter a current price and lot quantity to calculate the position value.</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Position average &amp; P/L tracker</CardTitle>
+              <CardDescription>
+                Add buy/sell transactions, then compare your remaining position with the latest close by ticker.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3 rounded-lg border border-dashed p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-foreground">Transactions</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setAverageTransactions((current) => {
+                        const nextId = current.length > 0 ? Math.max(...current.map((item) => item.id)) + 1 : 1
+                        return [...current, { id: nextId, side: "buy", price: "", lots: "" }]
+                      })
+                    }}
+                  >
+                    Add transaction
+                  </Button>
+                </div>
+
+                {averageTransactions.map((entry, index) => (
+                  <div key={entry.id} className="space-y-3 rounded-md border p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Transaction #{index + 1}</p>
+                      {averageTransactions.length > 1 ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setAverageTransactions((current) => current.filter((item) => item.id !== entry.id))
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      ) : null}
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground" htmlFor={`avg-side-${entry.id}`}>
+                          Side
+                        </label>
+                        <select
+                          id={`avg-side-${entry.id}`}
+                          className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                          value={entry.side}
+                          onChange={(event) => {
+                            setAverageTransactions((current) =>
+                              current.map((item) =>
+                                item.id === entry.id
+                                  ? { ...item, side: event.target.value === "sell" ? "sell" : "buy" }
+                                  : item,
+                              ),
+                            )
+                          }}
+                        >
+                          <option value="buy">Buy</option>
+                          <option value="sell">Sell</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground" htmlFor={`avg-price-${entry.id}`}>
+                          Price (IDR)
+                        </label>
+                        <Input
+                          id={`avg-price-${entry.id}`}
+                          inputMode="decimal"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="e.g. 5250"
+                          value={entry.price}
+                          onChange={(event) => {
+                            setAverageTransactions((current) =>
+                              current.map((item) => (item.id === entry.id ? { ...item, price: event.target.value } : item)),
+                            )
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground" htmlFor={`avg-lots-${entry.id}`}>
+                          Lots
+                        </label>
+                        <Input
+                          id={`avg-lots-${entry.id}`}
+                          inputMode="numeric"
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder="e.g. 2"
+                          value={entry.lots}
+                          onChange={(event) => {
+                            setAverageTransactions((current) =>
+                              current.map((item) => (item.id === entry.id ? { ...item, lots: event.target.value } : item)),
+                            )
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor="position-compare-symbol">
+                      Compare with latest close (ticker)
+                    </label>
+                    <Input
+                      id="position-compare-symbol"
+                      placeholder="e.g. BBCA"
+                      value={positionCompareSymbol}
+                      onChange={(event) => {
+                        setPositionCompareSymbol(event.target.value.toUpperCase())
+                        setPositionCompareError(null)
+                      }}
+                      autoComplete="off"
+                    />
+                  </div>
+                  <Button type="button" variant="outline" onClick={handlePositionCompareLookup} disabled={positionCompareLoading}>
+                    {positionCompareLoading ? "Checking..." : "Get latest close"}
+                  </Button>
+                </div>
+
+                <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                  {averagePriceBreakdown ? (
+                    <div className="space-y-1">
+                      <p>
+                        Open position: <span className="font-medium text-foreground">{averagePriceBreakdown.openLots.toLocaleString()} lots</span> ({averagePriceBreakdown.openShares.toLocaleString()} shares)
+                      </p>
+                      <p>
+                        Remaining cost basis: <span className="font-medium text-foreground">{formatIdr(averagePriceBreakdown.openCost)}</span>
+                      </p>
+                      <p>
+                        Average open price per share: <span className="font-medium text-foreground">{averagePriceBreakdown.averagePricePerShare !== null ? formatIdr(averagePriceBreakdown.averagePricePerShare) : "—"}</span>
+                      </p>
+                      {averagePriceBreakdown.averageCostPerLot !== null ? (
+                        <p>Average open cost per lot: {formatIdr(averagePriceBreakdown.averageCostPerLot)}</p>
+                      ) : null}
+                      <p>
+                        Realized P/L from sells: <span className={`font-medium ${averagePriceBreakdown.realizedPl >= 0 ? "text-emerald-600" : "text-destructive"}`}>{formatIdr(averagePriceBreakdown.realizedPl)}</span>
+                      </p>
+                      {averagePriceBreakdown.ignoredSellShares > 0 ? (
+                        <p>
+                          Ignored sell quantity: {averagePriceBreakdown.ignoredSellShares.toLocaleString()} shares (selling more than current position).
+                        </p>
+                      ) : null}
+                      {positionCompareError ? <p className="text-destructive">{positionCompareError}</p> : null}
+                      {positionCompareClose !== null && averagePriceBreakdown.openShares > 0 ? (
+                        <>
+                          <p>
+                            Latest close: <span className="font-medium text-foreground">{formatIdr(positionCompareClose)}</span>
+                            {positionCompareDate ? ` (as of ${positionCompareDate})` : ""}
+                          </p>
+                          <p>
+                            Unrealized P/L: <span className={`font-medium ${unrealizedPlValue !== null && unrealizedPlValue >= 0 ? "text-emerald-600" : "text-destructive"}`}>{unrealizedPlValue !== null ? formatIdr(unrealizedPlValue) : "—"}</span>
+                            {unrealizedPlPercent !== null ? ` (${formatPercent(unrealizedPlPercent)})` : ""}
+                          </p>
+                        </>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p>Add at least one valid buy/sell transaction to track average price, cost basis, and P/L.</p>
                   )}
                 </div>
               </div>
