@@ -139,6 +139,19 @@ Below is a quick reference for the feature abbreviations emitted by `features:ex
 - `y_hit_5d` — classification label for +3.5% target within 5 trading days. Range: 1 (hit target), 0 (did not hit), null (insufficient data).
 - `dd_5d` — reserved placeholder for drawdown (currently null).
 
+
+## Accumulation Anomaly Scanner
+Use this command to scan for potential accumulation setups using your idea: daily price down on lower volume, lower-timeframe absorption proxy (PBAS/absorption flag), and anchored broker-flow confirmation.
+
+```bash
+php artisan strategy:scan-accumulation --date=2026-04-08 --anchor-date=2026-01-01 --max-ret=-0.005 --max-vol-ratio=0.95 --min-pbas=70 --min-anchor-net-norm=0.01
+```
+
+Optional filters:
+- `--symbol=BBCA --symbol=ANTM` (or comma-separated) to scan only selected tickers.
+- `--limit=50` to expand result count.
+- `--min-net-norm` to tighten same-day absorption proxy from broker net-flow.
+
 ## Repository Layout
 ```
 .
