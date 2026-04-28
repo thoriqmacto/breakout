@@ -35,9 +35,4 @@ return [
         ],
     ],
 
-    'marketstack' => [
-        'base' => env('MARKETSTACK_BASE', 'https://api.marketstack.com/v2'),
-        'key'  => env('MARKETSTACK_KEY'),
-    ],
-
 ];
