@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
+use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
@@ -59,6 +60,16 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('trading-days', [TradingDayController::class, 'index']);
 
     // Portfolios & positions
+    Route::get('portfolios/{portfolio}/summary', [PortfolioController::class, 'summary'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.summary');
+    Route::get('portfolios/{portfolio}/holdings', [PortfolioController::class, 'holdings'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.holdings');
+    Route::get('portfolios/{portfolio}/allocations', [PortfolioController::class, 'allocations'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.allocations');
+
     Route::apiResource('portfolios', PortfolioController::class);
     Route::get('portfolios/{portfolio}/positions', [PositionController::class, 'index'])
         ->name('portfolios.positions.index');
@@ -70,4 +81,16 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('portfolios.positions.update');
     Route::delete('portfolios/{portfolio}/positions/{position}', [PositionController::class, 'destroy'])
         ->name('portfolios.positions.destroy');
+
+    // Cash movements
+    Route::get('portfolios/{portfolio}/cash-movements', [CashMovementController::class, 'index'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.cash-movements.index');
+    Route::post('portfolios/{portfolio}/cash-movements', [CashMovementController::class, 'store'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.cash-movements.store');
+    Route::delete('portfolios/{portfolio}/cash-movements/{cashMovement}', [CashMovementController::class, 'destroy'])
+        ->whereNumber('portfolio')
+        ->whereNumber('cashMovement')
+        ->name('portfolios.cash-movements.destroy');
 });

@@ -14,8 +14,10 @@ class PortfolioResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'name' => $this->name,
             'base_ccy' => $this->base_ccy,
+            'cash_balance' => (float) ($this->cash_balance ?? 0),
             'remarks' => $this->remarks,
             'year' => $this->year,
             'positions_count' => $this->when(
