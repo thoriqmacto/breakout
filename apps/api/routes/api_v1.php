@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
+use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
 
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
@@ -58,6 +59,10 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
 
     // Trading days overview
     Route::get('trading-days', [TradingDayController::class, 'index']);
+
+    // Strategy watchlist (read-only; produced by strategy:rank-watchlist)
+    Route::get('strategy/watchlist', [StrategyWatchlistController::class, 'index'])
+        ->name('strategy.watchlist.index');
 
     // Portfolios & positions
     Route::get('portfolios/{portfolio}/summary', [PortfolioController::class, 'summary'])
