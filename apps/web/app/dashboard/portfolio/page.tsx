@@ -5,6 +5,8 @@ import { Edit, Loader2, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
 import { AddAssetButton } from "@/components/add-asset-button"
+import { CashMovementsCard } from "@/components/cash-movements-card"
+import { PortfolioSummaryCard } from "@/components/portfolio-summary-card"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -109,6 +111,7 @@ export default function PortfolioPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [creatingPortfolio, setCreatingPortfolio] = useState(false)
   const [formState, setFormState] = useState<FormState>(emptyForm)
+  const [summaryRevision, setSummaryRevision] = useState(0)
 
   const handleAssetCreated = useCallback(
     (asset: AssetOption) => {
@@ -421,6 +424,7 @@ export default function PortfolioPage() {
       setPortfolio(current)
       setPositions(current?.positions ?? [])
       setAssetSummaries(current?.asset_summaries ?? [])
+      setSummaryRevision((r) => r + 1)
     } catch (cause) {
       const message =
         cause instanceof Error && cause.message
@@ -595,6 +599,22 @@ export default function PortfolioPage() {
               <CardContent className="text-2xl font-semibold">{formatIdr(summary.realizedPl)}</CardContent>
             </Card>
           </div>
+
+          {accessToken ? (
+            <PortfolioSummaryCard
+              accessToken={accessToken}
+              portfolioId={selectedPortfolioId}
+              revision={summaryRevision}
+            />
+          ) : null}
+
+          {accessToken ? (
+            <CashMovementsCard
+              accessToken={accessToken}
+              portfolioId={selectedPortfolioId}
+              onChange={() => setSummaryRevision((r) => r + 1)}
+            />
+          ) : null}
 
           <Card>
             <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
