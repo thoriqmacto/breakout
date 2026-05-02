@@ -17,45 +17,44 @@ class StrategyScanCommandTest extends TestCase
         Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
         Asset::create(['symbol' => 'BBB', 'name' => 'Asset BBB']);
 
+        // Laravel's bulk insert requires every row to have the same shape;
+        // normalize to a uniform column set with sensible defaults.
+        $template = [
+            'ret_1' => 0.0,
+            'vol_ratio_20' => 1.0,
+            'avg_net_norm' => 0.0,
+            'pbas' => 0,
+            'has_broker' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
         DB::table('features_daily')->insert([
-            [
+            array_merge($template, [
                 'symbol' => 'AAA',
                 'date' => '2026-02-01',
                 'avg_net_norm' => 0.04,
-                'has_broker' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
+            ]),
+            array_merge($template, [
                 'symbol' => 'AAA',
                 'date' => '2026-02-02',
                 'ret_1' => -0.011,
                 'vol_ratio_20' => 0.72,
                 'avg_net_norm' => 0.03,
                 'pbas' => 82,
-                'has_broker' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
+            ]),
+            array_merge($template, [
                 'symbol' => 'BBB',
                 'date' => '2026-02-01',
                 'avg_net_norm' => -0.03,
-                'has_broker' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
+            ]),
+            array_merge($template, [
                 'symbol' => 'BBB',
                 'date' => '2026-02-02',
                 'ret_1' => -0.015,
                 'vol_ratio_20' => 0.70,
                 'avg_net_norm' => -0.01,
                 'pbas' => 20,
-                'has_broker' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]),
         ]);
 
         $exit = Artisan::call('strategy:scan-accumulation', [

@@ -132,11 +132,38 @@ class AssetMetricsTest extends TestCase
 
     public function test_moving_average_weeks_matches_historical_average(): void
     {
-        $bars = $this->loadHistoricalBars('BUMI');
+        // Synthetic fixture: 30 trading weeks of bars (Mon–Fri), with the
+        // last close of each week increasing linearly by 10 starting at 100.
+        // This decouples the test from the moving database/seeders/data/historical/BUMI.csv
+        // fixture (which is rewritten on every historical update and used to make the
+        // expected values drift).
+        $bars = [];
+        $weeklyLastCloses = [];
+        $start = new \DateTimeImmutable('2024-01-01'); // a Monday
+        for ($week = 0; $week < 30; $week++) {
+            $weekClose = 100 + $week * 10; // 100, 110, ..., 390
+            $weeklyLastCloses[] = (float) $weekClose;
+            for ($d = 0; $d < 5; $d++) {
+                $date = $start->modify("+{$week} weeks +{$d} days");
+                $isLast = $d === 4;
+                $bars[] = [
+                    'date' => $date->format('d/m/Y'),
+                    'open' => $weekClose - 5,
+                    'high' => $weekClose + 5,
+                    'low' => $weekClose - 10,
+                    'close' => $isLast ? $weekClose : $weekClose - 1,
+                ];
+            }
+        }
+
         $metrics = new AssetMetrics($bars);
 
-        $this->assertEqualsWithDelta(114.5, $metrics->movingAverageWeeks(10), 0.0001);
-        $this->assertEqualsWithDelta(110.23333333333333, $metrics->movingAverageWeeks(30), 0.0001);
+        // Last 10 weekly closes: 300, 310, ..., 390 → average = 345.
+        $expected10 = array_sum(array_slice($weeklyLastCloses, -10)) / 10;
+        $expected30 = array_sum($weeklyLastCloses) / 30;
+
+        $this->assertEqualsWithDelta($expected10, $metrics->movingAverageWeeks(10), 0.0001);
+        $this->assertEqualsWithDelta($expected30, $metrics->movingAverageWeeks(30), 0.0001);
     }
 
     public function test_support_and_resistance_levels(): void
