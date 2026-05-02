@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Stockbit\StockbitTokenResolver;
 use App\Support\StockbitTokenStore;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -38,6 +39,17 @@ class StockbitExodusClient
 
     private function resolveBearer(string $configBearer): string
     {
+        try {
+            /** @var StockbitTokenResolver $resolver */
+            $resolver = app(StockbitTokenResolver::class);
+            $resolved = $resolver->resolve();
+            if (is_string($resolved) && $resolved !== '') {
+                return $resolved;
+            }
+        } catch (\Throwable) {
+            // fall through to legacy resolution
+        }
+
         try {
             /** @var StockbitTokenStore $store */
             $store = app(StockbitTokenStore::class);

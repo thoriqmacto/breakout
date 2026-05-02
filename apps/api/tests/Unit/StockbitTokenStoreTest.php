@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Support\StockbitTokenStore;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -35,6 +36,49 @@ class StockbitTokenStoreTest extends TestCase
 
         $this->assertNull($store->get());
         Storage::disk('local')->assertMissing('stockbit_token.json');
+    }
+
+    public function test_it_writes_token_in_encrypted_v2_format(): void
+    {
+        $store = new StockbitTokenStore();
+        $token = $this->jwtWithExpiry(time() + 3600);
+
+        $store->put($token);
+
+        $contents = Storage::disk('local')->get('stockbit_token.json');
+        $decoded = json_decode($contents, true);
+
+        $this->assertSame(2, $decoded['v']);
+        $this->assertArrayHasKey('bearer_encrypted', $decoded);
+        $this->assertArrayNotHasKey('bearer', $decoded);
+        $this->assertNotSame($token, $decoded['bearer_encrypted']);
+        $this->assertSame($token, Crypt::decryptString($decoded['bearer_encrypted']));
+    }
+
+    public function test_it_reads_legacy_plaintext_payload(): void
+    {
+        $token = $this->jwtWithExpiry(time() + 3600);
+        Storage::disk('local')->put(
+            'stockbit_token.json',
+            json_encode(['bearer' => $token])
+        );
+
+        $store = new StockbitTokenStore();
+
+        $this->assertSame($token, $store->get());
+    }
+
+    public function test_it_reads_legacy_encrypted_bearer_field(): void
+    {
+        $token = $this->jwtWithExpiry(time() + 3600);
+        Storage::disk('local')->put(
+            'stockbit_token.json',
+            json_encode(['bearer' => Crypt::encryptString($token)])
+        );
+
+        $store = new StockbitTokenStore();
+
+        $this->assertSame($token, $store->get());
     }
 
     private function jwtWithExpiry(int $timestamp): string

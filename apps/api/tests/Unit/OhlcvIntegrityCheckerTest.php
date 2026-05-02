@@ -7,6 +7,7 @@ use App\Models\TradingDay;
 use App\Services\OhlcvIntegrityChecker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class OhlcvIntegrityCheckerTest extends TestCase
@@ -16,6 +17,14 @@ class OhlcvIntegrityCheckerTest extends TestCase
     public function test_reports_gaps_duplicates_and_extras(): void
     {
         $now = now();
+
+        // The integrity checker is supposed to *detect* duplicate rows for
+        // (asset_id, date), so we have to bypass the schema's unique
+        // constraint to seed them. Drop the unique index for the duration
+        // of this test only.
+        Schema::table('price_bars', function ($table) {
+            $table->dropUnique(['asset_id', 'date']);
+        });
 
         $assetId = DB::table('assets')->insertGetId([
             'symbol' => 'AAA',

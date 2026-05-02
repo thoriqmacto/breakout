@@ -52,7 +52,10 @@ class StrategyScanCommand extends Command
             ->joinSub(
                 DB::table('features_daily')
                     ->select('symbol')
-                    ->selectRaw('AVG(avg_net_norm) as anchor_avg_net_norm')
+                    // CAST keeps SQLite's text-affinity for date filtering from
+                    // forcing the aggregate into TEXT, which would silently
+                    // drop the row when compared to a bound REAL parameter.
+                    ->selectRaw('CAST(AVG(avg_net_norm) AS REAL) as anchor_avg_net_norm')
                     ->whereBetween('date', [$anchorDate->toDateString(), $scanDate->toDateString()])
                     ->groupBy('symbol'),
                 'anchor',

@@ -10,6 +10,7 @@ import {
   HandCoins,
   FileText,
   LayoutDashboard,
+  LineChart,
   PanelLeft,
   PanelRight,
   Briefcase,
@@ -53,6 +54,11 @@ const navigation: NavigationItem[] = [
     label: "Broker Summary",
     href: "/dashboard/broker-summary",
     icon: HandCoins,
+  },
+  {
+    label: "Watchlist",
+    href: "/dashboard/strategy/watchlist",
+    icon: LineChart,
   },
   {
     label: "Scrapers",

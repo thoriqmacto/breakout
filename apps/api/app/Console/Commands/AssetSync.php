@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use App\Services\PythonRunner;
 use App\Services\BrokerSummaryImporter;
+use App\Services\Stockbit\StockbitTokenResolver;
 use App\Support\StockbitTokenStore;
 use App\Support\AssetList;
 use App\Models\TradingCalendarDay;
@@ -37,7 +38,8 @@ class AssetSync extends Command
         {--broker-summary-date= : Broker summary single date (YYYY-MM-DD)}
         {--broker-summary-from= : Broker summary start date (YYYY-MM-DD)}
         {--broker-summary-to= : Broker summary end date (YYYY-MM-DD)}
-        {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}';
+        {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}
+        {--token= : Stockbit bearer token (overrides env/config/cache/store)}';
 
     /**
      * The console command description.
@@ -59,6 +61,19 @@ class AssetSync extends Command
         $stockbitBackfillDays = (int) config('stockbit.backfill_days', 14);
         $eodDate = null;
         $eodTradingDate = null;
+
+        $cliToken = $this->option('token');
+        $cliToken = is_string($cliToken) ? trim($cliToken) : null;
+        if ($cliToken !== null && $cliToken !== '') {
+            /** @var StockbitTokenResolver $resolver */
+            $resolver = app(StockbitTokenResolver::class);
+            if ($resolver->isExpired($cliToken)) {
+                $this->error('Provided --token is already expired. Provide a fresh token.');
+
+                return Command::FAILURE;
+            }
+            $resolver->persist($cliToken);
+        }
 
         if ($this->option('eod')) {
             $eodDate = Carbon::now()->toDateString();
@@ -509,13 +524,19 @@ class AssetSync extends Command
             return false;
         }
 
-        $result = $this->call('stockbit:scrape', [
+        $scrapeArgs = [
             'tickers' => [$symbol],
             '--from' => $from,
             '--to' => $to,
             '--historical' => true,
             '--no-profile-sync' => $isNotProfile,
-        ]);
+        ];
+        $cliToken = $this->option('token');
+        if (is_string($cliToken) && trim($cliToken) !== '') {
+            $scrapeArgs['--token'] = trim($cliToken);
+        }
+
+        $result = $this->call('stockbit:scrape', $scrapeArgs);
 
         if ($result !== Command::SUCCESS) {
             $this->warn("Stockbit fetch failed for {$symbol}; falling back to yfinance if available.");
@@ -715,13 +736,19 @@ class AssetSync extends Command
             return;
         }
 
-        $result = $this->call('stockbit:scrape', [
+        $scrapeArgs = [
             'tickers' => $symbols,
             '--from' => $from,
             '--to' => $to,
             '--market-detector' => true,
             '--no-profile-sync' => true,
-        ]);
+        ];
+        $cliToken = $this->option('token');
+        if (is_string($cliToken) && trim($cliToken) !== '') {
+            $scrapeArgs['--token'] = trim($cliToken);
+        }
+
+        $result = $this->call('stockbit:scrape', $scrapeArgs);
 
         if ($result !== Command::SUCCESS) {
             $this->warn('Broker summary fetch failed.');
@@ -731,9 +758,11 @@ class AssetSync extends Command
     private function stockbitTokenAvailable(): bool
     {
         try {
-            /** @var StockbitTokenStore $store */
-            $store = app(StockbitTokenStore::class);
-            $bearer = $store->get() ?: config('stockbit.bearer');
+            /** @var StockbitTokenResolver $resolver */
+            $resolver = app(StockbitTokenResolver::class);
+            $cliToken = $this->option('token');
+            $cliToken = is_string($cliToken) ? trim($cliToken) : null;
+            $bearer = $resolver->resolve($cliToken);
 
             return is_string($bearer) && $bearer !== '';
         } catch (\Throwable) {

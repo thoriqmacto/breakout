@@ -60,6 +60,13 @@ class BrokerSummaryImporter
             }
 
             $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
+            // firstOrCreate does not refresh DB-side defaults like
+            // sync_broker_summary into the in-memory model on first insert,
+            // so reload before reading the flag to avoid a false-negative
+            // skip on freshly created assets.
+            if ($asset->wasRecentlyCreated) {
+                $asset->refresh();
+            }
             if (!$asset->sync_broker_summary) {
                 continue;
             }

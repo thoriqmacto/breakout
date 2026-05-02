@@ -8,6 +8,7 @@ use App\Models\TradingDay;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class TradingDaysControllerTest extends TestCase
 {

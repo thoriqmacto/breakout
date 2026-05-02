@@ -63,7 +63,8 @@ class BrokerSummaryApiTest extends TestCase
             ->assertJsonPath('data.symbol', 'AAA')
             ->assertJsonCount(1, 'data.rows')
             ->assertJsonPath('data.rows.0.broker', 'CD')
-            ->assertJsonPath('data.rows.0.net_value', -100.0)
+            // JSON round-trips whole-number floats as PHP ints; assert as int to match PHP 8.4 decoding.
+            ->assertJsonPath('data.rows.0.net_value', -100)
             ->assertJsonPath('data.rows.0.buy_avg_price', 9.25);
     }
 }

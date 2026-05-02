@@ -36,10 +36,6 @@ class AssetController extends ApiController
         return ApiResponse::success(AssetResource::collection($query->get()));
     }
 
-    public function testReturn(){
-        return ApiResponse::success("Test Return");
-    }
-
     public function metricsIndex()
     {
         $metrics = Metric::orderByDesc('sort_uptrend')
