@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Portfolio extends Model
@@ -13,7 +14,9 @@ class Portfolio extends Model
 
     protected $casts = [
         'id' => 'integer',
+        'user_id' => 'integer',
         'year' => 'integer',
+        'cash_balance' => 'float',
     ];
 
     public function positionsForYear(?int $year = null): HasMany
@@ -29,5 +32,15 @@ class Portfolio extends Model
     public function positions(): HasMany
     {
         return $this->hasMany(Position::class);
+    }
+
+    public function cashMovements(): HasMany
+    {
+        return $this->hasMany(CashMovement::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

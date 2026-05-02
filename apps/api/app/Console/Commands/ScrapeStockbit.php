@@ -6,6 +6,7 @@ use App\Services\AssetProfileUpdater;
 use App\Services\CsvBars;
 use App\Services\CsvUtilities;
 use App\Services\DbBars;
+use App\Services\Stockbit\StockbitTokenResolver;
 use App\Services\StockbitExodusClient;
 use App\Support\BrokerSummaryTransformer;
 use App\Support\AssetList;
@@ -30,7 +31,8 @@ class ScrapeStockbit extends Command
         {--no-profile-sync : Skip syncing asset profiles}
         {--eod : Capture EOD watchlist snapshot}
         {--watchlist-id= : Override watchlist ID for --eod snapshot}
-        {--overwrite : Force refreshing the --eod watchlist snapshot JSON}';
+        {--overwrite : Force refreshing the --eod watchlist snapshot JSON}
+        {--token= : Stockbit bearer token (overrides env/config/cache/store)}';
 
     protected $description = 'Scrape Stockbit and persist to DB and Seeds data.';
 
@@ -40,8 +42,12 @@ class ScrapeStockbit extends Command
     private array $assetIds = [];
     private bool $abortDueToUnauthorized = false;
 
-    public function handle(StockbitExodusClient $api, AssetProfileUpdater $profileUpdater, StockbitTokenStore $tokenStore): int
-    {
+    public function handle(
+        StockbitExodusClient $api,
+        AssetProfileUpdater $profileUpdater,
+        StockbitTokenStore $tokenStore,
+        StockbitTokenResolver $tokenResolver
+    ): int {
         $fetchMarketDetector = (bool) $this->option('market-detector');
         $fetchHistorical = (bool) $this->option('historical');
         $fromOption = ($fetchMarketDetector || $fetchHistorical) ? $this->option('from') : null;
@@ -82,7 +88,20 @@ class ScrapeStockbit extends Command
             $historicalPage = null;
         }
 
-        $bearer = $tokenStore->get() ?: config('stockbit.bearer');
+        $cliToken = $this->option('token');
+        $cliToken = is_string($cliToken) ? trim($cliToken) : null;
+
+        if ($cliToken !== null && $cliToken !== '') {
+            if ($tokenResolver->isExpired($cliToken)) {
+                $this->error('Provided --token is already expired. Provide a fresh token.');
+
+                return self::FAILURE;
+            }
+
+            $tokenResolver->persist($cliToken);
+        }
+
+        $bearer = $tokenResolver->resolve($cliToken);
         $exp = StockbitExodusClient::jwtExpiresAt($bearer);
 
         if ($bearer === '' || $bearer === null) {
@@ -94,12 +113,11 @@ class ScrapeStockbit extends Command
                     return self::FAILURE;
                 }
 
-                config(['stockbit.bearer' => $bearer]);
-                $tokenStore->put($bearer);
+                $tokenResolver->persist($bearer);
                 $api->setBearer($bearer);
                 $exp = StockbitExodusClient::jwtExpiresAt($bearer);
             } else {
-                $this->error('STOCKBIT_BEARER is missing. Run interactively to provide a token.');
+                $this->error('STOCKBIT_BEARER is missing. Run interactively to provide a token, set it via "php artisan stockbit:token:set", or pass --token=...');
 
                 return self::FAILURE;
             }
@@ -111,21 +129,20 @@ class ScrapeStockbit extends Command
                 if ($newBearer === '') {
                     $this->error('No bearer token supplied. Exiting.');
 
-                    $tokenStore->forget();
+                    $tokenResolver->forget();
 
                     return self::FAILURE;
                 }
 
-                config(['stockbit.bearer' => $newBearer]);
+                $tokenResolver->persist($newBearer);
                 $api->setBearer($newBearer);
-                $tokenStore->put($newBearer);
 
                 $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
                 if ($exp) {
                     $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
                 }
             } else {
-                $this->error('STOCKBIT_BEARER is expired. Run interactively to refresh the token.');
+                $this->error('STOCKBIT_BEARER is expired. Refresh via "php artisan stockbit:token:set" or run interactively.');
 
                 return self::FAILURE;
             }
@@ -1135,7 +1152,7 @@ class ScrapeStockbit extends Command
         $this->warn('Stockbit bearer token rejected (401).');
 
         if (!$this->input->isInteractive()) {
-            $this->error('STOCKBIT_BEARER is invalid. Run interactively to refresh the token.');
+            $this->error('STOCKBIT_BEARER is invalid. Refresh via "php artisan stockbit:token:set" or run interactively.');
             $this->abortDueToUnauthorized = true;
 
             return false;
@@ -1150,9 +1167,10 @@ class ScrapeStockbit extends Command
             return false;
         }
 
-        config(['stockbit.bearer' => $newBearer]);
+        /** @var StockbitTokenResolver $resolver */
+        $resolver = app(StockbitTokenResolver::class);
+        $resolver->persist($newBearer);
         $api->setBearer($newBearer);
-        $tokenStore->put($newBearer);
 
         $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
         if ($exp) {

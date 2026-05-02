@@ -3,7 +3,9 @@
 namespace App\Support;
 
 use App\Services\StockbitExodusClient;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
 class StockbitTokenStore
@@ -18,8 +20,12 @@ class StockbitTokenStore
         }
 
         $contents = Storage::disk(self::DISK)->get(self::PATH);
-        $decoded = json_decode($contents, true);
-        $bearer = is_array($decoded) ? ($decoded['bearer'] ?? null) : null;
+        $decoded = json_decode((string) $contents, true);
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $bearer = $this->extractBearer($decoded);
 
         if (!is_string($bearer) || $bearer === '') {
             return null;
@@ -36,9 +42,14 @@ class StockbitTokenStore
 
     public function put(string $bearer): void
     {
+        $payload = [
+            'v' => 2,
+            'bearer_encrypted' => Crypt::encryptString($bearer),
+        ];
+
         Storage::disk(self::DISK)->put(
             self::PATH,
-            json_encode(['bearer' => $bearer], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
 
@@ -59,5 +70,31 @@ class StockbitTokenStore
         $expiresAt = $this->expiresAt($bearer);
 
         return $expiresAt !== null && $expiresAt->isPast();
+    }
+
+    /**
+     * @param  array<string, mixed>  $decoded
+     */
+    private function extractBearer(array $decoded): ?string
+    {
+        $encrypted = $decoded['bearer_encrypted'] ?? null;
+        if (is_string($encrypted) && $encrypted !== '') {
+            try {
+                return Crypt::decryptString($encrypted);
+            } catch (DecryptException) {
+                return null;
+            }
+        }
+
+        $legacy = $decoded['bearer'] ?? null;
+        if (!is_string($legacy) || $legacy === '') {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($legacy);
+        } catch (DecryptException) {
+            return $legacy;
+        }
     }
 }

@@ -2,8 +2,10 @@ import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 
 export type PortfolioRecord = {
   id: number
+  user_id?: number | null
   name: string
   base_ccy: string
+  cash_balance?: number
   remarks: string | null
   year: number | null
   positions_count?: number
@@ -238,5 +240,144 @@ export async function deletePosition(
 
   if (!response.ok || !data || data.status !== "success") {
     throw new Error(extractErrorMessage(data, "Unable to delete position."))
+  }
+}
+
+export type Holding = {
+  asset_id: number
+  symbol: string | null
+  name: string | null
+  sector: string | null
+  qty: number
+  avg_cost: number
+  cost_basis: number
+  latest_close: number | null
+  latest_close_date: string | null
+  market_value: number
+  unrealized_pl: number
+  unrealized_pl_pct: number | null
+  last_executed_at: string | null
+}
+
+export type AllocationRow = {
+  asset_id?: number
+  symbol?: string | null
+  sector?: string | null
+  value: number
+  pct: number | null
+}
+
+export type PortfolioSummaryPayload = {
+  portfolio_id: number
+  base_ccy: string
+  cash_balance: number
+  total_market_value: number
+  total_equity: number
+  realized_pl: number
+  unrealized_pl: number
+  holdings: Holding[]
+  allocation_by_symbol: AllocationRow[]
+  allocation_by_sector: AllocationRow[]
+}
+
+export type CashMovementKind = "deposit" | "withdraw" | "fee" | "dividend" | "adjustment"
+
+export type CashMovementRecord = {
+  id: number
+  portfolio_id: number
+  kind: CashMovementKind
+  amount: number
+  signed_amount: number
+  executed_at: string | null
+  note: string | null
+}
+
+export type CashMovementPayload = {
+  kind: CashMovementKind
+  amount: number
+  executedAt: string
+  note?: string
+}
+
+export async function fetchPortfolioSummary(
+  accessToken: string,
+  portfolioId: number,
+): Promise<PortfolioSummaryPayload> {
+  const response = await fetch(buildApiUrl(`/v1/portfolios/${portfolioId}/summary`), {
+    method: "GET",
+    headers: buildHeaders(accessToken),
+  })
+
+  const payload = await parseJson<ApiResponse<PortfolioSummaryPayload>>(response)
+
+  if (!response.ok || !payload || payload.status !== "success" || !payload.data) {
+    throw new Error(extractErrorMessage(payload, "Unable to load portfolio summary."))
+  }
+
+  return payload.data
+}
+
+export async function fetchCashMovements(
+  accessToken: string,
+  portfolioId: number,
+): Promise<CashMovementRecord[]> {
+  const response = await fetch(buildApiUrl(`/v1/portfolios/${portfolioId}/cash-movements?limit=200`), {
+    method: "GET",
+    headers: buildHeaders(accessToken),
+  })
+
+  const payload = await parseJson<
+    ApiResponse<{ portfolio_id: number; rows: CashMovementRecord[] }>
+  >(response)
+
+  if (!response.ok || !payload || payload.status !== "success" || !payload.data) {
+    throw new Error(extractErrorMessage(payload, "Unable to load cash movements."))
+  }
+
+  return payload.data.rows ?? []
+}
+
+export async function createCashMovement(
+  accessToken: string,
+  portfolioId: number,
+  payload: CashMovementPayload,
+): Promise<CashMovementRecord> {
+  const response = await fetch(buildApiUrl(`/v1/portfolios/${portfolioId}/cash-movements`), {
+    method: "POST",
+    headers: buildHeaders(accessToken),
+    body: JSON.stringify({
+      kind: payload.kind,
+      amount: payload.amount,
+      executed_at: payload.executedAt,
+      note: payload.note ?? null,
+    }),
+  })
+
+  const data = await parseJson<ApiResponse<CashMovementRecord>>(response)
+
+  if (!response.ok || !data || data.status !== "success" || !data.data) {
+    throw new Error(extractErrorMessage(data, "Unable to record cash movement."))
+  }
+
+  return data.data
+}
+
+export async function deleteCashMovement(
+  accessToken: string,
+  portfolioId: number,
+  movementId: number,
+): Promise<void> {
+  const response = await fetch(
+    buildApiUrl(`/v1/portfolios/${portfolioId}/cash-movements/${movementId}`),
+    {
+      method: "DELETE",
+      headers: buildHeaders(accessToken),
+    },
+  )
+
+  const data = await parseJson<ApiResponse<null>>(response)
+
+  if (!response.ok || !data || data.status !== "success") {
+    throw new Error(extractErrorMessage(data, "Unable to delete cash movement."))
   }
 }

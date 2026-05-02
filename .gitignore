@@ -1,0 +1,28 @@
+# Repository-wide rules. Per-app .gitignore files (apps/api/.gitignore,
+# apps/web/.gitignore, .idea/.gitignore) override or extend this list.
+
+# Environment & secrets — never commit any populated env file.
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+secrets/
+secrets.json
+secrets.yml
+secrets.yaml
+
+# OS / editor / scratch
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Local databases (Laravel sqlite, dumps, etc.)
+*.sqlite
+*.sqlite-journal
+
+# Logs
+*.log

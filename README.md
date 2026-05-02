@@ -15,7 +15,7 @@ This repository contains the code for **Breakout**, structured as a multi-app mo
    ```bash
    npm install
    ```
-3. Copy `.env.example` to `.env` and configure your environment.
+3. Copy `apps/api/.env.example` (or `apps/api/.env.local.example` for a local dev preset) to `apps/api/.env` and configure your environment. **Never commit `.env*` files with real credentials**: the repository's root and `apps/api` `.gitignore` files exclude all `.env` and `.env.*` variants except the `*.example` templates. If you accidentally paste a real API key (Stockbit bearer, Marketstack key, AWS, etc.) into a tracked file, rotate the key immediately.
 4. Start the local development stack:
    ```bash
    composer dev
