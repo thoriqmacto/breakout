@@ -100,9 +100,15 @@ class LatestPricesTest extends TestCase
             ]);
         }
 
-        $this->artisan('asset:sync')
-            ->expectsConfirmation('Continue checking latest data anyway?', 'yes')
-            ->assertExitCode(0);
+        // Drive the non-interactive refresh path: detect outdated data and
+        // pull the missing days from the python/yfinance fallback CSV.
+        $this->artisan('asset:sync', [
+            '--check-python' => true,
+            '--run-python' => true,
+            '--import-csv' => true,
+            '--continue' => true,
+            '--chk-date' => '2024-01-03',
+        ])->assertExitCode(0);
 
         $this->assertDatabaseCount('price_bars', 3);
         $this->assertDatabaseHas('price_bars', ['date' => '2024-01-03']);

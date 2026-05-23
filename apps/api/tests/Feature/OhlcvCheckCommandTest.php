@@ -43,8 +43,8 @@ class OhlcvCheckCommandTest extends TestCase
 
         $this->artisan('ohlcv:check', ['symbol' => 'INCO'])
             ->expectsOutputToContain('Asset INCO (#' . $asset->id . ')')
-            ->expectsOutputToContain('Missing trading days: 2024-01-02')
-            ->expectsOutputToContain('  Consistency: <fg=red>FAILED</>')
+            ->expectsOutputToContain('Missing trading days (1): 2024-01-02')
+            ->expectsOutputToContain('Consistency: FAILED')
             ->assertExitCode(1);
     }
 
@@ -71,7 +71,7 @@ class OhlcvCheckCommandTest extends TestCase
 
         $this->artisan('ohlcv:check', ['--all' => true])
             ->expectsOutputToContain('Asset INCO (#' . $asset->id . ')')
-            ->expectsOutputToContain('  Consistency: <fg=green>PASSED</>')
+            ->expectsOutputToContain('Consistency: PASSED')
             ->assertExitCode(1);
     }
 }
