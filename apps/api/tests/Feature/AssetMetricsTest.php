@@ -44,6 +44,9 @@ class AssetMetricsTest extends TestCase
             ]);
         }
 
+        // Metrics are read from a precomputed table; populate it first.
+        $this->postJson('/api/v1/assets/metrics/update')->assertOk();
+
         $response = $this->getJson('/api/v1/assets/metrics');
 
         $response->assertOk()

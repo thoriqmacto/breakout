@@ -105,7 +105,9 @@ class AtrCalculatorTest extends TestCase
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('data.interval', 'weekly')
             ->assertJsonPath('data.period', 2)
-            ->assertJsonPath('data.atr', 7)
+            // Weekly bars: W1 high16/low8/close15, W2 high22/low14/close21.
+            // TR(W1)=16-8=8; TR(W2)=max(22-14, |22-15|, |14-15|)=8 → ATR(2)=8.
+            ->assertJsonPath('data.atr', 8)
             ->assertJsonPath('data.bar_count', 2);
     }
 }
