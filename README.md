@@ -152,6 +152,93 @@ Optional filters:
 - `--limit=50` to expand result count.
 - `--min-net-norm` to tighten same-day absorption proxy from broker net-flow.
 
+## Storage Backends
+
+Breakout keeps two different kinds of state, and they are stored differently on purpose.
+
+| Layer | What lives there | Where it lives |
+| --- | --- | --- |
+| **Database** (`price_bars`, `features_daily`) | Every bar and feature the app queries | Always the relational DB. **This is the query layer and the source of truth.** |
+| **File artifacts** (Stockbit JSON payloads, OHLCV seed CSVs) | Raw scrape payloads and the seed/export CSVs | Local disk by default; optionally mirrored to durable cold storage. |
+
+Google Drive is **backup and cold storage only**. Nothing reads it to answer a query — it has no random access, no atomic rename, and a request quota, none of which suit a hot path. Moving a file artifact to Drive never moves a query off the database.
+
+Everything below is opt-in. With the shipped defaults (`SB_SAVE_DISK=local`, `CSV_MIRROR_DISK` unset) the pipeline is entirely local and makes no remote calls, which is the intended development setup.
+
+### The two file paths
+
+**JSON payloads** (`broker_summary/`, `historical/`, `watchlist_eod/`) already write through `Storage::disk()`, so they follow a single setting:
+
+```dotenv
+SB_SAVE_DISK=gdrive   # local (default) | gdrive | s3
+```
+
+**OHLCV seed CSVs** (`database/seeders/data/historical/{SYMBOL}.csv`) are built on local disk and *mirrored* to the durable disk in batch:
+
+```dotenv
+CSV_MIRROR_DISK=gdrive   # empty (default) disables mirroring entirely
+CSV_MIRROR_PATH=seeds/historical
+```
+
+They are not written straight to Drive. The CSV flow is read-existing → merge → write-back, looped per symbol and per date chunk; doing that against Drive would cost an API call per iteration, invite `403 rateLimitExceeded`, and lose the atomic temp-file + `rename()` that makes a half-written CSV impossible. Instead each data-mutating command hydrates the local CSVs from the mirror before its loop and pushes the changed ones after it:
+
+```
+hydrate  →  existing local read/merge/write loop (unchanged)  →  flush
+```
+
+`stockbit:scrape`, `asset:sync`, `ohlcv:check`, and `csv:fix-date-format` all accept `--disk=` to override `CSV_MIRROR_DISK` for a single run. Passing `--disk=` with an empty value forces a purely local run.
+
+### Setting up a Google Drive service account
+
+1. In the [Google Cloud console](https://console.cloud.google.com/), create (or pick) a project and **enable the Google Drive API**.
+2. Create a **service account** and add a **JSON key**. Download it.
+3. Save the key at `apps/api/storage/app/google/service-account.json`. This path is gitignored — the key is as sensitive as the Stockbit bearer, so **never commit it** and never place it anywhere tracked.
+4. In Google Drive, create the folder that will hold the data and **share it with the service account's email** (`...@....iam.gserviceaccount.com`) with *Editor* access. A service account has no Drive storage quota of its own, so it must write into a folder shared with it.
+5. Copy the folder ID out of its URL (`https://drive.google.com/drive/folders/<FOLDER_ID>`).
+6. Fill in `apps/api/.env`:
+
+   ```dotenv
+   GOOGLE_DRIVE_KEY_FILE=storage/app/google/service-account.json
+   GOOGLE_DRIVE_FOLDER_ID=<FOLDER_ID>
+   GOOGLE_DRIVE_ROOT=breakout-data      # subfolder created inside the shared folder
+   ```
+
+7. Verify the credentials before wiring anything else up — the folder sharing is where most of the friction lives:
+
+   ```bash
+   cd apps/api
+   php artisan test --filter=GoogleDriveDiskTest
+   ```
+
+   The round-trip test skips itself when the credentials are absent and runs a real `put`/`get`/`delete` against the shared folder when they are present.
+
+### Migrating existing CSVs to the mirror
+
+```bash
+php artisan bars:mirror-push --disk=gdrive     # upload every local seed CSV
+php artisan bars:mirror-push --disk=gdrive --symbol=BBCA --symbol=BBRI
+php artisan bars:mirror-push --disk=gdrive --force   # re-upload even if unchanged
+```
+
+`bars:mirror-push` reports local and remote CSV counts and exits non-zero if any local CSV is missing from the mirror. **Compare those counts before treating the local copy as expendable.**
+
+The inverse restores a machine (or a clean checkout) from the mirror:
+
+```bash
+php artisan bars:mirror-pull --disk=gdrive
+php artisan bars:mirror-pull --disk=gdrive --force   # overwrite newer local files
+```
+
+By default a pull only fills in CSVs that are missing or older locally, so it will not clobber work in progress.
+
+### Notes
+
+- Repeat runs are cheap: a flush uploads only CSVs whose contents actually changed, tracked by a local hash manifest at `storage/app/bar-csv-mirror.json`. Delete that file (or use `--force`) to force a full re-upload.
+- Mirror failures are logged and skipped, never fatal. By the time the flush runs, the database rows and local CSVs — the real output of a run — are already written.
+- Throttling (`403 rateLimitExceeded`) and transient errors are retried with exponential backoff.
+- The Stockbit bearer token store stays on its own local disk and is deliberately **not** routed to Drive.
+- For a data pipeline, an S3-compatible store (Cloudflare R2, Backblaze B2) is technically a better fit than Drive, and `config/filesystems.php` already ships an `s3` disk. Because both go through the same Flysystem interface, switching is just `CSV_MIRROR_DISK=s3` / `SB_SAVE_DISK=s3`.
+
 ## Repository Layout
 ```
 .

@@ -101,6 +101,14 @@ Key environment variables (see `.env.example`):
 | `JWT_TTL` | Access-token lifetime in seconds (default 3600). |
 | `JWT_REFRESH_TTL` | Refresh-token lifetime in seconds (default 14 days). |
 | `JWT_LEEWAY` | Clock skew tolerance in seconds when validating tokens. |
+| `SB_SAVE_DISK` | Disk for Stockbit JSON payloads: `local` (default), `gdrive`, or `s3`. |
+| `CSV_MIRROR_DISK` | Durable mirror disk for the OHLCV seed CSVs. Unset (default) disables mirroring. |
+| `CSV_MIRROR_PATH` | Path prefix for the mirrored CSVs (default `seeds/historical`). |
+| `GOOGLE_DRIVE_KEY_FILE` | Path to the Google service-account JSON. **Never commit this file.** |
+| `GOOGLE_DRIVE_FOLDER_ID` | ID of the Drive folder shared with the service account. |
+| `GOOGLE_DRIVE_ROOT` | Folder created inside the shared folder (default `breakout-data`). |
+
+See [Storage Backends](../../README.md#storage-backends) in the root README for the service-account setup and the mirror commands. The database remains the query layer; Drive is durable cold storage only.
 
 ## Running Tests
 
