@@ -24,7 +24,7 @@ return [
     | may even configure multiple disks for the same driver. Examples for
     | most supported storage drivers are configured here for reference.
     |
-    | Supported drivers: "local", "ftp", "sftp", "s3"
+    | Supported drivers: "local", "ftp", "sftp", "s3", "gdrive"
     |
     */
 
@@ -56,6 +56,22 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        /*
+         * Google Drive is durable cold storage for the historical data artifacts
+         * (Stockbit JSON payloads and OHLCV seed CSVs). It is never a query
+         * layer -- `price_bars` / `features_daily` remain the source of truth.
+         *
+         * The driver is registered by App\Providers\GoogleDriveServiceProvider.
+         */
+        'gdrive' => [
+            'driver' => 'gdrive',
+            'keyFile' => env('GOOGLE_DRIVE_KEY_FILE'),   // path to the service-account JSON
+            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'), // ID of the Drive folder shared with the service account
+            'root' => env('GOOGLE_DRIVE_ROOT', 'breakout-data'), // folder created inside the shared folder
             'throw' => false,
             'report' => false,
         ],
