@@ -96,6 +96,17 @@ type AtrApiResponse = {
   bar_count: number | string
 }
 
+/**
+ * A leg of the averaging calculator. `side` must stay a union: the Side select
+ * writes "sell" into it, and the averaging maths has a separate sell branch.
+ */
+type AverageTransaction = {
+  id: number
+  side: "buy" | "sell"
+  price: string
+  lots: string
+}
+
 export default function DashboardPage() {
   const { user, accessToken } = useAuth()
   const [symbol, setSymbol] = useState("")
@@ -147,12 +158,12 @@ export default function DashboardPage() {
   const [portfolioSummaryError, setPortfolioSummaryError] = useState<string | null>(null)
   const [positionValuePriceInput, setPositionValuePriceInput] = useState("")
   const [positionValueLotsInput, setPositionValueLotsInput] = useState("")
-  const [averageTransactions, setAverageTransactions] = useState([
-    { id: 1, side: "buy" as const, price: "", lots: "" },
-    { id: 2, side: "buy" as const, price: "", lots: "" },
-    { id: 3, side: "buy" as const, price: "", lots: "" },
-    { id: 4, side: "buy" as const, price: "", lots: "" },
-    { id: 5, side: "buy" as const, price: "", lots: "" },
+  const [averageTransactions, setAverageTransactions] = useState<AverageTransaction[]>([
+    { id: 1, side: "buy", price: "", lots: "" },
+    { id: 2, side: "buy", price: "", lots: "" },
+    { id: 3, side: "buy", price: "", lots: "" },
+    { id: 4, side: "buy", price: "", lots: "" },
+    { id: 5, side: "buy", price: "", lots: "" },
   ])
   const [positionCompareSymbol, setPositionCompareSymbol] = useState("")
   const [positionCompareLoading, setPositionCompareLoading] = useState(false)
@@ -472,7 +483,11 @@ export default function DashboardPage() {
   const effectiveStopPrice = Number.isFinite(stopPrice) ? stopPrice : stopPriceFromPercent
 
   const profitLossFromTarget =
-    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(effectiveTargetPrice)
+    totalShares !== null &&
+    Number.isFinite(entryPrice) &&
+    entryPrice > 0 &&
+    effectiveTargetPrice !== null &&
+    Number.isFinite(effectiveTargetPrice)
       ? (() => {
           const gross = (effectiveTargetPrice - entryPrice) * totalShares
           const sellValue = effectiveTargetPrice * totalShares
@@ -485,7 +500,11 @@ export default function DashboardPage() {
       : null
 
   const profitLossFromStop =
-    totalShares !== null && Number.isFinite(entryPrice) && entryPrice > 0 && Number.isFinite(effectiveStopPrice)
+    totalShares !== null &&
+    Number.isFinite(entryPrice) &&
+    entryPrice > 0 &&
+    effectiveStopPrice !== null &&
+    Number.isFinite(effectiveStopPrice)
       ? (() => {
           const gross = (effectiveStopPrice - entryPrice) * totalShares
           const sellValue = effectiveStopPrice * totalShares
