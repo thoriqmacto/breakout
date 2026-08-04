@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\MirrorsSeedCsvs;
 use App\Services\AssetProfileUpdater;
 use App\Services\CsvBars;
 use App\Services\CsvUtilities;
@@ -32,15 +33,25 @@ class ScrapeStockbit extends Command
         {--eod : Capture EOD watchlist snapshot}
         {--watchlist-id= : Override watchlist ID for --eod snapshot}
         {--overwrite : Force refreshing the --eod watchlist snapshot JSON}
-        {--token= : Stockbit bearer token (overrides env/config/cache/store)}';
+        {--token= : Stockbit bearer token (overrides env/config/cache/store)}
+        {--disk= : Mirror disk for the seed CSVs (default: CSV_MIRROR_DISK; empty disables mirroring)}';
 
     protected $description = 'Scrape Stockbit and persist to DB and Seeds data.';
+
+    use MirrorsSeedCsvs;
 
     /**
      * @var array<string, int>
      */
     private array $assetIds = [];
     private bool $abortDueToUnauthorized = false;
+
+    /**
+     * Symbols whose seed CSV this run rewrote, mirrored once at the end.
+     *
+     * @var array<string, string>
+     */
+    private array $touchedSymbols = [];
 
     public function handle(
         StockbitExodusClient $api,
@@ -167,6 +178,10 @@ class ScrapeStockbit extends Command
 
         $tickers = array_values(array_unique(array_merge($argumentTickers, $configuredTickers)));
         $tickers = array_map(static fn (string $symbol): string => Str::upper($symbol), $tickers);
+
+        // An --eod snapshot writes CSVs for whatever the watchlist returns, which
+        // is not known until it is fetched, so pull the whole mirror in that case.
+        $this->hydrateSeedCsvs($this->option('eod') ? [] : $tickers);
 
         foreach ($tickers as $symbol) {
             if (!$this->option('no-profile-sync')) {
@@ -456,7 +471,35 @@ class ScrapeStockbit extends Command
             $this->captureWatchlistSnapshot($api, $disk, $tokenStore);
         }
 
+        $this->flushSeedCsvs(array_values($this->touchedSymbols));
+
         return self::SUCCESS;
+    }
+
+    /**
+     * Local path of a symbol's seed CSV.
+     *
+     * Reads csv.seed_dir, which defaults to the database_path() this command
+     * previously hardcoded, so the mirror and the writer cannot disagree.
+     */
+    private function seedCsvPath(string $symbol): string
+    {
+        $seedDir = (string) config('csv.seed_dir', database_path('seeders/data/historical'));
+
+        return rtrim($seedDir, '/' . DIRECTORY_SEPARATOR) . '/' . strtoupper($symbol) . '.csv';
+    }
+
+    /**
+     * Record a symbol whose seed CSV was rewritten so it can be mirrored after
+     * the run, instead of calling the mirror inside the per-symbol loop.
+     */
+    private function rememberTouchedSymbol(string $symbol): void
+    {
+        $symbol = strtoupper(trim($symbol));
+
+        if ($symbol !== '') {
+            $this->touchedSymbols[$symbol] = $symbol;
+        }
     }
 
     private function logHistoricalError(string $symbol, Carbon $from, Carbon $to, array $response, ?int $page = null): void
@@ -637,7 +680,7 @@ class ScrapeStockbit extends Command
             $dbBars->flush();
         }
 
-        $csvPath = database_path('seeders/data/historical/' . $symbol . '.csv');
+        $csvPath = $this->seedCsvPath($symbol);
         $existing = CsvBars::read($csvPath);
 
         foreach ($rows as $date => $ohlcv) {
@@ -652,6 +695,7 @@ class ScrapeStockbit extends Command
         }
 
         CsvBars::write($csvPath, $existing);
+        $this->rememberTouchedSymbol($symbol);
     }
 
     /**
@@ -969,7 +1013,7 @@ class ScrapeStockbit extends Command
                 ]);
             }
 
-            $csvPath = database_path('seeders/data/historical/' . $symbol . '.csv');
+            $csvPath = $this->seedCsvPath($symbol);
 
             if (!File::exists($csvPath)) {
                 $this->warn("Historical CSV missing for {$symbol}, skipping CSV update.");
@@ -987,6 +1031,7 @@ class ScrapeStockbit extends Command
             ];
 
             CsvBars::write($csvPath, $rows);
+            $this->rememberTouchedSymbol($symbol);
         }
 
         $dbBars->flush();

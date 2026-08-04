@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Console\Commands\Concerns\MirrorsSeedCsvs;
 use App\Models\Asset;
 use App\Services\CsvBars;
 use App\Services\SymbolDate;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Schema;
 
 class AssetSync extends Command
 {
+    use MirrorsSeedCsvs;
+
     /**
      * The name and signature of the console command.
      *
@@ -39,7 +42,8 @@ class AssetSync extends Command
         {--broker-summary-from= : Broker summary start date (YYYY-MM-DD)}
         {--broker-summary-to= : Broker summary end date (YYYY-MM-DD)}
         {--broker-summary-tickers=* : Limit broker summary sync to specific tickers}
-        {--token= : Stockbit bearer token (overrides env/config/cache/store)}';
+        {--token= : Stockbit bearer token (overrides env/config/cache/store)}
+        {--disk= : Mirror disk for the seed CSVs (default: CSV_MIRROR_DISK; empty disables mirroring)}';
 
     /**
      * The console command description.
@@ -50,8 +54,30 @@ class AssetSync extends Command
 
     /**
      * Execute the console command.
+     *
+     * The sync itself is unchanged and still reads and writes the seed CSVs on
+     * local disk. It is only bookended by the mirror: hydrate the local copies
+     * from the durable disk first, push the changed ones back afterwards. The
+     * flush is in a finally block so an early return or a mid-run failure still
+     * mirrors whatever was already written.
      */
     public function handle()
+    {
+        $symbols = AssetList::symbols(true);
+
+        $this->hydrateSeedCsvs($symbols);
+
+        try {
+            return $this->synchronize();
+        } finally {
+            $this->flushSeedCsvs($symbols);
+        }
+    }
+
+    /**
+     * Run the synchronization itself.
+     */
+    private function synchronize()
     {
         $this->info($this->description);
 

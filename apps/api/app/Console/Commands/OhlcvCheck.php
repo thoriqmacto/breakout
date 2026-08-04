@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\MirrorsSeedCsvs;
 use App\Models\Asset;
 use App\Services\CsvBars;
 use App\Services\DbBars;
@@ -16,13 +17,16 @@ use Illuminate\Support\Carbon;
 
 class OhlcvCheck extends Command
 {
+    use MirrorsSeedCsvs;
+
     protected $signature = 'ohlcv:check
         {symbol? : Asset symbol to check}
         {--all : Check all configured index symbols}
         {--from= : Restrict the check to start at this YYYY-MM-DD date}
         {--to= : Restrict the check to end at this YYYY-MM-DD date}
         {--resolve= : Resolve detected issues (supported: extra-bars, missing-days)}
-        {--force-delete : Remove unresolved trading days from the calendar when resolving missing days}';
+        {--force-delete : Remove unresolved trading days from the calendar when resolving missing days}
+        {--disk= : Mirror disk for the seed CSVs (default: CSV_MIRROR_DISK; empty disables mirroring)}';
 
     protected $description = 'Check OHLCV bar integrity for assets.';
 
@@ -61,7 +65,15 @@ class OhlcvCheck extends Command
         }
 
         if ($this->option('all')) {
-            return $this->checkAllConfiguredSymbols($from, $to, $resolve, $forceDelete);
+            $symbols = AssetList::symbols();
+
+            $this->hydrateSeedCsvs($symbols);
+
+            try {
+                return $this->checkAllConfiguredSymbols($from, $to, $resolve, $forceDelete);
+            } finally {
+                $this->flushSeedCsvs($symbols);
+            }
         }
 
         $symbol = $this->argument('symbol');
@@ -71,7 +83,16 @@ class OhlcvCheck extends Command
             return self::INVALID;
         }
 
-        $result = $this->checkSymbol(strtoupper((string) $symbol), $from, $to, $resolve, $forceDelete);
+        $symbol = strtoupper((string) $symbol);
+
+        $this->hydrateSeedCsvs([$symbol]);
+
+        try {
+            $result = $this->checkSymbol($symbol, $from, $to, $resolve, $forceDelete);
+        } finally {
+            $this->flushSeedCsvs([$symbol]);
+        }
+
         if ($result === null) {
             return self::FAILURE;
         }
