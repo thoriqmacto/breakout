@@ -137,6 +137,41 @@ class SeedCsvMirrorCommandTest extends TestCase
         $this->assertSame($csv, Storage::disk('gdrive')->get('seeds/historical/BBRI.csv'));
     }
 
+    /**
+     * The JSON path needed no code change: it already writes through
+     * Storage::disk(config('stockbit.save_disk')). Pointing that at the Drive
+     * disk must move the payload without disturbing the DB, which stays the
+     * query layer.
+     */
+    public function test_sb_save_disk_routes_the_historical_json_to_the_drive_disk(): void
+    {
+        config()->set('stockbit.save_disk', 'gdrive');
+        $asset = Asset::create(['symbol' => 'BBRI', 'name' => 'BBRI']);
+
+        $this->runHistoricalScrape(['--disk' => 'gdrive']);
+
+        // The raw payload lands on the Drive disk...
+        Storage::disk('gdrive')->assertExists('historical/BBRI_2024-02-01_2024-02-05_HS_PERIOD_DAILY.json');
+        Storage::disk('local')->assertMissing('historical/BBRI_2024-02-01_2024-02-05_HS_PERIOD_DAILY.json');
+
+        // Stored as one entry per fetched page, each the extracted result list.
+        $payload = json_decode(Storage::disk('gdrive')->get('historical/BBRI_2024-02-01_2024-02-05_HS_PERIOD_DAILY.json'), true);
+        $this->assertSame('2024-02-01', $payload[0][0]['date']);
+        $this->assertSame('2024-02-04', $payload[0][1]['date']);
+
+        // ...and the bars still land in the database.
+        $this->assertDatabaseHas('price_bars', [
+            'asset_id' => $asset->id,
+            'date' => '2024-02-01',
+            'close' => 105,
+        ]);
+        $this->assertDatabaseHas('price_bars', [
+            'asset_id' => $asset->id,
+            'date' => '2024-02-04',
+            'close' => 155,
+        ]);
+    }
+
     public function test_csv_fix_date_format_mirrors_the_seed_directory(): void
     {
         File::put($this->seedDir.'/BBRI.csv', "Date,Open,High,Low,Close,Volume\n2024-02-01,100,110,90,105,1000\n");
