@@ -103,6 +103,19 @@ class BarCsvMirror
             $remotePath = $this->remotePath($symbol);
 
             try {
+                // A local copy identical to the last file transferred for this
+                // symbol is already in sync, so there is nothing to download and
+                // no reason to spend remote calls asking. This is the steady
+                // state, and skipping it here is what keeps a routine run from
+                // re-downloading the whole mirror: flush() stamps the remote
+                // mtime to now, which would otherwise make every remote file
+                // look newer than its local counterpart on the following run.
+                if (! $force && $this->localMatchesManifest($symbol, $localPath)) {
+                    $result['skipped'][] = $symbol;
+
+                    continue;
+                }
+
                 if (! $this->attempt(fn () => $filesystem->fileExists($remotePath))) {
                     $result['skipped'][] = $symbol;
 
@@ -397,6 +410,23 @@ class BarCsvMirror
         }
 
         usleep($microseconds);
+    }
+
+    /**
+     * Whether the local file is byte-identical to the copy last transferred
+     * for this symbol, i.e. local and mirror are known to agree.
+     */
+    private function localMatchesManifest(string $symbol, string $localPath): bool
+    {
+        $known = $this->rememberedHash($symbol);
+
+        if ($known === null || ! is_file($localPath)) {
+            return false;
+        }
+
+        $contents = file_get_contents($localPath);
+
+        return $contents !== false && md5($contents) === $known;
     }
 
     /**

@@ -206,6 +206,82 @@ class BarCsvMirrorTest extends TestCase
         $this->assertSame(['BBCA'], $result['skipped']);
     }
 
+    public function test_a_flushed_symbol_is_not_re_downloaded_on_the_next_run(): void
+    {
+        // flush() stamps the remote mtime to now, leaving every remote file
+        // looking newer than its local counterpart. Without the hash check that
+        // would re-download the entire mirror on every single run.
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,100\n");
+        touch($this->seedDir.'/BBCA.csv', time() - 86400);
+
+        (new BarCsvMirror)->flush(['BBCA'], 'mirror');
+
+        $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror');
+
+        $this->assertSame([], $result['hydrated']);
+        $this->assertSame(['BBCA'], $result['skipped']);
+    }
+
+    public function test_force_hydrates_even_when_local_and_remote_agree(): void
+    {
+        $remote = "Date,Open\n02/01/2024,100\n";
+        Storage::disk('mirror')->put('seeds/historical/BBCA.csv', $remote);
+
+        $mirror = new BarCsvMirror;
+        $mirror->hydrate(['BBCA'], 'mirror');
+
+        // Local drifts out of band; --force restores the mirror's copy.
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,999\n");
+        touch($this->seedDir.'/BBCA.csv', time() + 600);
+
+        $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror', true);
+
+        $this->assertSame(['BBCA'], $result['hydrated']);
+        $this->assertSame($remote, file_get_contents($this->seedDir.'/BBCA.csv'));
+    }
+
+    public function test_a_locally_modified_csv_is_not_clobbered_by_hydrate(): void
+    {
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,100\n");
+        (new BarCsvMirror)->flush(['BBCA'], 'mirror');
+
+        $edited = "Date,Open\n02/01/2024,100\n03/01/2024,101\n";
+        $this->writeLocal('BBCA', $edited);
+
+        $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror');
+
+        $this->assertSame([], $result['hydrated']);
+        $this->assertSame($edited, file_get_contents($this->seedDir.'/BBCA.csv'));
+
+        // And the local change still reaches the mirror afterwards.
+        $this->assertSame(['BBCA'], (new BarCsvMirror)->flush(['BBCA'], 'mirror')['uploaded']);
+    }
+
+    public function test_forget_makes_the_next_flush_re_upload(): void
+    {
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,100\n");
+
+        $mirror = new BarCsvMirror;
+        $mirror->flush(['BBCA'], 'mirror');
+        $this->assertSame([], $mirror->flush(['BBCA'], 'mirror')['uploaded']);
+
+        $mirror->forget(['BBCA']);
+
+        $this->assertSame(['BBCA'], $mirror->flush(['BBCA'], 'mirror')['uploaded']);
+    }
+
+    public function test_forget_without_symbols_clears_everything(): void
+    {
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,100\n");
+        $this->writeLocal('TLKM', "Date,Open\n02/01/2024,200\n");
+
+        $mirror = new BarCsvMirror;
+        $mirror->flush([], 'mirror');
+        $mirror->forget();
+
+        $this->assertSame(['BBCA', 'TLKM'], $mirror->flush([], 'mirror')['uploaded']);
+    }
+
     public function test_an_unresolvable_mirror_disk_does_not_break_the_run(): void
     {
         $mirror = new BarCsvMirror;
