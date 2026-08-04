@@ -75,9 +75,10 @@ class BarCsvMirror
      *
      * @param  array<int, string>  $symbols  Symbols to hydrate; empty hydrates everything on the mirror.
      * @param  string|null  $disk  Mirror disk override; null falls back to config('csv.mirror_disk').
+     * @param  bool  $force  Download even when the local copy is newer (disaster recovery).
      * @return array{disk: ?string, hydrated: array<int, string>, skipped: array<int, string>, failed: array<int, string>}
      */
-    public function hydrate(array $symbols = [], ?string $disk = null): array
+    public function hydrate(array $symbols = [], ?string $disk = null, bool $force = false): array
     {
         $result = ['disk' => null, 'hydrated' => [], 'skipped' => [], 'failed' => []];
 
@@ -108,7 +109,7 @@ class BarCsvMirror
                     continue;
                 }
 
-                if (! $this->remoteIsNewer($filesystem, $remotePath, $localPath)) {
+                if (! $force && ! $this->remoteIsNewer($filesystem, $remotePath, $localPath)) {
                     $result['skipped'][] = $symbol;
 
                     continue;
@@ -211,6 +212,33 @@ class BarCsvMirror
     public function enabled(?string $disk = null): bool
     {
         return $this->resolveDisk($disk) !== null;
+    }
+
+    /**
+     * Drop remembered hashes so the next flush re-uploads regardless of whether
+     * the local contents changed.
+     *
+     * @param  array<int, string>  $symbols  Empty forgets every symbol.
+     */
+    public function forget(array $symbols = []): void
+    {
+        $symbols = $this->normalizeSymbols($symbols);
+
+        if ($symbols === []) {
+            $this->manifest = [];
+            $this->saveManifest();
+
+            return;
+        }
+
+        $manifest = $this->manifest();
+
+        foreach ($symbols as $symbol) {
+            unset($manifest[$this->manifestKey($symbol)]);
+        }
+
+        $this->manifest = $manifest;
+        $this->saveManifest();
     }
 
     /**
