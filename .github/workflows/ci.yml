@@ -22,7 +22,7 @@ jobs:
         working-directory: apps/api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 8.2 is the floor declared in composer.json. Testing the floor rather
       # than the newest runtime is what makes that declaration meaningful.
@@ -34,7 +34,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/api/vendor
           key: composer-${{ runner.os }}-php8.2-${{ hashFiles('apps/api/composer.lock') }}
@@ -72,12 +72,12 @@ jobs:
         working-directory: apps/web
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Matches the Node major Vercel builds with, so a green CI run means the
       # deploy will compile too.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -112,7 +112,7 @@ jobs:
         working-directory: apps/api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -121,7 +121,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/api/vendor
           key: composer-${{ runner.os }}-php8.2-${{ hashFiles('apps/api/composer.lock') }}
