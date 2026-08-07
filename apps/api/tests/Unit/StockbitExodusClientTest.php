@@ -21,15 +21,15 @@ class StockbitExodusClientTest extends TestCase
         config()->set('stockbit.base_url', 'https://example.test/api');
         config()->set('stockbit.defaults', [
             'transaction_type' => 'TRANSACTION_TYPE_NET',
-            'market_board'     => 'MARKET_BOARD_REGULER',
-            'investor_type'    => 'INVESTOR_TYPE_ALL',
-            'limit'            => 25,
+            'market_board' => 'MARKET_BOARD_REGULER',
+            'investor_type' => 'INVESTOR_TYPE_ALL',
+            'limit' => 25,
         ]);
     }
 
     private function makeClientWith(MockHandler $handler): StockbitExodusClient
     {
-        $client = new StockbitExodusClient();
+        $client = new StockbitExodusClient;
 
         $reflection = new \ReflectionProperty($client, 'http');
         $reflection->setAccessible(true);
@@ -154,7 +154,7 @@ class StockbitExodusClientTest extends TestCase
     {
         $future = time() + 3600;
         $payload = base64_encode(json_encode(['exp' => $future]));
-        $jwt = 'abc.' . rtrim(strtr($payload, '+/', '-_'), '=') . '.def';
+        $jwt = 'abc.'.rtrim(strtr($payload, '+/', '-_'), '=').'.def';
 
         $this->assertInstanceOf(\DateTimeImmutable::class, StockbitExodusClient::jwtExpiresAt($jwt));
         $this->assertNull(StockbitExodusClient::jwtExpiresAt(null));

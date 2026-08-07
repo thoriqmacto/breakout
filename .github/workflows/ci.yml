@@ -95,7 +95,7 @@ jobs:
         run: npm audit --audit-level=critical
 
   style:
-    name: API — Pint (informational)
+    name: API — Pint
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -120,22 +120,5 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      # Reports rather than gates, and deliberately exits 0.
-      #
-      # main carries ~118 pre-existing style issues across 215 files, so a
-      # blocking check would fail every pull request over code it did not
-      # touch. `continue-on-error` is not the answer either: it keeps the run
-      # green but still paints the check red, which is the same "always failing,
-      # learn to ignore it" outcome one step removed.
-      #
-      # Full pint output stays in this log, and the count surfaces as a warning
-      # annotation on the pull request. Once the backlog is cleared in a
-      # formatting-only commit, replace this whole step with a bare
-      # `./vendor/bin/pint --test` to turn the job into a real gate.
       - name: Check formatting
-        run: |
-          if ./vendor/bin/pint --test; then
-            echo "::notice::Pint is clean. The backlog is gone -- this job can now be made blocking."
-          else
-            echo "::warning::Pint reports pre-existing style issues on main. This job is informational until that backlog is cleared; see .github/workflows/ci.yml."
-          fi
+        run: ./vendor/bin/pint --test

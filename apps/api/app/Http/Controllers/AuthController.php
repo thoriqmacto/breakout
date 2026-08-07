@@ -17,9 +17,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly JwtService $jwt)
-    {
-    }
+    public function __construct(private readonly JwtService $jwt) {}
 
     public function register(Request $request): JsonResponse
     {

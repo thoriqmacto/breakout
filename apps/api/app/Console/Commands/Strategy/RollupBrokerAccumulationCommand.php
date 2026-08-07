@@ -57,7 +57,7 @@ class RollupBrokerAccumulationCommand extends Command
         }
 
         $latest = \Illuminate\Support\Facades\DB::table('broker_summary_facts')->max('trade_date');
-        if (!$latest) {
+        if (! $latest) {
             $this->warn('No rows found in broker_summary_facts. Provide --date explicitly.');
 
             return null;
@@ -74,7 +74,7 @@ class RollupBrokerAccumulationCommand extends Command
         $parts = array_filter(array_map('trim', explode(',', $raw)));
         $out = [];
         foreach ($parts as $part) {
-            if (!is_numeric($part)) {
+            if (! is_numeric($part)) {
                 continue;
             }
             $n = (int) $part;
@@ -87,7 +87,7 @@ class RollupBrokerAccumulationCommand extends Command
     }
 
     /**
-     * @param array<int, string> $rawSymbols
+     * @param  array<int, string>  $rawSymbols
      * @return array<int, string>|null
      */
     private function parseSymbols(array $rawSymbols): ?array

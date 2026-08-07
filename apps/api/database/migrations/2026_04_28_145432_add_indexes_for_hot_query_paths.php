@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Schema;
  *
  * All indexes are non-unique, additive, and reversible.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (Schema::hasTable('broker_summary_facts')) {

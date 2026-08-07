@@ -15,10 +15,19 @@ final class IdxTicks
 {
     public static function tickFor(float $price): float
     {
-        if ($price < 200) return 1.0;
-        if ($price < 500) return 2.0;
-        if ($price < 2000) return 5.0;
-        if ($price < 5000) return 10.0;
+        if ($price < 200) {
+            return 1.0;
+        }
+        if ($price < 500) {
+            return 2.0;
+        }
+        if ($price < 2000) {
+            return 5.0;
+        }
+        if ($price < 5000) {
+            return 10.0;
+        }
+
         return 25.0;
     }
 
@@ -26,6 +35,7 @@ final class IdxTicks
     public static function round(float $value, ?float $refPrice = null): float
     {
         $t = self::tickFor($refPrice ?? $value);
+
         return round($value / $t) * $t;
     }
 
@@ -33,6 +43,7 @@ final class IdxTicks
     public static function floor(float $value, ?float $refPrice = null): float
     {
         $t = self::tickFor($refPrice ?? $value);
+
         return floor($value / $t) * $t;
     }
 
@@ -40,6 +51,7 @@ final class IdxTicks
     public static function ceil(float $value, ?float $refPrice = null): float
     {
         $t = self::tickFor($refPrice ?? $value);
+
         return ceil($value / $t) * $t;
     }
 
@@ -47,6 +59,7 @@ final class IdxTicks
     public static function toTicks(float $delta, float $refPrice): int
     {
         $t = max(self::tickFor($refPrice), 1e-9);
+
         return (int) round($delta / $t);
     }
 

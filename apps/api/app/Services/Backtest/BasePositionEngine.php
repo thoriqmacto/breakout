@@ -17,7 +17,7 @@ abstract class BasePositionEngine
     /**
      * Append a new bar to the internal price history.
      *
-     * @param array{date:string, open:float, high:float, low:float, close:float, volume?:float} $bar
+     * @param  array{date:string, open:float, high:float, low:float, close:float, volume?:float}  $bar
      */
     protected function recordBar(array $bar): void
     {

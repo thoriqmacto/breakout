@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Schema;
  *   - down() recreates the tables with their original schema, so a
  *     rollback restores the previous state.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Drop order matters: trades → orders (FK), backtest_equity is
      * standalone, the rest depend only on assets which we keep.
@@ -39,7 +40,7 @@ return new class extends Migration {
     public function up(): void
     {
         foreach ($this->legacyTables as $table) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
 
@@ -58,7 +59,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        if (!Schema::hasTable('config_profiles')) {
+        if (! Schema::hasTable('config_profiles')) {
             Schema::create('config_profiles', function ($table) {
                 $table->id();
                 $table->string('name');
@@ -66,7 +67,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('signals')) {
+        if (! Schema::hasTable('signals')) {
             Schema::create('signals', function ($table) {
                 $table->id();
                 $table->foreignId('asset_id')->constrained('assets')->cascadeOnDelete();
@@ -79,7 +80,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('orders')) {
+        if (! Schema::hasTable('orders')) {
             Schema::create('orders', function ($table) {
                 $table->id();
                 $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();
@@ -91,7 +92,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('trades')) {
+        if (! Schema::hasTable('trades')) {
             Schema::create('trades', function ($table) {
                 $table->id();
                 $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
@@ -101,7 +102,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('sheet_sources')) {
+        if (! Schema::hasTable('sheet_sources')) {
             Schema::create('sheet_sources', function ($table) {
                 $table->id();
                 $table->string('kind');
@@ -110,7 +111,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('backtest_equity')) {
+        if (! Schema::hasTable('backtest_equity')) {
             Schema::create('backtest_equity', function ($table) {
                 $table->string('run_id');
                 $table->date('date');

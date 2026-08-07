@@ -127,6 +127,6 @@ class StockbitTokenResolverTest extends TestCase
     {
         $payload = rtrim(strtr(base64_encode(json_encode(['exp' => $exp])), '+/', '-_'), '=');
 
-        return 'header.' . $payload . '.signature';
+        return 'header.'.$payload.'.signature';
     }
 }

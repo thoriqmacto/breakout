@@ -11,9 +11,9 @@ use App\Services\PythonRunner;
 use App\Services\StockbitExodusClient;
 use App\Support\AssetList;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Carbon;
 
 class OhlcvCheck extends Command
 {
@@ -34,8 +34,7 @@ class OhlcvCheck extends Command
         private readonly OhlcvIntegrityChecker $checker,
         private readonly StockbitExodusClient $stockbit,
         private readonly PythonRunner $python,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -49,7 +48,7 @@ class OhlcvCheck extends Command
         if ($resolve !== null) {
             $resolve = strtolower((string) $resolve);
             $supported = ['extra-bars', 'missing-days'];
-            if (!in_array($resolve, $supported, true)) {
+            if (! in_array($resolve, $supported, true)) {
                 $this->error(sprintf(
                     'Unknown resolve option "%s". Supported values: %s',
                     $resolve,
@@ -133,7 +132,7 @@ class OhlcvCheck extends Command
 
         $report = $this->checker->checkAsset($asset, $from, $to);
 
-        if ($resolve === 'extra-bars' && !empty($report['extra_bars'])) {
+        if ($resolve === 'extra-bars' && ! empty($report['extra_bars'])) {
             $this->newLine();
             $this->info(sprintf('Resolving extra bars for %s...', $symbol));
             $this->resolveExtraBars($asset, $report['extra_bars']);
@@ -143,7 +142,7 @@ class OhlcvCheck extends Command
             $this->info(sprintf('No extra bars to resolve for %s.', $symbol));
         }
 
-        if ($resolve === 'missing-days' && !empty($report['missing_trading_days'])) {
+        if ($resolve === 'missing-days' && ! empty($report['missing_trading_days'])) {
             $this->newLine();
             $this->info(sprintf('Resolving missing trading days for %s...', $symbol));
             $this->resolveMissingDays($asset, $report['missing_trading_days'], $forceDelete);
@@ -159,7 +158,7 @@ class OhlcvCheck extends Command
     }
 
     /**
-     * @param array<string, mixed> $report
+     * @param  array<string, mixed>  $report
      */
     private function displayReport(array $report): void
     {
@@ -180,7 +179,7 @@ class OhlcvCheck extends Command
         ));
         $this->line(sprintf('  Trading days covered: %d', $report['actual_trading_days'] ?? 0));
 
-        if (!empty($report['missing_trading_days'])) {
+        if (! empty($report['missing_trading_days'])) {
             $this->warn(sprintf(
                 '  Missing trading days (%d): %s',
                 count($report['missing_trading_days']),
@@ -188,7 +187,7 @@ class OhlcvCheck extends Command
             ));
         }
 
-        if (!empty($report['extra_bars'])) {
+        if (! empty($report['extra_bars'])) {
             $this->warn(sprintf(
                 '  Extra bars (%d): %s',
                 count($report['extra_bars']),
@@ -196,8 +195,8 @@ class OhlcvCheck extends Command
             ));
         }
 
-        if (!empty($report['duplicate_bars'])) {
-            $this->warn('  Duplicate bars: ' . implode(', ', $report['duplicate_bars']));
+        if (! empty($report['duplicate_bars'])) {
+            $this->warn('  Duplicate bars: '.implode(', ', $report['duplicate_bars']));
         }
 
         $status = ($report['is_consistent'] ?? false) ? '<fg=green>PASSED</>' : '<fg=red>FAILED</>';
@@ -233,9 +232,9 @@ class OhlcvCheck extends Command
             return;
         }
 
-        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . strtoupper($asset->symbol) . '.csv';
+        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.strtoupper($asset->symbol).'.csv';
 
-        if (!is_file($csvPath)) {
+        if (! is_file($csvPath)) {
             $this->warn(sprintf('  CSV seed file not found for %s at %s; skipping CSV cleanup.', $asset->symbol, $csvPath));
 
             return;
@@ -300,7 +299,7 @@ class OhlcvCheck extends Command
 
             $normalized = $this->normalizeHistoricalResponse($response);
 
-            if (!isset($normalized[$date])) {
+            if (! isset($normalized[$date])) {
                 $this->warn(sprintf(
                     '  Stockbit did not return OHLCV data for %s on %s.',
                     $asset->symbol,
@@ -365,7 +364,7 @@ class OhlcvCheck extends Command
             return;
         }
 
-        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . strtoupper($asset->symbol) . '.csv';
+        $csvPath = rtrim($csvDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.strtoupper($asset->symbol).'.csv';
         $existing = CsvBars::read($csvPath);
 
         foreach ($bars as $date => $ohlcv) {
@@ -388,14 +387,14 @@ class OhlcvCheck extends Command
     {
         $symbol = strtoupper($asset->symbol);
         $args = [
-            '--start=' . $date,
-            '--end=' . $date,
-            $symbol . '.JK',
+            '--start='.$date,
+            '--end='.$date,
+            $symbol.'.JK',
         ];
 
         $result = $this->python->run('get_stocks.py', null, $args);
 
-        if (!$result['ok']) {
+        if (! $result['ok']) {
             $message = trim($result['stderr'] ?: $result['stdout']);
             $this->warn(sprintf(
                 '  Python get_stocks.py failed for %s on %s%s',
@@ -407,9 +406,9 @@ class OhlcvCheck extends Command
             return null;
         }
 
-        $csvPath = resource_path('python/csv/' . $symbol . '_PY.csv');
+        $csvPath = resource_path('python/csv/'.$symbol.'_PY.csv');
 
-        if (!is_file($csvPath)) {
+        if (! is_file($csvPath)) {
             $this->warn(sprintf(
                 '  Python fallback CSV not found for %s at %s.',
                 $symbol,
@@ -421,7 +420,7 @@ class OhlcvCheck extends Command
 
         $rows = CsvBars::read($csvPath);
 
-        if (!isset($rows[$date])) {
+        if (! isset($rows[$date])) {
             $this->warn(sprintf(
                 '  Python fallback did not contain OHLCV data for %s on %s.',
                 $symbol,
@@ -447,7 +446,7 @@ class OhlcvCheck extends Command
     }
 
     /**
-     * @param array<string, mixed> $response
+     * @param  array<string, mixed>  $response
      * @return array<string, array{open: float, high: float, low: float, close: float, volume: int}>
      */
     private function normalizeHistoricalResponse(array $response): array
@@ -463,7 +462,7 @@ class OhlcvCheck extends Command
         $rows = [];
 
         foreach ($containers as $container) {
-            if (!is_array($container)) {
+            if (! is_array($container)) {
                 continue;
             }
 
@@ -476,7 +475,7 @@ class OhlcvCheck extends Command
             }
 
             foreach ($items as $item) {
-                if (!is_array($item)) {
+                if (! is_array($item)) {
                     continue;
                 }
 
@@ -529,13 +528,13 @@ class OhlcvCheck extends Command
             return (float) $value;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
         $normalized = preg_replace('/[^0-9\-\.]/', '', str_replace(',', '', $value));
 
-        if ($normalized === '' || !is_numeric($normalized)) {
+        if ($normalized === '' || ! is_numeric($normalized)) {
             return null;
         }
 
@@ -552,7 +551,7 @@ class OhlcvCheck extends Command
             return (int) round((float) $value);
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
@@ -593,7 +592,7 @@ class OhlcvCheck extends Command
 
         $path = database_path('seeders/data/trading_days.php');
 
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             $this->warn('  Trading day seeder file not found; skipping seeder removal.');
 
             return;
@@ -602,12 +601,12 @@ class OhlcvCheck extends Command
         try {
             $data = include $path;
         } catch (\Throwable $e) {
-            $this->warn('  Unable to load trading day seeder file: ' . $e->getMessage());
+            $this->warn('  Unable to load trading day seeder file: '.$e->getMessage());
 
             return;
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $this->warn('  Trading day seeder file did not return an array; skipping seeder removal.');
 
             return;
@@ -617,7 +616,7 @@ class OhlcvCheck extends Command
         $removed = false;
 
         foreach ($data as $row) {
-            if (!is_array($row)) {
+            if (! is_array($row)) {
                 continue;
             }
 
@@ -630,13 +629,13 @@ class OhlcvCheck extends Command
             $remaining[] = $row;
         }
 
-        if (!$removed) {
+        if (! $removed) {
             $this->warn(sprintf('  Trading day %s not found in seeder file.', $date));
 
             return;
         }
 
-        $contents = "<?php\n\nreturn " . $this->exportArray(array_values($remaining)) . ";\n";
+        $contents = "<?php\n\nreturn ".$this->exportArray(array_values($remaining)).";\n";
 
         File::ensureDirectoryExists(dirname($path));
 
@@ -650,7 +649,7 @@ class OhlcvCheck extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $records
+     * @param  array<int, array<string, mixed>>  $records
      */
     private function exportArray(array $records): string
     {

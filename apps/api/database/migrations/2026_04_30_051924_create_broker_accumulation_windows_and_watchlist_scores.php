@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Schema;
  *     keyed by (scan_date, symbol, version) so multiple scoring
  *     versions can coexist for backtesting and trend tracking.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('broker_accumulation_windows', function (Blueprint $table) {

@@ -20,22 +20,29 @@ class StrategyScoringService
     public const VERSION = 'v1';
 
     public const WEIGHT_BAS = 0.45;
+
     public const WEIGHT_BCS = 0.35;
+
     public const WEIGHT_FILTERS = 0.20;
 
     /**
      * Weight contributions when both filters pass / partially pass.
      */
     private const FILTER_BONUS_LF = 50.0;
+
     private const FILTER_BONUS_RRF = 50.0;
 
     /**
      * BCS sub-score thresholds.
      */
     private const BCS_BREAKOUT_BONUS = 50.0;
+
     private const BCS_VOL_RATIO_THRESHOLD = 1.5;
+
     private const BCS_VOL_RATIO_BONUS = 25.0;
+
     private const BCS_CLOSE_POS_THRESHOLD = 0.7;
+
     private const BCS_CLOSE_POS_BONUS = 25.0;
 
     /**
@@ -55,7 +62,7 @@ class StrategyScoringService
     /**
      * Broker Accumulation Score (0..100).
      *
-     * @param array<int, array{avg_net_norm: float, top3_net_norm: float, accdist_score: int, window_days: int}> $windows
+     * @param  array<int, array{avg_net_norm: float, top3_net_norm: float, accdist_score: int, window_days: int}>  $windows
      */
     public function brokerAccumulation(array $windows, ?int $sameDayPbas = null): array
     {

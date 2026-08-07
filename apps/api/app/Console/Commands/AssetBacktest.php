@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Asset;
 use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
@@ -14,6 +13,7 @@ use App\Services\Strategies\RocMomentum;
 use App\Services\Strategies\RsiReversal;
 use App\Services\Strategies\SupportResistanceBreakout;
 use App\Services\Strategies\TrailingStop;
+use Illuminate\Console\Command;
 
 class AssetBacktest extends Command
 {
@@ -62,6 +62,7 @@ class AssetBacktest extends Command
         $tickers = $this->resolveTickers();
         if ($tickers === []) {
             $this->error('At least one ticker must be provided via --sym.');
+
             return Command::FAILURE;
         }
 
@@ -73,6 +74,7 @@ class AssetBacktest extends Command
         if ($strategyOption === 'HLSLBreakout') {
             if ($this->option('compare')) {
                 $this->error('The HLSLBreakout strategy cannot be combined with --compare.');
+
                 return Command::FAILURE;
             }
 
@@ -81,6 +83,7 @@ class AssetBacktest extends Command
 
         if (! array_key_exists($strategyOption, $map)) {
             $this->error("Unknown strategy: {$strategyOption}");
+
             return Command::FAILURE;
         }
 
@@ -99,6 +102,7 @@ class AssetBacktest extends Command
                 $trailingStop = TrailingStop::atr($multiple, $period);
             } else {
                 $this->error('Invalid trailing stop format.');
+
                 return Command::FAILURE;
             }
         }
@@ -115,6 +119,7 @@ class AssetBacktest extends Command
 
         if ($this->option('trades') && $this->option('compare')) {
             $this->error('The --trades option cannot be combined with --compare.');
+
             return Command::FAILURE;
         }
 
@@ -134,11 +139,12 @@ class AssetBacktest extends Command
             foreach ($names as $name) {
                 if (! array_key_exists($name, $map)) {
                     $this->error("Unknown strategy: {$name}");
+
                     return Command::FAILURE;
                 }
             }
 
-            $this->info('Tickers: ' . implode(', ', $tickers));
+            $this->info('Tickers: '.implode(', ', $tickers));
 
             $processed = 0;
             foreach ($tickers as $symbol) {
@@ -151,7 +157,7 @@ class AssetBacktest extends Command
 
                 $this->line('');
                 $this->info("Ticker: {$symbol}");
-                $this->info('Bars: ' . count($bars));
+                $this->info('Bars: '.count($bars));
 
                 $metricsByName = [];
                 foreach ($names as $name) {
@@ -190,13 +196,14 @@ class AssetBacktest extends Command
 
             if ($processed === 0) {
                 $this->error('No price data available for the provided tickers.');
+
                 return Command::FAILURE;
             }
 
             return Command::SUCCESS;
         }
 
-        $this->info('Tickers: ' . implode(', ', $tickers));
+        $this->info('Tickers: '.implode(', ', $tickers));
 
         $class = $map[$strategyOption];
         $processed = 0;
@@ -211,7 +218,7 @@ class AssetBacktest extends Command
 
             $this->line('');
             $this->info("Ticker: {$symbol}");
-            $this->info('Bars: ' . count($bars));
+            $this->info('Bars: '.count($bars));
 
             $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($strategyOption, $trailingStrategies, true));
             $strategy = $useTrailing
@@ -260,6 +267,7 @@ class AssetBacktest extends Command
 
         if ($processed === 0) {
             $this->error('No price data available for the provided tickers.');
+
             return Command::FAILURE;
         }
 
@@ -274,12 +282,14 @@ class AssetBacktest extends Command
             $asset = Asset::where('symbol', $ticker)->first();
             if (! $asset) {
                 $this->warn("Asset {$ticker} not found. Skipping.");
+
                 continue;
             }
 
             $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
             if ($prices->isEmpty()) {
                 $this->warn("No OHLCV data available for {$ticker}. Skipping.");
+
                 continue;
             }
 
@@ -302,6 +312,7 @@ class AssetBacktest extends Command
 
         if ($dataByTicker === []) {
             $this->error('No OHLCV data available for the provided tickers.');
+
             return Command::FAILURE;
         }
 
@@ -311,7 +322,7 @@ class AssetBacktest extends Command
 
         $this->line('');
         $this->info('HLSL Breakout Backtest');
-        $this->line('Tickers: ' . implode(', ', array_keys($dataByTicker)));
+        $this->line('Tickers: '.implode(', ', array_keys($dataByTicker)));
         foreach ($barCounts as $ticker => $count) {
             $this->line("{$ticker} Bars: {$count}");
         }
@@ -328,7 +339,7 @@ class AssetBacktest extends Command
             ['Avg Loss %', number_format($stats['avg_loss_pct'] ?? 0.0, 2)],
             ['Profit Factor', ($stats['profit_factor'] ?? null) === null
                 ? 'N/A'
-                : number_format((float) $stats['profit_factor'], 2)
+                : number_format((float) $stats['profit_factor'], 2),
             ],
         ];
 
@@ -407,12 +418,14 @@ class AssetBacktest extends Command
         $asset = Asset::where('symbol', $symbol)->first();
         if (! $asset) {
             $this->warn("Asset {$symbol} not found. Skipping.");
+
             return null;
         }
 
         $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close']);
         if ($prices->isEmpty()) {
             $this->warn("No price data available for {$symbol}. Skipping.");
+
             return null;
         }
 
@@ -432,7 +445,7 @@ class AssetBacktest extends Command
     }
 
     /**
-     * @param array<string, float|int> $metrics
+     * @param  array<string, float|int>  $metrics
      * @return array<string, string|int>
      */
     private function formatMetrics(array $metrics): array

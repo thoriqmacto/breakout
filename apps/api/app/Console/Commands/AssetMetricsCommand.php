@@ -3,15 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
+use App\Models\BandarDetectorSummary;
 use App\Models\Metric;
 use App\Services\AssetMetrics;
-use App\Models\BandarDetectorSummary;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class AssetMetricsCommand extends Command
 {
     protected $signature = 'asset:metrics {--sym=} {--all} {--persist : Persist the calculated metrics to the database}';
+
     protected $description = 'Display asset metrics using AssetMetrics service';
 
     public function handle()
@@ -32,7 +33,7 @@ class AssetMetricsCommand extends Command
 
         foreach ($symbols as $symbol) {
             $asset = Asset::where('symbol', $symbol)->first();
-            if (!$asset) {
+            if (! $asset) {
                 continue;
             }
             $bars = $asset->prices()->orderBy('date')->get()->toArray();
@@ -135,18 +136,18 @@ class AssetMetricsCommand extends Command
 
         usort($rows, function ($a, $b) {
             $A = [
-                (int)($a['sort_uptrend'] ?? 0),
-                (float)($a['sort_roc13'] ?? 0),
-                (float)($a['sort_close_vs_high55'] ?? 0),
-                (float)($a['sort_close_vs_high20'] ?? 0),
-                (float)($a['sort_vol_vs_avg20'] ?? 0),
+                (int) ($a['sort_uptrend'] ?? 0),
+                (float) ($a['sort_roc13'] ?? 0),
+                (float) ($a['sort_close_vs_high55'] ?? 0),
+                (float) ($a['sort_close_vs_high20'] ?? 0),
+                (float) ($a['sort_vol_vs_avg20'] ?? 0),
             ];
             $B = [
-                (int)($b['sort_uptrend'] ?? 0),
-                (float)($b['sort_roc13'] ?? 0),
-                (float)($b['sort_close_vs_high55'] ?? 0),
-                (float)($b['sort_close_vs_high20'] ?? 0),
-                (float)($b['sort_vol_vs_avg20'] ?? 0),
+                (int) ($b['sort_uptrend'] ?? 0),
+                (float) ($b['sort_roc13'] ?? 0),
+                (float) ($b['sort_close_vs_high55'] ?? 0),
+                (float) ($b['sort_close_vs_high20'] ?? 0),
+                (float) ($b['sort_vol_vs_avg20'] ?? 0),
             ];
             $result = $B <=> $A; // descending
 

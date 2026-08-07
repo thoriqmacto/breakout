@@ -19,12 +19,13 @@ class BreakoutPositionEngineTest extends TestCase
         foreach ($bars as $bar) {
             $events = $engine->onBar($bar);
         }
+
         return $events;
     }
 
     public function test_low_atr_entry_sets_two_percent_stop(): void
     {
-        $engine = new BreakoutPositionEngine();
+        $engine = new BreakoutPositionEngine;
 
         $bars = [];
         for ($i = 0; $i < 100; $i++) {
@@ -68,7 +69,7 @@ class BreakoutPositionEngineTest extends TestCase
 
     public function test_high_atr_entry_sets_three_percent_stop(): void
     {
-        $engine = new BreakoutPositionEngine();
+        $engine = new BreakoutPositionEngine;
 
         $bars = [];
         for ($i = 0; $i < 100; $i++) {
@@ -106,7 +107,7 @@ class BreakoutPositionEngineTest extends TestCase
 
     public function test_split_after_six_percent_gain_creates_two_legs(): void
     {
-        $engine = new BreakoutPositionEngine();
+        $engine = new BreakoutPositionEngine;
 
         $bars = [];
         for ($i = 0; $i < 100; $i++) {
@@ -160,7 +161,7 @@ class BreakoutPositionEngineTest extends TestCase
 
     public function test_fast_leg_exits_when_price_hits_stop(): void
     {
-        $engine = new BreakoutPositionEngine();
+        $engine = new BreakoutPositionEngine;
 
         $bars = [];
         for ($i = 0; $i < 100; $i++) {

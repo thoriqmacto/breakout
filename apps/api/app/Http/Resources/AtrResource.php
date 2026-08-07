@@ -28,7 +28,7 @@ class AtrResource extends JsonResource
         $data = $this->resource;
 
         $asset = $data['asset'];
-        if (!$asset instanceof Asset) {
+        if (! $asset instanceof Asset) {
             throw new InvalidArgumentException('AtrResource expects an Asset instance.');
         }
         $lastBar = $data['last_bar'] ?? null;

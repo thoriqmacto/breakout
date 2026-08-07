@@ -24,7 +24,8 @@ class BacktesterMetricsTest extends TestCase
     {
         $bars = $this->bars();
         $metrics = new AssetMetrics($bars);
-        $strategy = new class($metrics) extends BaseStrategy {
+        $strategy = new class($metrics) extends BaseStrategy
+        {
             public function signal(): string
             {
                 return $this->metrics->barCount() === 1 ? 'buy' : 'sell';

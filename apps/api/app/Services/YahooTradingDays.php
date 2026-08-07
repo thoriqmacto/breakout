@@ -12,14 +12,15 @@ use RuntimeException;
 class YahooTradingDays
 {
     private const SYMBOL = '^JKSE';
+
     private const SCRIPT = 'get_stocks.py';
+
     private const CHUNK_SIZE = 1000;
 
     public function __construct(
         private readonly PythonRunner $pythonRunner,
         private readonly TradingDay $tradingDay,
-    ) {
-    }
+    ) {}
 
     public function import(string $from = '2015-01-01', ?string $to = null): int
     {
@@ -39,14 +40,14 @@ class YahooTradingDays
 
         $result = $this->pythonRunner->run(self::SCRIPT, null, $args);
 
-        if (!$result['ok']) {
+        if (! $result['ok']) {
             $errorMessage = trim($result['stderr'] ?: $result['stdout']);
             throw new RuntimeException($errorMessage !== '' ? $errorMessage : 'Failed to fetch trading days from Python script.');
         }
 
         $payload = $result['json'];
 
-        if (!is_array($payload)) {
+        if (! is_array($payload)) {
             return 0;
         }
 
@@ -55,7 +56,7 @@ class YahooTradingDays
                 return is_array($item) && ($item['ticker'] ?? null) === self::SYMBOL;
             });
 
-        if (!is_array($tickerData)) {
+        if (! is_array($tickerData)) {
             return 0;
         }
 
@@ -84,19 +85,19 @@ class YahooTradingDays
     }
 
     /**
-     * @param array<int, mixed> $entries
+     * @param  array<int, mixed>  $entries
      */
     private function mapEntriesToRecords(array $entries, Carbon $startDate, Carbon $endDate, Carbon $now): Collection
     {
         return Collection::make($entries)
             ->map(function (mixed $entry) use ($startDate, $endDate, $now) {
-                if (!is_array($entry)) {
+                if (! is_array($entry)) {
                     return null;
                 }
 
                 $date = $entry['date'] ?? null;
 
-                if (!is_string($date)) {
+                if (! is_string($date)) {
                     return null;
                 }
 
@@ -126,14 +127,14 @@ class YahooTradingDays
     }
 
     /**
-     * @param array<int, mixed> $dates
+     * @param  array<int, mixed>  $dates
      */
     private function mapDatesToRecords(array $dates, Carbon $startDate, Carbon $endDate, Carbon $now): Collection
     {
         return Collection::make($dates)
             ->filter()
             ->map(function (mixed $date) use ($startDate, $endDate, $now) {
-                if (!is_string($date)) {
+                if (! is_string($date)) {
                     return null;
                 }
 
@@ -174,7 +175,7 @@ class YahooTradingDays
             }
         }
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return null;
         }
 

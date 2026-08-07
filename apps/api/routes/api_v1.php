@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
@@ -10,6 +9,7 @@ use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Assets

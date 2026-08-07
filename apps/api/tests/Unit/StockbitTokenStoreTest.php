@@ -18,7 +18,7 @@ class StockbitTokenStoreTest extends TestCase
 
     public function test_it_persists_and_returns_token_until_expired(): void
     {
-        $store = new StockbitTokenStore();
+        $store = new StockbitTokenStore;
         $token = $this->jwtWithExpiry(time() + 3600);
 
         $store->put($token);
@@ -29,7 +29,7 @@ class StockbitTokenStoreTest extends TestCase
 
     public function test_it_clears_expired_token(): void
     {
-        $store = new StockbitTokenStore();
+        $store = new StockbitTokenStore;
         $expired = $this->jwtWithExpiry(time() - 3600);
 
         $store->put($expired);
@@ -40,7 +40,7 @@ class StockbitTokenStoreTest extends TestCase
 
     public function test_it_writes_token_in_encrypted_v2_format(): void
     {
-        $store = new StockbitTokenStore();
+        $store = new StockbitTokenStore;
         $token = $this->jwtWithExpiry(time() + 3600);
 
         $store->put($token);
@@ -63,7 +63,7 @@ class StockbitTokenStoreTest extends TestCase
             json_encode(['bearer' => $token])
         );
 
-        $store = new StockbitTokenStore();
+        $store = new StockbitTokenStore;
 
         $this->assertSame($token, $store->get());
     }
@@ -76,7 +76,7 @@ class StockbitTokenStoreTest extends TestCase
             json_encode(['bearer' => Crypt::encryptString($token)])
         );
 
-        $store = new StockbitTokenStore();
+        $store = new StockbitTokenStore;
 
         $this->assertSame($token, $store->get());
     }
@@ -85,6 +85,6 @@ class StockbitTokenStoreTest extends TestCase
     {
         $payload = rtrim(strtr(base64_encode(json_encode(['exp' => $timestamp])), '+/', '-_'), '=');
 
-        return 'header.' . $payload . '.signature';
+        return 'header.'.$payload.'.signature';
     }
 }

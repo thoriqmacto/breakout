@@ -12,10 +12,15 @@ use Illuminate\Support\Facades\DB;
 class FeatureExtractionService
 {
     private const DEFAULT_LOOKBACK = 100;
+
     private const MIN_TICK = 0.0001;
+
     private const PBAS_BROKER_LOOKBACK_DAYS = 30;
+
     private const PBAS_BROKER_WEIGHT_CURRENT = 0.6;
+
     private const PBAS_BROKER_WEIGHT_HISTORY = 0.4;
+
     private const PBAS_BROKER_KEYS = [
         'accdist_score',
         'avg_net_norm',
@@ -31,7 +36,7 @@ class FeatureExtractionService
     public function extractOhlcvFeatures(Asset $asset, Carbon $date, ?Price $bar = null): array
     {
         $history = $this->loadOhlcvHistory($asset, $date, self::DEFAULT_LOOKBACK);
-        if ($bar !== null && (!$history->last() || $history->last()->date->toDateString() !== $date->toDateString())) {
+        if ($bar !== null && (! $history->last() || $history->last()->date->toDateString() !== $date->toDateString())) {
             $history->push($bar);
         }
 
@@ -220,7 +225,7 @@ class FeatureExtractionService
 
         foreach ($facts as $fact) {
             $type = (string) ($fact->broker_type ?? '');
-            if (!array_key_exists($type, $typeNet)) {
+            if (! array_key_exists($type, $typeNet)) {
                 continue;
             }
             $typeNet[$type] += (float) ($fact->net_value ?? 0.0);
@@ -263,7 +268,7 @@ class FeatureExtractionService
             )
             && ($brokerFeatures['seller_hhi'] ?? 0) >= 0.20;
 
-        $validLongSetup = !$distBreakdown && !$bandarDistHard;
+        $validLongSetup = ! $distBreakdown && ! $bandarDistHard;
 
         return [
             'absorption_flag' => $absorptionFlag,
@@ -408,8 +413,8 @@ class FeatureExtractionService
     }
 
     /**
-     * @param array<string, float|int> $brokerFeatures
-     * @param array<string, float> $historyAverages
+     * @param  array<string, float|int>  $brokerFeatures
+     * @param  array<string, float>  $historyAverages
      * @return array<string, float|int>
      */
     private function blendBrokerFeatures(array $brokerFeatures, array $historyAverages): array
@@ -423,7 +428,7 @@ class FeatureExtractionService
         $blended = $brokerFeatures;
 
         foreach ($historyAverages as $key => $avg) {
-            if (!array_key_exists($key, $brokerFeatures)) {
+            if (! array_key_exists($key, $brokerFeatures)) {
                 continue;
             }
             $current = (float) $brokerFeatures[$key];
@@ -497,6 +502,7 @@ class FeatureExtractionService
         }
 
         $slice = array_slice($values, -$period);
+
         return array_sum($slice) / $period;
     }
 
@@ -543,6 +549,7 @@ class FeatureExtractionService
         }
 
         $slice = array_slice($tr, -$period);
+
         return array_sum($slice) / $period;
     }
 
@@ -598,9 +605,9 @@ class FeatureExtractionService
     }
 
     /**
-     * @param array<string, float|int> $ohlcvFeatures
-     * @param array<string, float|int> $brokerFeatures
-     * @param array<string, bool> $crossFeatures
+     * @param  array<string, float|int>  $ohlcvFeatures
+     * @param  array<string, float|int>  $brokerFeatures
+     * @param  array<string, bool>  $crossFeatures
      */
     private function computePreBreakoutAccumulationScore(
         array $ohlcvFeatures,
@@ -731,9 +738,10 @@ class FeatureExtractionService
 
         if (is_string($value)) {
             $trimmed = trim(str_replace([',', ' '], '', $value));
-            if ($trimmed === '' || !is_numeric($trimmed)) {
+            if ($trimmed === '' || ! is_numeric($trimmed)) {
                 return 0.0;
             }
+
             return (float) $trimmed;
         }
 
@@ -743,7 +751,7 @@ class FeatureExtractionService
     private function extractMetricAmount(array $metrics, string $key): float
     {
         $entry = $metrics[$key] ?? null;
-        if (!is_array($entry)) {
+        if (! is_array($entry)) {
             return $this->toNumber($entry);
         }
 

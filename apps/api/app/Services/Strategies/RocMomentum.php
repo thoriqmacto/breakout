@@ -32,6 +32,7 @@ class RocMomentum extends BaseStrategy
         if ($roc <= -$this->threshold) {
             return 'sell';
         }
+
         return 'hold';
     }
 }

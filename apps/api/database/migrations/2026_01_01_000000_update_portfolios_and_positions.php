@@ -5,8 +5,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void {
+return new class extends Migration
+{
+    public function up(): void
+    {
         Schema::table('portfolios', function (Blueprint $table) {
             $table->string('remarks')->nullable()->after('name');
             $table->unsignedSmallInteger('year')->default((int) date('Y'))->after('remarks');
@@ -42,7 +44,8 @@ return new class extends Migration {
         }
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::table('portfolios', function (Blueprint $table) {
             $table->dropColumn(['remarks', 'year']);
         });

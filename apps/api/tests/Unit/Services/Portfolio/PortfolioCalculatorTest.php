@@ -24,7 +24,7 @@ class PortfolioCalculatorTest extends TestCase
         $this->makePosition($portfolio, $asset, 'entry', 100, 10_000, '2026-03-01');
         $this->makePosition($portfolio, $asset, 'entry', 100, 12_000, '2026-03-15');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $this->assertCount(1, $summary['holdings']);
         $holding = $summary['holdings'][0];
@@ -47,7 +47,7 @@ class PortfolioCalculatorTest extends TestCase
         $this->makePosition($portfolio, $asset, 'entry', 100, 5_000, '2026-03-01');
         $this->makePosition($portfolio, $asset, 'exit', 40, 6_000, '2026-03-15');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $holding = $summary['holdings'][0];
         $this->assertSame(60.0, $holding['qty']);
@@ -70,7 +70,7 @@ class PortfolioCalculatorTest extends TestCase
         $this->makePosition($portfolio, $asset, 'entry', 200, 1_000, '2026-03-01');
         $this->makePosition($portfolio, $asset, 'exit', 200, 1_400, '2026-03-15');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $this->assertSame([], $summary['holdings']);
         $this->assertSame(80_000.0, $summary['realized_pl']);
@@ -89,7 +89,7 @@ class PortfolioCalculatorTest extends TestCase
         // exit:  qty=50 @ 5500, fee_value=500 → realized = (5500-5010)*50 - 500 = 24_500 - 500 = 24_000
         $this->makePosition($portfolio, $asset, 'exit', 50, 5_500, '2026-03-15', feeValue: 500);
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $holding = $summary['holdings'][0];
         $this->assertSame(50.0, $holding['qty']);
@@ -129,7 +129,7 @@ class PortfolioCalculatorTest extends TestCase
             'executed_at' => '2026-03-26',
         ]);
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         // cash = 1_000_000 + 500_000 + 25_000 - 100_000 - 5_000 = 1_420_000
         $this->assertSame(1_420_000.0, $summary['cash_balance']);
@@ -152,7 +152,7 @@ class PortfolioCalculatorTest extends TestCase
         $this->makePosition($portfolio, $bmri, 'entry', 100, 5_000, '2026-03-01'); // mv 500_000
         $this->makePosition($portfolio, $tlkm, 'entry', 100, 4_000, '2026-03-01'); // mv 400_000
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $this->assertSame(1_400_000.0, $summary['total_market_value']);
 
@@ -174,7 +174,7 @@ class PortfolioCalculatorTest extends TestCase
         $asset = Asset::create(['symbol' => 'NEWX', 'name' => 'NEWX']);
         $this->makePosition($portfolio, $asset, 'entry', 100, 1_500, '2026-03-01');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $holding = $summary['holdings'][0];
         $this->assertNull($holding['latest_close']);
@@ -193,7 +193,7 @@ class PortfolioCalculatorTest extends TestCase
         // try to exit 100 — should clamp to 50
         $this->makePosition($portfolio, $asset, 'exit', 100, 1_200, '2026-03-15');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $this->assertSame([], $summary['holdings']);
         // realized = (1200 - 1000) * 50 = 10_000 (oversell clamped to 50)
@@ -210,7 +210,7 @@ class PortfolioCalculatorTest extends TestCase
         $this->makePosition($portfolio, $asset, 'exit', 50, 5_500, '2026-03-15');
         $this->makePosition($portfolio, $asset, 'entry', 100, 5_000, '2026-03-01');
 
-        $summary = (new PortfolioCalculator())->compute($portfolio->fresh());
+        $summary = (new PortfolioCalculator)->compute($portfolio->fresh());
 
         $holding = $summary['holdings'][0];
         $this->assertSame(50.0, $holding['qty']);

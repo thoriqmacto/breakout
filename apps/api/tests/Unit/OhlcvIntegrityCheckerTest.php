@@ -99,7 +99,7 @@ class OhlcvIntegrityCheckerTest extends TestCase
 
         $asset = Asset::findOrFail($assetId);
 
-        $checker = new OhlcvIntegrityChecker(new TradingDay(), new Asset());
+        $checker = new OhlcvIntegrityChecker(new TradingDay, new Asset);
         $report = $checker->checkAsset($asset);
 
         $this->assertSame($assetId, $report['asset_id']);
@@ -130,7 +130,7 @@ class OhlcvIntegrityCheckerTest extends TestCase
 
         $asset = Asset::findOrFail($assetId);
 
-        $checker = new OhlcvIntegrityChecker(new TradingDay(), new Asset());
+        $checker = new OhlcvIntegrityChecker(new TradingDay, new Asset);
         $report = $checker->checkAsset($asset);
 
         $this->assertSame(0, $report['total_rows']);

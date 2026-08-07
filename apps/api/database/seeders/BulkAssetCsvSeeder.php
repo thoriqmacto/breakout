@@ -41,17 +41,19 @@ class BulkAssetCsvSeeder extends Seeder
         @set_time_limit(0);
 
         $dir = $this->csvDir;
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             $this->command?->warn("CSV dir not found: {$dir}");
+
             return;
         }
 
         $files = collect(File::files($dir))
-            ->filter(fn($f) => Str::lower($f->getExtension()) === 'csv')
+            ->filter(fn ($f) => Str::lower($f->getExtension()) === 'csv')
             ->values();
 
         if ($files->isEmpty()) {
             $this->command?->warn('No CSV files found in '.$dir);
+
             return;
         }
 
@@ -74,27 +76,27 @@ class BulkAssetCsvSeeder extends Seeder
         $count = 0;
 
         foreach ($rows as $r) {
-            $rawDate = CsvUtilities::pick($r, ['date','Date','DATE']);
+            $rawDate = CsvUtilities::pick($r, ['date', 'Date', 'DATE']);
             $date = CsvUtilities::normDate($rawDate);
-            if (!$date) {
+            if (! $date) {
                 continue;
             }
 
             $batch[] = [
                 'asset_id' => $assetId,
-                'date'     => $date,
-                'open'     => CsvUtilities::num($r, 'open'),
-                'high'     => CsvUtilities::num($r, 'high'),
-                'low'      => CsvUtilities::num($r, 'low'),
-                'close'    => CsvUtilities::num($r, 'close'),
-                'volume'   => CsvUtilities::vol($r, 'volume'),
+                'date' => $date,
+                'open' => CsvUtilities::num($r, 'open'),
+                'high' => CsvUtilities::num($r, 'high'),
+                'low' => CsvUtilities::num($r, 'low'),
+                'close' => CsvUtilities::num($r, 'close'),
+                'volume' => CsvUtilities::vol($r, 'volume'),
             ];
 
             if (count($batch) >= $this->chunk) {
                 DB::table('price_bars')->upsert(
                     $batch,
-                    ['asset_id','date'],
-                    ['open','high','low','close','volume']
+                    ['asset_id', 'date'],
+                    ['open', 'high', 'low', 'close', 'volume']
                 );
                 $count += count($batch);
                 $batch = [];               // free the batch
@@ -103,11 +105,11 @@ class BulkAssetCsvSeeder extends Seeder
         }
 
         // flush tail
-        if (!empty($batch)) {
+        if (! empty($batch)) {
             DB::table('price_bars')->upsert(
                 $batch,
-                ['asset_id','date'],
-                ['open','high','low','close','volume']
+                ['asset_id', 'date'],
+                ['open', 'high', 'low', 'close', 'volume']
             );
             $count += count($batch);
         }
@@ -127,8 +129,7 @@ class BulkAssetCsvSeeder extends Seeder
 
         return (int) DB::table('assets')->insertGetId([
             'symbol' => $symbol,
-            'name'   => $symbol,
+            'name' => $symbol,
         ]);
     }
-
 }

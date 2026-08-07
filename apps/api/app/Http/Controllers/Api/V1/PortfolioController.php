@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PortfolioController extends ApiController
 {
-    public function __construct(private readonly PortfolioCalculator $calculator)
-    {
-    }
+    public function __construct(private readonly PortfolioCalculator $calculator) {}
 
     public function index(Request $request)
     {

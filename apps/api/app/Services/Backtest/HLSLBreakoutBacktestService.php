@@ -6,9 +6,7 @@ use Carbon\Carbon;
 
 class HLSLBreakoutBacktestService
 {
-    public function __construct(private readonly HLSLBreakoutBacktester $backtester)
-    {
-    }
+    public function __construct(private readonly HLSLBreakoutBacktester $backtester) {}
 
     public function run(array $tickerDailyData, float $initialCapital = 100000.0, int $boardLot = 100): array
     {

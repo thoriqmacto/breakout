@@ -7,9 +7,7 @@ use Carbon\Carbon;
 
 abstract class BaseStrategy
 {
-    public function __construct(protected ?AssetMetrics $metrics = null)
-    {
-    }
+    public function __construct(protected ?AssetMetrics $metrics = null) {}
 
     private ?TrailingStop $trailingStop = null;
 
@@ -20,6 +18,7 @@ abstract class BaseStrategy
     {
         $clone = clone $this;
         $clone->metrics = $metrics;
+
         return $clone;
     }
 
@@ -36,7 +35,7 @@ abstract class BaseStrategy
     /**
      * Normalize incoming OHLCV rows into sorted Carbon-backed structures.
      *
-     * @param array<int, array<string, mixed>> $rows
+     * @param  array<int, array<string, mixed>>  $rows
      * @return array<int, array<string, mixed>>
      */
     protected function prepareDailyData(array $rows): array
@@ -66,7 +65,7 @@ abstract class BaseStrategy
     /**
      * Group daily bars into weeks ending on the provided day (default Friday).
      *
-     * @param array<int, array<string, mixed>> $dailyData
+     * @param  array<int, array<string, mixed>>  $dailyData
      * @return array<int, array<string, mixed>>
      */
     protected function resampleWeekly(array $dailyData, int $weekEndingDay = Carbon::FRIDAY): array
@@ -108,7 +107,7 @@ abstract class BaseStrategy
     /**
      * Append an exponential moving average for a numeric field on each record.
      *
-     * @param array<int, array<string, mixed>> $records
+     * @param  array<int, array<string, mixed>>  $records
      */
     protected function computeVolumeEma(
         array &$records,

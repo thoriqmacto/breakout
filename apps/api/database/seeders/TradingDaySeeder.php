@@ -19,16 +19,16 @@ class TradingDaySeeder extends Seeder
 
     public function run(): void
     {
-        if (!File::exists($this->dataPath)) {
-            $this->command?->warn('Trading day seeder data file not found: ' . $this->dataPath);
+        if (! File::exists($this->dataPath)) {
+            $this->command?->warn('Trading day seeder data file not found: '.$this->dataPath);
 
             return;
         }
 
         $records = include $this->dataPath;
 
-        if (!is_array($records) || empty($records)) {
-            $this->command?->warn('Trading day seeder data file is empty: ' . $this->dataPath);
+        if (! is_array($records) || empty($records)) {
+            $this->command?->warn('Trading day seeder data file is empty: '.$this->dataPath);
 
             return;
         }
@@ -37,7 +37,7 @@ class TradingDaySeeder extends Seeder
 
         $payload = collect($records)
             ->map(function ($item) use ($now) {
-                if (!is_array($item) || !isset($item['date'])) {
+                if (! is_array($item) || ! isset($item['date'])) {
                     return null;
                 }
 
@@ -53,7 +53,7 @@ class TradingDaySeeder extends Seeder
                 }
 
                 $close = $item['close'] ?? null;
-                if ($close !== null && !is_numeric($close)) {
+                if ($close !== null && ! is_numeric($close)) {
                     $close = null;
                 }
 
@@ -69,7 +69,7 @@ class TradingDaySeeder extends Seeder
             ->all();
 
         if (empty($payload)) {
-            $this->command?->warn('Trading day seeder data file does not contain valid records: ' . $this->dataPath);
+            $this->command?->warn('Trading day seeder data file does not contain valid records: '.$this->dataPath);
 
             return;
         }
@@ -80,6 +80,6 @@ class TradingDaySeeder extends Seeder
             ['close', 'updated_at']
         );
 
-        $this->command?->info('Seeded ' . count($payload) . ' trading day records.');
+        $this->command?->info('Seeded '.count($payload).' trading day records.');
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Services\DbBars;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
-use App\Services\DbBars;
 
 class DbBarsTest extends TestCase
 {
@@ -72,4 +72,3 @@ class DbBarsTest extends TestCase
         $this->assertEquals(0, DB::table('price_bars')->count());
     }
 }
-

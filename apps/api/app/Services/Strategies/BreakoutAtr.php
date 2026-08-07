@@ -39,7 +39,7 @@ class BreakoutAtr extends BaseStrategy
         if ($close < $lower) {
             return 'sell';
         }
+
         return 'hold';
     }
 }
-

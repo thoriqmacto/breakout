@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class BacktestController extends ApiController
 {
-    public function __construct(private readonly HLSLBreakoutBacktestService $service)
-    {
-    }
+    public function __construct(private readonly HLSLBreakoutBacktestService $service) {}
 
     public function run(Request $request): JsonResponse
     {

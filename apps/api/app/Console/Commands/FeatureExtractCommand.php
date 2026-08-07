@@ -40,6 +40,7 @@ class FeatureExtractCommand extends Command
 
         if ($assets->isEmpty()) {
             $this->warn('No assets matched the requested filters.');
+
             return self::SUCCESS;
         }
 
@@ -50,6 +51,7 @@ class FeatureExtractCommand extends Command
             $dates = $this->resolveDatesForAsset($asset->id, $date, $from, $to);
             if ($dates === []) {
                 $this->warn("Skipping {$asset->symbol}; no price bars found for requested dates.");
+
                 continue;
             }
 
@@ -92,7 +94,7 @@ class FeatureExtractCommand extends Command
             $latest = Price::query()
                 ->where('asset_id', $assetId)
                 ->max('date');
-            if (!$latest) {
+            if (! $latest) {
                 return [];
             }
 

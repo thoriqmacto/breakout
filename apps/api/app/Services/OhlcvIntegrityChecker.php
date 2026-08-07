@@ -14,8 +14,7 @@ class OhlcvIntegrityChecker
     public function __construct(
         private readonly TradingDay $tradingDay,
         private readonly Asset $asset,
-    ) {
-    }
+    ) {}
 
     /**
      * Build integrity reports for every asset with OHLCV data.

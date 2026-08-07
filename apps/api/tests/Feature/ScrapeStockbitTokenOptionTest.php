@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Services\AssetProfileUpdater;
-use App\Services\Stockbit\StockbitTokenResolver;
 use App\Services\StockbitExodusClient;
 use App\Support\StockbitTokenStore;
 use Illuminate\Support\Facades\Artisan;
@@ -123,7 +122,7 @@ class ScrapeStockbitTokenOptionTest extends TestCase
     {
         $payload = rtrim(strtr(base64_encode(json_encode(['exp' => $exp])), '+/', '-_'), '=');
 
-        return 'header.' . $payload . '.signature';
+        return 'header.'.$payload.'.signature';
     }
 
     /**

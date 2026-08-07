@@ -9,13 +9,13 @@ trait ApiResponses
     protected function success($data = null, string $message = 'Success', int $code = 200): JsonResponse
     {
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => $message,
-            'data'    => $data,
+            'data' => $data,
         ], $code);
     }
 
-    protected function ok($message='OK'): JsonResponse
+    protected function ok($message = 'OK'): JsonResponse
     {
         return $this->success(null, $message, 200);
     }
@@ -38,9 +38,9 @@ trait ApiResponses
     protected function error(string $message = 'Something went wrong', int $code = 500, $errors = null): JsonResponse
     {
         return response()->json([
-            'status'  => 'error',
+            'status' => 'error',
             'message' => $message,
-            'errors'  => $errors,
+            'errors' => $errors,
         ], $code);
     }
 

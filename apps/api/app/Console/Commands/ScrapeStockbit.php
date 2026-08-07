@@ -9,13 +9,13 @@ use App\Services\CsvUtilities;
 use App\Services\DbBars;
 use App\Services\Stockbit\StockbitTokenResolver;
 use App\Services\StockbitExodusClient;
-use App\Support\BrokerSummaryTransformer;
 use App\Support\AssetList;
+use App\Support\BrokerSummaryTransformer;
 use App\Support\StockbitTokenStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -44,6 +44,7 @@ class ScrapeStockbit extends Command
      * @var array<string, int>
      */
     private array $assetIds = [];
+
     private bool $abortDueToUnauthorized = false;
 
     /**
@@ -150,7 +151,7 @@ class ScrapeStockbit extends Command
 
                 $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
                 if ($exp) {
-                    $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+                    $this->line('New JWT expires at: '.$exp->format('Y-m-d H:i:s T'));
                 }
             } else {
                 $this->error('STOCKBIT_BEARER is expired. Refresh via "php artisan stockbit:token:set" or run interactively.');
@@ -161,7 +162,7 @@ class ScrapeStockbit extends Command
             $api->setBearer($bearer);
 
             if ($exp) {
-                $this->line('JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+                $this->line('JWT expires at: '.$exp->format('Y-m-d H:i:s T'));
             }
         }
 
@@ -184,7 +185,7 @@ class ScrapeStockbit extends Command
         $this->hydrateSeedCsvs($this->option('eod') ? [] : $tickers);
 
         foreach ($tickers as $symbol) {
-            if (!$this->option('no-profile-sync')) {
+            if (! $this->option('no-profile-sync')) {
                 $profileResponse = $api->tickerProfile($symbol);
                 if ($this->refreshBearerIfUnauthorized($profileResponse, $api, $tokenStore)) {
                     if ($this->abortDueToUnauthorized) {
@@ -193,15 +194,15 @@ class ScrapeStockbit extends Command
                     $profileResponse = $api->tickerProfile($symbol);
                 }
                 $profileResult = $profileUpdater->applyTickerProfileResponse($symbol, $profileResponse);
-                if (!$profileResult['ok']) {
+                if (! $profileResult['ok']) {
                     $message = $profileResult['message'] ?? 'Unknown error';
                     $this->warn("Profile sync failed for {$symbol}: {$profileResult['error']} — {$message}");
                 } else {
                     $syncedAt = optional($profileResult['asset']->profile_synced_at)->toDateTimeString();
-                    $this->line('Profile synced for ' . $symbol . ($syncedAt ? " at {$syncedAt}" : ''));
+                    $this->line('Profile synced for '.$symbol.($syncedAt ? " at {$syncedAt}" : ''));
                 }
             } else {
-                $this->line('Profile sync skipped for ' . $symbol);
+                $this->line('Profile sync skipped for '.$symbol);
             }
 
             $ipoDate = $profileUpdater->getIPODate($symbol);
@@ -212,6 +213,7 @@ class ScrapeStockbit extends Command
 
             if ($rangeFrom->greaterThan($rangeTo)) {
                 $this->warn("Skipping {$symbol}: from date is after to date ({$rangeFrom->toDateString()} > {$rangeTo->toDateString()}).");
+
                 continue;
             }
 
@@ -219,7 +221,7 @@ class ScrapeStockbit extends Command
             $chunkEndLimit = $rangeTo->copy();
             $allRows = [];
 
-            if ($fetchMarketDetector){
+            if ($fetchMarketDetector) {
                 while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                     $chunkEnd = $chunkStart->copy()->addYear()->subDay();
                     if ($chunkEnd->greaterThan($chunkEndLimit)) {
@@ -262,6 +264,7 @@ class ScrapeStockbit extends Command
                         if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                             sleep(10);
                         }
+
                         continue;
                     }
 
@@ -269,7 +272,7 @@ class ScrapeStockbit extends Command
                     $visitedPages = [];
                     $nextPage = $this->extractNextPage($json);
 
-                    while ($nextPage !== null && !in_array($nextPage, $visitedPages, true)) {
+                    while ($nextPage !== null && ! in_array($nextPage, $visitedPages, true)) {
                         $visitedPages[] = $nextPage;
                         $this->line("Fetching broksum {$symbol} {$fromString} → {$toString} (page {$nextPage})");
 
@@ -302,9 +305,9 @@ class ScrapeStockbit extends Command
 
                         if (isset($paginatedJson['error'])) {
                             $this->warn(
-                                "Error for {$symbol} page {$nextPage}: " .
-                                ($paginatedJson['error'] ?? 'error') .
-                                ' — ' .
+                                "Error for {$symbol} page {$nextPage}: ".
+                                ($paginatedJson['error'] ?? 'error').
+                                ' — '.
                                 ($paginatedJson['message'] ?? 'Unknown error')
                             );
                             break;
@@ -334,7 +337,7 @@ class ScrapeStockbit extends Command
                     $jsonPath = "{$jsonDir}/{$jsonName}";
 
                     Storage::disk($disk)->put($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                    $this->line('Saved Broksum: ' . ($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
+                    $this->line('Saved Broksum: '.($disk === 'local' ? storage_path("app/{$jsonPath}") : $jsonPath));
 
                     $chunkRows = BrokerSummaryTransformer::toRows($symbol, $json);
                     $allRows = array_merge($allRows, $chunkRows);
@@ -347,7 +350,7 @@ class ScrapeStockbit extends Command
                 }
             }
 
-            if ($fetchHistorical){
+            if ($fetchHistorical) {
                 while ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                     $chunkEnd = $chunkStart->copy()->addYear()->subDay();
                     if ($chunkEnd->greaterThan($chunkEndLimit)) {
@@ -388,6 +391,7 @@ class ScrapeStockbit extends Command
                         if ($chunkStart->lessThanOrEqualTo($chunkEndLimit)) {
                             sleep(10);
                         }
+
                         continue;
                     }
 
@@ -399,7 +403,7 @@ class ScrapeStockbit extends Command
                         : null;
                     $totalData = count($initialHistoricalResult);
 
-                    while ($historicalNextPage !== null && !in_array($historicalNextPage, $historicalVisitedPages, true) && $totalData !== 0) {
+                    while ($historicalNextPage !== null && ! in_array($historicalNextPage, $historicalVisitedPages, true) && $totalData !== 0) {
                         $historicalVisitedPages[] = $historicalNextPage;
                         $this->info("Fetching historical {$symbol} {$fromString} → {$toString} (page {$historicalNextPage})");
 
@@ -445,13 +449,13 @@ class ScrapeStockbit extends Command
                         }
                     }
 
-                    if (count($historicalResponses)>0) {
+                    if (count($historicalResponses) > 0) {
                         $historicalNameParts = [$symbol, $fromString, $toString, $historicalPeriod];
-                        $historicalName = implode('_', $historicalNameParts) . '.json';
+                        $historicalName = implode('_', $historicalNameParts).'.json';
                         $historicalPath = "{$historicalDir}/{$historicalName}";
 
                         Storage::disk($disk)->put($historicalPath, json_encode($historicalResponses, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                        $this->line('Saved Historical: ' . ($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
+                        $this->line('Saved Historical: '.($disk === 'local' ? storage_path("app/{$historicalPath}") : $historicalPath));
 
                         $this->persistHistoricalBars($symbol, $historicalResponses);
                     }
@@ -486,7 +490,7 @@ class ScrapeStockbit extends Command
     {
         $seedDir = (string) config('csv.seed_dir', database_path('seeders/data/historical'));
 
-        return rtrim($seedDir, '/' . DIRECTORY_SEPARATOR) . '/' . strtoupper($symbol) . '.csv';
+        return rtrim($seedDir, '/'.DIRECTORY_SEPARATOR).'/'.strtoupper($symbol).'.csv';
     }
 
     /**
@@ -506,7 +510,7 @@ class ScrapeStockbit extends Command
     {
         $code = (string) ($response['error'] ?? 'error');
         $message = (string) ($response['message'] ?? 'Unknown error');
-        $range = $from->toDateString() . ' → ' . $to->toDateString();
+        $range = $from->toDateString().' → '.$to->toDateString();
         $pageSuffix = $page !== null ? " (page {$page})" : '';
 
         $this->error("Historical summary error for {$symbol}{$pageSuffix} [{$range}]: {$code} — {$message}");
@@ -523,7 +527,7 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $responses
+     * @param  array<int, array<string, mixed>>  $responses
      * @return array<string, mixed>
      */
     private function mergePaginatedResponses(array $responses): array
@@ -533,24 +537,24 @@ class ScrapeStockbit extends Command
         }
 
         $merged = $responses[0];
-        if (!is_array($merged)) {
+        if (! is_array($merged)) {
             $merged = [];
         }
 
         $listKeys = ['items', 'data', 'result'];
 
         foreach (array_slice($responses, 1) as $response) {
-            if (!is_array($response)) {
+            if (! is_array($response)) {
                 continue;
             }
 
             foreach ($listKeys as $key) {
-                if (!isset($response[$key]) || !is_array($response[$key])) {
+                if (! isset($response[$key]) || ! is_array($response[$key])) {
                     continue;
                 }
 
                 $existing = $merged[$key] ?? [];
-                if (!is_array($existing)) {
+                if (! is_array($existing)) {
                     $existing = [];
                 }
 
@@ -563,7 +567,7 @@ class ScrapeStockbit extends Command
         }
 
         foreach (['meta', 'pagination'] as $metaKey) {
-            if (!isset($merged[$metaKey]) || !is_array($merged[$metaKey])) {
+            if (! isset($merged[$metaKey]) || ! is_array($merged[$metaKey])) {
                 continue;
             }
 
@@ -584,7 +588,7 @@ class ScrapeStockbit extends Command
         }
 
         foreach (['meta', 'pagination', 'paginate'] as $containerKey) {
-            if (!isset($response[$containerKey]) || !is_array($response[$containerKey])) {
+            if (! isset($response[$containerKey]) || ! is_array($response[$containerKey])) {
                 continue;
             }
 
@@ -609,7 +613,7 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<string, mixed> $response
+     * @param  array<string, mixed>  $response
      * @return array<int, array<string, mixed>>
      */
     private function extractHistoricalResult(array $response): array
@@ -623,7 +627,7 @@ class ScrapeStockbit extends Command
         $containers[] = $response;
 
         foreach ($containers as $container) {
-            if (!is_array($container)) {
+            if (! is_array($container)) {
                 continue;
             }
 
@@ -640,7 +644,7 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<int, array<int, array<string, mixed>>> $pages
+     * @param  array<int, array<int, array<string, mixed>>>  $pages
      */
     private function persistHistoricalBars(string $symbol, array $pages): void
     {
@@ -652,6 +656,7 @@ class ScrapeStockbit extends Command
 
         if ($this->option('no-persist')) {
             $this->line('Skipping historical persistence (--no-persist).');
+
             return;
         }
 
@@ -699,7 +704,7 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<int, array<int, array<string, mixed>>> $pages
+     * @param  array<int, array<int, array<string, mixed>>>  $pages
      * @return array<string, array{open: float, high: float, low: float, close: float, volume: int}>
      */
     private function normalizeHistoricalRows(array $pages): array
@@ -707,7 +712,7 @@ class ScrapeStockbit extends Command
         $rows = [];
 
         foreach ($pages as $page) {
-            if (!is_array($page)) {
+            if (! is_array($page)) {
                 continue;
             }
 
@@ -720,7 +725,7 @@ class ScrapeStockbit extends Command
             }
 
             foreach ($items as $item) {
-                if (!is_array($item)) {
+                if (! is_array($item)) {
                     continue;
                 }
 
@@ -764,7 +769,7 @@ class ScrapeStockbit extends Command
         try {
             return Carbon::parse((string) $value)->toDateString();
         } catch (\Throwable $exception) {
-            $this->warn('Unable to parse historical date value: ' . (string) $value);
+            $this->warn('Unable to parse historical date value: '.(string) $value);
 
             return null;
         }
@@ -774,12 +779,12 @@ class ScrapeStockbit extends Command
         StockbitExodusClient $api,
         string $disk,
         StockbitTokenStore $tokenStore
-    ): void
-    {
+    ): void {
         $watchlistId = $this->option('watchlist-id') ?: config('stockbit.watchlist.id');
 
-        if (!$watchlistId) {
+        if (! $watchlistId) {
             $this->warn('--eod requires a watchlist ID (configure stockbit.watchlist.id or pass --watchlist-id).');
+
             return;
         }
 
@@ -793,7 +798,7 @@ class ScrapeStockbit extends Command
 
         $watchlist = null;
 
-        if (!$overwrite) {
+        if (! $overwrite) {
             $watchlist = $this->loadWatchlistSnapshotFromDisk($disk, $path);
         }
 
@@ -811,12 +816,12 @@ class ScrapeStockbit extends Command
             ];
 
             Storage::disk($disk)->put($path, json_encode($watchlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->line('Saved watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
+            $this->line('Saved watchlist JSON: '.($disk === 'local' ? storage_path("app/{$path}") : $path));
         } else {
-            $this->line('Loaded watchlist JSON: ' . ($disk === 'local' ? storage_path("app/{$path}") : $path));
+            $this->line('Loaded watchlist JSON: '.($disk === 'local' ? storage_path("app/{$path}") : $path));
 
             $existingMeta = $watchlist['meta'] ?? [];
-            if (!is_array($existingMeta)) {
+            if (! is_array($existingMeta)) {
                 $existingMeta = [];
             }
 
@@ -828,7 +833,7 @@ class ScrapeStockbit extends Command
                 $existingMeta
             );
 
-            if (!isset($watchlist['meta']['fetched_at'])) {
+            if (! isset($watchlist['meta']['fetched_at'])) {
                 $watchlist['meta']['fetched_at'] = Carbon::createFromFormat('Y-m-d', $date, $now->getTimezone())
                     ->startOfDay()
                     ->toIso8601String();
@@ -837,6 +842,7 @@ class ScrapeStockbit extends Command
 
         if ($this->option('no-persist')) {
             $this->line('Skipping watchlist persistence (--no-persist).');
+
             return;
         }
 
@@ -844,7 +850,7 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<string, mixed> $query
+     * @param  array<string, mixed>  $query
      * @return array<string, mixed>|null
      */
     private function fetchWatchlistSnapshot(
@@ -852,8 +858,7 @@ class ScrapeStockbit extends Command
         string $watchlistId,
         array $query,
         StockbitTokenStore $tokenStore
-    ): ?array
-    {
+    ): ?array {
         $watchlist = $api->watchlist($watchlistId, $query);
         if ($this->refreshBearerIfUnauthorized($watchlist, $api, $tokenStore)) {
             if ($this->abortDueToUnauthorized) {
@@ -866,6 +871,7 @@ class ScrapeStockbit extends Command
             $code = $watchlist['error'] ?? 'error';
             $message = $watchlist['message'] ?? 'Unknown error';
             $this->error("Watchlist {$watchlistId} error: {$code} — {$message}");
+
             return null;
         }
 
@@ -891,12 +897,13 @@ class ScrapeStockbit extends Command
                 $code = $column['error'] ?? 'error';
                 $message = $column['message'] ?? 'Unknown error';
                 $this->warn("Watchlist column {$itemId} error: {$code} — {$message}");
+
                 continue;
             }
 
             $results = $column['data']['results'] ?? [];
             foreach ($results as $row) {
-                if (!isset($row['symbol'])) {
+                if (! isset($row['symbol'])) {
                     continue;
                 }
 
@@ -910,7 +917,7 @@ class ScrapeStockbit extends Command
             ];
         }
 
-        if (!empty($columnLookups)) {
+        if (! empty($columnLookups)) {
             if (isset($columnLookups['__meta'])) {
                 $watchlist['column_metadata'] = $columnLookups['__meta'];
                 unset($columnLookups['__meta']);
@@ -932,21 +939,23 @@ class ScrapeStockbit extends Command
 
     private function loadWatchlistSnapshotFromDisk(string $disk, string $path): ?array
     {
-        if (!Storage::disk($disk)->exists($path)) {
+        if (! Storage::disk($disk)->exists($path)) {
             return null;
         }
 
         try {
             $contents = Storage::disk($disk)->get($path);
         } catch (\Throwable $exception) {
-            $this->warn('Failed to read existing watchlist snapshot: ' . $exception->getMessage());
+            $this->warn('Failed to read existing watchlist snapshot: '.$exception->getMessage());
+
             return null;
         }
 
         $decoded = json_decode($contents, true);
 
-        if (!is_array($decoded)) {
+        if (! is_array($decoded)) {
             $this->warn('Existing watchlist snapshot is invalid JSON.');
+
             return null;
         }
 
@@ -957,7 +966,7 @@ class ScrapeStockbit extends Command
     {
         $results = $watchlist['data']['result'] ?? [];
 
-        if (!is_array($results) || empty($results)) {
+        if (! is_array($results) || empty($results)) {
             return;
         }
 
@@ -984,7 +993,7 @@ class ScrapeStockbit extends Command
                 continue;
             }
 
-            if ($allowedSymbols !== [] && !isset($allowedSymbols[$symbol])) {
+            if ($allowedSymbols !== [] && ! isset($allowedSymbols[$symbol])) {
                 continue;
             }
 
@@ -992,6 +1001,7 @@ class ScrapeStockbit extends Command
 
             if ($ohlcv === null) {
                 $this->warn("Incomplete OHLCV data for {$symbol}, skipping update.");
+
                 continue;
             }
 
@@ -1015,18 +1025,19 @@ class ScrapeStockbit extends Command
 
             $csvPath = $this->seedCsvPath($symbol);
 
-            if (!File::exists($csvPath)) {
+            if (! File::exists($csvPath)) {
                 $this->warn("Historical CSV missing for {$symbol}, skipping CSV update.");
+
                 continue;
             }
 
             $rows = CsvBars::read($csvPath);
             $rows[$ymd] = [
                 'date' => $ymd,
-                'open' => $this->formatPrice($ohlcv['open'],0),
-                'high' => $this->formatPrice($ohlcv['high'],0),
-                'low' => $this->formatPrice($ohlcv['low'],0),
-                'close' => $this->formatPrice($ohlcv['close'],0),
+                'open' => $this->formatPrice($ohlcv['open'], 0),
+                'high' => $this->formatPrice($ohlcv['high'], 0),
+                'low' => $this->formatPrice($ohlcv['low'], 0),
+                'close' => $this->formatPrice($ohlcv['close'], 0),
                 'volume' => $ohlcv['volume'],
             ];
 
@@ -1038,9 +1049,9 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<string, mixed> $columns
-     * @param array<string, array<string, mixed>> $columnMetadata
-     * @param array<string, mixed> $row
+     * @param  array<string, mixed>  $columns
+     * @param  array<string, array<string, mixed>>  $columnMetadata
+     * @param  array<string, mixed>  $row
      * @return array{open: float, high: float, low: float, close: float, volume: int}|null
      */
     private function resolveOhlcvValues(array $columns, array $columnMetadata, array $row): ?array
@@ -1087,10 +1098,10 @@ class ScrapeStockbit extends Command
     }
 
     /**
-     * @param array<string, mixed> $columns
-     * @param array<string, array<string, mixed>> $columnMetadata
-     * @param array<string, mixed> $row
-     * @param array<int, string> $aliases
+     * @param  array<string, mixed>  $columns
+     * @param  array<string, array<string, mixed>>  $columnMetadata
+     * @param  array<string, mixed>  $row
+     * @param  array<int, string>  $aliases
      */
     private function resolveColumnValue(array $columns, array $columnMetadata, array $row, array $aliases): mixed
     {
@@ -1114,7 +1125,7 @@ class ScrapeStockbit extends Command
         $candidateKeys = [];
 
         foreach ($aliases as $alias) {
-            if (!is_string($alias) || trim($alias) === '') {
+            if (! is_string($alias) || trim($alias) === '') {
                 continue;
             }
 
@@ -1163,19 +1174,19 @@ class ScrapeStockbit extends Command
         $normalizedRow = [];
 
         foreach ($row as $key => $value) {
-            if (!is_string($key) && !is_int($key)) {
+            if (! is_string($key) && ! is_int($key)) {
                 continue;
             }
 
             $normalizedKey = $normalize((string) $key);
 
-            if ($normalizedKey !== null && !array_key_exists($normalizedKey, $normalizedRow)) {
+            if ($normalizedKey !== null && ! array_key_exists($normalizedKey, $normalizedRow)) {
                 $normalizedRow[$normalizedKey] = $value;
             }
         }
 
         foreach ($aliasNeedles as $needle) {
-            if ($needle === '' || !array_key_exists($needle, $normalizedRow)) {
+            if ($needle === '' || ! array_key_exists($needle, $normalizedRow)) {
                 continue;
             }
 
@@ -1196,7 +1207,7 @@ class ScrapeStockbit extends Command
 
         $this->warn('Stockbit bearer token rejected (401).');
 
-        if (!$this->input->isInteractive()) {
+        if (! $this->input->isInteractive()) {
             $this->error('STOCKBIT_BEARER is invalid. Refresh via "php artisan stockbit:token:set" or run interactively.');
             $this->abortDueToUnauthorized = true;
 
@@ -1219,7 +1230,7 @@ class ScrapeStockbit extends Command
 
         $exp = StockbitExodusClient::jwtExpiresAt($newBearer);
         if ($exp) {
-            $this->line('New JWT expires at: ' . $exp->format('Y-m-d H:i:s T'));
+            $this->line('New JWT expires at: '.$exp->format('Y-m-d H:i:s T'));
         }
 
         return true;
@@ -1235,7 +1246,7 @@ class ScrapeStockbit extends Command
             return (float) $value;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
@@ -1254,7 +1265,7 @@ class ScrapeStockbit extends Command
             return (int) round((float) $value);
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
@@ -1287,6 +1298,7 @@ class ScrapeStockbit extends Command
             ]);
         } catch (\Throwable $exception) {
             $this->warn("Failed to create asset for {$symbol}: {$exception->getMessage()}");
+
             return null;
         }
 

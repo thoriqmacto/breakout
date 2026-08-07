@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use DateTime;
@@ -8,47 +9,64 @@ class CsvBars
     /**
      * Read a CSV file and return rows keyed by YYYY-MM-DD.
      *
-     * @param string $path Path to the CSV file.
+     * @param  string  $path  Path to the CSV file.
      * @return array Rows indexed by date.
      */
-    public static function read(string $path): array {
-        if (!is_file($path)) return [];
-        if (($h = fopen($path, 'r')) === false) return [];
-        $header = null; $rows = [];
+    public static function read(string $path): array
+    {
+        if (! is_file($path)) {
+            return [];
+        }
+        if (($h = fopen($path, 'r')) === false) {
+            return [];
+        }
+        $header = null;
+        $rows = [];
         while (($r = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
-            if ($header === null) { $header = array_map(fn($x)=>strtolower(trim($x)), $r); continue; }
+            if ($header === null) {
+                $header = array_map(fn ($x) => strtolower(trim($x)), $r);
+
+                continue;
+            }
             $rec = array_combine($header, $r);
-            if (!$rec) continue;
+            if (! $rec) {
+                continue;
+            }
             $date = self::dateFrom($rec);
-            if (!$date) continue;
+            if (! $date) {
+                continue;
+            }
 
             $rows[$date] = [
-                'date'   => $date,
-                'open'   => self::field($rec, 'open'),
-                'high'   => self::field($rec, 'high'),
-                'low'    => self::field($rec, 'low'),
-                'close'  => self::field($rec, 'close'),
+                'date' => $date,
+                'open' => self::field($rec, 'open'),
+                'high' => self::field($rec, 'high'),
+                'low' => self::field($rec, 'low'),
+                'close' => self::field($rec, 'close'),
                 'volume' => (int) self::field($rec, 'volume'),
             ];
         }
         fclose($h);
         ksort($rows);
+
         return $rows;
     }
 
     /**
      * Write rows keyed by date back to CSV with a stable header and sorting.
      *
-     * @param string $path Destination CSV path.
-     * @param array  $rows Rows keyed by date.
-     * @return void
+     * @param  string  $path  Destination CSV path.
+     * @param  array  $rows  Rows keyed by date.
      */
-    public static function write(string $path, array $rows): void {
+    public static function write(string $path, array $rows): void
+    {
         $dir = dirname($path);
-        if (!is_dir($dir)) mkdir($dir, 0777, true);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
         $tmp = $path.'.tmp';
         $h = fopen($tmp, 'w');
-        fputcsv($h, ['Date','Open','High','Low','Close','Volume'], ',', '"', '\\');
+        fputcsv($h, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'], ',', '"', '\\');
         ksort($rows);
         foreach ($rows as $d => $r) {
             $dt = DateTime::createFromFormat('Y-m-d', $d);
@@ -62,13 +80,17 @@ class CsvBars
     /**
      * Merge arrays keyed by date; right side wins on conflicts.
      *
-     * @param array $base Base dataset keyed by date.
-     * @param array $add  Additional data keyed by date.
+     * @param  array  $base  Base dataset keyed by date.
+     * @param  array  $add  Additional data keyed by date.
      * @return array Merged result.
      */
-    public static function merge(array $base, array $add): array {
-        foreach ($add as $d => $row) { $base[$d] = $row; }
+    public static function merge(array $base, array $add): array
+    {
+        foreach ($add as $d => $row) {
+            $base[$d] = $row;
+        }
         ksort($base);
+
         return $base;
     }
 
@@ -77,35 +99,41 @@ class CsvBars
      * like "Open_TICKER" or "Adj Close_TICKER". Comparison is case-insensitive
      * and ignores spaces before the first underscore.
      */
-    private static function field(array $rec, string $name): float {
+    private static function field(array $rec, string $name): float
+    {
         foreach ($rec as $k => $v) {
             $base = strtolower(trim(explode('_', $k, 2)[0]));
             $base = str_replace(' ', '', $base);
             if ($base === $name) {
-                return is_numeric($v) ? (float)$v : 0.0;
+                return is_numeric($v) ? (float) $v : 0.0;
             }
         }
+
         return 0.0;
     }
 
     /**
      * Extract a YYYY-MM-DD date string from a CSV record.
      *
-     * @param array $rec CSV record.
+     * @param  array  $rec  CSV record.
      * @return string|null Date string if found, otherwise null.
      */
-    private static function dateFrom(array $rec): ?string {
+    private static function dateFrom(array $rec): ?string
+    {
         // Support common header variants
-        foreach (['date','timestamp','day'] as $k) {
-            if (!empty($rec[$k])) {
-                $raw = substr((string)$rec[$k], 0, 10);
+        foreach (['date', 'timestamp', 'day'] as $k) {
+            if (! empty($rec[$k])) {
+                $raw = substr((string) $rec[$k], 0, 10);
                 $dt = DateTime::createFromFormat('Y-m-d', $raw)
                     ?: DateTime::createFromFormat('d/m/Y', $raw)
                     ?: DateTime::createFromFormat('d-m-Y', $raw)
                     ?: DateTime::createFromFormat('m-d-Y', $raw);
-                if ($dt) return $dt->format('Y-m-d');
+                if ($dt) {
+                    return $dt->format('Y-m-d');
+                }
             }
         }
+
         return null;
     }
 }

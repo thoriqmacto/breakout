@@ -15,7 +15,7 @@ class BreakoutPositionEngine extends BasePositionEngine
     private ?BreakoutPosition $position = null;
 
     /**
-     * @param array{atr_low_pct?:float, entry_mode?:string, split_threshold?:float, fast_trail_pct?:float, slow_trail_pct?:float} $config
+     * @param  array{atr_low_pct?:float, entry_mode?:string, split_threshold?:float, fast_trail_pct?:float, slow_trail_pct?:float}  $config
      */
     public function __construct(array $config = [])
     {
@@ -31,7 +31,7 @@ class BreakoutPositionEngine extends BasePositionEngine
     /**
      * Process the next daily bar and return generated trade events.
      *
-     * @param array{date:string, open:float, high:float, low:float, close:float, volume?:float} $bar
+     * @param  array{date:string, open:float, high:float, low:float, close:float, volume?:float}  $bar
      * @return array<int, array<string, mixed>>
      */
     public function onBar(array $bar): array
@@ -121,7 +121,6 @@ class BreakoutPositionEngine extends BasePositionEngine
     /**
      * Determine whether the latest close breaks above a weekly high level.
      *
-     * @param string $atrRegime
      * @return array{level:string, tag:string}|null
      */
     private function detectBreakout(string $atrRegime): ?array
@@ -188,6 +187,7 @@ class BreakoutPositionEngine extends BasePositionEngine
             if ($allow20Breakout) {
                 return ['level' => '20wH', 'tag' => 'minor'];
             }
+
             return null;
         }
 
@@ -311,6 +311,7 @@ final class BreakoutPosition
                 return false;
             }
         }
+
         return true;
     }
 
@@ -382,6 +383,7 @@ final class BreakoutPosition
         }
 
         $gain = ($close / $this->entryPrice) - 1.0;
+
         return $gain > $threshold;
     }
 
@@ -417,6 +419,7 @@ final class BreakoutPosition
     private function maxHighestClose(): float
     {
         $values = array_map(static fn (BreakoutPositionLeg $leg): float => $leg->highestClose(), $this->legs);
+
         return $values === [] ? 0.0 : max($values);
     }
 }

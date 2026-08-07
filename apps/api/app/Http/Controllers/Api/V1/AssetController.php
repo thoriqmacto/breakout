@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Asset;
-use App\Models\Metric;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ApiResponse;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
-use App\Services\AssetMetrics;
+use App\Models\Asset;
 use App\Models\BandarDetectorSummary;
+use App\Models\Metric;
+use App\Services\AssetMetrics;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AssetController extends ApiController
 {
@@ -81,7 +81,7 @@ class AssetController extends ApiController
     {
         $metric = Metric::where('asset_id', $asset->id)->first();
 
-        if (!$metric) {
+        if (! $metric) {
             return ApiResponse::error('Metrics not found for this asset.', 404);
         }
 
@@ -125,7 +125,7 @@ class AssetController extends ApiController
 
         foreach ($assetsPayload as $row) {
             $asset = Asset::find($row['id']);
-            if (!$asset) {
+            if (! $asset) {
                 continue;
             }
 
@@ -156,6 +156,7 @@ class AssetController extends ApiController
 
                 if ($prices->isEmpty()) {
                     Metric::where('asset_id', $asset->id)->delete();
+
                     continue;
                 }
 
@@ -163,6 +164,7 @@ class AssetController extends ApiController
 
                 if ($bars === []) {
                     Metric::where('asset_id', $asset->id)->delete();
+
                     continue;
                 }
 
@@ -248,7 +250,6 @@ class AssetController extends ApiController
     /**
      * Store a newly created asset in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -281,7 +282,6 @@ class AssetController extends ApiController
     /**
      * Display the specified asset.
      *
-     * @param  \App\Models\Asset  $asset
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Asset $asset)
@@ -300,14 +300,12 @@ class AssetController extends ApiController
     /**
      * Update the specified asset in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Asset  $asset
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Asset $asset)
     {
         $data = $request->validate([
-            'symbol' => 'sometimes|required|string|max:10|unique:assets,symbol,' . $asset->id,
+            'symbol' => 'sometimes|required|string|max:10|unique:assets,symbol,'.$asset->id,
             'name' => 'sometimes|required|string',
             'lot_size' => 'nullable|numeric',
             'tick_size' => 'nullable|numeric',
@@ -341,7 +339,6 @@ class AssetController extends ApiController
     /**
      * Remove the specified asset from storage.
      *
-     * @param  \App\Models\Asset  $asset
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Asset $asset)
@@ -354,14 +351,13 @@ class AssetController extends ApiController
     /**
      * Retrieve the latest OHLCV price for the asset.
      *
-     * @param  \App\Models\Asset  $asset
      * @return \Illuminate\Http\JsonResponse
      */
     public function latestPrice(Asset $asset)
     {
         $price = $asset->latestPrice();
 
-        if (!$price) {
+        if (! $price) {
             return ApiResponse::error('Price data not found', 404);
         }
 
@@ -371,7 +367,6 @@ class AssetController extends ApiController
     /**
      * Retrieve the latest OHLCV price for the given asset symbol.
      *
-     * @param  string  $symbol
      * @return \Illuminate\Http\JsonResponse
      */
     public function latestPriceBySymbol(string $symbol)
@@ -390,13 +385,13 @@ class AssetController extends ApiController
 
         $asset = Asset::whereRaw('LOWER(symbol) = ?', [$normalizedSymbol])->first();
 
-        if (!$asset) {
+        if (! $asset) {
             return ApiResponse::error('Asset not found', 404);
         }
 
         $price = $asset->latestPrice();
 
-        if (!$price) {
+        if (! $price) {
             return ApiResponse::error('Price data not found', 404);
         }
 
@@ -417,6 +412,7 @@ class AssetController extends ApiController
             if ($price) {
                 $price->setRelation('asset', $asset);
             }
+
             return $price;
         })->filter()->values();
 
@@ -444,7 +440,7 @@ class AssetController extends ApiController
 
         $asset = Asset::whereRaw('LOWER(symbol) = ?', [$normalizedSymbol])->first();
 
-        if (!$asset) {
+        if (! $asset) {
             return ApiResponse::error('Asset not found', 404);
         }
 
@@ -454,8 +450,6 @@ class AssetController extends ApiController
     /**
      * Compute simple metrics for the asset.
      *
-     * @param  \App\Models\Asset  $asset
-     * @param  \App\Services\AssetMetrics  $metrics
      * @return \Illuminate\Http\JsonResponse
      */
     public function metrics(Asset $asset, AssetMetrics $metrics)
@@ -471,7 +465,7 @@ class AssetController extends ApiController
         }
 
         $interval = strtolower((string) $request->query('interval', 'daily'));
-        if (!in_array($interval, ['daily', 'weekly'], true)) {
+        if (! in_array($interval, ['daily', 'weekly'], true)) {
             return ApiResponse::error('Interval must be one of daily or weekly.', 422);
         }
 
@@ -504,5 +498,4 @@ class AssetController extends ApiController
             'bar_count' => count($bars),
         ]));
     }
-
 }

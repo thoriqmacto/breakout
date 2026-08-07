@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Asset extends Model {
+class Asset extends Model
+{
     protected $guarded = ['id'];
+
     public $timestamps = false;
 
     protected $casts = [

@@ -6,8 +6,8 @@ use App\Http\Resources\ApiResponse;
 use App\Models\Asset;
 use App\Models\Price;
 use App\Models\TradingDay;
-use Illuminate\Http\Request;
 use App\Support\AssetList;
+use Illuminate\Http\Request;
 
 class TradingDayController extends ApiController
 {

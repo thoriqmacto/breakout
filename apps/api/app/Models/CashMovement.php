@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CashMovement extends Model
 {
     public const KIND_DEPOSIT = 'deposit';
+
     public const KIND_WITHDRAW = 'withdraw';
+
     public const KIND_FEE = 'fee';
+
     public const KIND_DIVIDEND = 'dividend';
+
     public const KIND_ADJUSTMENT = 'adjustment';
 
     public const KINDS = [

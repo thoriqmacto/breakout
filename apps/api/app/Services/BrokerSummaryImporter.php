@@ -48,7 +48,7 @@ class BrokerSummaryImporter
 
             $contents = Storage::disk($disk)->get($path);
             $decoded = json_decode($contents, true);
-            if (!is_array($decoded)) {
+            if (! is_array($decoded)) {
                 continue;
             }
 
@@ -67,7 +67,7 @@ class BrokerSummaryImporter
             if ($asset->wasRecentlyCreated) {
                 $asset->refresh();
             }
-            if (!$asset->sync_broker_summary) {
+            if (! $asset->sync_broker_summary) {
                 continue;
             }
             $timestamp = now();
