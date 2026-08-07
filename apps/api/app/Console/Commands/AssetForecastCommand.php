@@ -58,6 +58,7 @@ class AssetForecastCommand extends Command
             } else {
                 $this->error('At least one ticker must be provided via --sym.');
             }
+
             return Command::FAILURE;
         }
 
@@ -94,10 +95,11 @@ class AssetForecastCommand extends Command
 
         if ($strategyOption !== 'HLSLBreakout') {
             $this->error("Unsupported strategy: {$strategyOption}. Only HLSLBreakout is available at the moment.");
+
             return Command::FAILURE;
         }
 
-        $strategy = new HLSLBreakoutStrategy();
+        $strategy = new HLSLBreakoutStrategy;
         $rows = [];
 
         foreach ($tickers as $symbol) {
@@ -178,6 +180,7 @@ class AssetForecastCommand extends Command
 
         if ($rows === []) {
             $this->warn('No rows to display.');
+
             return Command::FAILURE;
         }
 
@@ -298,18 +301,18 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, int> $widths
+     * @param  array<int, int>  $widths
      */
     private function buildTableBorder(array $widths): string
     {
         $segments = array_map(static fn (int $width): string => str_repeat('-', $width + 2), $widths);
 
-        return '+' . implode('+', $segments) . '+';
+        return '+'.implode('+', $segments).'+';
     }
 
     /**
-     * @param array<int, string> $row
-     * @param array<int, int> $widths
+     * @param  array<int, string>  $row
+     * @param  array<int, int>  $widths
      */
     private function buildTableRow(array $row, array $widths): string
     {
@@ -317,17 +320,17 @@ class AssetForecastCommand extends Command
 
         foreach ($row as $index => $cell) {
             $width = $widths[$index] ?? 0;
-            $cells[] = ' ' . str_pad($cell, $width) . ' ';
+            $cells[] = ' '.str_pad($cell, $width).' ';
         }
 
-        return '|' . implode('|', $cells) . '|';
+        return '|'.implode('|', $cells).'|';
     }
 
     /**
      * Determine the next actionable swing high and associated volume filters.
      *
-     * @param array<int, array<string, mixed>> $weeklyData
-     * @param array<int, array<string, mixed>> $signals
+     * @param  array<int, array<string, mixed>>  $weeklyData
+     * @param  array<int, array<string, mixed>>  $signals
      * @return array{
      *     entry_price: float|null,
      *     week_end: string|null,
@@ -609,8 +612,8 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $rows
-     * @param array{key:string, type:string, direction:string} $sortConfig
+     * @param  array<int, array<string, mixed>>  $rows
+     * @param  array{key:string, type:string, direction:string}  $sortConfig
      * @return array<int, array<string, mixed>>
      */
     private function sortRows(array $rows, array $sortConfig): array
@@ -677,9 +680,9 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, string> $filters
-     * @param array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}> $bars
-     * @param array<string, mixed> $forecast
+     * @param  array<int, string>  $filters
+     * @param  array<int, array{date:string, open:float, high:float, low:float, close:float, volume?:float}>  $bars
+     * @param  array<string, mixed>  $forecast
      */
     private function passesFilters(array $filters, array $bars, array $forecast): bool
     {
@@ -712,12 +715,14 @@ class AssetForecastCommand extends Command
         $asset = Asset::where('symbol', $symbol)->first();
         if (! $asset) {
             $this->warn("Asset {$symbol} not found. Skipping.");
+
             return null;
         }
 
         $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
         if ($prices->isEmpty()) {
             $this->warn("No price data available for {$symbol}. Skipping.");
+
             return null;
         }
 
@@ -738,7 +743,7 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $dailyBars
+     * @param  array<int, array<string, mixed>>  $dailyBars
      */
     private function computeBacktestFinalEquity(
         string $symbol,
@@ -770,8 +775,7 @@ class AssetForecastCommand extends Command
         string $strategyOption,
         bool $forceRerun,
         float $initialCapital
-    ): void
-    {
+    ): void {
         $requestedSymbols = array_values(array_unique(array_merge($summarySymbols, $tradeSymbols)));
         if ($requestedSymbols === []) {
             return;
@@ -873,9 +877,9 @@ class AssetForecastCommand extends Command
         if (in_array($symbol, $summarySymbols, true)) {
             $this->line('');
             $this->info("Backtest Summary for {$symbol}");
-            $this->line('Run ID: ' . $backtest['model']->run_id);
+            $this->line('Run ID: '.$backtest['model']->run_id);
             if ($backtest['model']->created_at) {
-                $this->line('Created: ' . $backtest['model']->created_at->toDateTimeString());
+                $this->line('Created: '.$backtest['model']->created_at->toDateTimeString());
             }
 
             $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($backtest['model']->stats_json ?? []));
@@ -920,8 +924,7 @@ class AssetForecastCommand extends Command
         string $strategyOption,
         bool $forceRerun,
         float $initialCapital
-    ): void
-    {
+    ): void {
         if ($forceRerun) {
             $backtest = $this->runAndStoreBacktestForSymbols($requestedSymbols, $strategyOption, $initialCapital);
         } else {
@@ -930,7 +933,7 @@ class AssetForecastCommand extends Command
         }
 
         if ($backtest === null) {
-            $this->warn('No backtest data found for ' . implode(', ', $requestedSymbols) . '.');
+            $this->warn('No backtest data found for '.implode(', ', $requestedSymbols).'.');
 
             return;
         }
@@ -950,10 +953,10 @@ class AssetForecastCommand extends Command
         if ($uniqueSummarySymbols !== []) {
             $this->line('');
             $this->info('Backtest Summary (Combined)');
-            $this->line('Tickers: ' . implode(', ', $runSymbols));
-            $this->line('Run ID: ' . $backtestModel->run_id);
+            $this->line('Tickers: '.implode(', ', $runSymbols));
+            $this->line('Run ID: '.$backtestModel->run_id);
             if ($backtestModel->created_at) {
-                $this->line('Created: ' . $backtestModel->created_at->toDateTimeString());
+                $this->line('Created: '.$backtestModel->created_at->toDateTimeString());
             }
 
             $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($backtestModel->stats_json ?? []));
@@ -998,6 +1001,7 @@ class AssetForecastCommand extends Command
 
             if ($trades === [] || $trades === null) {
                 $missingTradeSymbols[] = $symbol;
+
                 continue;
             }
 
@@ -1020,7 +1024,7 @@ class AssetForecastCommand extends Command
             $this->line('No trades recorded for this backtest run.');
 
             foreach ($missingTradeSymbols as $missingSymbol) {
-                $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+                $this->warn($missingSymbol.': no trade data available in this backtest run.');
             }
 
             return;
@@ -1034,12 +1038,12 @@ class AssetForecastCommand extends Command
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
-            $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+            $this->warn($missingSymbol.': no trade data available in this backtest run.');
         }
     }
 
     /**
-     * @param array<int, string> $symbols
+     * @param  array<int, string>  $symbols
      * @return array<string, array{run_id:string, model:Backtest}>
      */
     private function collectStoredBacktestsForSymbols(
@@ -1062,8 +1066,8 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, string> $symbols
-     * @param array<string, array{run_id:string, model:Backtest}> $contexts
+     * @param  array<int, string>  $symbols
+     * @param  array<string, array{run_id:string, model:Backtest}>  $contexts
      */
     private function contextsCoverSymbols(array $symbols, array $contexts): bool
     {
@@ -1077,9 +1081,9 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<string, array{run_id:string, model:Backtest, trades?:array<int, BacktestTrade>}> $contexts
-     * @param array<int, string> $summarySymbols
-     * @param array<int, string> $tradeSymbols
+     * @param  array<string, array{run_id:string, model:Backtest, trades?:array<int, BacktestTrade>}>  $contexts
+     * @param  array<int, string>  $summarySymbols
+     * @param  array<int, string>  $tradeSymbols
      */
     private function displayStoredBacktests(array &$contexts, array $summarySymbols, array $tradeSymbols): void
     {
@@ -1094,9 +1098,9 @@ class AssetForecastCommand extends Command
 
             $this->line('');
             $this->info("Backtest Summary for {$symbol}");
-            $this->line('Run ID: ' . $model->run_id);
+            $this->line('Run ID: '.$model->run_id);
             if ($model->created_at) {
-                $this->line('Created: ' . $model->created_at->toDateTimeString());
+                $this->line('Created: '.$model->created_at->toDateTimeString());
             }
 
             $this->renderTable(['Metric', 'Value'], $this->formatBacktestStats($model->stats_json ?? []));
@@ -1113,6 +1117,7 @@ class AssetForecastCommand extends Command
         foreach ($uniqueTradeSymbols as $symbol) {
             if (! isset($contexts[$symbol])) {
                 $missingTradeSymbols[] = $symbol;
+
                 continue;
             }
 
@@ -1123,6 +1128,7 @@ class AssetForecastCommand extends Command
             $trades = $contexts[$symbol]['trades'];
             if ($trades === []) {
                 $missingTradeSymbols[] = $symbol;
+
                 continue;
             }
 
@@ -1140,7 +1146,7 @@ class AssetForecastCommand extends Command
             $this->line('No trades recorded for this backtest run.');
 
             foreach ($missingTradeSymbols as $missingSymbol) {
-                $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+                $this->warn($missingSymbol.': no trade data available in this backtest run.');
             }
 
             return;
@@ -1154,12 +1160,12 @@ class AssetForecastCommand extends Command
         );
 
         foreach ($missingTradeSymbols as $missingSymbol) {
-            $this->warn($missingSymbol . ': no trade data available in this backtest run.');
+            $this->warn($missingSymbol.': no trade data available in this backtest run.');
         }
     }
 
     /**
-     * @param BacktestTrade|array<string, mixed> $trade
+     * @param  BacktestTrade|array<string, mixed>  $trade
      * @return array<int, string|int>
      */
     private function formatTradeTableRow(string $symbol, BacktestTrade|array $trade): array
@@ -1210,7 +1216,7 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, array<int, int|string>> $rows
+     * @param  array<int, array<int, int|string>>  $rows
      * @return array<int, array<int, int|string>>
      */
     private function sortTradeTableRows(array $rows): array
@@ -1280,19 +1286,22 @@ class AssetForecastCommand extends Command
     private function runAndStoreBacktestForSymbol(string $symbol, string $strategyOption, float $initialCapital): ?array
     {
         if ($strategyOption !== 'HLSLBreakout') {
-            $this->warn("Automatic backtests are only available for the HLSLBreakout strategy.");
+            $this->warn('Automatic backtests are only available for the HLSLBreakout strategy.');
+
             return null;
         }
 
         $asset = Asset::where('symbol', $symbol)->first();
         if (! $asset) {
             $this->warn("Asset {$symbol} not found. Skipping.");
+
             return null;
         }
 
         $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
         if ($prices->isEmpty()) {
             $this->warn("No price data available for {$symbol}. Skipping.");
+
             return null;
         }
 
@@ -1324,7 +1333,7 @@ class AssetForecastCommand extends Command
         }
 
         return DB::transaction(function () use ($symbol, $asset, $stats, $trades, $strategyOption, $initialCapital) {
-            $runId = 'auto-hlsl-' . Str::uuid()->toString();
+            $runId = 'auto-hlsl-'.Str::uuid()->toString();
 
             $backtest = Backtest::create([
                 'run_id' => $runId,
@@ -1367,7 +1376,7 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, string> $symbols
+     * @param  array<int, string>  $symbols
      * @return array{run_id:string, model:Backtest}|null
      */
     private function runAndStoreBacktestForSymbols(array $symbols, string $strategyOption, float $initialCapital): ?array
@@ -1396,12 +1405,14 @@ class AssetForecastCommand extends Command
             $asset = $assets->get($symbol);
             if (! $asset) {
                 $this->warn("Asset {$symbol} not found. Skipping.");
+
                 continue;
             }
 
             $prices = $asset->prices()->orderBy('date')->get(['date', 'open', 'high', 'low', 'close', 'volume']);
             if ($prices->isEmpty()) {
                 $this->warn("No price data available for {$symbol}. Skipping.");
+
                 continue;
             }
 
@@ -1427,7 +1438,7 @@ class AssetForecastCommand extends Command
 
         $includedSymbols = array_keys($dailyData);
         $this->line(
-            'Generating ' . $strategyOption . ' backtest for ' . implode(', ', $includedSymbols) . '...'
+            'Generating '.$strategyOption.' backtest for '.implode(', ', $includedSymbols).'...'
         );
 
         $result = $this->hlslBacktestService->run($dailyData, $initialCapital);
@@ -1450,7 +1461,7 @@ class AssetForecastCommand extends Command
         $assetMap = $assets->only($includedSymbols);
 
         return DB::transaction(function () use ($stats, $trades, $strategyOption, $includedSymbols, $assetMap, $initialCapital) {
-            $runId = 'auto-hlsl-' . Str::uuid()->toString();
+            $runId = 'auto-hlsl-'.Str::uuid()->toString();
 
             $backtest = Backtest::create([
                 'run_id' => $runId,
@@ -1510,7 +1521,7 @@ class AssetForecastCommand extends Command
     }
 
     /**
-     * @param array<int, string> $symbols
+     * @param  array<int, string>  $symbols
      * @return array{run_id:string, model:Backtest}|null
      */
     private function findLatestBacktestCoveringSymbols(

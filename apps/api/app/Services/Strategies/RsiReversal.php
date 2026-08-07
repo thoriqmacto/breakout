@@ -38,6 +38,7 @@ class RsiReversal extends BaseStrategy
         if ($previousRsi >= $this->overbought && $currentRsi < $this->overbought) {
             return 'sell';
         }
+
         return 'hold';
     }
 
@@ -51,6 +52,7 @@ class RsiReversal extends BaseStrategy
         $property->setAccessible(true);
         /** @var array $bars */
         $bars = $property->getValue($this->metrics);
+
         return $bars;
     }
 }

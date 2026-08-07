@@ -66,7 +66,7 @@ class CashMovementController extends ApiController
         // Reject negative amounts on signed-positive kinds; adjustments may be either sign.
         if ($data['kind'] !== CashMovement::KIND_ADJUSTMENT && (float) $data['amount'] < 0) {
             return ApiResponse::error('Validation failed', 422, [
-                'amount' => ['Amount must be non-negative for ' . $data['kind'] . '. Use kind=adjustment for signed corrections.'],
+                'amount' => ['Amount must be non-negative for '.$data['kind'].'. Use kind=adjustment for signed corrections.'],
             ]);
         }
 

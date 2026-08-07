@@ -6,19 +6,19 @@ return [
 
     'defaults' => [
         'transaction_type' => env('SB_TRANSACTION_TYPE', 'TRANSACTION_TYPE_NET'),
-        'market_board'     => env('SB_MARKET_BOARD', 'MARKET_BOARD_REGULER'),
-        'investor_type'    => env('SB_INVESTOR_TYPE', 'INVESTOR_TYPE_ALL'),
-        'limit'            => (int) env('SB_LIMIT', 25),
+        'market_board' => env('SB_MARKET_BOARD', 'MARKET_BOARD_REGULER'),
+        'investor_type' => env('SB_INVESTOR_TYPE', 'INVESTOR_TYPE_ALL'),
+        'limit' => (int) env('SB_LIMIT', 25),
     ],
 
     'historical' => [
         'period' => env('SB_HISTORICAL_PERIOD', 'HS_PERIOD_DAILY'),
-        'limit'  => env('SB_HISTORICAL_LIMIT'),
-        'page'   => env('SB_HISTORICAL_PAGE'),
+        'limit' => env('SB_HISTORICAL_LIMIT'),
+        'page' => env('SB_HISTORICAL_PAGE'),
     ],
 
     'save_disk' => env('SB_SAVE_DISK', 'local'),
-    'save_dir'  => env('SB_SAVE_DIR', 'broker_summary'),
+    'save_dir' => env('SB_SAVE_DIR', 'broker_summary'),
 
     'watchlist' => [
         'id' => env('SB_WATCHLIST_ID', 808507),

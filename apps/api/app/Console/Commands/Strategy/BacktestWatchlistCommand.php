@@ -24,15 +24,18 @@ class BacktestWatchlistCommand extends Command
         $to = $this->parseDate($this->option('to'), Carbon::today());
         if ($to === null) {
             $this->error('Invalid --to value.');
+
             return self::FAILURE;
         }
         $from = $this->parseDate($this->option('from'), $to->copy()->subDays(90));
         if ($from === null) {
             $this->error('Invalid --from value.');
+
             return self::FAILURE;
         }
         if ($from->greaterThan($to)) {
             $this->error('--from must not be after --to.');
+
             return self::FAILURE;
         }
 
@@ -46,6 +49,7 @@ class BacktestWatchlistCommand extends Command
 
         if ($this->option('json')) {
             $this->line(json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
             return self::SUCCESS;
         }
 
@@ -66,6 +70,7 @@ class BacktestWatchlistCommand extends Command
 
         if ($report['sample_size'] === 0) {
             $this->warn('No observations. Have you persisted watchlist_scores for this range and version?');
+
             return self::SUCCESS;
         }
 
@@ -75,9 +80,9 @@ class BacktestWatchlistCommand extends Command
             ['Horizon', 'Hit rate', 'Avg return', 'N'],
             array_map(static function (array $row): array {
                 return [
-                    $row['horizon'] . 'd',
-                    number_format(($row['hit_rate'] ?? 0) * 100, 2) . '%',
-                    number_format(($row['avg_return'] ?? 0) * 100, 2) . '%',
+                    $row['horizon'].'d',
+                    number_format(($row['hit_rate'] ?? 0) * 100, 2).'%',
+                    number_format(($row['avg_return'] ?? 0) * 100, 2).'%',
                     (int) ($row['n'] ?? 0),
                 ];
             }, $report['baseline'])
@@ -98,7 +103,7 @@ class BacktestWatchlistCommand extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $groups
+     * @param  array<int, array<string, mixed>>  $groups
      */
     private function printGroupedRows(array $groups, string $labelKey): void
     {
@@ -110,9 +115,9 @@ class BacktestWatchlistCommand extends Command
                 $rows[] = [
                     $group[$labelKey] ?? '?',
                     (int) ($group['n'] ?? 0),
-                    $h['horizon'] . 'd',
-                    number_format(($h['hit_rate'] ?? 0) * 100, 2) . '%',
-                    number_format(($h['avg_return'] ?? 0) * 100, 2) . '%',
+                    $h['horizon'].'d',
+                    number_format(($h['hit_rate'] ?? 0) * 100, 2).'%',
+                    number_format(($h['avg_return'] ?? 0) * 100, 2).'%',
                     $lift === null ? '—' : sprintf('%+0.2f pp', $lift * 100),
                     (int) ($h['n'] ?? 0),
                 ];
@@ -135,7 +140,7 @@ class BacktestWatchlistCommand extends Command
     }
 
     /**
-     * @param array<int, int> $fallback
+     * @param  array<int, int>  $fallback
      * @return array<int, int>
      */
     private function parseIntList(string $raw, array $fallback): array
@@ -143,7 +148,7 @@ class BacktestWatchlistCommand extends Command
         $parts = array_filter(array_map('trim', explode(',', $raw)));
         $out = [];
         foreach ($parts as $part) {
-            if (!is_numeric($part)) {
+            if (! is_numeric($part)) {
                 continue;
             }
             $n = (int) $part;

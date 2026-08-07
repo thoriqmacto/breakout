@@ -69,7 +69,7 @@ class ScraperRequestController extends ApiController
     {
         $user = $request->user();
 
-        if (!$user || $scraperRequest->user_id !== $user->id) {
+        if (! $user || $scraperRequest->user_id !== $user->id) {
             return ApiResponse::error('Saved command not found.', 404);
         }
 

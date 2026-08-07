@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Schema;
  *   - portfolios.cash_balance defaults to 0 so existing rows are valid.
  *   - cash_movements is a new table; nothing depends on its schema yet.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('portfolios', function (Blueprint $table) {

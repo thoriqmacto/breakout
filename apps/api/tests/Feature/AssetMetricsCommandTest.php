@@ -42,7 +42,7 @@ class AssetMetricsCommandTest extends TestCase
         $start = Carbon::parse('2024-01-01');
 
         $seed = function (string $symbol, array $closes) use ($start) {
-            $asset = Asset::create(['symbol' => $symbol, 'name' => 'Asset ' . $symbol]);
+            $asset = Asset::create(['symbol' => $symbol, 'name' => 'Asset '.$symbol]);
             foreach ($closes as $i => $close) {
                 Price::create([
                     'asset_id' => $asset->id,
@@ -67,7 +67,7 @@ class AssetMetricsCommandTest extends TestCase
 
         $output = Artisan::output();
         $order = ['AAA', 'AAB', 'BBB', 'CCC', 'DDD'];
-        $positions = array_map(fn($s) => strpos($output, $s), $order);
+        $positions = array_map(fn ($s) => strpos($output, $s), $order);
 
         foreach ($positions as $pos) {
             $this->assertNotFalse($pos);

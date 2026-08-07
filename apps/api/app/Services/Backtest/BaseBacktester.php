@@ -13,8 +13,8 @@ abstract class BaseBacktester
     /**
      * Run a backtest over the supplied OHLCV bars.
      *
-     * @param array<int, array{date:string, open:float, high:float, low:float, close:float}> $bars
-     * @param float $capital Starting capital.
+     * @param  array<int, array{date:string, open:float, high:float, low:float, close:float}>  $bars
+     * @param  float  $capital  Starting capital.
      * @return array{
      *     final_equity: float,
      *     equity_curve: array<int, array{date:string, equity:float}>,
@@ -46,12 +46,12 @@ abstract class BaseBacktester
                         $exitPrice = $stopLevel;
                         $equity += $position * $exitPrice;
                         $trades[] = [
-                            'entry_date'  => $entryDate,
-                            'exit_date'   => $bar['date'],
+                            'entry_date' => $entryDate,
+                            'exit_date' => $bar['date'],
                             'entry_price' => $entryPrice,
-                            'exit_price'  => $exitPrice,
-                            'shares'      => $position,
-                            'pnl'         => (float)($exitPrice - $entryPrice) * $position,
+                            'exit_price' => $exitPrice,
+                            'shares' => $position,
+                            'pnl' => (float) ($exitPrice - $entryPrice) * $position,
                         ];
                         $position = 0;
                         $trailingStop = null;
@@ -60,6 +60,7 @@ abstract class BaseBacktester
                             'date' => $bar['date'],
                             'equity' => $equity,
                         ];
+
                         continue;
                     }
                 } elseif ($position < 0) {
@@ -72,12 +73,12 @@ abstract class BaseBacktester
                         $exitPrice = $stopLevel;
                         $equity += $position * ($entryPrice - $exitPrice);
                         $trades[] = [
-                            'entry_date'  => $entryDate,
-                            'exit_date'   => $bar['date'],
+                            'entry_date' => $entryDate,
+                            'exit_date' => $bar['date'],
                             'entry_price' => $entryPrice,
-                            'exit_price'  => $exitPrice,
-                            'shares'      => $position,
-                            'pnl'         => (float)($entryPrice - $exitPrice) * abs($position),
+                            'exit_price' => $exitPrice,
+                            'shares' => $position,
+                            'pnl' => (float) ($entryPrice - $exitPrice) * abs($position),
                         ];
                         $position = 0;
                         $trailingStop = null;
@@ -86,6 +87,7 @@ abstract class BaseBacktester
                             'date' => $bar['date'],
                             'equity' => $equity,
                         ];
+
                         continue;
                     }
                 }
@@ -99,19 +101,19 @@ abstract class BaseBacktester
                 $position = (int) floor($equity / $price);
                 $equity -= $position * $price;
                 $entryPrice = $price;
-                $entryDate  = $bar['date'];
+                $entryDate = $bar['date'];
                 $extremePrice = $bar['high'];
                 $trailingStop = $strategy->trailingStop();
             } elseif ($signal === 'sell' && $position > 0) {
                 $exitPrice = IdxTicks::round($bar['close']);
                 $equity += $position * $exitPrice;
                 $trades[] = [
-                    'entry_date'  => $entryDate,
-                    'exit_date'   => $bar['date'],
+                    'entry_date' => $entryDate,
+                    'exit_date' => $bar['date'],
                     'entry_price' => $entryPrice,
-                    'exit_price'  => $exitPrice,
-                    'shares'      => $position,
-                    'pnl'         => (float)($exitPrice - $entryPrice) * $position,
+                    'exit_price' => $exitPrice,
+                    'shares' => $position,
+                    'pnl' => (float) ($exitPrice - $entryPrice) * $position,
                 ];
                 $position = 0;
                 $trailingStop = null;
@@ -129,19 +131,19 @@ abstract class BaseBacktester
             $lastClose = IdxTicks::round($last['close']);
             $equity += $position * $lastClose;
             $trades[] = [
-                'entry_date'  => $entryDate,
-                'exit_date'   => $last['date'],
+                'entry_date' => $entryDate,
+                'exit_date' => $last['date'],
                 'entry_price' => $entryPrice,
-                'exit_price'  => $lastClose,
-                'shares'      => $position,
-                'pnl'         => (float)($lastClose - $entryPrice) * $position,
+                'exit_price' => $lastClose,
+                'shares' => $position,
+                'pnl' => (float) ($lastClose - $entryPrice) * $position,
             ];
         }
 
         return [
             'final_equity' => $equity,
             'equity_curve' => $curve,
-            'trades'       => $trades,
+            'trades' => $trades,
         ];
     }
 
@@ -150,15 +152,15 @@ abstract class BaseBacktester
     /**
      * Calculate performance metrics for a backtest.
      *
-     * @param array<int, array{date:string, open:float, high:float, low:float, close:float}> $bars
-     * @param array<int, array{date:string, equity:float}> $curve
-     * @param array<int, array{entry_date:string, exit_date:string, entry_price:float, exit_price:float, shares:int, pnl:float}> $trades
+     * @param  array<int, array{date:string, open:float, high:float, low:float, close:float}>  $bars
+     * @param  array<int, array{date:string, equity:float}>  $curve
+     * @param  array<int, array{entry_date:string, exit_date:string, entry_price:float, exit_price:float, shares:int, pnl:float}>  $trades
      * @return array{cagr:float, maxdd:float, sharpe:float, winrate:float, profit_factor:float, trades:int}
      */
-     public function calculateMetrics(array $bars, array $curve, array $trades, float $capital, float $final): array
+    public function calculateMetrics(array $bars, array $curve, array $trades, float $capital, float $final): array
     {
         $start = Carbon::parse($bars[0]['date']);
-        $end   = Carbon::parse($bars[count($bars) - 1]['date']);
+        $end = Carbon::parse($bars[count($bars) - 1]['date']);
 
         // Calculate the holding period using the Actual/Actual day-count
         // convention.  This avoids treating leap years as longer than a
@@ -174,7 +176,7 @@ abstract class BaseBacktester
             $cursor = $segmentEnd;
         }
         $years = max(1e-9, $years);
-        $cagr  = ($final / $capital) ** (1 / $years) - 1;
+        $cagr = ($final / $capital) ** (1 / $years) - 1;
 
         $peak = $curve[0]['equity'];
         $maxDD = 0.0;
@@ -195,16 +197,22 @@ abstract class BaseBacktester
         $avg = $returns === [] ? 0.0 : array_sum($returns) / count($returns);
         $std = 0.0;
         if ($returns !== []) {
-            $variance = array_sum(array_map(fn($r) => ($r - $avg) ** 2, $returns)) / count($returns);
+            $variance = array_sum(array_map(fn ($r) => ($r - $avg) ** 2, $returns)) / count($returns);
             $std = sqrt($variance);
         }
         $sharpe = $std > 0 ? $avg / $std * sqrt(252) : 0.0;
 
-        $wins = 0; $gain = 0; $loss = 0;
+        $wins = 0;
+        $gain = 0;
+        $loss = 0;
         foreach ($trades as $t) {
             $pnl = $t['pnl'];
-            if ($pnl > 0) { $wins++; $gain += $pnl; }
-            else { $loss += abs($pnl); }
+            if ($pnl > 0) {
+                $wins++;
+                $gain += $pnl;
+            } else {
+                $loss += abs($pnl);
+            }
         }
         $tradeCount = count($trades);
         $winRate = $tradeCount > 0 ? $wins / (float) $tradeCount : 0.0;

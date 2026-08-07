@@ -10,7 +10,9 @@ use GuzzleHttp\Exception\RequestException;
 class StockbitExodusClient
 {
     private Client $http;
+
     private string $bearer;
+
     private array $defaults;
 
     public function __construct()
@@ -20,7 +22,7 @@ class StockbitExodusClient
         $this->defaults = $cfg['defaults'] ?? [];
 
         $this->http = new Client([
-            'base_uri' => rtrim((string) ($cfg['base_url'] ?? ''), '/') . '/',
+            'base_uri' => rtrim((string) ($cfg['base_url'] ?? ''), '/').'/',
             'headers' => [
                 'accept' => 'application/json',
                 'origin' => 'https://stockbit.com',
@@ -73,37 +75,37 @@ class StockbitExodusClient
     ): array {
         $q = [
             'from' => $from,
-            'to'   => $to,
+            'to' => $to,
             'transaction_type' => $transactionType ?: ($this->defaults['transaction_type'] ?? ''),
-            'market_board'     => $marketBoard     ?: ($this->defaults['market_board'] ?? ''),
-            'investor_type'    => $investorType    ?: ($this->defaults['investor_type'] ?? ''),
-            'limit'            => $limit ?? ($this->defaults['limit'] ?? 25),
+            'market_board' => $marketBoard ?: ($this->defaults['market_board'] ?? ''),
+            'investor_type' => $investorType ?: ($this->defaults['investor_type'] ?? ''),
+            'limit' => $limit ?? ($this->defaults['limit'] ?? 25),
         ];
 
         if ($page !== null) {
             $q['page'] = $page;
         }
 
-        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $headers = ['authorization' => 'Bearer '.$this->bearer];
 
         try {
             $res = $this->http->get("/marketdetectors/{$symbol}", [
                 'headers' => $headers,
-                'query'   => $q,
+                'query' => $q,
             ]);
         } catch (RequestException $e) {
             return ['error' => 'network_error', 'message' => $e->getMessage()];
         }
 
         $status = $res->getStatusCode();
-        $body   = (string) $res->getBody();
-        $json   = json_decode($body, true);
+        $body = (string) $res->getBody();
+        $json = json_decode($body, true);
 
         if ($status === 401) {
             return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
         }
         if ($status >= 400) {
-            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+            return ['error' => 'http_'.$status, 'message' => $body ?: 'HTTP error'];
         }
 
         return is_array($json) ? $json : ['raw' => $body];
@@ -111,17 +113,17 @@ class StockbitExodusClient
 
     public static function jwtExpiresAt(?string $jwt): ?\DateTimeImmutable
     {
-        if (!$jwt || !str_contains($jwt, '.')) {
+        if (! $jwt || ! str_contains($jwt, '.')) {
             return null;
         }
 
         [, $payloadB64] = explode('.', $jwt);
         $payload = json_decode(base64_decode(strtr($payloadB64, '-_', '+/')), true);
-        if (!isset($payload['exp'])) {
+        if (! isset($payload['exp'])) {
             return null;
         }
 
-        return (new \DateTimeImmutable())->setTimestamp((int) $payload['exp']);
+        return (new \DateTimeImmutable)->setTimestamp((int) $payload['exp']);
     }
 
     public function historicalSummary(
@@ -133,33 +135,33 @@ class StockbitExodusClient
         ?int $page = null
     ): array {
         $q = array_filter([
-            'period'     => $period,
+            'period' => $period,
             'start_date' => $startDate,
-            'end_date'   => $endDate,
-            'limit'      => $limit,
-            'page'       => $page,
+            'end_date' => $endDate,
+            'limit' => $limit,
+            'page' => $page,
         ], static fn ($value) => $value !== null && $value !== '');
 
-        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $headers = ['authorization' => 'Bearer '.$this->bearer];
 
         try {
             $res = $this->http->get("/company-price-feed/historical/summary/{$symbol}", [
                 'headers' => $headers,
-                'query'   => $q,
+                'query' => $q,
             ]);
         } catch (RequestException $e) {
             return ['error' => 'network_error', 'message' => $e->getMessage()];
         }
 
         $status = $res->getStatusCode();
-        $body   = (string) $res->getBody();
-        $json   = json_decode($body, true);
+        $body = (string) $res->getBody();
+        $json = json_decode($body, true);
 
         if ($status === 401) {
             return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
         }
         if ($status >= 400) {
-            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+            return ['error' => 'http_'.$status, 'message' => $body ?: 'HTTP error'];
         }
 
         return is_array($json) ? $json : ['raw' => $body];
@@ -167,7 +169,7 @@ class StockbitExodusClient
 
     public function tickerProfile(string $symbol): array
     {
-        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $headers = ['authorization' => 'Bearer '.$this->bearer];
 
         try {
             $res = $this->http->get("/emitten/{$symbol}/profile", [
@@ -178,14 +180,14 @@ class StockbitExodusClient
         }
 
         $status = $res->getStatusCode();
-        $body   = (string) $res->getBody();
-        $json   = json_decode($body, true);
+        $body = (string) $res->getBody();
+        $json = json_decode($body, true);
 
         if ($status === 401) {
             return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
         }
         if ($status >= 400) {
-            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+            return ['error' => 'http_'.$status, 'message' => $body ?: 'HTTP error'];
         }
 
         return is_array($json) ? $json : ['raw' => $body];
@@ -193,7 +195,7 @@ class StockbitExodusClient
 
     public function watchlist($watchlistId, array $query = []): array
     {
-        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $headers = ['authorization' => 'Bearer '.$this->bearer];
         $q = array_filter($query, static fn ($value) => $value !== null && $value !== '');
 
         try {
@@ -213,7 +215,7 @@ class StockbitExodusClient
             return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
         }
         if ($status >= 400) {
-            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+            return ['error' => 'http_'.$status, 'message' => $body ?: 'HTTP error'];
         }
 
         return is_array($json) ? $json : ['raw' => $body];
@@ -221,7 +223,7 @@ class StockbitExodusClient
 
     public function watchlistColumn($watchlistId, $itemId): array
     {
-        $headers = ['authorization' => 'Bearer ' . $this->bearer];
+        $headers = ['authorization' => 'Bearer '.$this->bearer];
         $q = ['fitemid' => $itemId];
 
         try {
@@ -241,7 +243,7 @@ class StockbitExodusClient
             return ['error' => 'unauthorized', 'message' => 'JWT expired or invalid (401). Replace STOCKBIT_BEARER.'];
         }
         if ($status >= 400) {
-            return ['error' => 'http_' . $status, 'message' => $body ?: 'HTTP error'];
+            return ['error' => 'http_'.$status, 'message' => $body ?: 'HTTP error'];
         }
 
         return is_array($json) ? $json : ['raw' => $body];

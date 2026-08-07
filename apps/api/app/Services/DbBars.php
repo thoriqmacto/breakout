@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,12 @@ class DbBars
     public function __construct(
         private int $chunkSize,
         private bool $dryRun = false,
-    ) {
-    }
+    ) {}
 
     /**
      * Add a row to the batch and flush if the chunk size is reached.
      *
-     * @param array<string, mixed> $row
+     * @param  array<string, mixed>  $row
      */
     public function add(array $row): void
     {
@@ -41,7 +41,7 @@ class DbBars
             return;
         }
 
-        if (!$this->dryRun) {
+        if (! $this->dryRun) {
             DB::table('price_bars')->upsert(
                 $this->batch,
                 ['asset_id', 'date'],
@@ -58,4 +58,3 @@ class DbBars
         return $this->inserted;
     }
 }
-

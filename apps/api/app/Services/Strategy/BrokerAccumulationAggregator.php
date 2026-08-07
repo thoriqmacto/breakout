@@ -21,7 +21,7 @@ class BrokerAccumulationAggregator
     public const DEFAULT_WINDOWS = [3, 5, 10, 20];
 
     /**
-     * @param array<int, int> $windows
+     * @param  array<int, int>  $windows
      * @return array{rows_written: int, assets: int}
      */
     public function rollup(Carbon $endDate, array $windows = self::DEFAULT_WINDOWS, ?array $symbols = null): array
@@ -142,7 +142,7 @@ class BrokerAccumulationAggregator
     }
 
     /**
-     * @param array<int, string>|null $symbols
+     * @param  array<int, string>|null  $symbols
      * @return array<int, Asset>
      */
     private function resolveAssets(?array $symbols): array

@@ -26,17 +26,20 @@ class StrategyScanCommand extends Command
         $scanDate = $this->resolveScanDate((string) ($this->option('date') ?? ''));
         if ($scanDate === null) {
             $this->error('Invalid --date value. Use YYYY-MM-DD.');
+
             return self::FAILURE;
         }
 
         if ($scanDate === false) {
             $this->warn('No rows found in features_daily. Run php artisan features:extract first.');
+
             return self::SUCCESS;
         }
 
         $anchorDate = $this->resolveAnchorDate($scanDate, (string) ($this->option('anchor-date') ?? ''));
         if ($anchorDate === null) {
             $this->error('Invalid --anchor-date value. Use YYYY-MM-DD and ensure it is not after --date.');
+
             return self::FAILURE;
         }
 
@@ -96,13 +99,14 @@ class StrategyScanCommand extends Command
 
         if ($rows->isEmpty()) {
             $this->warn('No symbols matched the accumulation anomaly filters.');
+
             return self::SUCCESS;
         }
 
         $tableRows = $rows->map(static fn ($row): array => [
             $row->symbol,
             $row->date,
-            number_format((float) $row->ret_1 * 100, 2) . '%',
+            number_format((float) $row->ret_1 * 100, 2).'%',
             number_format((float) $row->vol_ratio_20, 2),
             number_format((float) $row->avg_net_norm, 3),
             number_format((float) $row->anchor_avg_net_norm, 3),
@@ -132,7 +136,7 @@ class StrategyScanCommand extends Command
         }
 
         $latest = DB::table('features_daily')->max('date');
-        if (!$latest) {
+        if (! $latest) {
             return false;
         }
 
@@ -159,18 +163,17 @@ class StrategyScanCommand extends Command
     }
 
     /**
-     * @param mixed $symbolsOption
      * @return array<int, string>
      */
     private function normalizeSymbols(mixed $symbolsOption): array
     {
-        if (!is_array($symbolsOption)) {
+        if (! is_array($symbolsOption)) {
             return [];
         }
 
         $symbols = [];
         foreach ($symbolsOption as $value) {
-            if (!is_string($value)) {
+            if (! is_string($value)) {
                 continue;
             }
 

@@ -5,8 +5,8 @@ namespace Tests\Feature;
 use App\Models\Asset;
 use App\Models\Price;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -77,18 +77,18 @@ class LatestPricesTest extends TestCase
     public function test_asset_sync_fetches_missing_data_when_outdated(): void
     {
         $seedDir = database_path('seeders/data/test-sync');
-        if (!is_dir($seedDir)) {
+        if (! is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
-        file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
+        file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
         config(['csv.seed_dir' => $seedDir]);
         Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
-        if (!is_dir($pyDir)) {
+        if (! is_dir($pyDir)) {
             mkdir($pyDir, 0755, true);
         }
-        file_put_contents($pyDir . '/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
+        file_put_contents($pyDir.'/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
 
         config(['python.bin' => '/bin/echo']);
 
@@ -119,18 +119,18 @@ class LatestPricesTest extends TestCase
         Carbon::setTestNow('2024-01-03');
 
         $seedDir = database_path('seeders/data/test-eod');
-        if (!is_dir($seedDir)) {
+        if (! is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
-        file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
+        file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
         config(['csv.seed_dir' => $seedDir]);
         Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
-        if (!is_dir($pyDir)) {
+        if (! is_dir($pyDir)) {
             mkdir($pyDir, 0755, true);
         }
-        file_put_contents($pyDir . '/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
+        file_put_contents($pyDir.'/AAA_PY.csv', "date,open,high,low,close,volume\n2024-01-02,1,1,1,1,100\n2024-01-03,1,1,1,1,100\n");
 
         config(['python.bin' => '/bin/echo']);
 
@@ -150,10 +150,10 @@ class LatestPricesTest extends TestCase
     public function test_asset_sync_skips_assets_with_price_sync_disabled(): void
     {
         $seedDir = database_path('seeders/data/test-disabled-sync');
-        if (!is_dir($seedDir)) {
+        if (! is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
-        file_put_contents($seedDir . '/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
+        file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
         config(['csv.seed_dir' => $seedDir]);
 
         Asset::create([
@@ -171,12 +171,12 @@ class LatestPricesTest extends TestCase
     public function test_asset_sync_historical_date_reupserts_specific_day_from_csv(): void
     {
         $seedDir = database_path('seeders/data/test-historical-date');
-        if (!is_dir($seedDir)) {
+        if (! is_dir($seedDir)) {
             mkdir($seedDir, 0755, true);
         }
 
         file_put_contents(
-            $seedDir . '/AAA.csv',
+            $seedDir.'/AAA.csv',
             "date,open,high,low,close,volume\n2024-01-02,11,12,10,15,1000\n"
         );
         config(['csv.seed_dir' => $seedDir]);

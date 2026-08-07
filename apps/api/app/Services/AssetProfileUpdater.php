@@ -10,9 +10,7 @@ use Illuminate\Support\Str;
 
 class AssetProfileUpdater
 {
-    public function __construct(private StockbitExodusClient $client)
-    {
-    }
+    public function __construct(private StockbitExodusClient $client) {}
 
     /**
      * Sync an asset record with the latest ticker profile information from Stockbit.
@@ -41,7 +39,7 @@ class AssetProfileUpdater
         }
 
         $data = $response['data'] ?? null;
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return [
                 'ok' => false,
                 'error' => 'invalid_response',
@@ -142,9 +140,9 @@ class AssetProfileUpdater
         return $updates;
     }
 
-    private function mapHistoryMetrics(null|array $history): array
+    private function mapHistoryMetrics(?array $history): array
     {
-        if (!is_array($history)) {
+        if (! is_array($history)) {
             return [];
         }
 
@@ -184,7 +182,7 @@ class AssetProfileUpdater
             return Carbon::instance(clone $value)->startOfDay();
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
@@ -214,7 +212,7 @@ class AssetProfileUpdater
             return (float) $value;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 
@@ -226,7 +224,7 @@ class AssetProfileUpdater
         $normalized = str_replace([',', ' '], ['', ''], $normalized);
         $normalized = preg_replace('/[^0-9.\-]/', '', $normalized) ?? '';
 
-        if ($normalized === '' || $normalized === '-' || !is_numeric($normalized)) {
+        if ($normalized === '' || $normalized === '-' || ! is_numeric($normalized)) {
             return null;
         }
 
@@ -245,7 +243,7 @@ class AssetProfileUpdater
 
         $response = $this->client->tickerProfile($asset->symbol);
         $result = $this->applyTickerProfileResponse($asset, $response);
-        if (!$result['ok']) {
+        if (! $result['ok']) {
             return [];
         }
 
@@ -274,7 +272,7 @@ class AssetProfileUpdater
     private function getHistoryFromSeeder(Asset $asset): ?array
     {
         $profile = $this->readProfileSeederJson($asset);
-        if (!is_array($profile)) {
+        if (! is_array($profile)) {
             return null;
         }
 
@@ -287,7 +285,7 @@ class AssetProfileUpdater
     {
         $path = $this->profileSeederPath($asset);
 
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return null;
         }
 
@@ -306,13 +304,13 @@ class AssetProfileUpdater
     {
         $directory = database_path('seeders/data/profiles');
 
-        return $directory . DIRECTORY_SEPARATOR . Str::upper($asset->symbol) . '_profile.json';
+        return $directory.DIRECTORY_SEPARATOR.Str::upper($asset->symbol).'_profile.json';
     }
 
     private function writeProfileSeederJson(Asset $asset, array $profile, array $updates): void
     {
         $directory = database_path('seeders/data/profiles');
-        if (!File::isDirectory($directory)) {
+        if (! File::isDirectory($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
 
@@ -333,7 +331,7 @@ class AssetProfileUpdater
         $payload['ticker_profile_payload'] = $profile;
 
         foreach ($payload as $key => $value) {
-            if ($value instanceof \DateTimeInterface) {
+            if ($value instanceof DateTimeInterface) {
                 $payload[$key] = $value->format(DATE_ATOM);
             }
         }

@@ -4,6 +4,4 @@ namespace App\Exceptions;
 
 use RuntimeException;
 
-class JwtException extends RuntimeException
-{
-}
+class JwtException extends RuntimeException {}

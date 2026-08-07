@@ -5,6 +5,7 @@ namespace App\Services\Strategy;
 use App\Models\TradingDay;
 use App\Models\WatchlistScore;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -22,11 +23,11 @@ use Illuminate\Support\Facades\DB;
 class WatchlistBacktester
 {
     public const DEFAULT_HORIZONS = [5, 10, 20];
+
     public const DEFAULT_TARGET_PCT = 0.035;
 
     /**
-     * @param array<int, int> $horizons
-     *
+     * @param  array<int, int>  $horizons
      * @return array{
      *   from: string,
      *   to: string,
@@ -79,7 +80,7 @@ class WatchlistBacktester
                 continue;
             }
 
-            if (!isset($tradingDayIndex[$scanDate])) {
+            if (! isset($tradingDayIndex[$scanDate])) {
                 continue;
             }
             $entryIndex = $tradingDayIndex[$scanDate];
@@ -91,7 +92,7 @@ class WatchlistBacktester
             $perHorizon = [];
             foreach ($horizons as $h) {
                 $exitIndex = $entryIndex + $h;
-                if (!isset($tradingDays[$exitIndex])) {
+                if (! isset($tradingDays[$exitIndex])) {
                     continue;
                 }
                 $exitDate = $tradingDays[$exitIndex];
@@ -176,7 +177,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, WatchlistScore>
+     * @return Collection<int, WatchlistScore>
      */
     private function loadScores(Carbon $from, Carbon $to, string $version, ?int $limitPerDay)
     {
@@ -191,6 +192,7 @@ class WatchlistBacktester
 
         $rows = $query->orderBy('scan_date')->orderByDesc('score_total')->get();
         $perDayCounts = [];
+
         return $rows->filter(function (WatchlistScore $row) use (&$perDayCounts, $limitPerDay): bool {
             $scanDate = $this->normalizeDate($row->scan_date);
             if ($scanDate === null) {
@@ -201,15 +203,16 @@ class WatchlistBacktester
                 return false;
             }
             $perDayCounts[$scanDate]++;
+
             return true;
         })->values();
     }
 
     /**
-     * @param \Illuminate\Support\Collection<int, WatchlistScore> $rows
-     * @param array<int, string> $tradingDays
-     * @param array<string, int> $tradingDayIndex
-     * @param array<int, int> $horizons
+     * @param  Collection<int, WatchlistScore>  $rows
+     * @param  array<int, string>  $tradingDays
+     * @param  array<string, int>  $tradingDayIndex
+     * @param  array<int, int>  $horizons
      * @return array{0: string, 1: string}
      */
     private function priceWindow($rows, array $tradingDays, array $tradingDayIndex, array $horizons): array
@@ -219,7 +222,7 @@ class WatchlistBacktester
         $maxDate = null;
         foreach ($rows as $row) {
             $scanDate = $this->normalizeDate($row->scan_date);
-            if ($scanDate === null || !isset($tradingDayIndex[$scanDate])) {
+            if ($scanDate === null || ! isset($tradingDayIndex[$scanDate])) {
                 continue;
             }
             if ($minDate === null || $scanDate < $minDate) {
@@ -236,7 +239,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @param array<int, int> $assetIds
+     * @param  array<int, int>  $assetIds
      * @return array<int, array<string, object>>
      */
     private function loadBars(array $assetIds, string $minDate, string $maxDate): array
@@ -266,10 +269,10 @@ class WatchlistBacktester
     }
 
     /**
-     * @param array<int, array<string, mixed>> $observations
-     * @param array<int, int> $horizons
-     * @param callable(array<string, mixed>): bool $predicate
-     * @param array<int, array{horizon: int, hit_rate: float, avg_return: float, n: int}>|null $baseline
+     * @param  array<int, array<string, mixed>>  $observations
+     * @param  array<int, int>  $horizons
+     * @param  callable(array<string, mixed>): bool  $predicate
+     * @param  array<int, array{horizon: int, hit_rate: float, avg_return: float, n: int}>|null  $baseline
      * @return array<int, array{horizon: int, hit_rate: float, avg_return: float, lift_vs_baseline: float|null, n: int}>
      */
     private function aggregate(array $observations, array $horizons, callable $predicate, ?array $baseline = null): array
@@ -280,10 +283,10 @@ class WatchlistBacktester
             $sumReturn = 0.0;
             $count = 0;
             foreach ($observations as $obs) {
-                if (!$predicate($obs)) {
+                if (! $predicate($obs)) {
                     continue;
                 }
-                if (!isset($obs['per_horizon'][$h])) {
+                if (! isset($obs['per_horizon'][$h])) {
                     continue;
                 }
                 $count++;
@@ -314,7 +317,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @param array<int, array{horizon: int, hit_rate: float, avg_return: float, n: int}> $baseline
+     * @param  array<int, array{horizon: int, hit_rate: float, avg_return: float, n: int}>  $baseline
      */
     private function lookupBaselineHit(array $baseline, int $horizon): ?float
     {
@@ -346,16 +349,16 @@ class WatchlistBacktester
     private function filterCombos(): array
     {
         return [
-            ['LF=fail · RRF=fail', static fn (array $o) => !$o['lf_pass'] && !$o['rrf_pass']],
-            ['LF=pass · RRF=fail', static fn (array $o) => $o['lf_pass'] && !$o['rrf_pass']],
-            ['LF=fail · RRF=pass', static fn (array $o) => !$o['lf_pass'] && $o['rrf_pass']],
+            ['LF=fail · RRF=fail', static fn (array $o) => ! $o['lf_pass'] && ! $o['rrf_pass']],
+            ['LF=pass · RRF=fail', static fn (array $o) => $o['lf_pass'] && ! $o['rrf_pass']],
+            ['LF=fail · RRF=pass', static fn (array $o) => ! $o['lf_pass'] && $o['rrf_pass']],
             ['LF=pass · RRF=pass', static fn (array $o) => $o['lf_pass'] && $o['rrf_pass']],
         ];
     }
 
     /**
-     * @param array<int, array<string, mixed>> $observations
-     * @param callable(array<string, mixed>): bool $predicate
+     * @param  array<int, array<string, mixed>>  $observations
+     * @param  callable(array<string, mixed>): bool  $predicate
      */
     private function sampleSize(array $observations, callable $predicate): int
     {
@@ -389,7 +392,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @param array<int, int> $horizons
+     * @param  array<int, int>  $horizons
      */
     private function emptyReport(Carbon $from, Carbon $to, string $version, array $horizons, float $targetPct): array
     {

@@ -16,13 +16,13 @@ use RuntimeException;
 class TradingCalendarBuilder
 {
     private const SOURCE = '^JKSE';
+
     private const CHUNK_SIZE = 1000;
 
     public function __construct(
         private readonly TradingDay $tradingDay,
         private readonly TradingCalendarDay $calendarDay,
-    ) {
-    }
+    ) {}
 
     public function build(string $from, string $to, array $holidayReasons = []): int
     {
@@ -53,8 +53,8 @@ class TradingCalendarBuilder
         foreach ($period as $current) {
             $dateString = $current->toDateString();
             $isWeekend = $current->dayOfWeekIso >= 6;
-            $isTradingDay = !$isWeekend && isset($tradingLookup[$dateString]);
-            $isHoliday = !$isWeekend && !$isTradingDay;
+            $isTradingDay = ! $isWeekend && isset($tradingLookup[$dateString]);
+            $isHoliday = ! $isWeekend && ! $isTradingDay;
             $holidayReason = $holidayLookup[$dateString] ?? ($isHoliday ? 'Bourse Holiday' : null);
 
             $records[] = [
@@ -129,10 +129,10 @@ class TradingCalendarBuilder
         try {
             $data = json_decode($contents, true, flags: JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new InvalidArgumentException('Holiday JSON is invalid: ' . $exception->getMessage(), 0, $exception);
+            throw new InvalidArgumentException('Holiday JSON is invalid: '.$exception->getMessage(), 0, $exception);
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             throw new InvalidArgumentException('Holiday JSON must decode to an associative array.');
         }
 
@@ -185,7 +185,7 @@ class TradingCalendarBuilder
         $normalized = [];
 
         foreach ($entries as $date => $reason) {
-            if (!is_string($date) || !is_string($reason)) {
+            if (! is_string($date) || ! is_string($reason)) {
                 continue;
             }
 

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class MovingAverageCrossoverTest extends TestCase
 {
     /**
-     * @param array<int, float> $closes
+     * @param  array<int, float>  $closes
      * @return array<int, array{date:string, open:float, high:float, low:float, close:float}>
      */
     private function createBars(array $closes): array
@@ -27,6 +27,7 @@ class MovingAverageCrossoverTest extends TestCase
             ];
             $i++;
         }
+
         return $bars;
     }
 

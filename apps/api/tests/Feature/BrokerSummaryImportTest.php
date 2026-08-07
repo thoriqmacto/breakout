@@ -3,9 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Asset;
-use App\Models\BandarDetectorSummary;
-use App\Models\BrokerSummaryFact;
-use App\Models\Broksum;
 use App\Services\BrokerSummaryImporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;

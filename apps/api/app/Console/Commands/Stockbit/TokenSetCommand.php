@@ -24,7 +24,7 @@ class TokenSetCommand extends Command
             return self::FAILURE;
         }
 
-        if (!str_contains($token, '.')) {
+        if (! str_contains($token, '.')) {
             $this->error('The provided value does not look like a JWT (no "." separator).');
 
             return self::FAILURE;
@@ -32,7 +32,7 @@ class TokenSetCommand extends Command
 
         $expiresAt = StockbitExodusClient::jwtExpiresAt($token);
         if ($expiresAt !== null && $expiresAt <= new \DateTimeImmutable('now')) {
-            $this->error('The provided token is already expired (exp: ' . $expiresAt->format('Y-m-d H:i:s T') . ').');
+            $this->error('The provided token is already expired (exp: '.$expiresAt->format('Y-m-d H:i:s T').').');
 
             return self::FAILURE;
         }
@@ -41,11 +41,11 @@ class TokenSetCommand extends Command
 
         $tail = substr($token, -4);
         $this->info('Stockbit token saved.');
-        $this->line('  fingerprint: ****' . $tail);
+        $this->line('  fingerprint: ****'.$tail);
         if ($expiresAt !== null) {
             $remaining = $expiresAt->getTimestamp() - time();
-            $this->line('  expires_at:  ' . $expiresAt->format('Y-m-d H:i:s T'));
-            $this->line('  expires_in:  ' . $this->formatDuration(max(0, $remaining)));
+            $this->line('  expires_at:  '.$expiresAt->format('Y-m-d H:i:s T'));
+            $this->line('  expires_in:  '.$this->formatDuration(max(0, $remaining)));
         } else {
             $this->warn('  expires_at:  unknown (token has no parseable "exp" claim).');
         }
@@ -69,7 +69,7 @@ class TokenSetCommand extends Command
             $this->warn('Unable to read clipboard. Falling back to STDIN.');
         }
 
-        if (!$this->input->isInteractive() && !defined('STDIN')) {
+        if (! $this->input->isInteractive() && ! defined('STDIN')) {
             return '';
         }
 
@@ -90,7 +90,7 @@ class TokenSetCommand extends Command
 
     private function readStdin(): string
     {
-        if (!defined('STDIN')) {
+        if (! defined('STDIN')) {
             return '';
         }
 
@@ -106,7 +106,7 @@ class TokenSetCommand extends Command
         }
 
         $contents = '';
-        while (!feof(STDIN)) {
+        while (! feof(STDIN)) {
             $chunk = fread(STDIN, 4096);
             if ($chunk === false) {
                 break;
@@ -144,7 +144,7 @@ class TokenSetCommand extends Command
      */
     private function runProcess(array $cmd): ?string
     {
-        if (!function_exists('proc_open')) {
+        if (! function_exists('proc_open')) {
             return null;
         }
 
@@ -155,7 +155,7 @@ class TokenSetCommand extends Command
         ];
 
         $process = @proc_open($cmd, $descriptors, $pipes);
-        if (!is_resource($process)) {
+        if (! is_resource($process)) {
             return null;
         }
 
@@ -186,6 +186,6 @@ class TokenSetCommand extends Command
             return sprintf('%dm%02ds', $minutes, $secs);
         }
 
-        return $secs . 's';
+        return $secs.'s';
     }
 }

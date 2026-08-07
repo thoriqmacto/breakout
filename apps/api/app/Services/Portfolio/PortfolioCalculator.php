@@ -4,6 +4,7 @@ namespace App\Services\Portfolio;
 
 use App\Models\CashMovement;
 use App\Models\Portfolio;
+use App\Models\Position;
 use Illuminate\Support\Collection;
 
 /**
@@ -108,7 +109,7 @@ class PortfolioCalculator
      *   - Exit:  realized += qty_exit * (price_exit - avg_old) - fee
      *            qty -= qty_exit  (avg unchanged)
      *
-     * @param Collection<int, \App\Models\Position> $positions
+     * @param  Collection<int, Position>  $positions
      * @return array{0: array<int, array<string, mixed>>, 1: float}
      */
     private function reduceHoldings(Collection $positions): array
@@ -164,7 +165,7 @@ class PortfolioCalculator
     }
 
     /**
-     * @param Collection<int, CashMovement> $cashMovements
+     * @param  Collection<int, CashMovement>  $cashMovements
      */
     private function cashBalance(Portfolio $portfolio, Collection $cashMovements): float
     {
@@ -178,7 +179,7 @@ class PortfolioCalculator
     }
 
     /**
-     * @param array<string, mixed> $holding
+     * @param  array<string, mixed>  $holding
      * @return array<string, mixed>
      */
     private function shapeHolding(array $holding): array
@@ -205,7 +206,7 @@ class PortfolioCalculator
     }
 
     /**
-     * @param array<int, array<string, mixed>> $holdings
+     * @param  array<int, array<string, mixed>>  $holdings
      * @return array<int, array<string, mixed>>
      */
     private function allocationBySymbol(array $holdings, float $totalMarketValue): array
@@ -230,7 +231,7 @@ class PortfolioCalculator
     }
 
     /**
-     * @param array<int, array<string, mixed>> $holdings
+     * @param  array<int, array<string, mixed>>  $holdings
      * @return array<int, array<string, mixed>>
      */
     private function allocationBySector(array $holdings, float $totalMarketValue): array

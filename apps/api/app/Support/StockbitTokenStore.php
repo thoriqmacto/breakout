@@ -11,23 +11,24 @@ use Illuminate\Support\Facades\Storage;
 class StockbitTokenStore
 {
     private const DISK = 'local';
+
     private const PATH = 'stockbit_token.json';
 
     public function get(): ?string
     {
-        if (!Storage::disk(self::DISK)->exists(self::PATH)) {
+        if (! Storage::disk(self::DISK)->exists(self::PATH)) {
             return null;
         }
 
         $contents = Storage::disk(self::DISK)->get(self::PATH);
         $decoded = json_decode((string) $contents, true);
-        if (!is_array($decoded)) {
+        if (! is_array($decoded)) {
             return null;
         }
 
         $bearer = $this->extractBearer($decoded);
 
-        if (!is_string($bearer) || $bearer === '') {
+        if (! is_string($bearer) || $bearer === '') {
             return null;
         }
 
@@ -87,7 +88,7 @@ class StockbitTokenStore
         }
 
         $legacy = $decoded['bearer'] ?? null;
-        if (!is_string($legacy) || $legacy === '') {
+        if (! is_string($legacy) || $legacy === '') {
             return null;
         }
 

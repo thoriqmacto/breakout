@@ -91,8 +91,6 @@ class PositionController extends ApiController
      * Prepare a sanitized payload for creating or updating a position.
      *
      * @param  array<string, mixed>  $input
-     * @param  \App\Models\Portfolio  $portfolio
-     * @param  \App\Models\Position|null  $position
      */
     protected function preparePayload(array $input, Portfolio $portfolio, ?Position $position = null): array
     {

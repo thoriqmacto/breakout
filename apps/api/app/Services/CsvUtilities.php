@@ -12,7 +12,7 @@ class CsvUtilities
     public static function streamCsv(string $path): \Generator
     {
         $h = fopen($path, 'r');
-        if (!$h) {
+        if (! $h) {
             throw new \RuntimeException("Cannot open CSV: {$path}");
         }
 
@@ -24,13 +24,13 @@ class CsvUtilities
                 if (isset($data[0])) {
                     $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]); // strip BOM
                 }
-                $headers = array_map(fn($x) => Str::of($x)->lower()->trim()->value(), $data);
+                $headers = array_map(fn ($x) => Str::of($x)->lower()->trim()->value(), $data);
             } else {
                 $row = [];
                 foreach ($headers as $i => $key) {
                     $row[$key] = $data[$i] ?? null;
                 }
-                if (!empty($row['date'])) {
+                if (! empty($row['date'])) {
                     yield $row;     // yield one row at a time
                 }
             }
@@ -45,7 +45,7 @@ class CsvUtilities
     public static function parseCsv(string $path): array
     {
         $h = fopen($path, 'r');
-        if (!$h) {
+        if (! $h) {
             throw new \RuntimeException("Cannot open CSV: {$path}");
         }
 
@@ -57,14 +57,14 @@ class CsvUtilities
             if ($line === 0 && isset($data[0])) {
                 // strip BOM if present
                 $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
-                $headers = array_map(fn($x) => Str::of($x)->lower()->trim()->value(), $data);
+                $headers = array_map(fn ($x) => Str::of($x)->lower()->trim()->value(), $data);
             } else {
                 $row = [];
                 foreach ($headers as $i => $key) {
                     $row[$key] = $data[$i] ?? null;
                 }
                 // only keep rows with a non-empty date-like field
-                if (!empty($row['date'])) {
+                if (! empty($row['date'])) {
                     $rows[] = $row;
                 }
             }
@@ -85,6 +85,7 @@ class CsvUtilities
                 return (string) $row[$k];
             }
         }
+
         return null;
     }
 
@@ -102,12 +103,14 @@ class CsvUtilities
         // 19/08/2010 -> 2010-08-19 (assume D/M/Y for slashes)
         if (preg_match('#^\d{1,2}/\d{1,2}/\d{4}$#', $s)) {
             $dt = \DateTime::createFromFormat('d/m/Y', $s);
+
             return $dt ? $dt->format('Y-m-d') : null;
         }
         // 19-08-2010 or 08-19-2010
         if (preg_match('#^\d{1,2}-\d{1,2}-\d{4}$#', $s)) {
             $dt = \DateTime::createFromFormat('d-m-Y', $s)
                 ?: \DateTime::createFromFormat('m-d-Y', $s);
+
             return $dt ? $dt->format('Y-m-d') : null;
         }
         // Already ISO
@@ -116,6 +119,7 @@ class CsvUtilities
         }
         // 20100819, 19 Aug 2010, etc.
         $t = strtotime($s);
+
         return $t ? date('Y-m-d', $t) : null;
     }
 
@@ -126,10 +130,12 @@ class CsvUtilities
     {
         foreach ([$key, ucfirst($key), strtoupper($key)] as $k) {
             if (array_key_exists($k, $row) && $row[$k] !== '' && $row[$k] !== null) {
-                $val = str_replace([',',' '], '', (string) $row[$k]);
+                $val = str_replace([',', ' '], '', (string) $row[$k]);
+
                 return is_numeric($val) ? (float) $val : null;
             }
         }
+
         return null;
     }
 
@@ -141,17 +147,19 @@ class CsvUtilities
         foreach ([$key, ucfirst($key), strtoupper($key)] as $k) {
             if (array_key_exists($k, $row) && $row[$k] !== '' && $row[$k] !== null) {
                 $val = preg_replace('/[^\d]/', '', (string) $row[$k]);
+
                 return $val === '' ? null : (int) $val;
             }
         }
+
         return null;
     }
 
     /**
      * Convert an iterable of associative rows into a CSV string using the provided column order.
      *
-     * @param iterable<array<string, mixed>> $rows
-     * @param array<int, string> $columns
+     * @param  iterable<array<string, mixed>>  $rows
+     * @param  array<int, string>  $columns
      */
     public static function rowsToCsv(iterable $rows, array $columns): string
     {

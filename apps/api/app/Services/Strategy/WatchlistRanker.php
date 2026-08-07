@@ -23,16 +23,19 @@ use Illuminate\Support\Facades\DB;
 class WatchlistRanker
 {
     public const DEFAULT_WINDOWS = [3, 5, 10, 20];
+
     public const DEFAULT_LIQUIDITY_TURNOVER = 5_000_000_000.0; // IDR 5B
+
     public const DEFAULT_LIQUIDITY_BROKERS = 5;
+
     public const DEFAULT_MIN_RR = 2.0;
+
     public const DEFAULT_TOP = 30;
 
     public function __construct(
         private readonly StrategyScoringService $scoring,
         private readonly RiskCalculator $risk
-    ) {
-    }
+    ) {}
 
     /**
      * @param array{
@@ -44,7 +47,6 @@ class WatchlistRanker
      *   min_brokers?: int,
      *   min_rr?: float,
      * } $options
-     *
      * @return array{
      *   scan_date: string,
      *   version: string,
@@ -124,10 +126,10 @@ class WatchlistRanker
             $topBrokers = $this->topBrokersForAsset($assetId, $scanDate);
 
             $reasons = array_filter(array_merge(
-                ['BAS: ' . implode(', ', $bas['reasons'])],
-                ['BCS: ' . implode(', ', $bcs['reasons'] ?: ['no breakout signals'])],
-                ['liquidity: ' . $liquidity['reason']],
-                ['risk: ' . $rrf['reason']]
+                ['BAS: '.implode(', ', $bas['reasons'])],
+                ['BCS: '.implode(', ', $bcs['reasons'] ?: ['no breakout signals'])],
+                ['liquidity: '.$liquidity['reason']],
+                ['risk: '.$rrf['reason']]
             ));
 
             $rows[] = [
@@ -154,7 +156,7 @@ class WatchlistRanker
         }
 
         usort($rows, static function (array $a, array $b): int {
-            return ($b['score_total'] <=> $a['score_total']);
+            return $b['score_total'] <=> $a['score_total'];
         });
 
         $rows = array_slice($rows, 0, $top);
@@ -170,8 +172,8 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, string>|null $symbols
-     * @return array<int, Asset>  keyed by asset id
+     * @param  array<int, string>|null  $symbols
+     * @return array<int, Asset> keyed by asset id
      */
     private function loadAssets(?array $symbols): array
     {
@@ -186,9 +188,9 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, int> $assetIds
-     * @param array<int, int> $windows
-     * @return array<int, array<int, array<string, mixed>>>  asset_id => list of windows
+     * @param  array<int, int>  $assetIds
+     * @param  array<int, int>  $windows
+     * @return array<int, array<int, array<string, mixed>>> asset_id => list of windows
      */
     private function loadAccumulationWindows(array $assetIds, Carbon $scanDate, array $windows): array
     {
@@ -212,8 +214,8 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, Asset> $assetMap
-     * @return array<string, object>  symbol => features_daily row
+     * @param  array<int, Asset>  $assetMap
+     * @return array<string, object> symbol => features_daily row
      */
     private function loadFeatures(array $assetMap, Carbon $scanDate): array
     {
@@ -236,8 +238,8 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, int> $assetIds
-     * @return array<int, object>  asset_id => latest bar (close, date)
+     * @param  array<int, int>  $assetIds
+     * @return array<int, object> asset_id => latest bar (close, date)
      */
     private function loadLatestBar(array $assetIds, Carbon $scanDate): array
     {
@@ -250,7 +252,7 @@ class WatchlistRanker
         $out = [];
         foreach ($rows as $row) {
             $assetId = (int) $row->asset_id;
-            if (!isset($out[$assetId])) {
+            if (! isset($out[$assetId])) {
                 $out[$assetId] = $row;
             }
         }
@@ -259,8 +261,8 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, int> $assetIds
-     * @return array<int, float>  asset_id => 20-day swing low
+     * @param  array<int, int>  $assetIds
+     * @return array<int, float> asset_id => 20-day swing low
      */
     private function loadSwingLows(array $assetIds, Carbon $scanDate): array
     {
@@ -306,7 +308,7 @@ class WatchlistRanker
     }
 
     /**
-     * @param array<int, array<string, mixed>> $rows
+     * @param  array<int, array<string, mixed>>  $rows
      */
     private function persist(array $rows, string $version): int
     {

@@ -10,15 +10,12 @@ use RuntimeException;
 
 class HLSLBreakoutBacktester extends BaseBacktester
 {
-    public function __construct(private readonly HLSLBreakoutStrategy $strategy)
-    {
-    }
+    public function __construct(private readonly HLSLBreakoutStrategy $strategy) {}
 
     /**
      * Prepare and simulate trades for a single ticker.
      *
-     * @param string $ticker
-     * @param array<int, array<string, mixed>> $rows
+     * @param  array<int, array<string, mixed>>  $rows
      * @return array{
      *     trades: array<int, array<string, mixed>>,
      *     start: Carbon|null,
@@ -73,8 +70,8 @@ class HLSLBreakoutBacktester extends BaseBacktester
     /**
      * Compile statistics for the executed trades.
      *
-     * @param array<int, array<string, mixed>> $trades
-     * @param array<int, array{date:string, equity:float}> $equityCurve
+     * @param  array<int, array<string, mixed>>  $trades
+     * @param  array<int, array{date:string, equity:float}>  $equityCurve
      */
     public function compileStats(array $trades, array $equityCurve, float $initialCapital, float $finalCapital): array
     {
@@ -140,9 +137,9 @@ class HLSLBreakoutBacktester extends BaseBacktester
     }
 
     /**
-     * @param array<int, array<string, mixed>> $dailyData
-     * @param array<int, array<string, mixed>> $weeklyData
-     * @param array<int, array<string, mixed>> $signals
+     * @param  array<int, array<string, mixed>>  $dailyData
+     * @param  array<int, array<string, mixed>>  $weeklyData
+     * @param  array<int, array<string, mixed>>  $signals
      * @return array<int, array<string, mixed>>
      */
     private function simulateTrades(string $ticker, array $dailyData, array $weeklyData, array $signals): array
@@ -225,7 +222,7 @@ class HLSLBreakoutBacktester extends BaseBacktester
     }
 
     /**
-     * @param array<int, array{date:string, equity:float}> $equityCurve
+     * @param  array<int, array{date:string, equity:float}>  $equityCurve
      * @return array<int, array{date:string, open:float, high:float, low:float, close:float}>
      */
     private function equityCurveToBars(array $equityCurve): array
@@ -245,4 +242,3 @@ class HLSLBreakoutBacktester extends BaseBacktester
         }, $equityCurve);
     }
 }
-

@@ -44,7 +44,7 @@ class TradingDaysBuild extends Command
         try {
             $this->syncSeederFile();
         } catch (\Throwable $e) {
-            $this->warn('Unable to update trading day seeder: ' . $e->getMessage());
+            $this->warn('Unable to update trading day seeder: '.$e->getMessage());
         }
 
         return self::SUCCESS;
@@ -89,13 +89,13 @@ class TradingDaysBuild extends Command
 
         File::ensureDirectoryExists(dirname($path));
 
-        $contents = "<?php\n\nreturn " . $this->exportArray($records) . ";\n";
+        $contents = "<?php\n\nreturn ".$this->exportArray($records).";\n";
 
         if (File::put($path, $contents) === false) {
             throw new \RuntimeException('Failed to write trading day seeder data.');
         }
 
-        $this->info('Trading day seeder data saved to ' . $path . '.');
+        $this->info('Trading day seeder data saved to '.$path.'.');
     }
 
     /**
@@ -103,19 +103,19 @@ class TradingDaysBuild extends Command
      */
     private function readSeederData(string $path): ?array
     {
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return null;
         }
 
         $data = include $path;
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return null;
         }
 
         return Collection::make($data)
             ->map(function ($item) {
-                if (!is_array($item) || !isset($item['date'])) {
+                if (! is_array($item) || ! isset($item['date'])) {
                     return null;
                 }
 
@@ -136,8 +136,8 @@ class TradingDaysBuild extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $first
-     * @param array<int, array<string, mixed>> $second
+     * @param  array<int, array<string, mixed>>  $first
+     * @param  array<int, array<string, mixed>>  $second
      */
     private function recordsAreEqual(array $first, array $second): bool
     {
@@ -149,7 +149,7 @@ class TradingDaysBuild extends Command
     }
 
     /**
-     * @param array<int, array<string, mixed>> $records
+     * @param  array<int, array<string, mixed>>  $records
      */
     private function exportArray(array $records): string
     {

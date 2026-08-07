@@ -251,7 +251,7 @@ class StrategyWatchlistTest extends TestCase
     }
 
     /**
-     * @param array<int, array{date: string, broker: string, buy: int, sell: int, type?: string}> $rows
+     * @param  array<int, array{date: string, broker: string, buy: int, sell: int, type?: string}>  $rows
      */
     private function seedBrokerFacts(int $assetId, array $rows): void
     {

@@ -22,14 +22,15 @@ class AssetMetricsTest extends TestCase
         for ($i = 0; $i < 300; $i++) {
             $close = $i + 1; // deterministic progression
             $bars[] = [
-                'date'  => date('Y-m-d', $start + $i * 86400),
-                'open'  => $close,
-                'high'  => $close,
-                'low'   => $close - 2,
+                'date' => date('Y-m-d', $start + $i * 86400),
+                'open' => $close,
+                'high' => $close,
+                'low' => $close - 2,
                 'close' => $close,
                 'volume' => 1000 + $i,
             ];
         }
+
         return $bars;
     }
 
@@ -43,8 +44,8 @@ class AssetMetricsTest extends TestCase
      */
     private function loadHistoricalBars(string $symbol): array
     {
-        $path = dirname(__DIR__, 2) . "/database/seeders/data/historical/{$symbol}.csv";
-        if (!is_file($path)) {
+        $path = dirname(__DIR__, 2)."/database/seeders/data/historical/{$symbol}.csv";
+        if (! is_file($path)) {
             $this->fail("Historical data for symbol {$symbol} not found at {$path}");
         }
 
@@ -79,7 +80,7 @@ class AssetMetricsTest extends TestCase
 
         fclose($handle);
 
-        usort($bars, static fn(array $a, array $b): int => strcmp($a['date'], $b['date']));
+        usort($bars, static fn (array $a, array $b): int => strcmp($a['date'], $b['date']));
 
         return $bars;
     }
@@ -139,7 +140,7 @@ class AssetMetricsTest extends TestCase
         // expected values drift).
         $bars = [];
         $weeklyLastCloses = [];
-        $start = new \DateTimeImmutable('2024-01-01'); // a Monday
+        $start = new DateTimeImmutable('2024-01-01'); // a Monday
         for ($week = 0; $week < 30; $week++) {
             $weekClose = 100 + $week * 10; // 100, 110, ..., 390
             $weeklyLastCloses[] = (float) $weekClose;
@@ -222,7 +223,7 @@ class AssetMetricsTest extends TestCase
         $completedBars = [];
         $completedCloses = [];
         for ($i = 8; $i >= 1; $i--) {
-            $weekEnd = $currentMonday->sub(new DateInterval('P1D'))->sub(new DateInterval('P' . $i . 'W'));
+            $weekEnd = $currentMonday->sub(new DateInterval('P1D'))->sub(new DateInterval('P'.$i.'W'));
             $close = 100.0 + $i;
             $completedBars[] = [
                 'date' => $weekEnd->format('Y-m-d'),
@@ -268,7 +269,7 @@ class AssetMetricsTest extends TestCase
         $bars = [];
         $closes = [];
         for ($i = 0; $i < 5; $i++) {
-            $date = $start->add(new DateInterval('P' . $i . 'W'));
+            $date = $start->add(new DateInterval('P'.$i.'W'));
             $close = 10.0 + $i;
             $bars[] = [
                 'date' => $date->format('Y-m-d'),
@@ -290,7 +291,7 @@ class AssetMetricsTest extends TestCase
         $start = new DateTimeImmutable('2024-01-01');
         $bars = [];
         for ($i = 0; $i < 10; $i++) {
-            $date = $start->add(new DateInterval('P' . $i . 'D'));
+            $date = $start->add(new DateInterval('P'.$i.'D'));
             $close = (float) ($i + 1);
             $bars[] = [
                 'date' => $date->format('Y-m-d'),
@@ -344,9 +345,9 @@ class AssetMetricsTest extends TestCase
 
         $bars = [];
         for ($week = 30; $week >= 1; $week--) {
-            $weekMonday = $currentMonday->sub(new DateInterval('P' . $week . 'W'));
+            $weekMonday = $currentMonday->sub(new DateInterval('P'.$week.'W'));
             for ($day = 0; $day < 7; $day++) {
-                $date = $weekMonday->add(new DateInterval('P' . $day . 'D'));
+                $date = $weekMonday->add(new DateInterval('P'.$day.'D'));
                 $close = $day === 6 ? 50.0 : 200.0;
                 $bars[] = [
                     'date' => $date->format('Y-m-d'),

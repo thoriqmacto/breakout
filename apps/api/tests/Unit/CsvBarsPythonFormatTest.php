@@ -9,7 +9,7 @@ class CsvBarsPythonFormatTest extends TestCase
 {
     public function test_read_and_write_python_csv(): void
     {
-        $csv = <<<CSV
+        $csv = <<<'CSV'
 Date,Adj Close_DCII.JK,Close_DCII.JK,High_DCII.JK,Low_DCII.JK,Open_DCII.JK,Volume_DCII.JK
 2021-01-06,525.0,525.0,525.0,525.0,525.0,1100
 CSV;
@@ -22,7 +22,7 @@ CSV;
         $this->assertSame(525.0, $rows['2021-01-06']['close']);
         $this->assertSame(1100, $rows['2021-01-06']['volume']);
 
-        $out = $tmp . '.out';
+        $out = $tmp.'.out';
         CsvBars::write($out, $rows);
         $lines = file($out, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $this->assertSame('Date,Open,High,Low,Close,Volume', $lines[0]);

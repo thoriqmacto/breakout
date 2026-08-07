@@ -35,7 +35,7 @@ class HLSLBreakoutStrategy extends BaseStrategy
     /**
      * Produce breakout signals when price and volume criteria align.
      *
-     * @param array<int, array<string, mixed>> $weeklyData
+     * @param  array<int, array<string, mixed>>  $weeklyData
      * @return array<int, array<string, mixed>>
      */
     public function generateSignals(array $weeklyData): array
@@ -68,7 +68,7 @@ class HLSLBreakoutStrategy extends BaseStrategy
     /**
      * Map each week to the last observed swing low.
      *
-     * @param array<int, array<string, mixed>> $weeklyData
+     * @param  array<int, array<string, mixed>>  $weeklyData
      * @return array<string, float|null>
      */
     public function buildWeeklySwingLowMap(array $weeklyData): array
@@ -91,7 +91,7 @@ class HLSLBreakoutStrategy extends BaseStrategy
     /**
      * Complete analysis flow for convenience.
      *
-     * @param array<int, array<string, mixed>> $rows
+     * @param  array<int, array<string, mixed>>  $rows
      * @return array{
      *     daily: array<int, array<string, mixed>>,
      *     weekly: array<int, array<string, mixed>>,
@@ -134,4 +134,3 @@ class HLSLBreakoutStrategy extends BaseStrategy
         return 'hold';
     }
 }
-

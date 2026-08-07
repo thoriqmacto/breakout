@@ -15,22 +15,22 @@ final class BrokerSummaryTransformer
         $defaultDate = self::extractSummaryFromDate($json);
 
         foreach ($candidates as $entry) {
-            if (!is_array($entry)) {
+            if (! is_array($entry)) {
                 continue;
             }
 
-            $date   = $defaultDate ?? (self::firstNonEmpty(
+            $date = $defaultDate ?? (self::firstNonEmpty(
                 $entry,
                 ['date', 'trading_date', 'traded_at', 'day', 'session_date', 'netbs_date']
             ) ?? '');
             $broker = self::firstNonEmpty($entry, ['broker', 'broker_code', 'code', 'brokerName', 'netbs_broker_code']) ?? '';
 
-            $buy   = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy', 'bval']));
-            $sell  = self::num(self::firstNonEmpty($entry, ['sell_value', 'sellValue', 'total_sell', 'sell', 'sval']));
-            $net   = self::num(self::firstNonEmpty($entry, ['net_value', 'netValue', 'net']));
+            $buy = self::num(self::firstNonEmpty($entry, ['buy_value', 'buyValue', 'total_buy', 'buy', 'bval']));
+            $sell = self::num(self::firstNonEmpty($entry, ['sell_value', 'sellValue', 'total_sell', 'sell', 'sval']));
+            $net = self::num(self::firstNonEmpty($entry, ['net_value', 'netValue', 'net']));
 
             if (($buy === null || $sell === null) && isset($entry['values']) && is_array($entry['values'])) {
-                $buy  = $buy  ?? self::num($entry['values']['buy']  ?? $entry['values']['buy_value']  ?? null);
+                $buy = $buy ?? self::num($entry['values']['buy'] ?? $entry['values']['buy_value'] ?? null);
                 $sell = $sell ?? self::num($entry['values']['sell'] ?? $entry['values']['sell_value'] ?? null);
             }
 
@@ -51,12 +51,12 @@ final class BrokerSummaryTransformer
             }
 
             $rows[] = [
-                'symbol'     => $symbol,
-                'date'       => self::normalizeDate($date),
-                'broker'     => (string) $broker,
-                'net_value'  => (float) ($net   ?? 0),
-                'buy_value'  => (float) ($buy   ?? 0),
-                'sell_value' => (float) ($sell  ?? 0),
+                'symbol' => $symbol,
+                'date' => self::normalizeDate($date),
+                'broker' => (string) $broker,
+                'net_value' => (float) ($net ?? 0),
+                'buy_value' => (float) ($buy ?? 0),
+                'sell_value' => (float) ($sell ?? 0),
             ];
         }
 
@@ -81,7 +81,7 @@ final class BrokerSummaryTransformer
         $brokersBuy = $summary['brokers_buy'] ?? [];
         if (is_array($brokersBuy)) {
             foreach ($brokersBuy as $entry) {
-                if (!is_array($entry)) {
+                if (! is_array($entry)) {
                     continue;
                 }
 
@@ -92,7 +92,7 @@ final class BrokerSummaryTransformer
                     continue;
                 }
 
-                $key = $broker . '|' . $date;
+                $key = $broker.'|'.$date;
                 $byBroker[$key] ??= self::emptyFact($symbol, $broker, $date, $transactionType);
 
                 $byBroker[$key]['broker_type'] = $byBroker[$key]['broker_type']
@@ -108,7 +108,7 @@ final class BrokerSummaryTransformer
         $brokersSell = $summary['brokers_sell'] ?? [];
         if (is_array($brokersSell)) {
             foreach ($brokersSell as $entry) {
-                if (!is_array($entry)) {
+                if (! is_array($entry)) {
                     continue;
                 }
 
@@ -119,7 +119,7 @@ final class BrokerSummaryTransformer
                     continue;
                 }
 
-                $key = $broker . '|' . $date;
+                $key = $broker.'|'.$date;
                 $byBroker[$key] ??= self::emptyFact($symbol, $broker, $date, $transactionType);
 
                 $byBroker[$key]['broker_type'] = $byBroker[$key]['broker_type']
@@ -210,10 +210,10 @@ final class BrokerSummaryTransformer
     private static function extractBrokerSummaryEntries(array $json): array
     {
         if (
-            !isset($json['data'])
-            || !is_array($json['data'])
-            || !isset($json['data']['broker_summary'])
-            || !is_array($json['data']['broker_summary'])
+            ! isset($json['data'])
+            || ! is_array($json['data'])
+            || ! isset($json['data']['broker_summary'])
+            || ! is_array($json['data']['broker_summary'])
         ) {
             return [];
         }
@@ -223,7 +223,7 @@ final class BrokerSummaryTransformer
 
         if (isset($summary['brokers_buy']) && is_array($summary['brokers_buy'])) {
             foreach ($summary['brokers_buy'] as $entry) {
-                if (!is_array($entry)) {
+                if (! is_array($entry)) {
                     continue;
                 }
 
@@ -238,7 +238,7 @@ final class BrokerSummaryTransformer
 
         if (isset($summary['brokers_sell']) && is_array($summary['brokers_sell'])) {
             foreach ($summary['brokers_sell'] as $entry) {
-                if (!is_array($entry)) {
+                if (! is_array($entry)) {
                     continue;
                 }
 
@@ -271,7 +271,7 @@ final class BrokerSummaryTransformer
     }
 
     /**
-     * @param array<string, mixed> $summary
+     * @param  array<string, mixed>  $summary
      */
     private static function extractSummaryFromDate(array $json, array $summary = []): ?string
     {
@@ -310,7 +310,7 @@ final class BrokerSummaryTransformer
     }
 
     /**
-     * @param array<string, mixed> $summary
+     * @param  array<string, mixed>  $summary
      */
     private static function extractTransactionType(array $json, array $summary, ?string $fallback): ?string
     {
@@ -358,7 +358,7 @@ final class BrokerSummaryTransformer
     private static function firstNonEmpty(array $entry, array $keys): mixed
     {
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $entry)) {
+            if (! array_key_exists($key, $entry)) {
                 continue;
             }
 

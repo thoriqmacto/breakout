@@ -55,7 +55,7 @@ class DonchianStrategyTest extends TestCase
 
     public function test_backtest_final_equity(): void
     {
-        $backtester = new DonchianBacktester();
+        $backtester = new DonchianBacktester;
         $result = $backtester->run($this->bars(), 100.0);
         $this->assertSame(125.0, $result['final_equity']);
         $this->assertCount(5, $result['equity_curve']);

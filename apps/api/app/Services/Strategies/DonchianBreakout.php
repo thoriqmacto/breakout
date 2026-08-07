@@ -32,6 +32,7 @@ class DonchianBreakout extends BaseStrategy
         if ($close < $channel['lower']) {
             return 'sell';
         }
+
         return 'hold';
     }
 }

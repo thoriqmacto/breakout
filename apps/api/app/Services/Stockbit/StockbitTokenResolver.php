@@ -4,21 +4,24 @@ namespace App\Services\Stockbit;
 
 use App\Services\StockbitExodusClient;
 use App\Support\StockbitTokenStore;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class StockbitTokenResolver
 {
     public const SOURCE_OPTION = 'option';
+
     public const SOURCE_CONFIG = 'config';
+
     public const SOURCE_STORE = 'store';
+
     public const SOURCE_CACHE = 'cache';
+
     public const SOURCE_NONE = 'none';
 
     private const CACHE_KEY = 'stockbit.token';
 
-    public function __construct(private readonly StockbitTokenStore $store)
-    {
-    }
+    public function __construct(private readonly StockbitTokenStore $store) {}
 
     /**
      * Resolve a Stockbit bearer token using the documented priority order:
@@ -28,12 +31,12 @@ class StockbitTokenResolver
     public function resolve(?string $cliToken = null): ?string
     {
         $optionToken = is_string($cliToken) ? trim($cliToken) : '';
-        if ($optionToken !== '' && !$this->store->isExpired($optionToken)) {
+        if ($optionToken !== '' && ! $this->store->isExpired($optionToken)) {
             return $optionToken;
         }
 
         $configToken = trim((string) config('stockbit.bearer', ''));
-        if ($configToken !== '' && !$this->store->isExpired($configToken)) {
+        if ($configToken !== '' && ! $this->store->isExpired($configToken)) {
             return $configToken;
         }
 
@@ -43,7 +46,7 @@ class StockbitTokenResolver
         }
 
         $cached = Cache::get(self::CACHE_KEY);
-        if (is_string($cached) && $cached !== '' && !$this->store->isExpired($cached)) {
+        if (is_string($cached) && $cached !== '' && ! $this->store->isExpired($cached)) {
             return $cached;
         }
 
@@ -59,12 +62,12 @@ class StockbitTokenResolver
     public function resolveWithSource(?string $cliToken = null): array
     {
         $optionToken = is_string($cliToken) ? trim($cliToken) : '';
-        if ($optionToken !== '' && !$this->store->isExpired($optionToken)) {
+        if ($optionToken !== '' && ! $this->store->isExpired($optionToken)) {
             return ['token' => $optionToken, 'source' => self::SOURCE_OPTION];
         }
 
         $configToken = trim((string) config('stockbit.bearer', ''));
-        if ($configToken !== '' && !$this->store->isExpired($configToken)) {
+        if ($configToken !== '' && ! $this->store->isExpired($configToken)) {
             return ['token' => $configToken, 'source' => self::SOURCE_CONFIG];
         }
 
@@ -74,7 +77,7 @@ class StockbitTokenResolver
         }
 
         $cached = Cache::get(self::CACHE_KEY);
-        if (is_string($cached) && $cached !== '' && !$this->store->isExpired($cached)) {
+        if (is_string($cached) && $cached !== '' && ! $this->store->isExpired($cached)) {
             return ['token' => $cached, 'source' => self::SOURCE_CACHE];
         }
 
@@ -118,7 +121,7 @@ class StockbitTokenResolver
         return $this->store->isExpired($token);
     }
 
-    public function expiresAt(?string $token): ?\Illuminate\Support\Carbon
+    public function expiresAt(?string $token): ?Carbon
     {
         return $this->store->expiresAt($token);
     }

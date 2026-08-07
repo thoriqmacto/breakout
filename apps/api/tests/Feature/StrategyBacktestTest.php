@@ -178,7 +178,7 @@ class StrategyBacktestTest extends TestCase
     }
 
     /**
-     * @param array<int, string> $dates
+     * @param  array<int, string>  $dates
      */
     private function seedTradingDays(array $dates): void
     {
@@ -191,7 +191,7 @@ class StrategyBacktestTest extends TestCase
     }
 
     /**
-     * @param array<int, array{date: string, close: int|float}> $bars
+     * @param  array<int, array{date: string, close: int|float}>  $bars
      */
     private function seedBars(int $assetId, array $bars): void
     {
@@ -234,7 +234,7 @@ class StrategyBacktestTest extends TestCase
     }
 
     /**
-     * @param array<int, array<string, mixed>> $rows
+     * @param  array<int, array<string, mixed>>  $rows
      */
     private function byHorizon(array $rows, int $horizon): array
     {

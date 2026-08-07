@@ -23,7 +23,8 @@ class TrailingStopTest extends TestCase
     {
         $bars = $this->createBars();
         $metrics = new AssetMetrics($bars);
-        $strategy = new class($metrics) extends BaseStrategy {
+        $strategy = new class($metrics) extends BaseStrategy
+        {
             public function __construct(AssetMetrics $metrics)
             {
                 parent::__construct($metrics);

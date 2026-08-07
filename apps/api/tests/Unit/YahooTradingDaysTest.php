@@ -28,6 +28,7 @@ class YahooTradingDaysTest extends TestCase
                 $this->assertSame('get_stocks.py', $script);
                 $this->assertNull($payload);
                 $this->assertContains('--emit-dates', $args);
+
                 return true;
             })
             ->andReturn([
@@ -47,7 +48,7 @@ class YahooTradingDaysTest extends TestCase
                 ],
             ]);
 
-        $service = new YahooTradingDays($runner, new TradingDay());
+        $service = new YahooTradingDays($runner, new TradingDay);
 
         $count = $service->import('2024-01-01', '2024-01-31');
 
@@ -80,7 +81,7 @@ class YahooTradingDaysTest extends TestCase
             ],
         ]);
 
-        $service = new YahooTradingDays($runner, new TradingDay());
+        $service = new YahooTradingDays($runner, new TradingDay);
 
         $count = $service->import('2024-02-01', '2024-02-28');
 

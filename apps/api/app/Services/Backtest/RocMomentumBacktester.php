@@ -11,8 +11,7 @@ class RocMomentumBacktester extends BaseBacktester
     public function __construct(
         private int $lookback = 13,
         private float $threshold = 5.0,
-    ) {
-    }
+    ) {}
 
     protected function createStrategy(AssetMetrics $metrics): BaseStrategy
     {

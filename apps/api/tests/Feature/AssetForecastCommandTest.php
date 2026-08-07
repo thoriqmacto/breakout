@@ -838,7 +838,7 @@ class AssetForecastCommandTest extends TestCase
     }
 
     /**
-     * @param array<int, array{date:string, open:float, high:float, low:float, close:float, volume:int}> $rows
+     * @param  array<int, array{date:string, open:float, high:float, low:float, close:float, volume:int}>  $rows
      */
     private function seedPrices(Asset $asset, array $rows): void
     {

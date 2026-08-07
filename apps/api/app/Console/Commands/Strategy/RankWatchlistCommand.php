@@ -5,6 +5,7 @@ namespace App\Console\Commands\Strategy;
 use App\Services\Strategy\WatchlistRanker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RankWatchlistCommand extends Command
 {
@@ -89,8 +90,8 @@ class RankWatchlistCommand extends Command
             }
         }
 
-        $latest = \Illuminate\Support\Facades\DB::table('features_daily')->max('date');
-        if (!$latest) {
+        $latest = DB::table('features_daily')->max('date');
+        if (! $latest) {
             $this->warn('No rows found in features_daily. Run php artisan features:extract first.');
 
             return null;
@@ -107,7 +108,7 @@ class RankWatchlistCommand extends Command
         $parts = array_filter(array_map('trim', explode(',', $raw)));
         $out = [];
         foreach ($parts as $part) {
-            if (!is_numeric($part)) {
+            if (! is_numeric($part)) {
                 continue;
             }
             $n = (int) $part;
@@ -120,7 +121,7 @@ class RankWatchlistCommand extends Command
     }
 
     /**
-     * @param array<int, string> $rawSymbols
+     * @param  array<int, string>  $rawSymbols
      * @return array<int, string>|null
      */
     private function parseSymbols(array $rawSymbols): ?array

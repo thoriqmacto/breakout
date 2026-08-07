@@ -13,9 +13,9 @@ class TokenClearCommand extends Command
 
     public function handle(StockbitTokenResolver $resolver): int
     {
-        if (!$this->option('force') && $this->input->isInteractive()) {
+        if (! $this->option('force') && $this->input->isInteractive()) {
             $confirmed = $this->confirm('Remove the locally stored Stockbit token?', false);
-            if (!$confirmed) {
+            if (! $confirmed) {
                 $this->line('Aborted.');
 
                 return self::SUCCESS;

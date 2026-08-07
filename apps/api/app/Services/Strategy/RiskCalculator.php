@@ -18,7 +18,9 @@ namespace App\Services\Strategy;
 class RiskCalculator
 {
     public const ATR_MULTIPLE = 2.0;
+
     public const MIN_TARGET_PCT = 0.10;
+
     public const MIN_RISK_PCT = 0.005; // floor for risk distance to avoid divide-by-zero
 
     /**

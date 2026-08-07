@@ -4,10 +4,10 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 // Load versioned routes (v1), for temporary only without using auth
-require __DIR__ . '/api_v1.php';
+require __DIR__.'/api_v1.php';
 
 // generic/unversioned routes
-Route::get('/ping', fn() => response()->json(['ok' => true]));
+Route::get('/ping', fn () => response()->json(['ok' => true]));
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);

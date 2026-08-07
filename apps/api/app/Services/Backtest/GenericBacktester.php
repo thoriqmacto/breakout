@@ -10,13 +10,10 @@ use App\Services\Strategies\BaseStrategy;
  */
 class GenericBacktester extends BaseBacktester
 {
-    public function __construct(private BaseStrategy $strategy)
-    {
-    }
+    public function __construct(private BaseStrategy $strategy) {}
 
     protected function createStrategy(AssetMetrics $metrics): BaseStrategy
     {
         return $this->strategy->withMetrics($metrics);
     }
 }
-

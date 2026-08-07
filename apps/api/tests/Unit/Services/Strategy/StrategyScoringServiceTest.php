@@ -9,7 +9,7 @@ class StrategyScoringServiceTest extends TestCase
 {
     public function test_broker_accumulation_returns_zero_when_no_windows(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->brokerAccumulation([]);
 
         $this->assertSame(0.0, $result['score']);
@@ -18,7 +18,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_broker_accumulation_score_within_bounds(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->brokerAccumulation([
             ['window_days' => 3, 'avg_net_norm' => 0.05, 'top3_net_norm' => 0.04, 'accdist_score' => 1],
             ['window_days' => 5, 'avg_net_norm' => 0.03, 'top3_net_norm' => 0.02, 'accdist_score' => 1],
@@ -33,7 +33,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_broker_accumulation_negative_flow_scores_below_neutral(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->brokerAccumulation([
             ['window_days' => 5, 'avg_net_norm' => -0.05, 'top3_net_norm' => -0.04, 'accdist_score' => -1],
         ]);
@@ -43,7 +43,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_breakout_confirmation_full_score_on_strong_signals(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->breakoutConfirmation([
             'breakout20' => true,
             'close_pos' => 0.9,
@@ -56,7 +56,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_breakout_confirmation_partial_credit_for_above_average_volume(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->breakoutConfirmation([
             'breakout20' => false,
             'close_pos' => 0.5,
@@ -69,7 +69,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_breakout_confirmation_zero_when_no_signals(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->breakoutConfirmation([
             'breakout20' => false,
             'close_pos' => 0.4,
@@ -81,7 +81,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_liquidity_filter_passes_above_thresholds(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->liquidityFilter(
             turnoverValue: 10_000_000_000,
             activeBrokerCount: 12,
@@ -95,7 +95,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_liquidity_filter_fails_low_turnover(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->liquidityFilter(
             turnoverValue: 1_000_000_000,
             activeBrokerCount: 20,
@@ -108,7 +108,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_liquidity_filter_fails_few_brokers(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->liquidityFilter(
             turnoverValue: 10_000_000_000,
             activeBrokerCount: 2,
@@ -122,7 +122,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_risk_reward_filter(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
 
         $this->assertTrue($service->riskRewardFilter(2.5)['pass']);
         $this->assertFalse($service->riskRewardFilter(1.5)['pass']);
@@ -132,7 +132,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_total_combines_subscores_with_documented_weights(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->total(80.0, 60.0, true, true);
 
         // 0.45*80 + 0.35*60 + 0.20*100 = 36 + 21 + 20 = 77
@@ -144,7 +144,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_total_caps_at_100(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $result = $service->total(100.0, 100.0, true, true);
 
         // 0.45*100 + 0.35*100 + 0.20*100 = 100
@@ -153,7 +153,7 @@ class StrategyScoringServiceTest extends TestCase
 
     public function test_filter_failures_drop_total_score(): void
     {
-        $service = new StrategyScoringService();
+        $service = new StrategyScoringService;
         $passed = $service->total(80.0, 60.0, true, true)['score_total'];
         $failed = $service->total(80.0, 60.0, false, false)['score_total'];
 

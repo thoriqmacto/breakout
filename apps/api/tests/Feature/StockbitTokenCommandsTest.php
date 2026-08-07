@@ -32,7 +32,7 @@ class StockbitTokenCommandsTest extends TestCase
 
         $output = Artisan::output();
         $this->assertStringContainsString('Stockbit token saved.', $output);
-        $this->assertStringContainsString('****' . substr($token, -4), $output);
+        $this->assertStringContainsString('****'.substr($token, -4), $output);
         $this->assertStringNotContainsString($token, $output);
     }
 
@@ -76,8 +76,8 @@ class StockbitTokenCommandsTest extends TestCase
         $this->assertSame(0, $exit);
         $output = Artisan::output();
         $this->assertStringContainsString('Stockbit token is configured.', $output);
-        $this->assertStringContainsString('source:      ' . StockbitTokenResolver::SOURCE_STORE, $output);
-        $this->assertStringContainsString('****' . substr($token, -4), $output);
+        $this->assertStringContainsString('source:      '.StockbitTokenResolver::SOURCE_STORE, $output);
+        $this->assertStringContainsString('****'.substr($token, -4), $output);
         $this->assertStringNotContainsString($token, $output);
     }
 
@@ -97,6 +97,6 @@ class StockbitTokenCommandsTest extends TestCase
     {
         $payload = rtrim(strtr(base64_encode(json_encode(['exp' => $exp])), '+/', '-_'), '=');
 
-        return 'header.' . $payload . '.signature';
+        return 'header.'.$payload.'.signature';
     }
 }

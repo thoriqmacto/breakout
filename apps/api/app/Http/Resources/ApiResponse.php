@@ -81,7 +81,7 @@ class ApiResponse extends JsonResource
             $payload['errors'] = $this->resource['errors'];
         }
 
-        if (!empty($this->resource['meta'] ?? [])) {
+        if (! empty($this->resource['meta'] ?? [])) {
             $payload['meta'] = $this->resource['meta'];
         }
 

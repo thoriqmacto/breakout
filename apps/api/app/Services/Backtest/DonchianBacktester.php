@@ -8,9 +8,7 @@ use App\Services\Strategies\DonchianBreakout;
 
 class DonchianBacktester extends BaseBacktester
 {
-    public function __construct(private int $period = 3)
-    {
-    }
+    public function __construct(private int $period = 3) {}
 
     protected function createStrategy(AssetMetrics $metrics): BaseStrategy
     {

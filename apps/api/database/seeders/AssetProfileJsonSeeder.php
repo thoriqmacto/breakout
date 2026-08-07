@@ -46,18 +46,20 @@ class AssetProfileJsonSeeder extends Seeder
 
     public function run(): void
     {
-        if (!is_dir($this->profileDir)) {
-            $this->command?->warn('Profile JSON dir not found: ' . $this->profileDir);
+        if (! is_dir($this->profileDir)) {
+            $this->command?->warn('Profile JSON dir not found: '.$this->profileDir);
+
             return;
         }
 
         $files = collect(File::files($this->profileDir))
-            ->filter(fn($file) => Str::lower($file->getExtension()) === 'json')
-            ->sortBy(fn($file) => $file->getFilename())
+            ->filter(fn ($file) => Str::lower($file->getExtension()) === 'json')
+            ->sortBy(fn ($file) => $file->getFilename())
             ->values();
 
         if ($files->isEmpty()) {
-            $this->command?->warn('No profile JSON files found in ' . $this->profileDir);
+            $this->command?->warn('No profile JSON files found in '.$this->profileDir);
+
             return;
         }
 
@@ -70,7 +72,8 @@ class AssetProfileJsonSeeder extends Seeder
     {
         $payload = $this->readJson($path);
         if ($payload === null) {
-            $this->command?->warn('Profile JSON is empty or invalid: ' . $path);
+            $this->command?->warn('Profile JSON is empty or invalid: '.$path);
+
             return;
         }
         $symbol = $this->resolveSymbolFromPayload($payload, $path);
@@ -82,11 +85,11 @@ class AssetProfileJsonSeeder extends Seeder
 
         $updates = $this->normalizePayload($payload);
 
-        if (!isset($updates['name']) && empty($asset->name)) {
+        if (! isset($updates['name']) && empty($asset->name)) {
             $updates['name'] = $symbol;
         }
 
-        if (!isset($updates['profile_synced_at'])) {
+        if (! isset($updates['profile_synced_at'])) {
             $updates['profile_synced_at'] = Carbon::now();
         }
 
@@ -96,17 +99,17 @@ class AssetProfileJsonSeeder extends Seeder
             $asset = $asset->fresh();
         }
 
-        if (!empty($updates)) {
+        if (! empty($updates)) {
             $asset->fill($updates);
             $asset->save();
         }
 
-        $this->command?->info('Seeded profile for ' . $symbol);
+        $this->command?->info('Seeded profile for '.$symbol);
     }
 
     private function resolveSymbolFromPayload(array $payload, string $path): string
     {
-        if (!empty($payload['symbol'])) {
+        if (! empty($payload['symbol'])) {
             return Str::upper(trim((string) $payload['symbol']));
         }
 
@@ -133,6 +136,7 @@ class AssetProfileJsonSeeder extends Seeder
 
             if (in_array($key, $this->jsonColumns, true)) {
                 $updates[$key] = $value;
+
                 continue;
             }
 
@@ -140,12 +144,14 @@ class AssetProfileJsonSeeder extends Seeder
                 if (is_numeric($value)) {
                     $updates[$key] = (int) $value;
                 }
+
                 continue;
             }
 
             if (in_array($key, ['tick_size', 'float', 'ipo_price', 'marketcap'], true)) {
                 if (is_numeric($value)) {
                     $updates[$key] = (float) $value;
+
                     continue;
                 }
 
@@ -162,6 +168,7 @@ class AssetProfileJsonSeeder extends Seeder
                 if (is_numeric($normalized)) {
                     $updates[$key] = (float) $normalized;
                 }
+
                 continue;
             }
 
@@ -170,6 +177,7 @@ class AssetProfileJsonSeeder extends Seeder
                 if ($parsed) {
                     $updates[$key] = $parsed;
                 }
+
                 continue;
             }
 
@@ -181,7 +189,7 @@ class AssetProfileJsonSeeder extends Seeder
 
     private function readJson(string $path): ?array
     {
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return null;
         }
 
@@ -195,4 +203,3 @@ class AssetProfileJsonSeeder extends Seeder
         return is_array($decoded) ? $decoded : null;
     }
 }
-

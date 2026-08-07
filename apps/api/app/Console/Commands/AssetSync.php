@@ -2,21 +2,21 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Console\Commands\Concerns\MirrorsSeedCsvs;
 use App\Models\Asset;
-use App\Services\CsvBars;
-use App\Services\SymbolDate;
-use App\Services\DbBars;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
-use App\Services\PythonRunner;
-use App\Services\BrokerSummaryImporter;
-use App\Services\Stockbit\StockbitTokenResolver;
-use App\Support\StockbitTokenStore;
-use App\Support\AssetList;
 use App\Models\TradingCalendarDay;
 use App\Models\TradingDay;
+use App\Services\BrokerSummaryImporter;
+use App\Services\CsvBars;
+use App\Services\DbBars;
+use App\Services\PythonRunner;
+use App\Services\Stockbit\StockbitTokenResolver;
+use App\Services\SymbolDate;
+use App\Support\AssetList;
+use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class AssetSync extends Command
@@ -113,10 +113,10 @@ class AssetSync extends Command
             $this->input->setOption('continue', true);
             $this->input->setOption('chk-date', $eodTradingDate);
             $this->input->setOption('broker-summary', true);
-            if (!$this->option('broker-summary-from')) {
+            if (! $this->option('broker-summary-from')) {
                 $this->input->setOption('broker-summary-from', $eodTradingDate);
             }
-            if (!$this->option('broker-summary-to')) {
+            if (! $this->option('broker-summary-to')) {
                 $this->input->setOption('broker-summary-to', $eodTradingDate);
             }
         }
@@ -134,7 +134,7 @@ class AssetSync extends Command
 
         $shouldSyncProfile = static function (string $symbol) use ($assetSettings): bool {
             $asset = $assetSettings->get(strtoupper($symbol));
-            if (!$asset) {
+            if (! $asset) {
                 return true;
             }
 
@@ -164,39 +164,39 @@ class AssetSync extends Command
         }
 
         // Collect CSV files available in seed directory
-        $seedFiles = glob($seedDir . '/*.csv') ?: [];
-        $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
+        $seedFiles = glob($seedDir.'/*.csv') ?: [];
+        $csvSymbols = array_map(fn ($f) => strtoupper(basename($f, '.csv')), $seedFiles);
 
         // Compare config symbols with available CSV files
         $missing = array_diff($indexSymbols, $csvSymbols);
-        if (!empty($missing) && !$this->option('broker-summary')) {
-            $this->warn('CSV seed files missing for: ' . implode(', ', $missing));
+        if (! empty($missing) && ! $this->option('broker-summary')) {
+            $this->warn('CSV seed files missing for: '.implode(', ', $missing));
 
             $this->info('Attempting to backfill missing CSV from Stockbit first ...');
             $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
             $to = Carbon::now()->toDateString();
             foreach ($missing as $sym) {
-                if ($this->fetchWithStockbit($sym, $from, $to, !$shouldSyncProfile($sym))) {
+                if ($this->fetchWithStockbit($sym, $from, $to, ! $shouldSyncProfile($sym))) {
                     $this->info("Stockbit CSV backfill complete for {$sym}.");
                 }
             }
 
             // Refresh missing after Stockbit attempt
-            $seedFiles = glob($seedDir . '/*.csv') ?: [];
-            $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
+            $seedFiles = glob($seedDir.'/*.csv') ?: [];
+            $csvSymbols = array_map(fn ($f) => strtoupper(basename($f, '.csv')), $seedFiles);
             $missing = array_diff($indexSymbols, $csvSymbols);
 
-            if (!empty($missing)) {
+            if (! empty($missing)) {
                 // Offer to check python csv directory for missing files
                 $checkPython = $this->option('check-python') ??
                                $this->confirm('Check python csv folder for these assets?', false);
                 if ($checkPython) {
                     $pyDir = resource_path('python/csv');
 
-                    $found     = [];
+                    $found = [];
                     $missingPy = [];
                     foreach ($missing as $sym) {
-                        $pyFile = $pyDir . '/' . $sym . '_PY.csv';
+                        $pyFile = $pyDir.'/'.$sym.'_PY.csv';
                         if (is_file($pyFile)) {
                             $found[$sym] = $pyFile;
                         } else {
@@ -205,14 +205,14 @@ class AssetSync extends Command
                         }
                     }
 
-                    if (!empty($missingPy)) {
+                    if (! empty($missingPy)) {
                         $tickFile = resource_path('python/tickers.txt');
 
                         // Reset tickers file so it only contains the newly missing symbols
-                        $tickers = array_map(fn($sym) => $sym . '.JK', $missingPy);
-                        file_put_contents($tickFile, implode(PHP_EOL, $tickers) . PHP_EOL);
+                        $tickers = array_map(fn ($sym) => $sym.'.JK', $missingPy);
+                        file_put_contents($tickFile, implode(PHP_EOL, $tickers).PHP_EOL);
 
-                        $this->info('Missing tickers written to tickers.txt: ' . implode(', ', $tickers));
+                        $this->info('Missing tickers written to tickers.txt: '.implode(', ', $tickers));
 
                         $runPython = $this->option('run-python') ??
                                      $this->confirm('Run python get_stocks.py now?', false);
@@ -238,10 +238,10 @@ class AssetSync extends Command
                         }
                     }
 
-                    if (!empty($found)) {
+                    if (! empty($found)) {
                         $this->info('Found python csv files:');
                         foreach ($found as $sym => $file) {
-                            $this->line('- ' . $sym . ': ' . basename($file));
+                            $this->line('- '.$sym.': '.basename($file));
                         }
 
                         $importCsv = $this->option('import-csv') ??
@@ -250,19 +250,19 @@ class AssetSync extends Command
                             foreach ($found as $sym => $pyFile) {
                                 $rows = CsvBars::read($pyFile);
                                 if ($rows !== []) {
-                                    $dest = $seedDir . '/' . $sym . '.csv';
+                                    $dest = $seedDir.'/'.$sym.'.csv';
                                     $existing = CsvBars::read($dest);
                                     $merged = CsvBars::merge($existing, $rows);
                                     CsvBars::write($dest, $merged);
-                                    $this->info('Seed file written: ' . basename($dest));
+                                    $this->info('Seed file written: '.basename($dest));
                                 } else {
                                     $this->warn("No data in python csv for {$sym}");
                                 }
                             }
 
                             // Re-scan seed directory after attempting to import
-                            $seedFiles = glob($seedDir . '/*.csv') ?: [];
-                            $csvSymbols = array_map(fn($f) => strtoupper(basename($f, '.csv')), $seedFiles);
+                            $seedFiles = glob($seedDir.'/*.csv') ?: [];
+                            $csvSymbols = array_map(fn ($f) => strtoupper(basename($f, '.csv')), $seedFiles);
                             $missing = array_diff($indexSymbols, $csvSymbols);
                         }
                     }
@@ -272,8 +272,8 @@ class AssetSync extends Command
             }
         }
 
-        if (!$this->option('continue') &&
-            !$this->confirm('Continue checking latest data anyway?', false)
+        if (! $this->option('continue') &&
+            ! $this->confirm('Continue checking latest data anyway?', false)
         ) {
             return Command::FAILURE;
         }
@@ -283,18 +283,19 @@ class AssetSync extends Command
         $dbBars = new DbBars($chunk, false);
 
         foreach ($indexSymbols as $symbol) {
-            $csvPath = $seedDir . '/' . $symbol . '.csv';
-            if (!is_file($csvPath)) {
+            $csvPath = $seedDir.'/'.$symbol.'.csv';
+            if (! is_file($csvPath)) {
                 $this->info("Attempting to backfill missing CSV for {$symbol} from Stockbit…");
                 $from = Carbon::now()->subDays($stockbitBackfillDays)->toDateString();
                 $to = Carbon::now()->toDateString();
 
-                if (!$this->fetchWithStockbit($symbol, $from, $to, !$shouldSyncProfile($symbol))) {
+                if (! $this->fetchWithStockbit($symbol, $from, $to, ! $shouldSyncProfile($symbol))) {
                     $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt. Python fallback will be used if available.");
                 }
 
-                if (!is_file($csvPath)) {
+                if (! is_file($csvPath)) {
                     $this->warn("Skipping {$symbol}; CSV still missing after Stockbit attempt.");
+
                     continue;
                 }
             }
@@ -320,32 +321,32 @@ class AssetSync extends Command
                 }
 
                 $dbBars->add([
-                    'asset_id'   => $asset->id,
-                    'date'       => $ymd,
-                    'open'       => $row['open'],
-                    'high'       => $row['high'],
-                    'low'        => $row['low'],
-                    'close'      => $row['close'],
-                    'volume'     => $row['volume'],
+                    'asset_id' => $asset->id,
+                    'date' => $ymd,
+                    'open' => $row['open'],
+                    'high' => $row['high'],
+                    'low' => $row['low'],
+                    'close' => $row['close'],
+                    'volume' => $row['volume'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
             }
         }
 
-        if ($dbBars->inserted()>0) {
-            $this->info('Upserted ' . $dbBars->inserted() . ' rows into DB.');
+        if ($dbBars->inserted() > 0) {
+            $this->info('Upserted '.$dbBars->inserted().' rows into DB.');
         }
 
         $dbBars->flush();
 
-        $shouldCheckLatest = !$this->option('continue') || $this->option('eod') || !$this->option('broker-summary');
+        $shouldCheckLatest = ! $this->option('continue') || $this->option('eod') || ! $this->option('broker-summary');
 
         if ($shouldCheckLatest) {
             // Ask user for a custom date to check against latest data
             $chkLatest = $this->option('chk-date');
             $showIsLatest = (bool) $chkLatest;
-            if (!$chkLatest) {
+            if (! $chkLatest) {
                 $autoChkLatest = $this->resolveLatestTradingDay(Carbon::now()->toDateString());
                 if ($autoChkLatest) {
                     $chkLatest = $autoChkLatest;
@@ -354,8 +355,8 @@ class AssetSync extends Command
             }
 
             if (
-                !$chkLatest &&
-                !$this->option('continue') &&
+                ! $chkLatest &&
+                ! $this->option('continue') &&
                 $this->confirm('Do you have your own chk-date to compare with latest-date data?', false)
             ) {
                 $chkLatest = $this->ask('Enter chk-date (YYYY-MM-DD)');
@@ -374,16 +375,16 @@ class AssetSync extends Command
             $rows = [];
             $i = 1;
             foreach ($indexSymbols as $symbol) {
-                $csvPath = $seedDir . '/' . $symbol . '.csv';
+                $csvPath = $seedDir.'/'.$symbol.'.csv';
                 $csvRows = CsvBars::read($csvPath);
-                $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                $dates = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
                 if ($chkLatest && Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
-                    $start  = Carbon::parse($dates['latest'])->addDay()->toDateString();
-                    $end    = $chkLatest ?: now()->toDateString();
-                    $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, !$shouldSyncProfile($symbol));
+                    $start = Carbon::parse($dates['latest'])->addDay()->toDateString();
+                    $end = $chkLatest ?: now()->toDateString();
+                    $stockbitFetched = $this->fetchWithStockbit($symbol, $start, $end, ! $shouldSyncProfile($symbol));
                     $csvRows = CsvBars::read($csvPath);
-                    $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                    $dates = SymbolDate::latest($symbol, $csvRows, $chkLatest);
 
                     if (Carbon::parse($dates['latest'])->lt(Carbon::parse($chkLatest))) {
                         if ($this->option('eod')) {
@@ -396,26 +397,27 @@ class AssetSync extends Command
                             if ($yfinanceReady === false) {
                                 $message = "Skipping download for {$symbol} because latest IDX data is not yet available.";
                                 if ($yfinanceLatestDate) {
-                                    $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                                    $message .= ' Last available date: '.$yfinanceLatestDate.'.';
                                 }
                                 $this->warn($message);
+
                                 continue;
                             }
                         }
 
-                        $ticker = $symbol . '.JK';
+                        $ticker = $symbol.'.JK';
 
                         $this->call('python:run', [
                             'script' => 'get_stocks.py',
-                            '--arg'  => ["--start={$start}", "--end={$end}", $ticker],
+                            '--arg' => ["--start={$start}", "--end={$end}", $ticker],
                         ]);
 
-                        $pyFile = resource_path('python/csv/' . $symbol . '_PY.csv');
+                        $pyFile = resource_path('python/csv/'.$symbol.'_PY.csv');
                         if (is_file($pyFile)) {
                             $newRows = CsvBars::read($pyFile);
                             if ($newRows !== []) {
                                 $existing = CsvBars::read($csvPath);
-                                $merged   = CsvBars::merge($existing, $newRows);
+                                $merged = CsvBars::merge($existing, $newRows);
                                 CsvBars::write($csvPath, $merged);
 
                                 $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
@@ -432,13 +434,13 @@ class AssetSync extends Command
                                     }
 
                                     $updBars->add([
-                                        'asset_id'   => $asset->id,
-                                        'date'       => $ymd,
-                                        'open'       => $row['open'],
-                                        'high'       => $row['high'],
-                                        'low'        => $row['low'],
-                                        'close'      => $row['close'],
-                                        'volume'     => $row['volume'],
+                                        'asset_id' => $asset->id,
+                                        'date' => $ymd,
+                                        'open' => $row['open'],
+                                        'high' => $row['high'],
+                                        'low' => $row['low'],
+                                        'close' => $row['close'],
+                                        'volume' => $row['volume'],
                                         'created_at' => now(),
                                         'updated_at' => now(),
                                     ]);
@@ -446,7 +448,7 @@ class AssetSync extends Command
                                 $updBars->flush();
 
                                 $csvRows = $merged;
-                                $dates   = SymbolDate::latest($symbol, $csvRows, $chkLatest);
+                                $dates = SymbolDate::latest($symbol, $csvRows, $chkLatest);
                             }
                         }
                     }
@@ -469,7 +471,7 @@ class AssetSync extends Command
                 $i++;
             }
 
-            $headers = ['No','Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
+            $headers = ['No', 'Symbol', 'CSV Latest', 'DB Latest', 'Total Bars'];
             if ($showIsLatest) {
                 $headers[] = 'Is Latest?';
             }
@@ -489,14 +491,14 @@ class AssetSync extends Command
                 $rowCount = $summary['row_count'] ?? 0;
                 $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
             } catch (\Throwable $exception) {
-                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+                $this->warn('Failed to import broker summaries: '.$exception->getMessage());
             }
 
             return Command::SUCCESS;
         }
 
         if ($brokerSummaryRequested) {
-            if (!$brokerSummaryImportOnly) {
+            if (! $brokerSummaryImportOnly) {
                 $brokerSummarySymbols = $this->resolveBrokerSummarySymbols(
                     $this->option('broker-summary-tickers') ?? [],
                     $indexSymbols,
@@ -531,11 +533,11 @@ class AssetSync extends Command
                 $rowCount = $summary['row_count'] ?? 0;
                 $this->line("Imported broker summaries: {$rowCount} rows from {$fileCount} files.");
             } catch (\Throwable $exception) {
-                $this->warn('Failed to import broker summaries: ' . $exception->getMessage());
+                $this->warn('Failed to import broker summaries: '.$exception->getMessage());
             }
         }
 
-        if (!$this->option('eod') && $this->option('broker-summary')){
+        if (! $this->option('eod') && $this->option('broker-summary')) {
             return Command::FAILURE;
         }
 
@@ -544,7 +546,7 @@ class AssetSync extends Command
 
     private function fetchWithStockbit(string $symbol, string $from, string $to, bool $isNotProfile): bool
     {
-        if (!$this->stockbitTokenAvailable()) {
+        if (! $this->stockbitTokenAvailable()) {
             $this->warn("Skipping Stockbit fetch for {$symbol}; bearer token not configured.");
 
             return false;
@@ -574,7 +576,7 @@ class AssetSync extends Command
     }
 
     /**
-     * @param array<int, string> $symbols
+     * @param  array<int, string>  $symbols
      */
     private function syncHistoricalDateForAllAssets(
         array $symbols,
@@ -588,7 +590,7 @@ class AssetSync extends Command
             return Command::SUCCESS;
         }
 
-        $this->info("Refreshing historical data on {$historicalDate} for " . count($symbols) . ' assets.');
+        $this->info("Refreshing historical data on {$historicalDate} for ".count($symbols).' assets.');
 
         $chunk = (int) config('csv.chunk_size', 200);
         $dbBars = new DbBars($chunk, false);
@@ -596,14 +598,15 @@ class AssetSync extends Command
         $missing = [];
 
         foreach ($symbols as $symbol) {
-            $this->fetchWithStockbit($symbol, $historicalDate, $historicalDate, !$shouldSyncProfile($symbol));
+            $this->fetchWithStockbit($symbol, $historicalDate, $historicalDate, ! $shouldSyncProfile($symbol));
 
-            $csvPath = $seedDir . '/' . $symbol . '.csv';
+            $csvPath = $seedDir.'/'.$symbol.'.csv';
             $rows = CsvBars::read($csvPath);
             $row = $rows[$historicalDate] ?? null;
 
             if ($row === null) {
                 $missing[] = $symbol;
+
                 continue;
             }
 
@@ -631,7 +634,7 @@ class AssetSync extends Command
         $this->info("Re-upserted {$synced} asset bars for {$historicalDate}.");
 
         if ($missing !== []) {
-            $this->warn('No historical row found for: ' . implode(', ', $missing));
+            $this->warn('No historical row found for: '.implode(', ', $missing));
         }
 
         return Command::SUCCESS;
@@ -639,7 +642,7 @@ class AssetSync extends Command
 
     private function normalizeHistoricalDate(?string $date): ?string
     {
-        if (!is_string($date) || trim($date) === '') {
+        if (! is_string($date) || trim($date) === '') {
             return null;
         }
 
@@ -651,9 +654,9 @@ class AssetSync extends Command
     }
 
     /**
-     * @param array<int, string> $requested
-     * @param array<int, string> $defaults
-     * @param \Illuminate\Support\Collection $assetSettings
+     * @param  array<int, string>  $requested
+     * @param  array<int, string>  $defaults
+     * @param  Collection  $assetSettings
      * @return array<int, string>
      */
     private function resolveBrokerSummarySymbols(array $requested, array $defaults, $assetSettings): array
@@ -665,8 +668,9 @@ class AssetSync extends Command
 
         foreach ($symbols as $symbol) {
             $asset = $assetSettings->get($symbol);
-            if ($asset && !$asset->sync_broker_summary) {
+            if ($asset && ! $asset->sync_broker_summary) {
                 $this->line("Skipping broker summary for {$symbol}; sync disabled.");
+
                 continue;
             }
 
@@ -753,12 +757,13 @@ class AssetSync extends Command
     }
 
     /**
-     * @param array<int, string> $symbols
+     * @param  array<int, string>  $symbols
      */
     private function fetchBrokerSummaries(array $symbols, string $from, string $to): void
     {
-        if (!$this->stockbitTokenAvailable()) {
+        if (! $this->stockbitTokenAvailable()) {
             $this->warn('Skipping broker summary fetch; bearer token not configured.');
+
             return;
         }
 
@@ -827,7 +832,7 @@ class AssetSync extends Command
                 } else {
                     $message = 'Latest IDX data on yfinance is not available yet.';
                     if ($yfinanceLatestDate) {
-                        $message .= ' Last available date: ' . $yfinanceLatestDate . '.';
+                        $message .= ' Last available date: '.$yfinanceLatestDate.'.';
                     }
                     $this->warn($message);
                 }
@@ -837,7 +842,7 @@ class AssetSync extends Command
             }
         } catch (\Throwable $e) {
             $yfinanceReady = null;
-            $this->warn('Failed to check yfinance latest data: ' . $e->getMessage());
+            $this->warn('Failed to check yfinance latest data: '.$e->getMessage());
         }
     }
 }

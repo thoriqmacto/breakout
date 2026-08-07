@@ -262,4 +262,3 @@ class AssetBacktestCommandTest extends TestCase
         $this->assertStringContainsString('The --trades option cannot be combined with --compare.', $output);
     }
 }
-
