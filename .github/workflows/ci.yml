@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch makes the in-flight run irrelevant.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API — Laravel tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 8.2 is the floor declared in composer.json. Testing the floor rather
+      # than the newest runtime is what makes that declaration meaningful.
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: apps/api/vendor
+          key: composer-${{ runner.os }}-php8.2-${{ hashFiles('apps/api/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-php8.2-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      # No .env is written on purpose. phpunit.xml already pins the test
+      # environment (sqlite in-memory, array cache/session), and APP_KEY is the
+      # only thing missing from it. Supplying it as a throwaway env var keeps a
+      # key out of the repository and avoids `artisan key:generate`, which
+      # cannot run on a fresh checkout: AppServiceProvider::boot() resolves
+      # JwtService, and that throws while APP_KEY and JWT_SECRET are both empty.
+      - name: Run tests
+        run: |
+          export APP_KEY="base64:$(head -c 32 /dev/urandom | base64)"
+          php artisan test
+
+  web:
+    name: Web — types, build, lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Matches the Node major Vercel builds with, so a green CI run means the
+      # deploy will compile too.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # next build type-checks too, but running tsc first gives the whole list
+      # of type errors instead of only the one the build dies on.
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Fails only on a new critical advisory. The repository currently carries
+      # 3 high advisories that cannot clear without the semver-major next@16
+      # upgrade, so gating on "high" here would be permanently red and would
+      # teach everyone to ignore this job.
+      - name: Audit dependencies
+        run: npm audit --audit-level=critical
+
+  style:
+    name: API — Pint (informational)
+    runs-on: ubuntu-latest
+    # Not blocking yet: main carries ~118 pre-existing style issues across 215
+    # files, so enforcing this today would fail every pull request regardless of
+    # its contents. Clear the backlog in a dedicated formatting-only commit,
+    # then delete this line to make the job gate merges.
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: apps/api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: apps/api/vendor
+          key: composer-${{ runner.os }}-php8.2-${{ hashFiles('apps/api/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-php8.2-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check formatting
+        run: ./vendor/bin/pint --test
