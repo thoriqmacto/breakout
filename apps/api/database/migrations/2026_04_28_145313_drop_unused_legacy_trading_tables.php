@@ -46,7 +46,7 @@ return new class extends Migration
 
             $rowCount = DB::table($table)->count();
             if ($rowCount > 0) {
-                throw new \RuntimeException(sprintf(
+                throw new RuntimeException(sprintf(
                     'Refusing to drop legacy table "%s": it still contains %d row(s). Migrate or archive the data first, then re-run.',
                     $table,
                     $rowCount

@@ -56,7 +56,7 @@ class Asset extends Model
      * This leverages the relationship with the Price model to obtain
      * the most recent OHLCV values and their corresponding date.
      *
-     * @return \App\Models\Price|null
+     * @return Price|null
      */
     public function latestPrice()
     {

@@ -15,6 +15,7 @@ use App\Services\SymbolDate;
 use App\Support\AssetList;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -655,7 +656,7 @@ class AssetSync extends Command
     /**
      * @param  array<int, string>  $requested
      * @param  array<int, string>  $defaults
-     * @param  \Illuminate\Support\Collection  $assetSettings
+     * @param  Collection  $assetSettings
      * @return array<int, string>
      */
     private function resolveBrokerSummarySymbols(array $requested, array $defaults, $assetSettings): array

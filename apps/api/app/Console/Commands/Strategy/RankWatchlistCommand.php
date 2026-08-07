@@ -5,6 +5,7 @@ namespace App\Console\Commands\Strategy;
 use App\Services\Strategy\WatchlistRanker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RankWatchlistCommand extends Command
 {
@@ -89,7 +90,7 @@ class RankWatchlistCommand extends Command
             }
         }
 
-        $latest = \Illuminate\Support\Facades\DB::table('features_daily')->max('date');
+        $latest = DB::table('features_daily')->max('date');
         if (! $latest) {
             $this->warn('No rows found in features_daily. Run php artisan features:extract first.');
 

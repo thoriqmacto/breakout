@@ -10,6 +10,7 @@ use App\Models\Asset;
 use App\Models\BandarDetectorSummary;
 use App\Models\Metric;
 use App\Services\AssetMetrics;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +20,7 @@ class AssetController extends ApiController
     /**
      * Display a listing of assets.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
@@ -250,7 +251,7 @@ class AssetController extends ApiController
     /**
      * Store a newly created asset in storage.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
@@ -282,7 +283,7 @@ class AssetController extends ApiController
     /**
      * Display the specified asset.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show(Asset $asset)
     {
@@ -300,7 +301,7 @@ class AssetController extends ApiController
     /**
      * Update the specified asset in storage.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, Asset $asset)
     {
@@ -339,7 +340,7 @@ class AssetController extends ApiController
     /**
      * Remove the specified asset from storage.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(Asset $asset)
     {
@@ -351,7 +352,7 @@ class AssetController extends ApiController
     /**
      * Retrieve the latest OHLCV price for the asset.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function latestPrice(Asset $asset)
     {
@@ -367,7 +368,7 @@ class AssetController extends ApiController
     /**
      * Retrieve the latest OHLCV price for the given asset symbol.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function latestPriceBySymbol(string $symbol)
     {
@@ -401,7 +402,7 @@ class AssetController extends ApiController
     /**
      * Retrieve the latest OHLCV prices for all assets.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function latestPrices()
     {
@@ -450,7 +451,7 @@ class AssetController extends ApiController
     /**
      * Compute simple metrics for the asset.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function metrics(Asset $asset, AssetMetrics $metrics)
     {

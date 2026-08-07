@@ -4,6 +4,7 @@ namespace App\Services\Stockbit;
 
 use App\Services\StockbitExodusClient;
 use App\Support\StockbitTokenStore;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class StockbitTokenResolver
@@ -120,7 +121,7 @@ class StockbitTokenResolver
         return $this->store->isExpired($token);
     }
 
-    public function expiresAt(?string $token): ?\Illuminate\Support\Carbon
+    public function expiresAt(?string $token): ?Carbon
     {
         return $this->store->expiresAt($token);
     }

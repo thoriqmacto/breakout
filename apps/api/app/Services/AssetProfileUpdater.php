@@ -331,7 +331,7 @@ class AssetProfileUpdater
         $payload['ticker_profile_payload'] = $profile;
 
         foreach ($payload as $key => $value) {
-            if ($value instanceof \DateTimeInterface) {
+            if ($value instanceof DateTimeInterface) {
                 $payload[$key] = $value->format(DATE_ATOM);
             }
         }

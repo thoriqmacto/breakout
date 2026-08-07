@@ -140,7 +140,7 @@ class AssetMetricsTest extends TestCase
         // expected values drift).
         $bars = [];
         $weeklyLastCloses = [];
-        $start = new \DateTimeImmutable('2024-01-01'); // a Monday
+        $start = new DateTimeImmutable('2024-01-01'); // a Monday
         for ($week = 0; $week < 30; $week++) {
             $weekClose = 100 + $week * 10; // 100, 110, ..., 390
             $weeklyLastCloses[] = (float) $weekClose;

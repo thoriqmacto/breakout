@@ -5,6 +5,7 @@ namespace App\Services\Strategy;
 use App\Models\TradingDay;
 use App\Models\WatchlistScore;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -176,7 +177,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, WatchlistScore>
+     * @return Collection<int, WatchlistScore>
      */
     private function loadScores(Carbon $from, Carbon $to, string $version, ?int $limitPerDay)
     {
@@ -208,7 +209,7 @@ class WatchlistBacktester
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, WatchlistScore>  $rows
+     * @param  Collection<int, WatchlistScore>  $rows
      * @param  array<int, string>  $tradingDays
      * @param  array<string, int>  $tradingDayIndex
      * @param  array<int, int>  $horizons

@@ -54,6 +54,16 @@ jobs:
           export APP_KEY="base64:$(head -c 32 /dev/urandom | base64)"
           php artisan test
 
+      # composer.json pins config.platform.php to 8.2, so the lockfile is
+      # resolved for the declared floor rather than for whatever PHP the person
+      # running `composer update` happens to have. Without it an update on a
+      # newer machine silently pulls packages that cannot install here.
+      - name: Verify the lockfile resolves for PHP 8.2
+        run: composer check-platform-reqs
+
+      - name: Audit dependencies
+        run: composer audit
+
   web:
     name: Web — types, build, lint
     runs-on: ubuntu-latest

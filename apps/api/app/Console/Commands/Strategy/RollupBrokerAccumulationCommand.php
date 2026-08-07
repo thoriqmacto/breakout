@@ -5,6 +5,7 @@ namespace App\Console\Commands\Strategy;
 use App\Services\Strategy\BrokerAccumulationAggregator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RollupBrokerAccumulationCommand extends Command
 {
@@ -56,7 +57,7 @@ class RollupBrokerAccumulationCommand extends Command
             }
         }
 
-        $latest = \Illuminate\Support\Facades\DB::table('broker_summary_facts')->max('trade_date');
+        $latest = DB::table('broker_summary_facts')->max('trade_date');
         if (! $latest) {
             $this->warn('No rows found in broker_summary_facts. Provide --date explicitly.');
 
