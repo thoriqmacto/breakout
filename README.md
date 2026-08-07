@@ -239,6 +239,67 @@ By default a pull only fills in CSVs that are missing or older locally, so it wi
 - The Stockbit bearer token store stays on its own local disk and is deliberately **not** routed to Drive.
 - For a data pipeline, an S3-compatible store (Cloudflare R2, Backblaze B2) is technically a better fit than Drive, and `config/filesystems.php` already ships an `s3` disk. Because both go through the same Flysystem interface, switching is just `CSV_MIRROR_DISK=s3` / `SB_SAVE_DISK=s3`.
 
+## CI / CD
+
+Two workflows in `.github/workflows/`.
+
+### `ci.yml` — runs on every pull request and push to `main`
+
+| Job | Checks |
+| --- | --- |
+| **API — Laravel tests** | `php artisan test` on PHP 8.2, `composer check-platform-reqs`, `composer audit` |
+| **Web — types, build, lint** | `tsc --noEmit`, `eslint`, `next build`, `npm audit --audit-level=critical` |
+| **API — Pint** | `pint --test` |
+
+All three block merges. The whole suite finishes in under a minute.
+
+Two details worth knowing if you edit it:
+
+- **PHP 8.2 is deliberate** — it is the floor `apps/api/composer.json` declares, and `config.platform.php` pins the resolver to it. Without that pin, running `composer update` on a newer machine silently produces a lockfile that cannot install on 8.2. `composer check-platform-reqs` in CI catches that drift.
+- **No `.env` is written.** `phpunit.xml` already pins the test environment; only `APP_KEY` is missing and it is exported as a throwaway. `php artisan key:generate` cannot be used here — it boots `AppServiceProvider`, which resolves `JwtService`, which throws while `APP_KEY` and `JWT_SECRET` are both empty.
+
+### `backend-deploy.yml` — deploys `apps/api` to the VPS
+
+Triggered by `ci.yml` completing successfully on `main`, so a deploy can never ship a commit the tests rejected. It deploys the exact commit CI validated, not whatever `main` has become since. `workflow_dispatch` allows a manual re-deploy.
+
+The web app is **not** covered here: Vercel builds and deploys `apps/web` from `main` on its own.
+
+**The workflow is inert until you switch it on.** It is gated on a repository variable, so merging it changes nothing:
+
+```
+Settings → Secrets and variables → Actions → Variables
+  DEPLOY_ENABLED = true
+```
+
+Required secrets, on a `production` GitHub Environment (`Settings → Environments → production`), which also lets you add required reviewers or a wait timer:
+
+| Secret | Purpose |
+| --- | --- |
+| `DEPLOY_HOST` | VPS hostname or IP |
+| `DEPLOY_USER` | SSH user owning the deploy directory |
+| `DEPLOY_SSH_KEY` | Private key, full PEM contents. Use a dedicated deploy key, not a personal one |
+| `DEPLOY_PATH` | Absolute path to the **repository root** on the server (the workflow `cd`s into `apps/api` itself) |
+| `DEPLOY_PORT` | Optional, defaults to `22` |
+| `DEPLOY_KNOWN_HOSTS` | Strongly recommended. Output of `ssh-keyscan -H <host>`. Without it the workflow falls back to trusting the host on first contact, which leaves the deploy key exposed to a man-in-the-middle |
+
+What it runs on the server:
+
+```bash
+git fetch --prune origin && git reset --hard <the SHA CI validated>
+php artisan down --retry=15
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan queue:restart
+php artisan up          # via a trap, so it runs even if a step above fails
+```
+
+Server-side prerequisites, one time: the repo cloned at `DEPLOY_PATH`, a complete `.env` in `apps/api` (`config:cache` bakes it in, so it must be correct before the first deploy), PHP and Composer on `PATH` for the deploy user, and write access to `storage/` and `bootstrap/cache/`.
+
+Note `git reset --hard` discards anything uncommitted on the server — deliberate, so the deployed tree always matches the commit, but do not hand-edit files there.
+
+**Do the first run manually** via *Actions → Deploy API → Run workflow*, and watch it. Deployment is the one part of this that cannot be rehearsed in CI.
+
 ## Repository Layout
 ```
 .
