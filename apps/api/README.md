@@ -117,3 +117,43 @@ php artisan test --testsuite=Feature --filter=AuthenticationTest
 ```
 
 Feature coverage includes registration, login, token refresh, logout, and guarded route access via both Sanctum and JWT.
+
+## Troubleshooting
+
+### `The GET method is not supported for route api/auth/login. Supported methods: POST.`
+
+This is raised when a **GET** reaches the front controller, so the request that
+arrived at PHP was not the POST that was sent. `/api/auth/login` is registered
+POST-only and nothing in the app rewrites the verb — confirm with:
+
+```bash
+php artisan route:list --path=auth
+```
+
+The verb is almost always lost to a **301/302 redirect in front of PHP**. Both
+status codes permit a client to re-issue the request as GET without the body,
+and every browser, curl `-L`, and Postman's "follow redirects" does exactly
+that. The redirect is invisible in the error page because the client already
+followed it.
+
+Find it by sending the request **without** following redirects:
+
+```bash
+curl -i -X POST https://api.example.com/api/auth/login \
+  -H 'Accept: application/json' \
+  -d 'email=api@example.com' -d 'password=secret'
+```
+
+A `3xx` with a `Location:` header means the redirect is the cause. Common sources:
+
+| `Location` differs by | Cause | Fix |
+| --- | --- | --- |
+| Scheme (`http:` → `https:`) | Vhost or Cloudflare "Always Use HTTPS" | Point the client at the `https://` URL directly, so no redirect is needed |
+| Trailing slash | The canonicalization rule in `public/.htaccess` | Already emits `308`, which preserves the method — check for a duplicate `301` rule in the vhost |
+| Host (`www.` ↔ apex) | Vhost or DNS-level canonical host redirect | Point the client at the canonical host |
+
+Whatever the source, the durable fix is to have clients call the final URL, not
+a URL that redirects — a redirected POST costs an extra round trip even when the
+status code preserves the method. For the web app that means setting
+`NEXT_PUBLIC_API_URL` to the canonical scheme, host, and path, with no trailing
+slash.

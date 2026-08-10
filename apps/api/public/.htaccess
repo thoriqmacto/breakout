@@ -14,9 +14,13 @@
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
     # Redirect Trailing Slashes If Not A Folder...
+    # 308 rather than Laravel's stock 301: a 301 lets the client re-issue the
+    # request as GET and drop the body, so POST /api/auth/login/ arrives at the
+    # front controller as GET /api/auth/login and dies with a confusing
+    # MethodNotAllowedHttpException. 308 is the method-preserving equivalent.
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
+    RewriteRule ^ %1 [L,R=308]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
