@@ -117,3 +117,70 @@ php artisan test --testsuite=Feature --filter=AuthenticationTest
 ```
 
 Feature coverage includes registration, login, token refresh, logout, and guarded route access via both Sanctum and JWT.
+
+## Troubleshooting
+
+### `The GET method is not supported for route api/auth/login. Supported methods: POST.`
+
+This is raised when a **GET** reaches the front controller, so the request that
+arrived at PHP was not the POST that was sent. `/api/auth/login` is registered
+POST-only and nothing in the app rewrites the verb — confirm with:
+
+```bash
+php artisan route:list --path=auth
+```
+
+The verb is lost between the client and PHP. Send the request again **without
+following redirects** — that single flag separates the two causes:
+
+```bash
+curl -i -X POST https://api.example.com/api/auth/login \
+  -H 'Accept: application/json' \
+  -d 'email=api@example.com' -d 'password=secret'
+```
+
+#### A `3xx` with a `Location:` header — a redirect ate the method
+
+A 301 or 302 permits the client to re-issue the request as GET and drop the
+body, and browsers, `curl -L`, and Postman's "follow redirects" all do. The
+redirect is invisible in the error page because the client already followed it.
+
+| `Location` differs by | Cause | Fix |
+| --- | --- | --- |
+| Scheme (`http:` → `https:`) | The `:80` server block, or Cloudflare "Always Use HTTPS" | `return 308` instead of `301`, and point clients at `https://` directly |
+| Host (`www.` ↔ apex) | Canonical-host redirect in the vhost or DNS | Point clients at the canonical host |
+| Trailing slash | `try_files $uri $uri/ …` — the `$uri/` makes nginx 301 to append a slash | Drop `$uri/`; nothing under `public/` should be served as a directory |
+
+The durable fix is to have clients call the final URL rather than one that
+redirects — a redirected POST costs a wasted round trip even when the status
+code preserves the method. For the web app that means `NEXT_PUBLIC_API_URL` set
+to the canonical scheme, host, and path, with no trailing slash.
+
+#### A `405` straight away, no redirect — nginx never told PHP the method
+
+If the 405 comes back on the first response, nothing redirected and the client
+really did send a POST. Then the method was dropped on the way into PHP-FPM.
+`Symfony\Component\HttpFoundation\Request::getMethod()` reads
+`$_SERVER['REQUEST_METHOD']` **and defaults to `GET`** when it is absent, so a
+PHP location block missing `include fastcgi_params;` makes every request in the
+application look like a GET:
+
+```nginx
+location ~ ^/index\.php(/|$) {
+    fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    include fastcgi_params;          # <- REQUEST_METHOD rides on this
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+}
+```
+
+The tell is breadth: this breaks `register`, `refresh`, and `logout` too, and
+every other non-GET route in the API. If exactly one endpoint fails it is a
+redirect; if every POST fails it is `fastcgi_params`. Confirm from the box with
+`nginx -T | grep -A15 'index\.php'`.
+
+A known-good vhost carrying both fixes lives at
+[`deploy/nginx/breakout-api.conf`](../../deploy/nginx/breakout-api.conf).
+
+> `public/.htaccess` also emits a method-preserving `308` for its trailing-slash
+> rule, but nginx never reads `.htaccess` — that file only matters if the app is
+> ever served by Apache.

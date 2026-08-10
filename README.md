@@ -294,7 +294,9 @@ php artisan queue:restart
 php artisan up          # via a trap, so it runs even if a step above fails
 ```
 
-Server-side prerequisites, one time: the repo cloned at `DEPLOY_PATH`, a complete `.env` in `apps/api` (`config:cache` bakes it in, so it must be correct before the first deploy), PHP and Composer on `PATH` for the deploy user, and write access to `storage/` and `bootstrap/cache/`.
+Server-side prerequisites, one time: the repo cloned at `DEPLOY_PATH`, a complete `.env` in `apps/api` (`config:cache` bakes it in, so it must be correct before the first deploy), PHP and Composer on `PATH` for the deploy user, write access to `storage/` and `bootstrap/cache/`, and an nginx vhost pointing at `apps/api/public`.
+
+The vhost is **not** deployed by the workflow — it is installed once by hand — but a known-good one is committed at [`deploy/nginx/breakout-api.conf`](deploy/nginx/breakout-api.conf). Two of its settings are load-bearing and worth not rediscovering: the `:80` block returns **308** rather than 301, and the PHP location does `include fastcgi_params;`. Either one wrong and every POST to the API arrives at Laravel as a GET, failing with `MethodNotAllowedHttpException` — see [Troubleshooting](apps/api/README.md#troubleshooting) in the API README.
 
 Note `git reset --hard` discards anything uncommitted on the server — deliberate, so the deployed tree always matches the commit, but do not hand-edit files there.
 
@@ -304,6 +306,8 @@ Note `git reset --hard` discards anything uncommitted on the server — delibera
 ```
 .
 ├── README.md
+├── deploy/
+│   └── nginx/      Reference vhost for the API (installed by hand, not by CI)
 └── apps/
     ├── api/        Laravel API
     │   ├── app/            Domain code (Models, Services, Console, etc.)
