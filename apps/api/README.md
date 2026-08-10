@@ -130,13 +130,8 @@ POST-only and nothing in the app rewrites the verb — confirm with:
 php artisan route:list --path=auth
 ```
 
-The verb is almost always lost to a **301/302 redirect in front of PHP**. Both
-status codes permit a client to re-issue the request as GET without the body,
-and every browser, curl `-L`, and Postman's "follow redirects" does exactly
-that. The redirect is invisible in the error page because the client already
-followed it.
-
-Find it by sending the request **without** following redirects:
+The verb is lost between the client and PHP. Send the request again **without
+following redirects** — that single flag separates the two causes:
 
 ```bash
 curl -i -X POST https://api.example.com/api/auth/login \
@@ -144,16 +139,48 @@ curl -i -X POST https://api.example.com/api/auth/login \
   -d 'email=api@example.com' -d 'password=secret'
 ```
 
-A `3xx` with a `Location:` header means the redirect is the cause. Common sources:
+#### A `3xx` with a `Location:` header — a redirect ate the method
+
+A 301 or 302 permits the client to re-issue the request as GET and drop the
+body, and browsers, `curl -L`, and Postman's "follow redirects" all do. The
+redirect is invisible in the error page because the client already followed it.
 
 | `Location` differs by | Cause | Fix |
 | --- | --- | --- |
-| Scheme (`http:` → `https:`) | Vhost or Cloudflare "Always Use HTTPS" | Point the client at the `https://` URL directly, so no redirect is needed |
-| Trailing slash | The canonicalization rule in `public/.htaccess` | Already emits `308`, which preserves the method — check for a duplicate `301` rule in the vhost |
-| Host (`www.` ↔ apex) | Vhost or DNS-level canonical host redirect | Point the client at the canonical host |
+| Scheme (`http:` → `https:`) | The `:80` server block, or Cloudflare "Always Use HTTPS" | `return 308` instead of `301`, and point clients at `https://` directly |
+| Host (`www.` ↔ apex) | Canonical-host redirect in the vhost or DNS | Point clients at the canonical host |
+| Trailing slash | `try_files $uri $uri/ …` — the `$uri/` makes nginx 301 to append a slash | Drop `$uri/`; nothing under `public/` should be served as a directory |
 
-Whatever the source, the durable fix is to have clients call the final URL, not
-a URL that redirects — a redirected POST costs an extra round trip even when the
-status code preserves the method. For the web app that means setting
-`NEXT_PUBLIC_API_URL` to the canonical scheme, host, and path, with no trailing
-slash.
+The durable fix is to have clients call the final URL rather than one that
+redirects — a redirected POST costs a wasted round trip even when the status
+code preserves the method. For the web app that means `NEXT_PUBLIC_API_URL` set
+to the canonical scheme, host, and path, with no trailing slash.
+
+#### A `405` straight away, no redirect — nginx never told PHP the method
+
+If the 405 comes back on the first response, nothing redirected and the client
+really did send a POST. Then the method was dropped on the way into PHP-FPM.
+`Symfony\Component\HttpFoundation\Request::getMethod()` reads
+`$_SERVER['REQUEST_METHOD']` **and defaults to `GET`** when it is absent, so a
+PHP location block missing `include fastcgi_params;` makes every request in the
+application look like a GET:
+
+```nginx
+location ~ ^/index\.php(/|$) {
+    fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    include fastcgi_params;          # <- REQUEST_METHOD rides on this
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+}
+```
+
+The tell is breadth: this breaks `register`, `refresh`, and `logout` too, and
+every other non-GET route in the API. If exactly one endpoint fails it is a
+redirect; if every POST fails it is `fastcgi_params`. Confirm from the box with
+`nginx -T | grep -A15 'index\.php'`.
+
+A known-good vhost carrying both fixes lives at
+[`deploy/nginx/breakout-api.conf`](../../deploy/nginx/breakout-api.conf).
+
+> `public/.htaccess` also emits a method-preserving `308` for its trailing-slash
+> rule, but nginx never reads `.htaccess` — that file only matters if the app is
+> ever served by Apache.
