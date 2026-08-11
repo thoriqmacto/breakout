@@ -51,14 +51,22 @@ class StrategyScanCommand extends Command
         $minPbas = (int) $this->option('min-pbas');
         $limit = max(1, (int) $this->option('limit'));
 
+        // The CAST keeps SQLite's text-affinity for date filtering from forcing
+        // the aggregate into TEXT, which would silently drop the row when
+        // compared to a bound REAL parameter. The target type is not portable:
+        // REAL is a syntax error in MySQL/MariaDB ("ERROR 1064 ... near
+        // 'REAL)'"), so pick the spelling each engine accepts.
+        $anchorAvgCast = match (DB::connection()->getDriverName()) {
+            'sqlite' => 'CAST(AVG(avg_net_norm) AS REAL)',
+            'pgsql' => 'CAST(AVG(avg_net_norm) AS DOUBLE PRECISION)',
+            default => 'CAST(AVG(avg_net_norm) AS DOUBLE)',
+        };
+
         $rows = DB::table('features_daily as fd')
             ->joinSub(
                 DB::table('features_daily')
                     ->select('symbol')
-                    // CAST keeps SQLite's text-affinity for date filtering from
-                    // forcing the aggregate into TEXT, which would silently
-                    // drop the row when compared to a bound REAL parameter.
-                    ->selectRaw('CAST(AVG(avg_net_norm) AS REAL) as anchor_avg_net_norm')
+                    ->selectRaw("{$anchorAvgCast} as anchor_avg_net_norm")
                     ->whereBetween('date', [$anchorDate->toDateString(), $scanDate->toDateString()])
                     ->groupBy('symbol'),
                 'anchor',

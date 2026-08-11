@@ -30,7 +30,12 @@ return new class extends Migration
             $table->decimal('net_value', 24, 2)->default(0);
             $table->timestamps();
 
-            $table->unique(['asset_id', 'trade_date', 'broker_code', 'transaction_type']);
+            // Named explicitly: the auto-generated name is 76 characters and
+            // MySQL/MariaDB cap identifiers at 64. SQLite has no such limit.
+            $table->unique(
+                ['asset_id', 'trade_date', 'broker_code', 'transaction_type'],
+                'broker_summary_facts_unique',
+            );
             $table->index(['asset_id', 'trade_date']);
             $table->index(['asset_id', 'broker_code']);
         });
@@ -51,7 +56,11 @@ return new class extends Migration
             $table->json('metrics_json')->nullable();
             $table->timestamps();
 
-            $table->unique(['asset_id', 'from_date', 'to_date', 'transaction_type']);
+            // Same 64-char identifier limit as above.
+            $table->unique(
+                ['asset_id', 'from_date', 'to_date', 'transaction_type'],
+                'bandar_detector_summaries_unique',
+            );
             $table->index(['asset_id', 'to_date']);
         });
     }
