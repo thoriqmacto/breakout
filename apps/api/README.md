@@ -156,30 +156,29 @@ redirects — a redirected POST costs a wasted round trip even when the status
 code preserves the method. For the web app that means `NEXT_PUBLIC_API_URL` set
 to the canonical scheme, host, and path, with no trailing slash.
 
-#### A `405` straight away, no redirect — nginx never told PHP the method
+Measured end to end against this app, through a real nginx and PHP-FPM:
 
-If the 405 comes back on the first response, nothing redirected and the client
-really did send a POST. Then the method was dropped on the way into PHP-FPM.
-`Symfony\Component\HttpFoundation\Request::getMethod()` reads
-`$_SERVER['REQUEST_METHOD']` **and defaults to `GET`** when it is absent, so a
-PHP location block missing `include fastcgi_params;` makes every request in the
-application look like a GET:
-
-```nginx
-location ~ ^/index\.php(/|$) {
-    fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-    include fastcgi_params;          # <- REQUEST_METHOD rides on this
-    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-}
+```
+through a 301:  final: GET  -> HTTP 405   (the error above, verbatim)
+through a 308:  final: POST -> HTTP 500   (reaches AuthController::login)
 ```
 
-The tell is breadth: this breaks `register`, `refresh`, and `logout` too, and
-every other non-GET route in the API. If exactly one endpoint fails it is a
-redirect; if every POST fails it is `fastcgi_params`. Confirm from the box with
-`nginx -T | grep -A15 'index\.php'`.
+#### A `405` straight away, no redirect
 
-A known-good vhost carrying both fixes lives at
-[`deploy/nginx/breakout-api.conf`](../../deploy/nginx/breakout-api.conf).
+Then nothing redirected and the client really did send a GET — check the caller
+before the server. `$_SERVER['REQUEST_METHOD']` going missing is *not* a
+plausible explanation here: `Request::getMethod()` does default to `GET` when it
+is absent, but the only realistic way to lose it on nginx is to drop
+`include fastcgi_params;`, and that also drops `REQUEST_URI`. The observed
+result is not a 405 — Laravel resolves every request as `/` and returns **200**
+with the welcome page. A silent 200 on every endpoint is that misconfiguration's
+signature; a 405 is not.
+
+A known-good vhost lives at
+[`deploy/nginx/breakout-api.conf`](../../deploy/nginx/breakout-api.conf). It is
+IPv4-only as committed — `listen [::]:80;` on a host without IPv6 fails
+`nginx -t` outright with *"socket() [::]:80 failed (97: Address family not
+supported by protocol)"*.
 
 > `public/.htaccess` also emits a method-preserving `308` for its trailing-slash
 > rule, but nginx never reads `.htaccess` — that file only matters if the app is
