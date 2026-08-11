@@ -296,7 +296,12 @@ php artisan up          # via a trap, so it runs even if a step above fails
 
 Server-side prerequisites, one time: the repo cloned at `DEPLOY_PATH`, a complete `.env` in `apps/api` (`config:cache` bakes it in, so it must be correct before the first deploy), PHP and Composer on `PATH` for the deploy user, write access to `storage/` and `bootstrap/cache/`, and an nginx vhost pointing at `apps/api/public`.
 
-The vhost is **not** deployed by the workflow — it is installed once by hand — but a known-good one is committed at [`deploy/nginx/breakout-api.conf`](deploy/nginx/breakout-api.conf). Two of its settings are load-bearing and worth not rediscovering: the `:80` block returns **308** rather than 301, and the PHP location does `include fastcgi_params;`. Either one wrong and every POST to the API arrives at Laravel as a GET, failing with `MethodNotAllowedHttpException` — see [Troubleshooting](apps/api/README.md#troubleshooting) in the API README.
+The vhost is **not** deployed by the workflow — it is installed once by hand — but a known-good one is committed at [`deploy/nginx/breakout-api.conf`](deploy/nginx/breakout-api.conf). Two of its settings are load-bearing and worth not rediscovering:
+
+- The `:80` block returns **308**, not 301. A 301 lets the client re-issue the request as GET without its body, so every POST to the API arrives at Laravel as a GET and fails with `MethodNotAllowedHttpException`.
+- The PHP location does `include fastcgi_params;`. Without it `REQUEST_URI` never reaches PHP, Laravel routes everything to `/`, and the whole API silently answers 200 with the welcome page.
+
+It is also IPv4-only as committed — uncomment the `listen [::]` lines only if the host has IPv6, since they fail `nginx -t` outright otherwise. See [Troubleshooting](apps/api/README.md#troubleshooting) in the API README for the diagnostic.
 
 Note `git reset --hard` discards anything uncommitted on the server — deliberate, so the deployed tree always matches the commit, but do not hand-edit files there.
 
