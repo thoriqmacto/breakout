@@ -37,7 +37,17 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique('asset_id');
-            $table->index(['sort_uptrend', 'sort_roc13', 'sort_close_vs_high55', 'sort_close_vs_high20', 'sort_vol_vs_avg20']);
+
+            // Named explicitly: the auto-generated name for these five columns
+            // is 97 characters, and MySQL/MariaDB cap identifiers at 64. SQLite
+            // has no such limit, so this only fails once the app moves engines.
+            $table->index([
+                'sort_uptrend',
+                'sort_roc13',
+                'sort_close_vs_high55',
+                'sort_close_vs_high20',
+                'sort_vol_vs_avg20',
+            ], 'metrics_ranking_index');
         });
     }
 

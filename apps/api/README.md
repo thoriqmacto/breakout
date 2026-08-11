@@ -118,6 +118,91 @@ php artisan test --testsuite=Feature --filter=AuthenticationTest
 
 Feature coverage includes registration, login, token refresh, logout, and guarded route access via both Sanctum and JWT.
 
+## Switching from SQLite to MariaDB
+
+The `mariadb` connection is already defined in `config/database.php`; nothing
+needs adding there. The steps below were run end to end against MariaDB 10.11.
+
+**1. Install the PHP driver for the FPM runtime, not just the CLI.** The CLI and
+FPM can be different builds — a working `php artisan migrate` proves nothing
+about what nginx talks to, and a missing driver surfaces as a 500 from the app.
+
+```bash
+sudo apt-get install php8.2-mysql && sudo systemctl restart php8.2-fpm
+php -r 'var_dump(extension_loaded("pdo_mysql"));'   # CLI
+php-fpm8.2 -i | grep pdo_mysql                      # FPM
+```
+
+**2. Create the database with utf8mb4.**
+
+```sql
+CREATE DATABASE breakout CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'breakout'@'localhost' IDENTIFIED BY '...';
+GRANT ALL PRIVILEGES ON breakout.* TO 'breakout'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+**3. Point `.env` at it, then clear the config cache.**
+
+```dotenv
+DB_CONNECTION=mariadb
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=breakout
+DB_USERNAME=breakout
+DB_PASSWORD=...
+```
+
+```bash
+php artisan config:clear
+```
+
+`config:clear` is not optional. Deploys run `config:cache`, which bakes the old
+`DB_CONNECTION` into `bootstrap/cache/config.php`; without clearing it the app
+keeps using SQLite while every command you run appears to succeed.
+
+**4. Create the schema, then copy the rows.**
+
+```bash
+php artisan migrate
+php artisan db:copy --from=sqlite --to=mariadb --pretend   # dry run first
+php artisan db:copy --from=sqlite --to=mariadb
+```
+
+`db:copy` reads through the query builder rather than replaying a dump —
+`sqlite3 .dump` emits `AUTOINCREMENT`, double-quoted identifiers and SQLite type
+names that MariaDB rejects. It skips `migrations` (already populated by step 4)
+along with cache, session and queue tables, and drops foreign key checks for the
+duration so table order does not matter. Verify before cutting over:
+
+```bash
+php artisan db:copy --from=sqlite --to=mariadb --pretend   # should report 0 new rows
+```
+
+**5. Re-cache and restart.**
+
+```bash
+php artisan config:cache && php artisan route:cache
+sudo systemctl reload php8.2-fpm
+```
+
+### Things that differ from SQLite
+
+- **Identifiers are capped at 64 characters.** Laravel derives index names from
+  the table and column names, and SQLite accepts any length. Three indexes in
+  this repo exceeded the cap and are now named explicitly. If you add a
+  multi-column index, name it.
+- **A failed migration does not roll back.** MariaDB DDL is not transactional,
+  so a migration that dies partway leaves its tables behind and the retry fails
+  with `Base table or view already exists`. Drop the debris, or use
+  `migrate:fresh` on a database you are willing to lose.
+- **`CAST(x AS REAL)` is a syntax error** (`ERROR 1064`). MariaDB wants `DOUBLE`.
+  Raw SQL that names a type needs a `match` on the driver — see
+  `StrategyScanCommand` and `TradingDaysStats` for the pattern.
+- **The test suite still runs on SQLite** (`phpunit.xml` pins
+  `DB_CONNECTION=sqlite`, `:memory:`). Green tests therefore do not prove a
+  query works on MariaDB. Anything raw is worth exercising against both.
+
 ## Troubleshooting
 
 ### `The GET method is not supported for route api/auth/login. Supported methods: POST.`
