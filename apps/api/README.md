@@ -203,7 +203,56 @@ sudo systemctl reload php8.2-fpm
   `DB_CONNECTION=sqlite`, `:memory:`). Green tests therefore do not prove a
   query works on MariaDB. Anything raw is worth exercising against both.
 
+## Creating a user without the sign-up form
+
+`POST /api/auth/register` is the normal path, but it needs the whole chain
+working — nginx, PHP-FPM, CORS, and the frontend pointing at the right API URL.
+`user:create` writes to the database directly, so the first account can exist
+before any of that does:
+
+```bash
+php artisan user:create                                   # prompts, password hidden
+php artisan user:create --name="Ada" --email=ada@example.com   # prompts for password only
+```
+
+It applies the same validation the endpoint does — unique email, `Password::defaults()` —
+so a CLI account cannot slip past a constraint registration would have caught.
+Prefer the prompt over `--password`: an argument lands in shell history and in
+the process list.
+
+This is also the fastest way to split a broken sign-up form from a broken API.
+If `user:create` succeeds and the created account then logs in over `curl`, the
+API is fine and the fault is in the browser path — CORS, `NEXT_PUBLIC_API_URL`,
+or the network in front of PHP.
+
 ## Troubleshooting
+
+### Registration fails from the web app
+
+The endpoint returns a specific message for every validation failure, and the
+frontend displays it verbatim. What you see on screen identifies the cause:
+
+| Message on screen | HTTP | Meaning |
+| --- | --- | --- |
+| `The email has already been taken.` | 422 | Account exists — sign in instead |
+| `The password field must be at least 8 characters.` | 422 | `Password::defaults()` minimum |
+| `The password field confirmation does not match.` | 422 | The two password fields differ |
+| `Failed to fetch` (or a CORS error in the console) | — | The response never arrived: wrong `NEXT_PUBLIC_API_URL`, an origin missing from `CORS_ALLOWED_ORIGINS`, or a 5xx in front of PHP |
+
+The last row is the one that is not about the request. Confirm the API is
+healthy on its own before touching the frontend:
+
+```bash
+curl -i -X POST https://api.example.com/api/auth/register \
+  -H 'Accept: application/json' \
+  -d 'name=Test' -d 'email=new@example.com' \
+  -d 'password=Str0ngPassw0rd' -d 'password_confirmation=Str0ngPassw0rd'
+```
+
+A `201` here with a failure in the browser means the API is fine and the
+problem is the browser path. `CORS_ALLOWED_ORIGINS` in `apps/api/.env` must
+list the frontend origin exactly — scheme and host, no trailing slash, and
+each Vercel preview domain is a distinct origin.
 
 ### `The GET method is not supported for route api/auth/login. Supported methods: POST.`
 
