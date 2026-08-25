@@ -68,8 +68,7 @@ class GoogleDriveCheckCommand extends Command
         // because "false" on its own says nothing about what Google refused.
         if ($disk->put($path, $first) === false) {
             $this->error("Write failed: could not put [{$path}].");
-            $this->explainFailure($diskName, $path, $first);
-            $this->hint($diskName);
+            $this->hint($diskName, $this->explainFailure($diskName, $path, $first));
 
             return self::FAILURE;
         }
@@ -180,8 +179,16 @@ class GoogleDriveCheckCommand extends Command
             $this->line('  resolved:  '.$resolved.(is_file($resolved) ? ' (found)' : ' (MISSING)'));
         }
 
+        $teamDriveId = (string) ($config['teamDriveId'] ?? '');
+
         $this->line('  folder id: '.(((string) ($config['folderId'] ?? '')) === '' ? '(unset)' : 'set'));
+        $this->line('  shared drive: '.($teamDriveId === '' ? '(unset)' : 'set — takes precedence over folder id'));
         $this->line('  root:      '.((string) ($config['root'] ?? 'breakout-data')));
+
+        if ($teamDriveId === '') {
+            $this->warn('  Writing into a My Drive folder. A service account has no storage quota, so it');
+            $this->warn('  can create folders there but not files. Set GOOGLE_DRIVE_TEAM_DRIVE_ID instead.');
+        }
 
         // The account identity is the one thing you need in order to share the
         // folder, and it is not a credential -- only private_key is. Printing
@@ -245,12 +252,12 @@ class GoogleDriveCheckCommand extends Command
      * the useful part (403 insufficient permissions, 404 folder not found,
      * "Drive API has not been used in project…") is usually the innermost one.
      */
-    private function explainFailure(string $diskName, string $path, string $contents): void
+    private function explainFailure(string $diskName, string $path, string $contents): string
     {
         $config = config("filesystems.disks.{$diskName}");
 
         if (! is_array($config)) {
-            return;
+            return '';
         }
 
         $config['throw'] = true;
@@ -266,27 +273,78 @@ class GoogleDriveCheckCommand extends Command
             $this->warn('  The retry succeeded. The first write may have hit a transient error or a rate limit.');
         } catch (Throwable $e) {
             $depth = 0;
+            $collected = [];
 
             for ($error = $e; $error !== null; $error = $error->getPrevious()) {
+                $message = trim($error->getMessage());
+                $collected[] = class_basename($error).' '.$message;
+
                 $this->line(sprintf(
                     '  %s%s: %s',
                     str_repeat('  ', $depth++),
                     class_basename($error),
-                    trim($error->getMessage()),
+                    $message,
                 ));
             }
+
+            return implode(' ', $collected);
         }
+
+        return '';
     }
 
-    private function hint(string $diskName): void
+    /**
+     * Guidance chosen from what Google actually said, rather than a single
+     * guess. An earlier version always blamed the folder share, which is
+     * actively misleading when the share is correct and the real problem is
+     * that a service account cannot own files at all.
+     *
+     * @param  string  $error  The collected error text, empty when unknown.
+     */
+    private function hint(string $diskName, string $error = ''): void
     {
         if ($diskName !== 'gdrive') {
             return;
         }
 
+        $error = mb_strtolower($error);
+
         $this->newLine();
-        $this->line('A service account has no Drive storage of its own, so the target folder must be');
-        $this->line("shared with the service account's email (…@….iam.gserviceaccount.com) as Editor.");
-        $this->line('That share is the usual cause of a write that fails without an obvious reason.');
+
+        if (str_contains($error, 'storagequotaexceeded') || str_contains($error, 'quota')) {
+            $this->line('Google removed storage quota from service accounts, so one cannot own a file in');
+            $this->line('My Drive even when the folder is shared with it. Folders cost no quota, which is');
+            $this->line('why breakout-data and smoke were created but the file write then failed.');
+            $this->newLine();
+            $this->line('Use a Shared Drive instead: create one, add the service account as a member with');
+            $this->line('Content manager, and set GOOGLE_DRIVE_TEAM_DRIVE_ID to the Shared Drive id (the');
+            $this->line('part after /drive/folders/ in its URL). A Shared Drive owns its files, so no');
+            $this->line('quota is charged to the account. It takes precedence over GOOGLE_DRIVE_FOLDER_ID.');
+
+            return;
+        }
+
+        if (str_contains($error, 'notfound') || str_contains($error, '404')) {
+            $this->line('Drive reported the target as not found. Check GOOGLE_DRIVE_FOLDER_ID (or');
+            $this->line('GOOGLE_DRIVE_TEAM_DRIVE_ID) holds only the id from the folder URL, with no');
+            $this->line('surrounding https://drive.google.com/drive/folders/ and no trailing slash.');
+            $this->line('A folder that exists but is not shared with the account also reads as missing.');
+
+            return;
+        }
+
+        if (str_contains($error, 'insufficientpermissions') || str_contains($error, '403')) {
+            $this->line('Drive refused the write as unauthorised. Share the target with the service');
+            $this->line("account's email (…@….iam.gserviceaccount.com) as Editor, or add it to the");
+            $this->line('Shared Drive as Content manager. Sharing with your own account does not help:');
+            $this->line('the service account is a separate identity.');
+
+            return;
+        }
+
+        $this->line('Check, in order: that the Drive API is enabled for this project, that the target');
+        $this->line("is shared with the service account's email as Editor, and that the id in .env is");
+        $this->line('just the id from the folder URL. If folders appear in Drive but files do not, the');
+        $this->line('cause is service-account storage quota -- use a Shared Drive.');
     }
 }

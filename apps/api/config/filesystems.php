@@ -70,7 +70,11 @@ return [
         'gdrive' => [
             'driver' => 'gdrive',
             'keyFile' => env('GOOGLE_DRIVE_KEY_FILE'),   // path to the service-account JSON
-            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'), // ID of the Drive folder shared with the service account
+            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'), // ID of the My Drive folder shared with the service account
+            // ID of a Shared Drive. Preferred: a Shared Drive owns its files, so
+            // the service account does not need storage quota of its own. Takes
+            // precedence over folderId when both are set.
+            'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
             'root' => env('GOOGLE_DRIVE_ROOT', 'breakout-data'), // folder created inside the shared folder
             'throw' => false,
             'report' => false,
