@@ -207,10 +207,14 @@ hydrate  →  existing local read/merge/write loop (unchanged)  →  flush
 
    ```bash
    cd apps/api
-   php artisan test --filter=GoogleDriveDiskTest
+   php artisan gdrive:check
    ```
 
-   The round-trip test skips itself when the credentials are absent and runs a real `put`/`get`/`delete` against the shared folder when they are present.
+   It prints the resolved configuration — never the credentials themselves — then writes, reads back, overwrites and deletes a probe file in the shared folder, reporting which step failed. `--keep` leaves the probe file behind if you want to see it in Drive; `--disk=` targets another disk.
+
+   **Use this rather than the test suite on a server.** `php artisan test` comes from `nunomaduro/collision`, which is a `require-dev` package, so it is absent wherever `composer install --no-dev` has run — including any host the deploy workflow has touched, which is exactly where the credentials live. Running it there fails with `Command "test" is not defined`. The equivalent test, `GoogleDriveDiskTest`, still runs locally and skips itself when the credentials are absent.
+
+   The overwrite step is worth its own mention: Drive permits two files with the same name in one folder, where a normal filesystem does not. `gdrive:check` fails if a second write creates a duplicate rather than replacing, because a mirror that accumulates copies looks healthy until the folder is inspected.
 
 ### Migrating existing CSVs to the mirror
 
