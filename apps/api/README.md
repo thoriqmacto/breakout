@@ -203,6 +203,95 @@ sudo systemctl reload php8.2-fpm
   `DB_CONNECTION=sqlite`, `:memory:`). Green tests therefore do not prove a
   query works on MariaDB. Anything raw is worth exercising against both.
 
+## Rule-builder strategies
+
+A strategy is a user-authored rule tree evaluated against `features_daily`
+joined with `metrics` for one scan date. Symbols that satisfy the tree are
+persisted as matches, each carrying the trace that justifies it.
+
+### Rule shape
+
+A node is either a **group** (`op` of `and`/`or` plus `rules`) or a **condition**
+(`field`, `operator`, and `value` where the operator takes one):
+
+```json
+{
+  "op": "and",
+  "rules": [
+    { "field": "metrics.uptrend", "operator": "is_true" },
+    { "field": "metrics.close_vs_high20", "operator": "gte", "value": 0.9 },
+    { "op": "or", "rules": [
+        { "field": "features.vol_ratio_20", "operator": "gte", "value": 1.2 },
+        { "field": "features.breakout20", "operator": "is_true" }
+    ]}
+  ]
+}
+```
+
+Fields are namespaced by source (`features.*`, `metrics.*`) because `pbas`
+exists in both. `GET /api/v1/strategies/schema` returns the whole vocabulary --
+fields, operators per type, and the depth and condition limits -- so the UI
+never hardcodes a copy that can drift from what the validator accepts.
+
+Rules come from users, so a field name is never interpolated into SQL: anything
+outside `FieldRegistry` is rejected before the strategy is stored.
+
+Two behaviours worth knowing:
+
+- **A null field fails every comparison** rather than coercing to zero.
+  Without that, `less than 1` would match every symbol whose feature was never
+  computed. Use `is_null` / `not_null` to ask about absence deliberately.
+- **Evaluation does not short-circuit.** Every condition runs so the trace can
+  show why each one passed or failed; trees are capped at 50 conditions.
+
+### Visibility
+
+| | Owner | Anyone else |
+| --- | --- | --- |
+| `private` | see, run, edit, delete | nothing (404) |
+| `public` | see, run, edit, delete | see, run, copy — **not** edit (403) |
+
+Copying forks a public strategy into a private one owned by the copier, with
+`copied_from_id` pointing back at the original. That is the intended path for
+adapting somebody else's strategy.
+
+### Running
+
+Ranking walks every symbol with features for the date, so the API queues it:
+
+```
+POST /api/v1/strategies/{id}/run   ->  202, run row in "queued"
+```
+
+**A queue worker must be running** or the run stays queued forever. `.env` uses
+`QUEUE_CONNECTION=database`, so on the VPS that means a supervised
+`php artisan queue:work`. Without one, use the CLI instead, which runs
+synchronously and needs no worker:
+
+```bash
+php artisan strategy:run                 # every active strategy, latest feature date
+php artisan strategy:run --id=3 --date=2026-05-20
+```
+
+Either path records a `strategy_runs` row and mirrors the outcome onto the
+strategy (`last_run_at`, `last_run_status`, `last_match_count`) so a dashboard
+card renders from one row rather than a subquery per card.
+
+### Endpoints
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `GET` | `/api/v1/strategies/schema` | Field and operator vocabulary |
+| `GET` | `/api/v1/strategies?scope=mine\|public\|all` | Defaults to `all` |
+| `POST` | `/api/v1/strategies` | Rule tree validated before storage |
+| `GET` | `/api/v1/strategies/{id}` | Includes `rules` |
+| `PATCH` | `/api/v1/strategies/{id}` | Owner only |
+| `DELETE` | `/api/v1/strategies/{id}` | Owner only |
+| `POST` | `/api/v1/strategies/{id}/copy` | Fork into your own private copy |
+| `POST` | `/api/v1/strategies/{id}/run` | Queues a run, returns 202 |
+| `GET` | `/api/v1/strategies/{id}/runs` | Run history, newest first |
+| `GET` | `/api/v1/strategies/{id}/runs/{run}` | Matches with explanation traces |
+
 ## Creating a user without the sign-up form
 
 `POST /api/auth/register` is the normal path, but it needs the whole chain

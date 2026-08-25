@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
+use App\Http\Controllers\Api\V1\StrategyController;
 use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,31 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Strategy watchlist (read-only; produced by strategy:rank-watchlist)
     Route::get('strategy/watchlist', [StrategyWatchlistController::class, 'index'])
         ->name('strategy.watchlist.index');
+
+    // Rule-builder strategies. The schema route is declared before the
+    // apiResource so "strategies/schema" is not swallowed by "strategies/{id}".
+    Route::get('strategies/schema', [StrategyController::class, 'schema'])
+        ->name('strategies.schema');
+
+    Route::post('strategies/{strategy}/copy', [StrategyController::class, 'copy'])
+        ->whereNumber('strategy')
+        ->name('strategies.copy');
+
+    Route::post('strategies/{strategy}/run', [StrategyController::class, 'run'])
+        ->whereNumber('strategy')
+        ->name('strategies.run');
+
+    Route::get('strategies/{strategy}/runs', [StrategyController::class, 'runs'])
+        ->whereNumber('strategy')
+        ->name('strategies.runs');
+
+    Route::get('strategies/{strategy}/runs/{run}', [StrategyController::class, 'runMatches'])
+        ->whereNumber('strategy')
+        ->whereNumber('run')
+        ->name('strategies.runs.matches');
+
+    Route::apiResource('strategies', StrategyController::class)
+        ->whereNumber('strategy');
 
     // Portfolios & positions
     Route::get('portfolios/{portfolio}/summary', [PortfolioController::class, 'summary'])

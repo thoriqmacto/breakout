@@ -14,6 +14,7 @@ import {
   PanelLeft,
   PanelRight,
   Briefcase,
+  SlidersHorizontal,
   Terminal,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
@@ -59,6 +60,11 @@ const navigation: NavigationItem[] = [
     label: "Watchlist",
     href: "/dashboard/strategy/watchlist",
     icon: LineChart,
+  },
+  {
+    label: "Strategies",
+    href: "/dashboard/strategy",
+    icon: SlidersHorizontal,
   },
   {
     label: "Scrapers",

@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import Link from "next/link"
+
 import { useAuth } from "@/components/auth-provider"
+import { StrategyCards } from "@/components/strategy-cards"
 import {
   Card,
   CardContent,
@@ -14,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { fetchPortfolios, type PositionRecord } from "@/lib/portfolio-client"
+import { fetchStrategies, type StrategyRecord } from "@/lib/strategy-builder-client"
 import { formatIdr } from "@/lib/currency"
 
 const parseNumericInput = (value: string) => {
@@ -109,6 +113,8 @@ type AverageTransaction = {
 
 export default function DashboardPage() {
   const { user, accessToken } = useAuth()
+  const [strategies, setStrategies] = useState<StrategyRecord[]>([])
+  const [strategiesError, setStrategiesError] = useState<string | null>(null)
   const [symbol, setSymbol] = useState("")
   const [closePriceInput, setClosePriceInput] = useState("")
   const [percentInput, setPercentInput] = useState("")
@@ -170,6 +176,33 @@ export default function DashboardPage() {
   const [positionCompareError, setPositionCompareError] = useState<string | null>(null)
   const [positionCompareClose, setPositionCompareClose] = useState<number | null>(null)
   const [positionCompareDate, setPositionCompareDate] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) {
+      setStrategies([])
+      setStrategiesError("Sign in to view your strategies.")
+      return
+    }
+
+    let cancelled = false
+    setStrategiesError(null)
+
+    fetchStrategies(accessToken, "all")
+      .then((rows) => {
+        if (!cancelled) setStrategies(rows)
+      })
+      .catch((cause) => {
+        if (!cancelled) {
+          setStrategiesError(
+            cause instanceof Error ? cause.message : "Unable to load strategies.",
+          )
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [accessToken])
 
   useEffect(() => {
     const trimmed = symbol.trim()
@@ -830,6 +863,35 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Strategies</h2>
+            <p className="text-sm text-muted-foreground">
+              Latest run for each strategy you own or can see.
+            </p>
+          </div>
+          <Link href="/dashboard/strategy">
+            <Button variant="outline" size="sm">
+              Manage
+            </Button>
+          </Link>
+        </div>
+
+        {strategiesError ? (
+          <Card>
+            <CardContent className="py-6 text-sm text-muted-foreground">
+              {strategiesError}
+            </CardContent>
+          </Card>
+        ) : (
+          <StrategyCards
+            strategies={strategies}
+            emptyMessage="No strategies yet. Create one to start scanning."
+          />
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
