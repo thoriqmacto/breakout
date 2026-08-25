@@ -81,17 +81,24 @@ jobs:
               "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_SHA='$DEPLOY_SHA' bash -euo pipefail -s" <<'REMOTE'
             cd "$DEPLOY_PATH"
 
-            # Always lift maintenance mode, including on failure. A deploy that
-            # dies midway must not leave the site down indefinitely.
-            trap 'php artisan up || true' EXIT
-
             echo "==> Deploying $DEPLOY_SHA"
             git fetch --prune origin
             git reset --hard "$DEPLOY_SHA"
 
+            # artisan lives in apps/api, not the repository root. Running the
+            # maintenance commands from DEPLOY_PATH only produced "Could not
+            # open input file: artisan", swallowed by the `|| true`, so the app
+            # was never actually put into maintenance mode during a deploy.
+            cd apps/api
+
+            # Always lift maintenance mode, including on failure. A deploy that
+            # dies midway must not leave the site down indefinitely. Set after
+            # the cd so the trap resolves artisan, and before `down` so there is
+            # no window where the site is down with no trap armed.
+            trap 'php artisan up || true' EXIT
+
             php artisan down --retry=15 || true
 
-            cd apps/api
             composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
 
             php artisan migrate --force

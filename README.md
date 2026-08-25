@@ -307,6 +307,26 @@ Note `git reset --hard` discards anything uncommitted on the server — delibera
 
 **Do the first run manually** via *Actions → Deploy API → Run workflow*, and watch it. Deployment is the one part of this that cannot be rehearsed in CI.
 
+A queue worker is a separate, ongoing concern: `queue:restart` above only signals a running worker to pick up new code, it does not start one. Rule-builder strategy runs are queued (`QUEUE_CONNECTION=database`), so without a supervised `php artisan queue:work` in `apps/api` they stay in `queued` forever.
+
+#### The deploy fails in about five seconds
+
+That is the `Configure SSH` step, before anything reaches the server. Open the failed run and expand it — the step prints its resolved environment:
+
+```
+env:
+  DEPLOY_SSH_KEY:
+  DEPLOY_KNOWN_HOSTS:
+  DEPLOY_HOST:
+  DEPLOY_PORT: 22
+```
+
+Blank values mean the secrets are not readable by the job. GitHub renders a set secret as `***`, never as an empty string, so empty is proof they are missing rather than wrong. `DEPLOY_PORT: 22` is the workflow's own `|| '22'` default and says nothing either way.
+
+The job runs at all only when `DEPLOY_ENABLED` is `true`, so reaching this step means the variable is set and the secrets are not. They must live either on the **`production` environment** (`Settings → Environments → production → Environment secrets`) or on the repository (`Settings → Secrets and variables → Actions`) — an environment-scoped job reads both, but a secret added to a *different* environment is invisible to it.
+
+With an empty `DEPLOY_HOST` the fallback `ssh-keyscan` exits non-zero, and the step runs under `bash -e`, which is why the whole job stops there with exit code 1 rather than continuing to a clearer error.
+
 ## Repository Layout
 ```
 .
