@@ -63,9 +63,12 @@ class GoogleDriveCheckCommand extends Command
         string $second,
     ): int {
         // The disk is configured with throw => false, so a failed API call
-        // returns false rather than raising. Every result is checked.
+        // returns false rather than raising. Every result is checked -- and on
+        // failure the write is repeated against a throwing copy of the disk,
+        // because "false" on its own says nothing about what Google refused.
         if ($disk->put($path, $first) === false) {
             $this->error("Write failed: could not put [{$path}].");
+            $this->explainFailure($diskName, $path, $first);
             $this->hint($diskName);
 
             return self::FAILURE;
@@ -179,9 +182,49 @@ class GoogleDriveCheckCommand extends Command
 
         $this->line('  folder id: '.(((string) ($config['folderId'] ?? '')) === '' ? '(unset)' : 'set'));
         $this->line('  root:      '.((string) ($config['root'] ?? 'breakout-data')));
+
+        // The account identity is the one thing you need in order to share the
+        // folder, and it is not a credential -- only private_key is. Printing
+        // it saves opening the JSON by hand on the server.
+        $identity = $this->serviceAccountIdentity($resolved);
+
+        foreach ($identity as $label => $value) {
+            $this->line(sprintf('  %-10s %s', $label.':', $value));
+        }
+
         $this->newLine();
 
         return true;
+    }
+
+    /**
+     * Read the non-secret identity fields out of the service-account JSON.
+     *
+     * @return array<string, string>
+     */
+    private function serviceAccountIdentity(string $path): array
+    {
+        if ($path === '' || ! is_file($path) || ! is_readable($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+
+        if (! is_array($decoded)) {
+            return ['key json' => 'unreadable (not valid JSON)'];
+        }
+
+        $identity = [];
+
+        if (is_string($decoded['client_email'] ?? null)) {
+            $identity['account'] = $decoded['client_email'];
+        }
+
+        if (is_string($decoded['project_id'] ?? null)) {
+            $identity['project'] = $decoded['project_id'];
+        }
+
+        return $identity;
     }
 
     private function cleanup(
@@ -192,6 +235,47 @@ class GoogleDriveCheckCommand extends Command
         $disk->delete($path);
 
         return $exit;
+    }
+
+    /**
+     * Repeat the failed write against a copy of the disk with throw => true, so
+     * the underlying Google error is printed instead of a bare false.
+     *
+     * Flysystem wraps the API error, so the whole `previous` chain is walked --
+     * the useful part (403 insufficient permissions, 404 folder not found,
+     * "Drive API has not been used in project…") is usually the innermost one.
+     */
+    private function explainFailure(string $diskName, string $path, string $contents): void
+    {
+        $config = config("filesystems.disks.{$diskName}");
+
+        if (! is_array($config)) {
+            return;
+        }
+
+        $config['throw'] = true;
+
+        $this->newLine();
+        $this->line('Retrying with exceptions enabled to surface the underlying error:');
+
+        try {
+            Storage::build($config)->put($path, $contents);
+
+            // Succeeded on the retry, which points at something transient
+            // rather than a permission or configuration problem.
+            $this->warn('  The retry succeeded. The first write may have hit a transient error or a rate limit.');
+        } catch (Throwable $e) {
+            $depth = 0;
+
+            for ($error = $e; $error !== null; $error = $error->getPrevious()) {
+                $this->line(sprintf(
+                    '  %s%s: %s',
+                    str_repeat('  ', $depth++),
+                    class_basename($error),
+                    trim($error->getMessage()),
+                ));
+            }
+        }
     }
 
     private function hint(string $diskName): void
