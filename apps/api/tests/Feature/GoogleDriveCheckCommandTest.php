@@ -164,4 +164,62 @@ class GoogleDriveCheckCommandTest extends TestCase
 
         @unlink($keyFile);
     }
+
+    /**
+     * The hint must follow what Google said. Blaming the folder share when the
+     * account cannot own files at all is what sent the last diagnosis wrong.
+     */
+    public function test_a_quota_error_recommends_a_shared_drive_rather_than_the_folder_share(): void
+    {
+        Storage::extend('quota-exceeded', function ($app, array $config): FilesystemAdapter {
+            $adapter = new class(storage_path('framework/testing/quota')) extends LocalFilesystemAdapter
+            {
+                public function write(string $path, string $contents, Config $config): void
+                {
+                    throw UnableToWriteFile::atLocation(
+                        $path,
+                        '(403) storageQuotaExceeded: Service Accounts do not have storage quota.',
+                    );
+                }
+            };
+
+            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+        });
+
+        config(['filesystems.disks.gdrive' => [
+            'driver' => 'quota-exceeded',
+            'throw' => false,
+        ]]);
+
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('GOOGLE_DRIVE_TEAM_DRIVE_ID', $output);
+        $this->assertStringContainsString('Shared Drive', $output);
+        // The old, wrong advice must not be what a quota failure prints.
+        $this->assertStringNotContainsString('That share is the usual cause', $output);
+    }
+
+    public function test_a_not_found_error_points_at_the_configured_id(): void
+    {
+        Storage::extend('not-found', function ($app, array $config): FilesystemAdapter {
+            $adapter = new class(storage_path('framework/testing/notfound')) extends LocalFilesystemAdapter
+            {
+                public function write(string $path, string $contents, Config $config): void
+                {
+                    throw UnableToWriteFile::atLocation($path, '(404) notFound: File not found: abc123.');
+                }
+            };
+
+            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+        });
+
+        config(['filesystems.disks.gdrive' => ['driver' => 'not-found', 'throw' => false]]);
+
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('not found', $output);
+        $this->assertStringContainsString('GOOGLE_DRIVE_FOLDER_ID', $output);
+    }
 }

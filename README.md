@@ -193,15 +193,20 @@ hydrate  →  existing local read/merge/write loop (unchanged)  →  flush
 1. In the [Google Cloud console](https://console.cloud.google.com/), create (or pick) a project and **enable the Google Drive API**.
 2. Create a **service account** and add a **JSON key**. Download it.
 3. Save the key at `apps/api/storage/app/google/service-account.json`. This path is gitignored — the key is as sensitive as the Stockbit bearer, so **never commit it** and never place it anywhere tracked.
-4. In Google Drive, create the folder that will hold the data and **share it with the service account's email** (`...@....iam.gserviceaccount.com`) with *Editor* access. A service account has no Drive storage quota of its own, so it must write into a folder shared with it.
-5. Copy the folder ID out of its URL (`https://drive.google.com/drive/folders/<FOLDER_ID>`).
+4. Create a **Shared Drive** (Drive → Shared drives → New) and add the service account's email (`...@....iam.gserviceaccount.com`) as a member with **Content manager**.
+
+   **A Shared Drive, not a folder in My Drive.** Google removed storage quota from service accounts, so an account cannot *own* a file — and in My Drive the creator owns what it creates. Sharing a My Drive folder with the account is not enough: it will create folders there quite happily, because folders cost no quota, then fail on the first actual file. A Shared Drive owns its own contents, so nothing is charged to the account.
+
+5. Copy the Shared Drive ID out of its URL (`https://drive.google.com/drive/folders/<ID>`).
 6. Fill in `apps/api/.env`:
 
    ```dotenv
    GOOGLE_DRIVE_KEY_FILE=storage/app/google/service-account.json
-   GOOGLE_DRIVE_FOLDER_ID=<FOLDER_ID>
-   GOOGLE_DRIVE_ROOT=breakout-data      # subfolder created inside the shared folder
+   GOOGLE_DRIVE_TEAM_DRIVE_ID=<SHARED_DRIVE_ID>
+   GOOGLE_DRIVE_ROOT=breakout-data      # subfolder created inside it
    ```
+
+   `GOOGLE_DRIVE_FOLDER_ID` still exists for a My Drive folder and takes lower precedence when both are set, but it only works where the account never has to own a file — which for this app is nowhere. Prefer the Shared Drive.
 
 7. Verify the credentials before wiring anything else up — the folder sharing is where most of the friction lives:
 

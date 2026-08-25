@@ -38,10 +38,12 @@ class GoogleDriveServiceProvider extends ServiceProvider
             $keyFile = $this->resolveKeyFile($config['keyFile'] ?? null);
 
             $folderId = isset($config['folderId']) ? trim((string) $config['folderId']) : '';
+            $teamDriveId = isset($config['teamDriveId']) ? trim((string) $config['teamDriveId']) : '';
 
-            if ($folderId === '') {
+            if ($folderId === '' && $teamDriveId === '') {
                 throw new InvalidArgumentException(
-                    'The gdrive disk requires GOOGLE_DRIVE_FOLDER_ID: the ID of the Drive folder shared with the service account.'
+                    'The gdrive disk requires GOOGLE_DRIVE_TEAM_DRIVE_ID (a Shared Drive) or '.
+                    'GOOGLE_DRIVE_FOLDER_ID (a My Drive folder shared with the service account).'
                 );
             }
 
@@ -53,10 +55,17 @@ class GoogleDriveServiceProvider extends ServiceProvider
                 ? trim((string) $config['root'])
                 : 'breakout-data';
 
+            // A Shared Drive owns its own files, so the service account never
+            // needs storage of its own. Google removed service-account storage
+            // quota, so an account writing into a plain My Drive folder can
+            // create folders (which cost nothing) but not files. teamDriveId
+            // therefore takes precedence when both are set.
             $adapter = new GoogleDriveAdapter(
                 new GoogleDriveService($client),
                 $root,
-                ['sharedFolderId' => $folderId]
+                $teamDriveId !== ''
+                    ? ['teamDriveId' => $teamDriveId]
+                    : ['sharedFolderId' => $folderId]
             );
 
             return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
