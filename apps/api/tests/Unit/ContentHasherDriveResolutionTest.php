@@ -7,7 +7,6 @@ use Illuminate\Filesystem\FilesystemAdapter as LaravelFilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem as Flysystem;
-use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Masbug\Flysystem\GoogleDriveAdapter;
 use Tests\TestCase;
 
@@ -156,20 +155,18 @@ class ContentHasherDriveResolutionTest extends TestCase
         $this->assertSame(md5('date,close'), $hasher->remote($disk, 'seeds/historical/AAA.csv'));
     }
 
-    public function test_streamed_hashing_matches_md5_for_a_plain_adapter(): void
+    public function test_streamed_hashing_matches_md5(): void
     {
-        $adapter = new InMemoryFilesystemAdapter;
-        $disk = new LaravelFilesystemAdapter(new Flysystem($adapter), $adapter, []);
-        $disk->put('x.csv', 'hello world');
+        Storage::fake('local');
+        Storage::disk('local')->put('x.csv', 'hello world');
 
-        $this->assertSame(md5('hello world'), (new ContentHasher)->remote($disk, 'x.csv'));
+        $this->assertSame(md5('hello world'), (new ContentHasher)->remote(Storage::disk('local'), 'x.csv'));
     }
 
     public function test_a_missing_remote_file_hashes_to_null(): void
     {
-        $adapter = new InMemoryFilesystemAdapter;
-        $disk = new LaravelFilesystemAdapter(new Flysystem($adapter), $adapter, []);
+        Storage::fake('local');
 
-        $this->assertNull((new ContentHasher)->remote($disk, 'absent.csv'));
+        $this->assertNull((new ContentHasher)->remote(Storage::disk('local'), 'absent.csv'));
     }
 }
