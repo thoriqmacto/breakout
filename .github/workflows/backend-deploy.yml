@@ -67,6 +67,30 @@ jobs:
           fi
           chmod 600 ~/.ssh/known_hosts
 
+          # Check the pin actually covers what the next step connects to.
+          #
+          # OpenSSH keys a non-default port as [host]:port, so an entry written
+          # by a portless `ssh-keyscan host` does not match a connection to
+          # port 2222 -- and vice versa. Neither does an entry for the IP when
+          # DEPLOY_HOST is a name. Every one of those surfaces only as the five
+          # words "Host key verification failed", which names neither the cause
+          # nor the fix, so the check is done here where both are known.
+          if [ "$DEPLOY_PORT" = "22" ]; then
+            KNOWN_HOSTS_LOOKUP="$DEPLOY_HOST"
+          else
+            KNOWN_HOSTS_LOOKUP="[$DEPLOY_HOST]:$DEPLOY_PORT"
+          fi
+
+          if ! ssh-keygen -F "$KNOWN_HOSTS_LOOKUP" -f ~/.ssh/known_hosts > /dev/null 2>&1; then
+            echo "::error::known_hosts has no entry matching the host and port this deploy connects to, so SSH will refuse with 'Host key verification failed'."
+            echo "Entries parsed from the current known_hosts: $(ssh-keygen -l -f ~/.ssh/known_hosts 2>/dev/null | wc -l)"
+            echo "Regenerate the DEPLOY_KNOWN_HOSTS secret on a trusted machine, passing the same port the deploy uses:"
+            echo "    ssh-keyscan -p <DEPLOY_PORT> <DEPLOY_HOST>"
+            echo "Use exactly the DEPLOY_HOST value the secret holds -- an entry for the IP does not match a hostname."
+            echo "If that reports zero entries, the port or host is wrong or the server is unreachable from here."
+            exit 1
+          fi
+
       - name: Deploy
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
