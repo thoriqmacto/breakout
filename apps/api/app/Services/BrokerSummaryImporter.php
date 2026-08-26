@@ -30,6 +30,21 @@ class BrokerSummaryImporter
     ];
 
     /**
+     * Columns declared unsigned in the bandar_detector_summaries schema.
+     *
+     * number_broker_buysell is absent: it is buyers minus sellers and is
+     * signed. It was declared unsigned once, and MariaDB rejected a normal
+     * -27 with the same 1264 that this guard exists to explain -- but the fix
+     * there was the column type, not the value, so listing it here would have
+     * turned a schema bug into a spurious import failure.
+     */
+    private const UNSIGNED_DETECTOR_COLUMNS = [
+        'total_buyer',
+        'total_seller',
+        'volume',
+    ];
+
+    /**
      * Largest value BIGINT UNSIGNED holds.
      */
     private const UNSIGNED_BIGINT_MAX = 18446744073709551615;
@@ -43,11 +58,21 @@ class BrokerSummaryImporter
      * tell them apart -- this says which it is, and for which broker and date.
      *
      * @param  array<int, array<string, mixed>>  $payload
+     * @param  array<int, string>  $columns
+     * @param  string  $label  How to identify a row: its broker, or the window.
      */
-    private function guardMagnitudes(string $symbol, array $payload): void
-    {
+    private function guardMagnitudes(
+        string $symbol,
+        array $payload,
+        array $columns = self::UNSIGNED_COLUMNS,
+        string $label = 'broker',
+    ): void {
         foreach ($payload as $row) {
-            foreach (self::UNSIGNED_COLUMNS as $column) {
+            $subject = $label === 'broker'
+                ? sprintf('%s %s on %s', $symbol, $row['broker_code'] ?? '?', $row['trade_date'] ?? '?')
+                : sprintf('%s for %s..%s', $symbol, $row['from_date'] ?? '?', $row['to_date'] ?? '?');
+
+            foreach ($columns as $column) {
                 $value = $row[$column] ?? 0;
 
                 if (! is_int($value) && ! is_float($value)) {
@@ -56,10 +81,8 @@ class BrokerSummaryImporter
 
                 if ($value < 0) {
                     throw new RuntimeException(sprintf(
-                        '%s %s on %s has a negative %s (%s). That column is unsigned, so the database will reject it.',
-                        $symbol,
-                        $row['broker_code'] ?? '?',
-                        $row['trade_date'] ?? '?',
+                        '%s has a negative %s (%s). That column is unsigned, so the database will reject it.',
+                        $subject,
                         $column,
                         $value,
                     ));
@@ -67,10 +90,8 @@ class BrokerSummaryImporter
 
                 if ($value > self::UNSIGNED_BIGINT_MAX) {
                     throw new RuntimeException(sprintf(
-                        '%s %s on %s has a %s of %s, larger than the column can store. The source data looks wrong.',
-                        $symbol,
-                        $row['broker_code'] ?? '?',
-                        $row['trade_date'] ?? '?',
+                        '%s has a %s of %s, larger than the column can store. The source data looks wrong.',
+                        $subject,
                         $column,
                         $value,
                     ));
@@ -228,23 +249,34 @@ class BrokerSummaryImporter
                 if (is_array($metricsJson)) {
                     $metricsJson = json_encode($metricsJson);
                 }
+                $detectorPayload = [[
+                    'asset_id' => $asset->id,
+                    'from_date' => $bandarDetector['from_date'],
+                    'to_date' => $bandarDetector['to_date'],
+                    'transaction_type' => $bandarDetector['transaction_type'],
+                    'broker_accdist' => $bandarDetector['broker_accdist'],
+                    'number_broker_buysell' => $bandarDetector['number_broker_buysell'],
+                    'total_buyer' => $bandarDetector['total_buyer'],
+                    'total_seller' => $bandarDetector['total_seller'],
+                    'value' => $bandarDetector['value'],
+                    'volume' => $bandarDetector['volume'],
+                    'average_price' => $bandarDetector['average_price'],
+                    'metrics_json' => $metricsJson,
+                    'created_at' => $timestamp,
+                    'updated_at' => $timestamp,
+                ]];
+
+                // This upsert was not guarded, which is why an out-of-range
+                // number_broker_buysell reached the driver raw.
+                $this->guardMagnitudes(
+                    $symbol,
+                    $detectorPayload,
+                    self::UNSIGNED_DETECTOR_COLUMNS,
+                    'window',
+                );
+
                 BandarDetectorSummary::upsert(
-                    [[
-                        'asset_id' => $asset->id,
-                        'from_date' => $bandarDetector['from_date'],
-                        'to_date' => $bandarDetector['to_date'],
-                        'transaction_type' => $bandarDetector['transaction_type'],
-                        'broker_accdist' => $bandarDetector['broker_accdist'],
-                        'number_broker_buysell' => $bandarDetector['number_broker_buysell'],
-                        'total_buyer' => $bandarDetector['total_buyer'],
-                        'total_seller' => $bandarDetector['total_seller'],
-                        'value' => $bandarDetector['value'],
-                        'volume' => $bandarDetector['volume'],
-                        'average_price' => $bandarDetector['average_price'],
-                        'metrics_json' => $metricsJson,
-                        'created_at' => $timestamp,
-                        'updated_at' => $timestamp,
-                    ]],
+                    $detectorPayload,
                     ['asset_id', 'from_date', 'to_date', 'transaction_type'],
                     [
                         'broker_accdist',
