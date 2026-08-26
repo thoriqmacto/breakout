@@ -34,9 +34,11 @@ class GoogleDriveCheckCommand extends Command
         try {
             $disk = Storage::disk($diskName);
         } catch (Throwable $e) {
-            // The gdrive driver validates its own config on resolve, so a
-            // missing key file or folder id surfaces here with a usable message.
+            // The gdrive driver validates its credentials and exchanges the
+            // refresh token while resolving, so a missing variable or a
+            // rejected grant surfaces here rather than at the first write.
             $this->error($e->getMessage());
+            $this->hint($diskName, $e->getMessage());
 
             return self::FAILURE;
         }
@@ -146,9 +148,10 @@ class GoogleDriveCheckCommand extends Command
     }
 
     /**
-     * Print what the disk resolved to, without echoing anything sensitive --
-     * the key file's contents are credentials, so only its path and presence
-     * are reported.
+     * Print what the disk resolved to, without echoing anything sensitive.
+     * The client secret and refresh token are credentials, and the client id
+     * has no diagnostic value beyond being present, so all three are reported
+     * only as set or unset.
      */
     private function reportConfiguration(string $diskName): bool
     {
@@ -168,70 +171,26 @@ class GoogleDriveCheckCommand extends Command
             return true;
         }
 
-        $keyFile = (string) ($config['keyFile'] ?? '');
-        $resolved = $keyFile !== '' && ! str_starts_with($keyFile, DIRECTORY_SEPARATOR)
-            ? base_path($keyFile)
-            : $keyFile;
-
-        $this->line('  key file:  '.($keyFile === '' ? '(unset)' : $keyFile));
-
-        if ($keyFile !== '') {
-            $this->line('  resolved:  '.$resolved.(is_file($resolved) ? ' (found)' : ' (MISSING)'));
+        foreach ([
+            'client id' => 'clientId',
+            'client secret' => 'clientSecret',
+            'refresh token' => 'refreshToken',
+        ] as $label => $key) {
+            // Credentials are only ever reported as present or absent.
+            $this->line(sprintf(
+                '  %-15s %s',
+                $label.':',
+                trim((string) ($config[$key] ?? '')) === '' ? 'unset' : 'set',
+            ));
         }
 
-        $teamDriveId = (string) ($config['teamDriveId'] ?? '');
+        $folderId = trim((string) ($config['folderId'] ?? ''));
 
-        $this->line('  folder id: '.(((string) ($config['folderId'] ?? '')) === '' ? '(unset)' : 'set'));
-        $this->line('  shared drive: '.($teamDriveId === '' ? '(unset)' : 'set — takes precedence over folder id'));
-        $this->line('  root:      '.((string) ($config['root'] ?? 'breakout-data')));
-
-        if ($teamDriveId === '') {
-            $this->warn('  Writing into a My Drive folder. A service account has no storage quota, so it');
-            $this->warn('  can create folders there but not files. Set GOOGLE_DRIVE_TEAM_DRIVE_ID instead.');
-        }
-
-        // The account identity is the one thing you need in order to share the
-        // folder, and it is not a credential -- only private_key is. Printing
-        // it saves opening the JSON by hand on the server.
-        $identity = $this->serviceAccountIdentity($resolved);
-
-        foreach ($identity as $label => $value) {
-            $this->line(sprintf('  %-10s %s', $label.':', $value));
-        }
-
+        $this->line(sprintf('  %-15s %s', 'folder id:', $folderId === '' ? '(My Drive root)' : 'set'));
+        $this->line(sprintf('  %-15s %s', 'root:', (string) ($config['root'] ?? 'breakout-data')));
         $this->newLine();
 
         return true;
-    }
-
-    /**
-     * Read the non-secret identity fields out of the service-account JSON.
-     *
-     * @return array<string, string>
-     */
-    private function serviceAccountIdentity(string $path): array
-    {
-        if ($path === '' || ! is_file($path) || ! is_readable($path)) {
-            return [];
-        }
-
-        $decoded = json_decode((string) file_get_contents($path), true);
-
-        if (! is_array($decoded)) {
-            return ['key json' => 'unreadable (not valid JSON)'];
-        }
-
-        $identity = [];
-
-        if (is_string($decoded['client_email'] ?? null)) {
-            $identity['account'] = $decoded['client_email'];
-        }
-
-        if (is_string($decoded['project_id'] ?? null)) {
-            $identity['project'] = $decoded['project_id'];
-        }
-
-        return $identity;
     }
 
     private function cleanup(
@@ -295,9 +254,8 @@ class GoogleDriveCheckCommand extends Command
 
     /**
      * Guidance chosen from what Google actually said, rather than a single
-     * guess. An earlier version always blamed the folder share, which is
-     * actively misleading when the share is correct and the real problem is
-     * that a service account cannot own files at all.
+     * guess. An earlier version always blamed one cause, which is actively
+     * misleading when that cause is not the real one.
      *
      * @param  string  $error  The collected error text, empty when unknown.
      */
@@ -311,40 +269,55 @@ class GoogleDriveCheckCommand extends Command
 
         $this->newLine();
 
-        if (str_contains($error, 'storagequotaexceeded') || str_contains($error, 'quota')) {
-            $this->line('Google removed storage quota from service accounts, so one cannot own a file in');
-            $this->line('My Drive even when the folder is shared with it. Folders cost no quota, which is');
-            $this->line('why breakout-data and smoke were created but the file write then failed.');
+        if (str_contains($error, 'invalid_grant')) {
+            $this->line('The refresh token was rejected. A refresh token stops working when it is');
+            $this->line('revoked, when the account password or security settings change, when it no');
+            $this->line('longer matches the OAuth client, or when it was issued while the consent');
+            $this->line('screen was still in Testing -- those expire after seven days.');
             $this->newLine();
-            $this->line('Use a Shared Drive instead: create one, add the service account as a member with');
-            $this->line('Content manager, and set GOOGLE_DRIVE_TEAM_DRIVE_ID to the Shared Drive id (the');
-            $this->line('part after /drive/folders/ in its URL). A Shared Drive owns its files, so no');
-            $this->line('quota is charged to the account. It takes precedence over GOOGLE_DRIVE_FOLDER_ID.');
+            $this->line('Generate a new one and put it in GOOGLE_DRIVE_REFRESH_TOKEN, then run');
+            $this->line('php artisan config:cache. For a token that keeps working, move the OAuth');
+            $this->line('consent screen out of Testing in the Google Cloud console.');
+
+            return;
+        }
+
+        if (str_contains($error, 'invalid_client') || str_contains($error, 'unauthorized_client')) {
+            $this->line('The OAuth client itself was rejected. Check GOOGLE_DRIVE_CLIENT_ID and');
+            $this->line('GOOGLE_DRIVE_CLIENT_SECRET against the credential in the Google Cloud');
+            $this->line('console, and that the refresh token was issued by that same client.');
+
+            return;
+        }
+
+        if (str_contains($error, 'has not been used') || str_contains($error, 'accessnotconfigured')
+            || str_contains($error, 'api has not been enabled')) {
+            $this->line('The Google Drive API is not enabled for the Cloud project behind this OAuth');
+            $this->line('client. Enable it under APIs & Services, then retry -- it can take a minute');
+            $this->line('to take effect.');
+
+            return;
+        }
+
+        if (str_contains($error, 'insufficientpermissions') || str_contains($error, 'insufficient')
+            || str_contains($error, '403')) {
+            $this->line('The token was accepted but lacks the scope this needs. It must carry');
+            $this->line('https://www.googleapis.com/auth/drive -- a read-only or drive.file scope is');
+            $this->line('not enough. Re-authorise with that scope and regenerate the refresh token.');
 
             return;
         }
 
         if (str_contains($error, 'notfound') || str_contains($error, '404')) {
-            $this->line('Drive reported the target as not found. Check GOOGLE_DRIVE_FOLDER_ID (or');
-            $this->line('GOOGLE_DRIVE_TEAM_DRIVE_ID) holds only the id from the folder URL, with no');
-            $this->line('surrounding https://drive.google.com/drive/folders/ and no trailing slash.');
-            $this->line('A folder that exists but is not shared with the account also reads as missing.');
+            $this->line('Drive reported the target as not found. If GOOGLE_DRIVE_FOLDER_ID is set,');
+            $this->line('check it holds only the id from the folder URL and that the authorised');
+            $this->line('account can open that folder. Leave it blank to use My Drive directly.');
 
             return;
         }
 
-        if (str_contains($error, 'insufficientpermissions') || str_contains($error, '403')) {
-            $this->line('Drive refused the write as unauthorised. Share the target with the service');
-            $this->line("account's email (…@….iam.gserviceaccount.com) as Editor, or add it to the");
-            $this->line('Shared Drive as Content manager. Sharing with your own account does not help:');
-            $this->line('the service account is a separate identity.');
-
-            return;
-        }
-
-        $this->line('Check, in order: that the Drive API is enabled for this project, that the target');
-        $this->line("is shared with the service account's email as Editor, and that the id in .env is");
-        $this->line('just the id from the folder URL. If folders appear in Drive but files do not, the');
-        $this->line('cause is service-account storage quota -- use a Shared Drive.');
+        $this->line('Check, in order: that the Google Drive API is enabled for the OAuth client\'s');
+        $this->line('project, that the three GOOGLE_DRIVE_* credentials are the current ones, and');
+        $this->line('that the refresh token was authorised with the full drive scope.');
     }
 }

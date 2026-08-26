@@ -188,38 +188,48 @@ hydrate  →  existing local read/merge/write loop (unchanged)  →  flush
 
 `stockbit:scrape`, `asset:sync`, `ohlcv:check`, and `csv:fix-date-format` all accept `--disk=` to override `CSV_MIRROR_DISK` for a single run. Passing `--disk=` with an empty value forces a purely local run.
 
-### Setting up a Google Drive service account
+### Setting up Google Drive OAuth for a personal Gmail account
+
+Authentication is OAuth 2.0 as a real Google user, not a service account. A service account cannot be used here: Google gives them no storage quota, so one can create folders in My Drive quite happily and then fail on the first actual file, which makes the failure look like a permissions problem when it is not.
 
 1. In the [Google Cloud console](https://console.cloud.google.com/), create (or pick) a project and **enable the Google Drive API**.
-2. Create a **service account** and add a **JSON key**. Download it.
-3. Save the key at `apps/api/storage/app/google/service-account.json`. This path is gitignored — the key is as sensitive as the Stockbit bearer, so **never commit it** and never place it anywhere tracked.
-4. Create a **Shared Drive** (Drive → Shared drives → New) and add the service account's email (`...@....iam.gserviceaccount.com`) as a member with **Content manager**.
-
-   **A Shared Drive, not a folder in My Drive.** Google removed storage quota from service accounts, so an account cannot *own* a file — and in My Drive the creator owns what it creates. Sharing a My Drive folder with the account is not enough: it will create folders there quite happily, because folders cost no quota, then fail on the first actual file. A Shared Drive owns its own contents, so nothing is charged to the account.
-
-5. Copy the Shared Drive ID out of its URL (`https://drive.google.com/drive/folders/<ID>`).
-6. Fill in `apps/api/.env`:
+2. Configure the **OAuth consent screen**. Add the Gmail account that will own the files as a test user if the app stays in Testing.
+3. Create an **OAuth 2.0 Client ID** of type **Web application**.
+4. Add `https://developers.google.com/oauthplayground` as an **authorized redirect URI** — this is what lets the Playground mint the refresh token below.
+5. Open the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/), and in the gear menu tick **Use your own OAuth credentials**, pasting the client ID and secret.
+6. In step 1 enter the scope `https://www.googleapis.com/auth/drive` — the full Drive scope. `drive.file` and the read-only scopes are not enough for the mirror.
+7. Authorize as the Gmail account that should own the backups, then **Exchange authorization code for tokens**.
+8. Copy the **refresh token**. That is the credential the VPS uses; it lets scheduled and CLI jobs authenticate with no browser.
+9. Fill in `apps/api/.env` on the server:
 
    ```dotenv
-   GOOGLE_DRIVE_KEY_FILE=storage/app/google/service-account.json
-   GOOGLE_DRIVE_TEAM_DRIVE_ID=<SHARED_DRIVE_ID>
-   GOOGLE_DRIVE_ROOT=breakout-data      # subfolder created inside it
+   GOOGLE_DRIVE_CLIENT_ID=xxxx.apps.googleusercontent.com
+   GOOGLE_DRIVE_CLIENT_SECRET=xxxx
+   GOOGLE_DRIVE_REFRESH_TOKEN=xxxx
+
+   GOOGLE_DRIVE_FOLDER_ID=              # blank = My Drive root
+   GOOGLE_DRIVE_ROOT=breakout-data
+
+   CSV_MIRROR_DISK=gdrive
+   CSV_MIRROR_PATH=seeds/historical
    ```
 
-   `GOOGLE_DRIVE_FOLDER_ID` still exists for a My Drive folder and takes lower precedence when both are set, but it only works where the account never has to own a file — which for this app is nowhere. Prefer the Shared Drive.
+   Those values are placeholders. `GOOGLE_DRIVE_CLIENT_SECRET` and `GOOGLE_DRIVE_REFRESH_TOKEN` are credentials — never commit them, and there is no longer any JSON key file to protect.
 
-7. Verify the credentials before wiring anything else up — the folder sharing is where most of the friction lives:
+   Leaving `GOOGLE_DRIVE_FOLDER_ID` blank puts everything under `My Drive/breakout-data`. Set it only to nest the app folder inside an existing folder, and then it must hold just the id from that folder's URL.
 
-   ```bash
-   cd apps/api
-   php artisan gdrive:check
-   ```
+10. **While the consent screen is in Testing, refresh tokens expire after seven days.** For a VPS that should keep working, publish the app in the Google Cloud console. This is the single most common cause of Drive working for a week and then failing with `invalid_grant`.
 
-   It prints the resolved configuration — never the credentials themselves — then writes, reads back, overwrites and deletes a probe file in the shared folder, reporting which step failed. `--keep` leaves the probe file behind if you want to see it in Drive; `--disk=` targets another disk.
+11. Apply the configuration and verify:
 
-   **Use this rather than the test suite on a server.** `php artisan test` comes from `nunomaduro/collision`, which is a `require-dev` package, so it is absent wherever `composer install --no-dev` has run — including any host the deploy workflow has touched, which is exactly where the credentials live. Running it there fails with `Command "test" is not defined`. The equivalent test, `GoogleDriveDiskTest`, still runs locally and skips itself when the credentials are absent.
+    ```bash
+    cd apps/api
+    php artisan optimize:clear
+    php artisan config:cache      # config:cache bakes .env in; clearing first is required
+    php artisan gdrive:check
+    ```
 
-   The overwrite step is worth its own mention: Drive permits two files with the same name in one folder, where a normal filesystem does not. `gdrive:check` fails if a second write creates a duplicate rather than replacing, because a mirror that accumulates copies looks healthy until the folder is inspected.
+    `gdrive:check` reports each credential as `set` or `unset` — never their values — then writes, reads back, overwrites and deletes a probe file, naming whichever step fails. `--keep` leaves the probe in place so you can see it in Drive.
 
 ### Migrating existing CSVs to the mirror
 
