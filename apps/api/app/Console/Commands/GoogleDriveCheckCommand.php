@@ -282,10 +282,24 @@ class GoogleDriveCheckCommand extends Command
             return;
         }
 
-        if (str_contains($error, 'invalid_client') || str_contains($error, 'unauthorized_client')) {
-            $this->line('The OAuth client itself was rejected. Check GOOGLE_DRIVE_CLIENT_ID and');
-            $this->line('GOOGLE_DRIVE_CLIENT_SECRET against the credential in the Google Cloud');
-            $this->line('console, and that the refresh token was issued by that same client.');
+        // Google answers a bad client with {"error": "invalid_client",
+        // "error_description": "Unauthorized"}, so the bare word is matched too
+        // for the case where only the description survives.
+        if (str_contains($error, 'invalid_client') || str_contains($error, 'unauthorized_client')
+            || str_contains($error, 'unauthorized')) {
+            $this->line('Google rejected the OAuth client, not the refresh token. "Unauthorized" is');
+            $this->line('the description it returns for invalid_client, and it means one of:');
+            $this->newLine();
+            $this->line('  - GOOGLE_DRIVE_CLIENT_SECRET does not match GOOGLE_DRIVE_CLIENT_ID;');
+            $this->line('  - either value carries a stray space, quote or newline from being pasted');
+            $this->line('    into .env -- check with: grep GOOGLE_DRIVE_CLIENT .env | cat -A');
+            $this->line('  - the refresh token was minted by a *different* OAuth client, so the');
+            $this->line('    three values do not belong to one credential;');
+            $this->line('  - the client id is an Android/iOS/Desktop type rather than Web');
+            $this->line('    application, which cannot use this grant.');
+            $this->newLine();
+            $this->line('Compare all three against the same credential in the Google Cloud console,');
+            $this->line('then run php artisan config:cache before retrying.');
 
             return;
         }
