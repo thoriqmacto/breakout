@@ -109,11 +109,24 @@ jobs:
             git fetch --prune origin
             git reset --hard "$DEPLOY_SHA"
 
-            # artisan lives in apps/api, not the repository root. Running the
-            # maintenance commands from DEPLOY_PATH only produced "Could not
-            # open input file: artisan", swallowed by the `|| true`, so the app
-            # was never actually put into maintenance mode during a deploy.
-            cd apps/api
+            # artisan lives in apps/api, not the repository root, and running
+            # the maintenance commands from the root only produced "Could not
+            # open input file: artisan" -- swallowed by the `|| true`, so the
+            # app was never actually put into maintenance mode.
+            #
+            # But DEPLOY_PATH may legitimately be either the repository root or
+            # apps/api itself: git works from either, since apps/api is inside
+            # the worktree, so `git reset` above succeeds regardless. An
+            # unconditional `cd apps/api` assumed the root and killed the deploy
+            # with "cd: apps/api: No such file or directory" when it was not.
+            if [ -f artisan ]; then
+              :
+            elif [ -f apps/api/artisan ]; then
+              cd apps/api
+            else
+              echo "::error::No artisan found at $DEPLOY_PATH or $DEPLOY_PATH/apps/api. DEPLOY_PATH must be the repository root or the apps/api directory inside it."
+              exit 1
+            fi
 
             # Always lift maintenance mode, including on failure. A deploy that
             # dies midway must not leave the site down indefinitely. Set after
