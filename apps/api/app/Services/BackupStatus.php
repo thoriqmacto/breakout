@@ -67,13 +67,10 @@ class BackupStatus
         $health = $this->health->check($remoteDisk);
         $remote = $health['can_read'] ? $this->disk($remoteDisk) : null;
 
-        $historicalRemote = $this->diskFiles(
-            $remote,
-            trim((string) config('csv.mirror_path', 'seeds/historical'), '/'),
-            ['csv'],
-        );
-
+        $historicalDirectory = trim((string) config('csv.mirror_path', 'seeds/historical'), '/');
         $brokerDirectory = trim((string) config('stockbit.save_dir', 'broker_summary'), '/');
+
+        $historicalRemote = $this->diskFiles($remote, $historicalDirectory, ['csv']);
 
         $collections = [
             $this->collection(
@@ -86,6 +83,7 @@ class BackupStatus
                 // service (BarCsvMirror), so they are the only one this page
                 // can offer to push.
                 pushable: true,
+                remoteDirectory: $historicalDirectory,
             ),
             $this->collection(
                 'broker_summary',
@@ -94,6 +92,7 @@ class BackupStatus
                 $this->diskFiles($remote, $brokerDirectory, ['csv', 'json']),
                 $remote,
                 pushable: false,
+                remoteDirectory: $brokerDirectory,
             ),
         ];
 
@@ -184,35 +183,40 @@ class BackupStatus
         }
 
         try {
-            $paths = $disk->allFiles($directory);
+            // One listing, not a listing plus two metadata calls per file.
+            // Flysystem's FileAttributes already carry size and mtime -- on
+            // Drive they come from the same response as the names -- whereas
+            // $disk->size() and $disk->lastModified() each resolve the path and
+            // fetch again. Thirty files was enough for that to exceed the
+            // gateway timeout and return 504.
+            $listing = $disk->getDriver()->listContents($directory, false);
+            $files = [];
+
+            foreach ($listing as $item) {
+                if (! $item->isFile()) {
+                    continue;
+                }
+
+                $path = $item->path();
+
+                if (! in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $extensions, true)) {
+                    continue;
+                }
+
+                $name = ltrim(substr($path, strlen($directory)), '/');
+                $timestamp = $item->lastModified();
+                $size = $item->fileSize();
+
+                $files[$name] = [
+                    'path' => $path,
+                    'size' => $size,
+                    'modified_at' => $timestamp ? Carbon::createFromTimestamp($timestamp)->toIso8601String() : null,
+                    'timestamp' => $timestamp,
+                    'local' => false,
+                ];
+            }
         } catch (Throwable) {
             return ['status' => 'failed', 'files' => []];
-        }
-
-        $files = [];
-
-        foreach ($paths as $path) {
-            if (! in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $extensions, true)) {
-                continue;
-            }
-
-            $name = ltrim(substr($path, strlen($directory)), '/');
-
-            try {
-                $timestamp = $disk->lastModified($path);
-                $size = $disk->size($path);
-            } catch (Throwable) {
-                $timestamp = null;
-                $size = null;
-            }
-
-            $files[$name] = [
-                'path' => $path,
-                'size' => $size,
-                'modified_at' => $timestamp ? Carbon::createFromTimestamp($timestamp)->toIso8601String() : null,
-                'timestamp' => $timestamp,
-                'local' => false,
-            ];
         }
 
         return ['status' => 'ok', 'files' => $files];
@@ -230,6 +234,7 @@ class BackupStatus
         array $remote,
         ?Filesystem $remoteDisk,
         bool $pushable,
+        string $remoteDirectory = '',
     ): array {
         $localFiles = $local['files'];
         $remoteFiles = $remote['files'];
@@ -237,6 +242,13 @@ class BackupStatus
 
         $names = array_values(array_unique([...array_keys($localFiles), ...array_keys($remoteFiles)]));
         sort($names, SORT_NATURAL | SORT_FLAG_CASE);
+
+        // Drive hands over every checksum in the folder for one query, so ask
+        // once here rather than twice per file inside compare(). Empty for any
+        // other disk, and compare() then hashes individually.
+        $checksums = $remoteScanned && $remoteDisk !== null
+            ? $this->hasher->directoryChecksums($remoteDisk, $remoteDirectory)
+            : [];
 
         $files = [];
 
@@ -248,6 +260,7 @@ class BackupStatus
                 $remoteDisk,
                 $remoteScanned,
                 $pushable,
+                $checksums[$name] ?? null,
             );
         }
 
@@ -275,6 +288,7 @@ class BackupStatus
         ?Filesystem $remoteDisk,
         bool $remoteScanned,
         bool $pushable,
+        ?string $knownRemoteHash = null,
     ): array {
         // Drive could not be listed. Absence proves nothing, so the file is
         // unknown rather than local-only, and nothing is offered as pushable.
@@ -294,7 +308,7 @@ class BackupStatus
             return $this->entry($name, self::COMPARE_ERROR, $local, $remote, false);
         }
 
-        $state = $this->compare($local, $remote, $remoteDisk, $localHash, $remoteHash);
+        $state = $this->compare($local, $remote, $remoteDisk, $knownRemoteHash, $localHash, $remoteHash);
 
         $local['hash'] = $localHash;
         $remote['hash'] = $remoteHash;
@@ -315,6 +329,7 @@ class BackupStatus
         array $local,
         array $remote,
         ?Filesystem $remoteDisk,
+        ?string $knownRemoteHash,
         ?string &$localHash,
         ?string &$remoteHash,
     ): string {
@@ -333,7 +348,10 @@ class BackupStatus
         }
 
         $localHash = $this->hasher->local((string) $local['path']);
-        $remoteHash = $this->hasher->remote($remoteDisk, (string) $remote['path']);
+
+        // The bulk listing already answered this for Drive. Only fall back to
+        // a per-file lookup (or a full download) when it did not.
+        $remoteHash = $knownRemoteHash ?? $this->hasher->remote($remoteDisk, (string) $remote['path']);
 
         // An unreadable side means unknown. Reporting that as synced is the
         // one failure mode this page must never have.
