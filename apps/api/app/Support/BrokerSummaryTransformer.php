@@ -4,6 +4,10 @@ namespace App\Support;
 
 final class BrokerSummaryTransformer
 {
+    public const SIDE_BUY = 'buy';
+
+    public const SIDE_SELL = 'sell';
+
     /**
      * @return array<int, array{symbol:string,date:string,broker:string,net_value:float,buy_value:float,sell_value:float}>
      */
@@ -152,6 +156,174 @@ final class BrokerSummaryTransformer
     }
 
     /**
+     * Read a response as what it is: one aggregate over data.from..data.to.
+     *
+     * The payload's own range is authoritative. netbs_date is carried through
+     * as source_date for auditing and is never treated as a trading date --
+     * in a ranged response it is the range start repeated on every row, and
+     * reading it as a day is what made three months of flow look like 26 May.
+     *
+     * @param  string|null  $fromDate  Filename fallback, used only when the payload omits the range.
+     * @param  string|null  $toDate  Filename fallback.
+     * @return array{
+     *     symbol:string, from_date:?string, to_date:?string, transaction_type:?string,
+     *     entries:array<int, array<string, mixed>>, coverage:array<string, mixed>,
+     *     bandar_detector:array<string, mixed>|null
+     * }|null
+     */
+    public static function toWindow(
+        string $symbol,
+        array $json,
+        ?string $fromDate = null,
+        ?string $toDate = null,
+        ?string $transactionType = null,
+    ): ?array {
+        $summary = self::extractBrokerSummaryPayload($json);
+        $detector = self::extractBandarDetectorPayload($json);
+
+        if ($summary === [] && $detector === null) {
+            return null;
+        }
+
+        $payloadFrom = self::extractSummaryFromDate($json, $summary);
+        $payloadTo = self::extractSummaryToDate($json, $summary);
+
+        $entries = [];
+        $buyers = 0;
+        $sellers = 0;
+
+        foreach (self::rowsOf($summary, 'brokers_buy') as $entry) {
+            $row = self::entry($entry, self::SIDE_BUY);
+
+            if ($row !== null) {
+                $entries[] = $row;
+                $buyers++;
+            }
+        }
+
+        foreach (self::rowsOf($summary, 'brokers_sell') as $entry) {
+            $row = self::entry($entry, self::SIDE_SELL);
+
+            if ($row !== null) {
+                $entries[] = $row;
+                $sellers++;
+            }
+        }
+
+        $totalBuyer = $detector !== null ? self::int($detector['total_buyer'] ?? null) : null;
+        $totalSeller = $detector !== null ? self::int($detector['total_seller'] ?? null) : null;
+
+        return [
+            'symbol' => strtoupper($symbol),
+            'from_date' => $payloadFrom ?? ($fromDate ? self::normalizeDate($fromDate) : null),
+            'to_date' => $payloadTo ?? ($toDate ? self::normalizeDate($toDate) : null),
+            'payload_from_date' => $payloadFrom,
+            'payload_to_date' => $payloadTo,
+            'transaction_type' => self::extractTransactionType($json, $summary, $transactionType),
+            'entries' => $entries,
+            'coverage' => [
+                'returned_buyer_count' => $buyers,
+                'returned_seller_count' => $sellers,
+                'total_buyer' => $totalBuyer,
+                'total_seller' => $totalSeller,
+                // A null total means Stockbit did not say how many exist,
+                // which is not evidence that the list is complete.
+                'buyers_truncated' => $totalBuyer !== null && $buyers < $totalBuyer,
+                'sellers_truncated' => $totalSeller !== null && $sellers < $totalSeller,
+            ],
+            'bandar_detector' => $detector === null
+                ? null
+                : self::toBandarDetectorSummary($json, $fromDate, $toDate, $transactionType),
+        ];
+    }
+
+    /**
+     * Normalise one broker row.
+     *
+     * The two arrays are net-buyer and net-seller rankings for the window, not
+     * gross legs, so the mapping keeps net and gross apart:
+     *
+     *   buy:  net_lot<-blot  net_value<-bval  gross_volume<-blotv  gross_value<-bvalv
+     *   sell: net_lot<-slot  net_value<-sval  gross_volume<-slotv  gross_value<-svalv
+     *
+     * Signs come through untouched. A buyer-list blot can be negative in real
+     * payloads, and abs() would replace the source's meaning with the array's
+     * name.
+     *
+     * @param  array<string, mixed>  $entry
+     * @return array<string, mixed>|null
+     */
+    private static function entry(array $entry, string $side): ?array
+    {
+        $broker = trim((string) ($entry['netbs_broker_code'] ?? $entry['broker_code'] ?? $entry['broker'] ?? ''));
+
+        if ($broker === '') {
+            return null;
+        }
+
+        $isBuy = $side === self::SIDE_BUY;
+        $sourceDate = (string) ($entry['netbs_date'] ?? $entry['date'] ?? '');
+
+        return [
+            'broker_code' => strtoupper($broker),
+            'side' => $side,
+            // Real payloads use "type" ("Asing", "Lokal", "Pemerintah"); the
+            // older keys are kept so existing fixtures still resolve.
+            'broker_type' => self::stringOrNull(
+                $entry['type'] ?? $entry['netbs_broker_type'] ?? $entry['broker_type'] ?? null
+            ),
+            // freq arrives as a numeric string, and num() also copes with the
+            // scientific notation the other numeric fields use.
+            'frequency' => self::int($entry['freq'] ?? $entry['frequency'] ?? null),
+            'source_date' => $sourceDate === '' ? null : self::normalizeDate($sourceDate),
+            'net_lot' => self::int($isBuy ? ($entry['blot'] ?? null) : ($entry['slot'] ?? null)),
+            'net_value' => self::decimal($isBuy ? ($entry['bval'] ?? null) : ($entry['sval'] ?? null)),
+            'gross_volume' => self::int($isBuy ? ($entry['blotv'] ?? null) : ($entry['slotv'] ?? null)),
+            'gross_value' => self::decimal($isBuy ? ($entry['bvalv'] ?? null) : ($entry['svalv'] ?? null)),
+            'average_price' => self::decimal(
+                $isBuy
+                    ? ($entry['netbs_buy_avg_price'] ?? $entry['buy_avg_price'] ?? null)
+                    : ($entry['netbs_sell_avg_price'] ?? $entry['sell_avg_price'] ?? null)
+            ),
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function rowsOf(array $summary, string $key): array
+    {
+        $rows = $summary[$key] ?? [];
+
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        return array_values(array_filter($rows, 'is_array'));
+    }
+
+    /**
+     * The window's end, read from the payload. Mirrors extractSummaryFromDate.
+     */
+    private static function extractSummaryToDate(array $json, array $summary = []): ?string
+    {
+        foreach ([
+            $summary['to'] ?? null,
+            $summary['to_date'] ?? null,
+            $json['data']['to'] ?? null,
+            $json['data']['to_date'] ?? null,
+            $json['to'] ?? null,
+            $json['to_date'] ?? null,
+        ] as $candidate) {
+            if (is_string($candidate) && trim($candidate) !== '') {
+                return self::normalizeDate($candidate);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
     public static function toBandarDetectorSummary(
@@ -166,12 +338,22 @@ final class BrokerSummaryTransformer
         }
 
         $transactionType = self::extractTransactionType($json, [], $transactionType);
-        $metricsKeys = ['avg', 'avg5', 'top1', 'top3', 'top5', 'top10'];
+
+        // Every nested group is kept, not just the six known today. A metric
+        // Stockbit adds later would otherwise be silently dropped on import
+        // and be unrecoverable without re-reading the archived JSON. The known
+        // keys are listed first so the common ones keep a stable order.
         $metrics = [];
 
-        foreach ($metricsKeys as $key) {
+        foreach (['avg', 'avg5', 'top1', 'top3', 'top5', 'top10'] as $key) {
             if (isset($detector[$key]) && is_array($detector[$key])) {
                 $metrics[$key] = $detector[$key];
+            }
+        }
+
+        foreach ($detector as $key => $value) {
+            if (is_array($value) && ! array_key_exists($key, $metrics)) {
+                $metrics[$key] = $value;
             }
         }
 

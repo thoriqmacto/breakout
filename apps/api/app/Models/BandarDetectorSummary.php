@@ -11,6 +11,7 @@ class BandarDetectorSummary extends Model
 
     protected $fillable = [
         'asset_id',
+        'broker_summary_window_id',
         'from_date',
         'to_date',
         'transaction_type',
@@ -25,8 +26,11 @@ class BandarDetectorSummary extends Model
     ];
 
     protected $casts = [
-        'from_date' => 'date',
-        'to_date' => 'date',
+        // Date-only, and formatted as such. A bare 'date' cast round-trips as
+        // "2026-05-26 00:00:00", which does not match the stored DATE value,
+        // so updateOrCreate looked the row up and missed every time.
+        'from_date' => 'date:Y-m-d',
+        'to_date' => 'date:Y-m-d',
         'number_broker_buysell' => 'int',
         'total_buyer' => 'int',
         'total_seller' => 'int',
@@ -39,5 +43,16 @@ class BandarDetectorSummary extends Model
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);
+    }
+
+    /**
+     * The retrieval window this detector describes.
+     *
+     * Nullable for rows imported before windows existed; those are relinked
+     * by broker-summary:rebuild.
+     */
+    public function window(): BelongsTo
+    {
+        return $this->belongsTo(BrokerSummaryWindow::class, 'broker_summary_window_id');
     }
 }
