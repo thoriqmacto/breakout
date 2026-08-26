@@ -91,28 +91,24 @@ class GoogleDriveDiagnoseCommand extends Command
         //    count means the fast path is not covering everything and the rest
         //    are downloaded in full to be hashed -- the difference between
         //    seconds and minutes. An empty folder legitimately yields none.
-        $this->stage("bulk checksums for {$historicalDir}", function () use ($hasher, $disk, $historicalDir, &$remoteFiles) {
-            $checksums = count($hasher->directoryChecksums($disk, $historicalDir));
+        $this->checksumStage($hasher, $disk, $historicalDir, $remoteFiles);
 
-            return [
-                $remoteFiles === 0 || $checksums >= $remoteFiles,
-                $remoteFiles === 0
-                    ? 'nothing to check'
-                    : "{$checksums} of {$remoteFiles} files",
-            ];
-        });
+        // The report compares both collections, so both are measured. Only the
+        // historical folder used to be checked here, which would have hidden a
+        // fast path working for one directory and not the other.
+        $brokerFiles = 0;
 
-        $this->stage("list {$brokerDir}", function () use ($disk, $brokerDir) {
-            $count = 0;
-
+        $this->stage("list {$brokerDir}", function () use ($disk, $brokerDir, &$brokerFiles) {
             foreach ($disk->getDriver()->listContents($brokerDir, false) as $item) {
                 if ($item->isFile()) {
-                    $count++;
+                    $brokerFiles++;
                 }
             }
 
-            return [true, "{$count} files"];
+            return [true, "{$brokerFiles} files"];
         });
+
+        $this->checksumStage($hasher, $disk, $brokerDir, $brokerFiles);
 
         $this->stage('hash local seed CSVs', function () use ($hasher, $seedDir) {
             $count = 0;
@@ -141,6 +137,32 @@ class GoogleDriveDiagnoseCommand extends Command
         $this->render($timeout);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Measure the bulk checksum fast path for one directory.
+     *
+     * When it comes up short the reason is printed. A bare "0 of 52" cost real
+     * time to diagnose: it was a path-resolution failure, indistinguishable
+     * from an empty folder or a permissions problem without it.
+     */
+    private function checksumStage(
+        ContentHasher $hasher,
+        mixed $disk,
+        string $directory,
+        int &$fileCount,
+    ): void {
+        $this->stage("bulk checksums for {$directory}", function () use ($hasher, $disk, $directory, &$fileCount) {
+            $checksums = count($hasher->directoryChecksums($disk, $directory));
+            $ok = $fileCount === 0 || $checksums >= $fileCount;
+            $detail = $fileCount === 0 ? 'nothing to check' : "{$checksums} of {$fileCount} files";
+
+            if (! $ok && ($reason = $hasher->lastFailureReason()) !== null) {
+                $detail .= " -- {$reason}";
+            }
+
+            return [$ok, $detail];
+        });
     }
 
     /**
