@@ -97,10 +97,19 @@ final class BrokerSummaryTransformer
 
                 $byBroker[$key]['broker_type'] = $byBroker[$key]['broker_type']
                     ?? self::stringOrNull($entry['netbs_broker_type'] ?? $entry['broker_type'] ?? null);
-                $byBroker[$key]['buy_lot'] = self::int($entry['blot'] ?? $entry['buy_lot'] ?? null) ?? 0;
-                $byBroker[$key]['buy_volume'] = self::int($entry['blotv'] ?? $entry['buy_volume'] ?? null) ?? 0;
-                $byBroker[$key]['buy_value'] = self::decimal($entry['bval'] ?? $entry['buy_value'] ?? null) ?? 0.0;
-                $byBroker[$key]['buy_value_v'] = self::decimal($entry['bvalv'] ?? $entry['buy_value_v'] ?? null) ?? 0.0;
+                // Magnitudes, like the sell side below. buy_lot, buy_volume and
+                // the buy values are unsigned columns; direction lives in the
+                // signed net_* fields computed further down as buy - sell.
+                //
+                // The sell branch has always taken abs() because Stockbit
+                // returns sell figures negative. The buy branch did not, so a
+                // negative in a buy row reached MariaDB as-is and it rejected
+                // the insert with 1264 "Out of range value for column
+                // 'buy_lot'". SQLite, being typeless, had stored it happily.
+                $byBroker[$key]['buy_lot'] = self::absInt($entry['blot'] ?? $entry['buy_lot'] ?? null) ?? 0;
+                $byBroker[$key]['buy_volume'] = self::absInt($entry['blotv'] ?? $entry['buy_volume'] ?? null) ?? 0;
+                $byBroker[$key]['buy_value'] = self::absDecimal($entry['bval'] ?? $entry['buy_value'] ?? null) ?? 0.0;
+                $byBroker[$key]['buy_value_v'] = self::absDecimal($entry['bvalv'] ?? $entry['buy_value_v'] ?? null) ?? 0.0;
                 $byBroker[$key]['buy_avg_price'] = self::decimal($entry['netbs_buy_avg_price'] ?? $entry['buy_avg_price'] ?? null);
             }
         }
