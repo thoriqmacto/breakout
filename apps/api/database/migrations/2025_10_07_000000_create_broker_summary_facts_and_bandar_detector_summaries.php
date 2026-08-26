@@ -47,7 +47,12 @@ return new class extends Migration
             $table->date('to_date');
             $table->string('transaction_type', 50);
             $table->string('broker_accdist', 20)->nullable();
-            $table->unsignedInteger('number_broker_buysell')->nullable();
+            // Signed: this is buyers minus sellers, and more sellers than
+            // buyers is the normal way to express distribution. It was
+            // unsignedInteger until 2026_08_26_000000, which MariaDB rejected
+            // outright. total_buyer and total_seller are counts, so they stay
+            // unsigned.
+            $table->integer('number_broker_buysell')->nullable();
             $table->unsignedInteger('total_buyer')->nullable();
             $table->unsignedInteger('total_seller')->nullable();
             $table->decimal('value', 24, 2)->nullable();
