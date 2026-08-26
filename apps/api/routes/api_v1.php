@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
+use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PositionController;
@@ -53,8 +54,24 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::apiResource('assets', AssetController::class);
 
     // Broker summary
+    //
+    // The legacy endpoint reads broksums, whose single `date` column cannot
+    // express a range. It is kept for existing callers and is only meaningful
+    // for single-day summaries.
     Route::get('broker-summaries', [BrokerSummaryController::class, 'index'])
         ->name('broker-summaries.index');
+
+    // Canonical, range-aware. A Stockbit response is one aggregate over
+    // from..to, so the window is the unit rather than a fabricated day.
+    Route::get('broker-summary/windows', [BrokerSummaryWindowController::class, 'index'])
+        ->name('broker-summary.windows.index');
+
+    Route::get('broker-summary/windows/{window}', [BrokerSummaryWindowController::class, 'show'])
+        ->whereNumber('window')
+        ->name('broker-summary.windows.show');
+
+    Route::get('broker-summary/entries', [BrokerSummaryWindowController::class, 'entries'])
+        ->name('broker-summary.entries.index');
 
     // Backtest
     Route::get('backtest', [BacktestController::class, 'run']);

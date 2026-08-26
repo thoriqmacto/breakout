@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Models\Asset;
 use App\Models\BandarDetectorSummary;
 use App\Models\BrokerSummaryFact;
+use App\Models\BrokerSummaryWindow;
 use App\Models\Broksum;
 use App\Support\BrokerSummaryTransformer;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
@@ -101,6 +104,148 @@ class BrokerSummaryImporter
     }
 
     /**
+     * Persist one retrieval window, its broker entries and its detector.
+     *
+     * Identity is (asset, from_date, to_date, transaction_type), so
+     * 2026-05-26..2026-08-26 and 2026-05-26..2026-09-26 are different rows
+     * rather than one overwriting the other, and re-importing the same file
+     * updates in place instead of duplicating.
+     *
+     * @param  array<string, mixed>  $window
+     */
+    private function storeWindow(
+        Asset $asset,
+        array $window,
+        string $path,
+        string $contents,
+        Carbon $timestamp,
+    ): ?BrokerSummaryWindow {
+        $from = $window['from_date'] ?? null;
+        $to = $window['to_date'] ?? null;
+
+        if (! is_string($from) || ! is_string($to) || $from === '' || $to === '') {
+            Log::warning('Broker summary window skipped: the range could not be resolved.', [
+                'symbol' => $window['symbol'],
+                'file' => $path,
+            ]);
+
+            return null;
+        }
+
+        if ($from > $to) {
+            Log::warning('Broker summary window skipped: from_date is after to_date.', [
+                'symbol' => $window['symbol'],
+                'from' => $from,
+                'to' => $to,
+                'file' => $path,
+            ]);
+
+            return null;
+        }
+
+        // The payload's range wins, but a filename that disagrees is worth
+        // saying so about: it usually means the archive was renamed or the
+        // request and response drifted apart. Silently picking one is how the
+        // original bug went unnoticed for so long.
+        $meta = $this->metaFromPath($path);
+        $this->warnOnRangeMismatch($window, $meta, $path);
+
+        $model = BrokerSummaryWindow::updateOrCreate(
+            [
+                'asset_id' => $asset->id,
+                'from_date' => $from,
+                'to_date' => $to,
+                'transaction_type' => $window['transaction_type'] ?? '',
+            ],
+            [
+                'returned_buyer_count' => $window['coverage']['returned_buyer_count'],
+                'returned_seller_count' => $window['coverage']['returned_seller_count'],
+                'total_buyer' => $window['coverage']['total_buyer'],
+                'total_seller' => $window['coverage']['total_seller'],
+                'source_filename' => $path,
+                'source_hash' => hash('sha256', $contents),
+                'imported_at' => $timestamp,
+            ],
+        );
+
+        // Replace rather than merge: a re-import is the authoritative view of
+        // that window, and a broker that dropped out of the list must not
+        // linger from the previous run.
+        $model->entries()->delete();
+
+        foreach (array_chunk($window['entries'], 500) as $chunk) {
+            $model->entries()->createMany($chunk);
+        }
+
+        $detector = $window['bandar_detector'] ?? null;
+
+        if (is_array($detector)) {
+            // Handed over as an array: the model casts metrics_json, and
+            // encoding it here first would store the JSON string itself.
+            $metricsJson = $detector['metrics_json'];
+
+            $this->guardMagnitudes(
+                $window['symbol'],
+                [$detector + ['from_date' => $from, 'to_date' => $to]],
+                self::UNSIGNED_DETECTOR_COLUMNS,
+                'window',
+            );
+
+            BandarDetectorSummary::updateOrCreate(
+                [
+                    'asset_id' => $asset->id,
+                    'from_date' => $from,
+                    'to_date' => $to,
+                    'transaction_type' => $window['transaction_type'] ?? '',
+                ],
+                [
+                    'broker_summary_window_id' => $model->id,
+                    'broker_accdist' => $detector['broker_accdist'],
+                    'number_broker_buysell' => $detector['number_broker_buysell'],
+                    'total_buyer' => $detector['total_buyer'],
+                    'total_seller' => $detector['total_seller'],
+                    'value' => $detector['value'],
+                    'volume' => $detector['volume'],
+                    'average_price' => $detector['average_price'],
+                    'metrics_json' => $metricsJson,
+                ],
+            );
+        }
+
+        return $model;
+    }
+
+    /**
+     * @param  array<string, mixed>  $window
+     * @param  array<string, mixed>  $meta
+     */
+    private function warnOnRangeMismatch(array $window, array $meta, string $path): void
+    {
+        $payloadFrom = $window['payload_from_date'] ?? null;
+        $payloadTo = $window['payload_to_date'] ?? null;
+        $fileFrom = $meta['from_date'] ?? null;
+        $fileTo = $meta['to_date'] ?? null;
+
+        if ($payloadFrom === null && $payloadTo === null) {
+            return;
+        }
+
+        $mismatched = ($fileFrom !== null && $payloadFrom !== null && $payloadFrom !== $fileFrom)
+            || ($fileTo !== null && $payloadTo !== null && $payloadTo !== $fileTo);
+
+        if (! $mismatched) {
+            return;
+        }
+
+        Log::warning('Broker summary range mismatch; the payload range was used.', [
+            'symbol' => $window['symbol'],
+            'payload_range' => $payloadFrom.'..'.$payloadTo,
+            'filename_range' => $fileFrom.'..'.$fileTo,
+            'file' => $path,
+        ]);
+    }
+
+    /**
      * Import broker summary JSON files from disk into the broksums table.
      *
      * @return array{file_count:int,row_count:int,symbols:array<string,int>}
@@ -143,8 +288,18 @@ class BrokerSummaryImporter
 
             $meta = $this->metaFromPath($path);
             $transactionType = $meta['transaction_type'] ?? config('stockbit.defaults.transaction_type');
+
+            $window = BrokerSummaryTransformer::toWindow(
+                $symbol,
+                $decoded,
+                $meta['from_date'] ?? null,
+                $meta['to_date'] ?? null,
+                $transactionType,
+            );
+
             $facts = BrokerSummaryTransformer::toFacts($symbol, $decoded, $transactionType);
-            if ($facts === []) {
+
+            if ($facts === [] && $window === null) {
                 continue;
             }
 
@@ -160,6 +315,27 @@ class BrokerSummaryImporter
                 continue;
             }
             $timestamp = now();
+
+            // The canonical record. Written first so the detector and, for a
+            // genuine single day, the legacy projections can point at it.
+            $windowModel = $window === null
+                ? null
+                : $this->storeWindow($asset, $window, $path, $contents, $timestamp);
+
+            // broker_summary_facts and broksums can only express one date, so
+            // they are written solely for a genuine single-day window. Feeding
+            // them a range aggregate stamped with its start date is the bug
+            // this whole change exists to remove, and the strategy consumers
+            // reading trade_date as a trading day would carry it onwards.
+            $singleDay = $windowModel !== null && $windowModel->isSingleDay();
+
+            if ($window !== null && ! $singleDay) {
+                $rowCount += count($window['entries']);
+                $symbols[$symbol] = ($symbols[$symbol] ?? 0) + count($window['entries']);
+
+                continue;
+            }
+
             $factsPayload = [];
             $broksumPayload = [];
 
@@ -238,59 +414,8 @@ class BrokerSummaryImporter
                 );
             }
 
-            $bandarDetector = BrokerSummaryTransformer::toBandarDetectorSummary(
-                $decoded,
-                $meta['from_date'] ?? null,
-                $meta['to_date'] ?? null,
-                $transactionType,
-            );
-            if ($bandarDetector !== null && $bandarDetector['from_date'] && $bandarDetector['to_date']) {
-                $metricsJson = $bandarDetector['metrics_json'];
-                if (is_array($metricsJson)) {
-                    $metricsJson = json_encode($metricsJson);
-                }
-                $detectorPayload = [[
-                    'asset_id' => $asset->id,
-                    'from_date' => $bandarDetector['from_date'],
-                    'to_date' => $bandarDetector['to_date'],
-                    'transaction_type' => $bandarDetector['transaction_type'],
-                    'broker_accdist' => $bandarDetector['broker_accdist'],
-                    'number_broker_buysell' => $bandarDetector['number_broker_buysell'],
-                    'total_buyer' => $bandarDetector['total_buyer'],
-                    'total_seller' => $bandarDetector['total_seller'],
-                    'value' => $bandarDetector['value'],
-                    'volume' => $bandarDetector['volume'],
-                    'average_price' => $bandarDetector['average_price'],
-                    'metrics_json' => $metricsJson,
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ]];
-
-                // This upsert was not guarded, which is why an out-of-range
-                // number_broker_buysell reached the driver raw.
-                $this->guardMagnitudes(
-                    $symbol,
-                    $detectorPayload,
-                    self::UNSIGNED_DETECTOR_COLUMNS,
-                    'window',
-                );
-
-                BandarDetectorSummary::upsert(
-                    $detectorPayload,
-                    ['asset_id', 'from_date', 'to_date', 'transaction_type'],
-                    [
-                        'broker_accdist',
-                        'number_broker_buysell',
-                        'total_buyer',
-                        'total_seller',
-                        'value',
-                        'volume',
-                        'average_price',
-                        'metrics_json',
-                        'updated_at',
-                    ]
-                );
-            }
+            // The detector is written by storeWindow(), tied to the window it
+            // describes, so it is not repeated here.
 
             $rowCount += count($factsPayload);
             $symbols[$symbol] = ($symbols[$symbol] ?? 0) + count($factsPayload);
