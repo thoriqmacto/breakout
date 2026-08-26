@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\GoogleDriveOAuthClassifier;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
@@ -265,9 +266,25 @@ class GoogleDriveCheckCommand extends Command
             return;
         }
 
+        // GoogleDriveOAuthClassifier is the single reading of a Google failure,
+        // shared with the backup-status health endpoint so the CLI and the web
+        // page cannot disagree about what is wrong. The longer prose below is
+        // kept for the cases it recognises, since a terminal has room for it.
+        $verdict = app(GoogleDriveOAuthClassifier::class)->classify($error);
+
         $error = mb_strtolower($error);
 
         $this->newLine();
+
+        if ($verdict['status'] === GoogleDriveOAuthClassifier::UNREACHABLE) {
+            $this->line($verdict['message']);
+
+            foreach ($verdict['guidance'] as $line) {
+                $this->line('  - '.$line);
+            }
+
+            return;
+        }
 
         if (str_contains($error, 'invalid_grant')) {
             $this->line('The refresh token was rejected. A refresh token stops working when it is');
