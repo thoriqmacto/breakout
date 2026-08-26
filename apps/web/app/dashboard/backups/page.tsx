@@ -29,7 +29,7 @@ export default function BackupStatusPage() {
     try {
       const response = await fetch(buildApiUrl("/v1/backup-status"), { headers: { Accept: "application/json", Authorization: `Bearer ${accessToken}` } })
       const payload = await parseJson<ApiResponse<Report>>(response)
-      if (!response.ok || !payload || payload.status !== "success") throw new Error(payload && "message" in payload ? payload.message : "Unable to load backup status")
+      if (!response.ok || !payload || payload.status !== "success") throw new Error((payload && "message" in payload && typeof payload.message === "string" && payload.message) || "Unable to load backup status")
       setReport(payload.data)
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Unable to load backup status")
