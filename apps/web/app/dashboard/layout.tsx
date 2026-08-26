@@ -14,6 +14,7 @@ import {
   PanelLeft,
   PanelRight,
   Briefcase,
+  DatabaseBackup,
   SlidersHorizontal,
   Terminal,
 } from "lucide-react"
@@ -70,6 +71,11 @@ const navigation: NavigationItem[] = [
     label: "Scrapers",
     href: "/dashboard/scrapers",
     icon: Terminal,
+  },
+  {
+    label: "Backup Status",
+    href: "/dashboard/backups",
+    icon: DatabaseBackup,
   },
   {
     label: "Reports",
