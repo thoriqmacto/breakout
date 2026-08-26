@@ -25,24 +25,51 @@ def safe_import(pkg):
         return None
 
 def install_package(pkg):
+    # Every diagnostic here goes to stderr. --emit-dates makes stdout a JSON
+    # document that PythonRunner decodes, and pip's own chatter on stdout would
+    # corrupt it -- so even a *successful* auto-install used to break the
+    # caller.
     pyexe = console_python()
     try:
-        subprocess.check_call([pyexe, "-m", "ensurepip", "--upgrade"])
+        subprocess.check_call([pyexe, "-m", "ensurepip", "--upgrade"], stdout=sys.stderr)
     except Exception:
         pass
     try:
-        subprocess.check_call([pyexe, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
+        subprocess.check_call(
+            [pyexe, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"],
+            stdout=sys.stderr,
+        )
     except Exception:
-        print(f"[WARN] Could not upgrade pip")
-    subprocess.check_call([pyexe, "-m", "pip", "install", pkg])
+        print("[WARN] Could not upgrade pip", file=sys.stderr)
+    subprocess.check_call([pyexe, "-m", "pip", "install", pkg], stdout=sys.stderr)
 
 def require(pkg):
     mod = safe_import(pkg)
-    if mod is None:
-        print(f"[INFO] Installing {pkg} ...")
+    if mod is not None:
+        return mod
+
+    # Installing on demand is a convenience for a developer machine, and it
+    # cannot work on a Debian or Ubuntu server: ensurepip ships in the
+    # python3-venv package rather than in python3, and PEP 668 marks the system
+    # interpreter externally-managed, so pip refuses to write into it at all.
+    # Report the fix instead of a CalledProcessError traceback.
+    print(f"[INFO] {pkg} is not installed; trying to install it ...", file=sys.stderr)
+    try:
         install_package(pkg)
-        mod = importlib.import_module(pkg)
-    return mod
+    except Exception as exc:
+        raise SystemExit(
+            f"The Python package '{pkg}' is missing and could not be installed automatically "
+            f"({exc}).\n"
+            f"Install the dependencies into a virtualenv and point PYTHON_BIN at its "
+            f"interpreter:\n"
+            f"    sudo apt install python3-venv          # Debian/Ubuntu only\n"
+            f"    python3 -m venv .venv\n"
+            f"    .venv/bin/pip install -r resources/python/requirements.txt\n"
+            f"then set PYTHON_BIN in .env to the absolute path of .venv/bin/python and run "
+            f"php artisan config:cache."
+        ) from exc
+
+    return importlib.import_module(pkg)
 
 pd = None
 yf = None
