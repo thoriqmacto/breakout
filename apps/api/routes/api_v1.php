@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\BacktestController;
+use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
@@ -13,6 +14,9 @@ use App\Http\Controllers\Api\V1\TradingDayController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
+    Route::get('backup-status', [BackupStatusController::class, 'index'])
+        ->name('backup-status.index');
+
     // Assets
     Route::get('assets/{asset}/latest-price', [AssetController::class, 'latestPrice'])
         ->whereNumber('asset')
