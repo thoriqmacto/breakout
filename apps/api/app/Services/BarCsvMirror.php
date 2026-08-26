@@ -156,9 +156,10 @@ class BarCsvMirror
      *
      * @param  array<int, string>  $symbols  Symbols to flush; empty flushes every local seed CSV.
      * @param  string|null  $disk  Mirror disk override; null falls back to config('csv.mirror_disk').
+     * @param  bool  $force  Upload even when the manifest says the local file is unchanged.
      * @return array{disk: ?string, uploaded: array<int, string>, skipped: array<int, string>, failed: array<int, string>}
      */
-    public function flush(array $symbols = [], ?string $disk = null): array
+    public function flush(array $symbols = [], ?string $disk = null, bool $force = false): array
     {
         $result = ['disk' => null, 'uploaded' => [], 'skipped' => [], 'failed' => []];
 
@@ -198,7 +199,14 @@ class BarCsvMirror
 
                 $hash = md5($contents);
 
-                if ($this->rememberedHash($symbol) === $hash) {
+                // The manifest records what was last *sent*, not what the
+                // mirror currently holds, so it cannot see a remote file that
+                // was deleted or edited outside this application. A routine
+                // flush is right to trust it; a push the operator asked for
+                // because the backup page reported a discrepancy is not, and
+                // silently skipping there would leave the mirror wrong with a
+                // success message on screen.
+                if (! $force && $this->rememberedHash($symbol) === $hash) {
                     $result['skipped'][] = $symbol;
 
                     continue;

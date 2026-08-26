@@ -17,6 +17,9 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('backup-status', [BackupStatusController::class, 'index'])
         ->name('backup-status.index');
 
+    Route::post('backup-status/mirror-push', [BackupStatusController::class, 'mirrorPush'])
+        ->name('backup-status.mirror-push');
+
     // Assets
     Route::get('assets/{asset}/latest-price', [AssetController::class, 'latestPrice'])
         ->whereNumber('asset')

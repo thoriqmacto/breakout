@@ -107,45 +107,55 @@ class AssetProfileUpdaterTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2025-09-01 08:00:00'));
 
+        // AssetProfileUpdater writes the seeder JSON to
+        // database/seeders/data/profiles/{SYMBOL}_profile.json, which is
+        // tracked. This test used to run as BUMI, so every `php artisan test`
+        // deleted the real BUMI_profile.json from the working tree -- and a
+        // failure between the delete and the cleanup left fabricated test data
+        // in its place. A symbol that is not a real ticker cannot collide with
+        // anything committed.
+        $symbol = 'ZZTEST';
+
         $asset = Asset::create([
-            'symbol' => 'BUMI',
-            'name' => 'BUMI',
+            'symbol' => $symbol,
+            'name' => $symbol,
         ]);
 
-        $profilePath = database_path('seeders/data/profiles/BUMI_profile.json');
-        if (File::exists($profilePath)) {
-            File::delete($profilePath);
-        }
+        $profilePath = database_path("seeders/data/profiles/{$symbol}_profile.json");
+        $this->assertFileDoesNotExist($profilePath, 'The probe symbol must not be a committed profile.');
 
         $client = $this->createMock(StockbitExodusClient::class);
         $client->expects($this->once())
             ->method('tickerProfile')
-            ->with('BUMI')
+            ->with($symbol)
             ->willReturn(['data' => $this->sampleProfile]);
 
         $service = new AssetProfileUpdater($client);
-        $result = $service->sync($asset);
 
-        $this->assertTrue($result['ok']);
-        $fresh = $asset->fresh();
-        $this->assertEquals($this->sampleProfile['address'], $fresh->address);
-        $this->assertSame($this->sampleProfile['background'], $fresh->background);
-        $this->assertEquals($this->sampleProfile['history'], $fresh->history);
-        $this->assertEquals($this->sampleProfile, $fresh->ticker_profile_payload);
-        $this->assertEquals(4500.0, $fresh->ipo_price);
-        $this->assertEquals(28.88, $fresh->float);
-        $this->assertTrue($fresh->profile_synced_at->eq(Carbon::now()));
+        try {
+            $result = $service->sync($asset);
 
-        $this->assertFileExists($profilePath);
-        $payload = json_decode(File::get($profilePath), true);
-        $this->assertSame('BUMI', $payload['symbol']);
-        $this->assertSame('BUMI', $payload['name']);
-        $this->assertSame(Carbon::now()->toIso8601String(), $payload['profile_synced_at']);
-        $this->assertEquals($this->sampleProfile, $payload['ticker_profile_payload']);
+            $this->assertTrue($result['ok']);
+            $fresh = $asset->fresh();
+            $this->assertEquals($this->sampleProfile['address'], $fresh->address);
+            $this->assertSame($this->sampleProfile['background'], $fresh->background);
+            $this->assertEquals($this->sampleProfile['history'], $fresh->history);
+            $this->assertEquals($this->sampleProfile, $fresh->ticker_profile_payload);
+            $this->assertEquals(4500.0, $fresh->ipo_price);
+            $this->assertEquals(28.88, $fresh->float);
+            $this->assertTrue($fresh->profile_synced_at->eq(Carbon::now()));
 
-        File::delete($profilePath);
-
-        Carbon::setTestNow();
+            $this->assertFileExists($profilePath);
+            $payload = json_decode(File::get($profilePath), true);
+            $this->assertSame($symbol, $payload['symbol']);
+            $this->assertSame($symbol, $payload['name']);
+            $this->assertSame(Carbon::now()->toIso8601String(), $payload['profile_synced_at']);
+            $this->assertEquals($this->sampleProfile, $payload['ticker_profile_payload']);
+        } finally {
+            // finally, so a failed assertion above still leaves the tree clean.
+            File::delete($profilePath);
+            Carbon::setTestNow();
+        }
     }
 
     public function test_it_returns_error_when_client_reports_issue(): void
