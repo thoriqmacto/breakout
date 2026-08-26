@@ -173,4 +173,37 @@ class GoogleDriveDiskTest extends TestCase
             );
         }
     }
+
+    /**
+     * Google answers a bad OAuth client with
+     * {"error": "invalid_client", "error_description": "Unauthorized"}.
+     *
+     * Reporting only the description produced "Google Drive OAuth failed:
+     * Unauthorized" on the VPS, which says nothing about which credential is
+     * wrong and does not match the invalid_client hint. The code must survive.
+     */
+    public function test_an_oauth_error_reports_the_code_not_just_the_description(): void
+    {
+        config([
+            'filesystems.disks.gdrive.clientId' => 'not-a-real-client.apps.googleusercontent.com',
+            'filesystems.disks.gdrive.clientSecret' => 'not-a-real-secret',
+            'filesystems.disks.gdrive.refreshToken' => 'not-a-real-refresh-token',
+        ]);
+        Storage::forgetDisk('gdrive');
+
+        try {
+            Storage::disk('gdrive');
+            $this->fail('Expected Google to reject these credentials.');
+        } catch (InvalidArgumentException $e) {
+            $message = $e->getMessage();
+
+            // Whatever Google returns, the machine-readable code has to be in
+            // the message -- that is what the gdrive:check hints match on.
+            $this->assertMatchesRegularExpression(
+                '/invalid_client|invalid_grant|invalid_request|unauthorized_client/i',
+                $message,
+                "The OAuth error code was dropped from: {$message}",
+            );
+        }
+    }
 }

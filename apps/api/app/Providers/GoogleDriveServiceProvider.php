@@ -102,10 +102,24 @@ class GoogleDriveServiceProvider extends ServiceProvider
 
         // A rejected grant comes back as a normal array with an error key
         // rather than as an exception.
+        //
+        // Both halves are reported. The code is the machine-readable part and
+        // is what the gdrive:check hints match on, while the description is
+        // often uselessly terse on its own -- a wrong client secret answers
+        // {"error": "invalid_client", "error_description": "Unauthorized"},
+        // and reporting only "Unauthorized" hides which credential was wrong.
         if (is_array($token) && isset($token['error'])) {
-            $detail = is_string($token['error_description'] ?? null)
+            $code = is_string($token['error']) ? $token['error'] : '';
+            $description = is_string($token['error_description'] ?? null)
                 ? $token['error_description']
-                : (string) $token['error'];
+                : '';
+
+            $detail = match (true) {
+                $code !== '' && $description !== '' => "{$code} ({$description})",
+                $code !== '' => $code,
+                $description !== '' => $description,
+                default => 'the token endpoint rejected the request without saying why',
+            };
 
             throw new InvalidArgumentException("Google Drive OAuth failed: {$detail}");
         }
