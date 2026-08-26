@@ -10,10 +10,17 @@ use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use Masbug\Flysystem\GoogleDriveAdapter;
+use Throwable;
 
 /**
  * Registers the "gdrive" filesystem driver so Google Drive can back any disk
  * through the regular Storage facade.
+ *
+ * Authentication is OAuth 2.0 against a personal Google account: a client id,
+ * client secret and long-lived refresh token, all from the environment. There
+ * is no credentials file. A service account was tried first and cannot work
+ * here -- Google gives service accounts no storage quota, so one can create
+ * folders in My Drive but never own a file in them.
  *
  * Drive is durable cold storage for file artifacts only. The relational tables
  * (`price_bars`, `features_daily`) stay the query layer, and secrets such as
@@ -35,37 +42,34 @@ class GoogleDriveServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Storage::extend('gdrive', function ($app, array $config): FilesystemAdapter {
-            $keyFile = $this->resolveKeyFile($config['keyFile'] ?? null);
-
-            $folderId = isset($config['folderId']) ? trim((string) $config['folderId']) : '';
-            $teamDriveId = isset($config['teamDriveId']) ? trim((string) $config['teamDriveId']) : '';
-
-            if ($folderId === '' && $teamDriveId === '') {
-                throw new InvalidArgumentException(
-                    'The gdrive disk requires GOOGLE_DRIVE_TEAM_DRIVE_ID (a Shared Drive) or '.
-                    'GOOGLE_DRIVE_FOLDER_ID (a My Drive folder shared with the service account).'
-                );
-            }
+            $clientId = $this->requireConfig($config, 'clientId', 'GOOGLE_DRIVE_CLIENT_ID');
+            $clientSecret = $this->requireConfig($config, 'clientSecret', 'GOOGLE_DRIVE_CLIENT_SECRET');
+            $refreshToken = $this->requireConfig($config, 'refreshToken', 'GOOGLE_DRIVE_REFRESH_TOKEN');
 
             $client = new GoogleClient;
-            $client->setAuthConfig($keyFile);
+            $client->setClientId($clientId);
+            $client->setClientSecret($clientSecret);
+            $client->setApplicationName(config('app.name', 'Breakout').' Google Drive');
             $client->addScope(GoogleDriveService::DRIVE);
+
+            $this->authenticate($client, $refreshToken);
 
             $root = isset($config['root']) && trim((string) $config['root']) !== ''
                 ? trim((string) $config['root'])
                 : 'breakout-data';
 
-            // A Shared Drive owns its own files, so the service account never
-            // needs storage of its own. Google removed service-account storage
-            // quota, so an account writing into a plain My Drive folder can
-            // create folders (which cost nothing) but not files. teamDriveId
-            // therefore takes precedence when both are set.
+            $folderId = isset($config['folderId']) ? trim((string) $config['folderId']) : '';
+
+            // The adapter defaults useDisplayPaths to true, so $root is resolved
+            // as a *display path* under the parent and created when missing --
+            // not treated as a file id. With no folderId the parent is the
+            // authenticated user's My Drive, giving My Drive/breakout-data.
+            $options = $folderId !== '' ? ['sharedFolderId' => $folderId] : [];
+
             $adapter = new GoogleDriveAdapter(
                 new GoogleDriveService($client),
                 $root,
-                $teamDriveId !== ''
-                    ? ['teamDriveId' => $teamDriveId]
-                    : ['sharedFolderId' => $folderId]
+                $options
             );
 
             return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
@@ -73,29 +77,57 @@ class GoogleDriveServiceProvider extends ServiceProvider
     }
 
     /**
-     * Resolve the service-account JSON path, accepting paths relative to the
-     * application root so `.env` can carry `storage/app/google/...`.
+     * Exchange the refresh token for an access token.
+     *
+     * Done once per resolved disk rather than per operation: Laravel memoises
+     * a disk for the life of the process, and the adapter calls its own
+     * refreshToken() before each request, which re-fetches when the access
+     * token has expired. google/apiclient re-injects the refresh token into
+     * the stored credentials when Google's response omits it, so a
+     * long-running worker keeps refreshing indefinitely.
      */
-    private function resolveKeyFile(mixed $keyFile): string
+    private function authenticate(GoogleClient $client, string $refreshToken): void
     {
-        $keyFile = is_string($keyFile) ? trim($keyFile) : '';
-
-        if ($keyFile === '') {
+        try {
+            $token = $client->fetchAccessTokenWithRefreshToken($refreshToken);
+        } catch (Throwable $e) {
+            // Never surface the exception verbatim: the request it describes
+            // carries the client secret and refresh token.
             throw new InvalidArgumentException(
-                'The gdrive disk requires GOOGLE_DRIVE_KEY_FILE: a path to the Google service-account JSON.'
+                'Google Drive OAuth request failed: '.$e->getMessage().' '.
+                'Check GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET and '.
+                'GOOGLE_DRIVE_REFRESH_TOKEN, and that the host can reach accounts.google.com.'
             );
         }
 
-        $path = str_starts_with($keyFile, DIRECTORY_SEPARATOR)
-            ? $keyFile
-            : base_path($keyFile);
+        // A rejected grant comes back as a normal array with an error key
+        // rather than as an exception.
+        if (is_array($token) && isset($token['error'])) {
+            $detail = is_string($token['error_description'] ?? null)
+                ? $token['error_description']
+                : (string) $token['error'];
 
-        if (! is_file($path)) {
-            throw new InvalidArgumentException(
-                "Google service-account file not found at [{$path}]. Set GOOGLE_DRIVE_KEY_FILE to the credentials JSON."
-            );
+            throw new InvalidArgumentException("Google Drive OAuth failed: {$detail}");
         }
 
-        return $path;
+        if (! is_array($token) || ! isset($token['access_token'])) {
+            throw new InvalidArgumentException(
+                'Google Drive OAuth returned no access token. Regenerate GOOGLE_DRIVE_REFRESH_TOKEN.'
+            );
+        }
+    }
+
+    /**
+     * Read a required credential, naming the environment variable that sets it.
+     */
+    private function requireConfig(array $config, string $key, string $envVar): string
+    {
+        $value = isset($config[$key]) ? trim((string) $config[$key]) : '';
+
+        if ($value === '') {
+            throw new InvalidArgumentException("The gdrive disk requires {$envVar}.");
+        }
+
+        return $value;
     }
 }

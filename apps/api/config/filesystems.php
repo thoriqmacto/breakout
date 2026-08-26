@@ -69,13 +69,21 @@ return [
          */
         'gdrive' => [
             'driver' => 'gdrive',
-            'keyFile' => env('GOOGLE_DRIVE_KEY_FILE'),   // path to the service-account JSON
-            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'), // ID of the My Drive folder shared with the service account
-            // ID of a Shared Drive. Preferred: a Shared Drive owns its files, so
-            // the service account does not need storage quota of its own. Takes
-            // precedence over folderId when both are set.
-            'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
-            'root' => env('GOOGLE_DRIVE_ROOT', 'breakout-data'), // folder created inside the shared folder
+
+            // OAuth 2.0 against a personal Google account. A service account
+            // cannot be used: Google gives them no storage quota, so one can
+            // create folders in My Drive but never own a file in them.
+            'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
+            'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+            'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+
+            // Optional parent folder. Blank means the authenticated user's My
+            // Drive root, which is the normal setup.
+            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'),
+
+            // Folder created/used under the parent. A display path, not an id.
+            'root' => env('GOOGLE_DRIVE_ROOT', 'breakout-data'),
+
             'throw' => false,
             'report' => false,
         ],

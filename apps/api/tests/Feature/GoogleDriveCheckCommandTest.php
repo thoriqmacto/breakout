@@ -56,50 +56,62 @@ class GoogleDriveCheckCommandTest extends TestCase
     }
 
     /**
-     * The command must not print the service-account path as "found" when it
-     * is not, since that is the first thing anyone checks on a failing host.
+     * Credentials are reported only as present or absent, and a blank folder
+     * id is normal rather than an error -- My Drive is the default target.
      */
-    public function test_it_reports_a_missing_key_file_without_resolving_the_disk(): void
+    public function test_it_reports_credentials_as_set_or_unset(): void
     {
         config([
-            'filesystems.disks.gdrive.keyFile' => 'storage/app/google/definitely-not-here.json',
-            'filesystems.disks.gdrive.folderId' => 'some-folder-id',
-        ]);
-
-        $exit = Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
-        $output = Artisan::output();
-
-        $this->assertSame(1, $exit);
-        $this->assertStringContainsString('MISSING', $output);
-        $this->assertStringContainsString('Google service-account file not found', $output);
-    }
-
-    public function test_it_reports_a_missing_folder_id(): void
-    {
-        // A real key file is not needed: folderId is validated by the driver too.
-        config([
-            'filesystems.disks.gdrive.keyFile' => 'composer.json',
+            'filesystems.disks.gdrive.driver' => 'gdrive',
+            'filesystems.disks.gdrive.clientId' => 'an-id.apps.googleusercontent.com',
+            'filesystems.disks.gdrive.clientSecret' => 'a-secret',
+            'filesystems.disks.gdrive.refreshToken' => '',
             'filesystems.disks.gdrive.folderId' => '',
+            'filesystems.disks.gdrive.root' => 'breakout-data',
         ]);
-
-        $exit = Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
-        $output = Artisan::output();
-
-        $this->assertSame(1, $exit);
-        $this->assertStringContainsString('(unset)', $output);
-        $this->assertStringContainsString('GOOGLE_DRIVE_FOLDER_ID', $output);
-    }
-
-    public function test_it_does_not_print_the_credentials_themselves(): void
-    {
-        Storage::fake('gdrive');
 
         Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
         $output = Artisan::output();
 
-        // The folder id is reported only as set/unset, never echoed.
-        $this->assertStringNotContainsString('private_key', $output);
-        $this->assertStringNotContainsString('BEGIN PRIVATE KEY', $output);
+        $this->assertStringContainsString('client id:', $output);
+        $this->assertStringContainsString('client secret:', $output);
+        $this->assertStringContainsString('refresh token:', $output);
+        $this->assertStringContainsString('unset', $output);
+        $this->assertStringContainsString('(My Drive root)', $output);
+        $this->assertStringContainsString('breakout-data', $output);
+    }
+
+    public function test_it_never_prints_the_credential_values(): void
+    {
+        config([
+            'filesystems.disks.gdrive.driver' => 'gdrive',
+            'filesystems.disks.gdrive.clientId' => 'client-id-value',
+            'filesystems.disks.gdrive.clientSecret' => 'client-secret-value',
+            'filesystems.disks.gdrive.refreshToken' => 'refresh-token-value',
+        ]);
+
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+        $output = Artisan::output();
+
+        $this->assertStringNotContainsString('client-secret-value', $output);
+        $this->assertStringNotContainsString('refresh-token-value', $output);
+        $this->assertStringNotContainsString('client-id-value', $output);
+    }
+
+    public function test_a_missing_credential_names_its_environment_variable(): void
+    {
+        config([
+            'filesystems.disks.gdrive.driver' => 'gdrive',
+            'filesystems.disks.gdrive.clientId' => '',
+            'filesystems.disks.gdrive.clientSecret' => 'a-secret',
+            'filesystems.disks.gdrive.refreshToken' => 'a-token',
+        ]);
+        Storage::forgetDisk('gdrive');
+
+        $exit = Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+
+        $this->assertSame(1, $exit);
+        $this->assertStringContainsString('GOOGLE_DRIVE_CLIENT_ID', Artisan::output());
     }
 
     /**
@@ -108,22 +120,11 @@ class GoogleDriveCheckCommandTest extends TestCase
      *
      * Uses a driver whose adapter always fails to write. With throw => false
      * Laravel swallows that into `false`, and with throw => true it propagates
-     * -- which is exactly the pair of behaviours the diagnosis relies on, and
-     * what a Drive permission error looks like from the command's side.
+     * -- exactly the pair of behaviours the diagnosis relies on.
      */
     public function test_it_surfaces_the_underlying_error_when_a_write_fails(): void
     {
-        Storage::extend('always-fails', function ($app, array $config): FilesystemAdapter {
-            $adapter = new class(storage_path('framework/testing/always-fails')) extends LocalFilesystemAdapter
-            {
-                public function write(string $path, string $contents, Config $config): void
-                {
-                    throw UnableToWriteFile::atLocation($path, 'the adapter refuses every write');
-                }
-            };
-
-            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
-        });
+        $this->registerFailingDriver('always-fails', 'the adapter refuses every write');
 
         config(['filesystems.disks.wedged' => ['driver' => 'always-fails', 'throw' => false]]);
 
@@ -133,87 +134,70 @@ class GoogleDriveCheckCommandTest extends TestCase
         $this->assertSame(1, $exit);
         $this->assertStringContainsString('Write failed', $output);
         $this->assertStringContainsString('Retrying with exceptions enabled', $output);
-        // The real reason, rather than just "false".
         $this->assertStringContainsString('UnableToWriteFile', $output);
         $this->assertStringContainsString('refuses every write', $output);
     }
 
-    public function test_it_prints_the_service_account_identity_but_not_the_private_key(): void
-    {
-        $keyFile = storage_path('framework/testing/service-account.json');
-        @mkdir(dirname($keyFile), 0777, true);
-        file_put_contents($keyFile, json_encode([
-            'type' => 'service_account',
-            'project_id' => 'breakout-demo-1234',
-            'client_email' => 'writer@breakout-demo-1234.iam.gserviceaccount.com',
-            'private_key' => "-----BEGIN PRIVATE KEY-----\nSECRET\n-----END PRIVATE KEY-----\n",
-        ]));
-
-        config([
-            'filesystems.disks.gdrive.keyFile' => $keyFile,
-            'filesystems.disks.gdrive.folderId' => 'some-folder',
-        ]);
-
-        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
-        $output = Artisan::output();
-
-        $this->assertStringContainsString('writer@breakout-demo-1234.iam.gserviceaccount.com', $output);
-        $this->assertStringContainsString('breakout-demo-1234', $output);
-        $this->assertStringNotContainsString('SECRET', $output);
-        $this->assertStringNotContainsString('BEGIN PRIVATE KEY', $output);
-
-        @unlink($keyFile);
-    }
-
     /**
-     * The hint must follow what Google said. Blaming the folder share when the
-     * account cannot own files at all is what sent the last diagnosis wrong.
+     * The hint must follow what Google said. A rejected refresh token is the
+     * failure an operator is most likely to hit, and it needs its own advice.
      */
-    public function test_a_quota_error_recommends_a_shared_drive_rather_than_the_folder_share(): void
+    public function test_an_invalid_grant_recommends_regenerating_the_refresh_token(): void
     {
-        Storage::extend('quota-exceeded', function ($app, array $config): FilesystemAdapter {
-            $adapter = new class(storage_path('framework/testing/quota')) extends LocalFilesystemAdapter
-            {
-                public function write(string $path, string $contents, Config $config): void
-                {
-                    throw UnableToWriteFile::atLocation(
-                        $path,
-                        '(403) storageQuotaExceeded: Service Accounts do not have storage quota.',
-                    );
-                }
-            };
-
-            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
-        });
-
-        config(['filesystems.disks.gdrive' => [
-            'driver' => 'quota-exceeded',
-            'throw' => false,
-        ]]);
+        $this->registerFailingDriver('invalid-grant', '(400) invalid_grant: Token has been expired or revoked.');
+        config(['filesystems.disks.gdrive' => ['driver' => 'invalid-grant', 'throw' => false]]);
 
         Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
         $output = Artisan::output();
 
-        $this->assertStringContainsString('GOOGLE_DRIVE_TEAM_DRIVE_ID', $output);
-        $this->assertStringContainsString('Shared Drive', $output);
-        // The old, wrong advice must not be what a quota failure prints.
-        $this->assertStringNotContainsString('That share is the usual cause', $output);
+        $this->assertStringContainsString('GOOGLE_DRIVE_REFRESH_TOKEN', $output);
+        $this->assertStringContainsString('Testing', $output);
+        // Service-account advice must never appear again.
+        $this->assertStringNotContainsString('Shared Drive', $output);
+        $this->assertStringNotContainsString('iam.gserviceaccount.com', $output);
     }
 
-    public function test_a_not_found_error_points_at_the_configured_id(): void
+    public function test_an_invalid_client_points_at_the_id_and_secret(): void
     {
-        Storage::extend('not-found', function ($app, array $config): FilesystemAdapter {
-            $adapter = new class(storage_path('framework/testing/notfound')) extends LocalFilesystemAdapter
-            {
-                public function write(string $path, string $contents, Config $config): void
-                {
-                    throw UnableToWriteFile::atLocation($path, '(404) notFound: File not found: abc123.');
-                }
-            };
+        $this->registerFailingDriver('invalid-client', '(401) invalid_client: The OAuth client was not found.');
+        config(['filesystems.disks.gdrive' => ['driver' => 'invalid-client', 'throw' => false]]);
 
-            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
-        });
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+        $output = Artisan::output();
 
+        $this->assertStringContainsString('GOOGLE_DRIVE_CLIENT_ID', $output);
+        $this->assertStringContainsString('GOOGLE_DRIVE_CLIENT_SECRET', $output);
+    }
+
+    public function test_insufficient_permissions_names_the_required_scope(): void
+    {
+        $this->registerFailingDriver('no-scope', '(403) insufficientPermissions: Insufficient Permission');
+        config(['filesystems.disks.gdrive' => ['driver' => 'no-scope', 'throw' => false]]);
+
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+
+        $this->assertStringContainsString(
+            'https://www.googleapis.com/auth/drive',
+            Artisan::output(),
+        );
+    }
+
+    public function test_a_disabled_api_says_so(): void
+    {
+        $this->registerFailingDriver(
+            'api-off',
+            'Google Drive API has not been used in project 123 before or it is disabled.',
+        );
+        config(['filesystems.disks.gdrive' => ['driver' => 'api-off', 'throw' => false]]);
+
+        Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
+
+        $this->assertStringContainsString('not enabled', Artisan::output());
+    }
+
+    public function test_a_not_found_error_points_at_the_configured_folder_id(): void
+    {
+        $this->registerFailingDriver('not-found', '(404) notFound: File not found: abc123.');
         config(['filesystems.disks.gdrive' => ['driver' => 'not-found', 'throw' => false]]);
 
         Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
@@ -221,5 +205,29 @@ class GoogleDriveCheckCommandTest extends TestCase
 
         $this->assertStringContainsString('not found', $output);
         $this->assertStringContainsString('GOOGLE_DRIVE_FOLDER_ID', $output);
+    }
+
+    /**
+     * Registers a disk driver whose adapter refuses every write with the given
+     * message, standing in for a Drive API rejection.
+     */
+    private function registerFailingDriver(string $name, string $reason): void
+    {
+        Storage::extend($name, function ($app, array $config) use ($name, $reason): FilesystemAdapter {
+            $adapter = new class(storage_path('framework/testing/'.$name), $reason) extends LocalFilesystemAdapter
+            {
+                public function __construct(string $root, private readonly string $reason)
+                {
+                    parent::__construct($root);
+                }
+
+                public function write(string $path, string $contents, Config $config): void
+                {
+                    throw UnableToWriteFile::atLocation($path, $this->reason);
+                }
+            };
+
+            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+        });
     }
 }

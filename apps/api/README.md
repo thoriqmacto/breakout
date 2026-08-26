@@ -104,11 +104,13 @@ Key environment variables (see `.env.example`):
 | `SB_SAVE_DISK` | Disk for Stockbit JSON payloads: `local` (default), `gdrive`, or `s3`. |
 | `CSV_MIRROR_DISK` | Durable mirror disk for the OHLCV seed CSVs. Unset (default) disables mirroring. |
 | `CSV_MIRROR_PATH` | Path prefix for the mirrored CSVs (default `seeds/historical`). |
-| `GOOGLE_DRIVE_KEY_FILE` | Path to the Google service-account JSON. **Never commit this file.** |
-| `GOOGLE_DRIVE_FOLDER_ID` | ID of the Drive folder shared with the service account. |
-| `GOOGLE_DRIVE_ROOT` | Folder created inside the shared folder (default `breakout-data`). |
+| `GOOGLE_DRIVE_CLIENT_ID` | OAuth client id for the Drive integration. |
+| `GOOGLE_DRIVE_CLIENT_SECRET` | OAuth client secret. **Credential — never commit.** |
+| `GOOGLE_DRIVE_REFRESH_TOKEN` | Long-lived refresh token for the Gmail account that owns the files. **Credential — never commit.** |
+| `GOOGLE_DRIVE_FOLDER_ID` | Optional parent folder id. Blank uses the account's My Drive root. |
+| `GOOGLE_DRIVE_ROOT` | Folder created under the parent (default `breakout-data`). |
 
-See [Storage Backends](../../README.md#storage-backends) in the root README for the service-account setup and the mirror commands. The database remains the query layer; Drive is durable cold storage only.
+See [Storage Backends](../../README.md#storage-backends) in the root README for the OAuth setup and the mirror commands. The database remains the query layer; Drive is durable cold storage only.
 
 ## Running Tests
 
