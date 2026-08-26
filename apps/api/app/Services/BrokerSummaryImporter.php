@@ -8,9 +8,77 @@ use App\Models\BrokerSummaryFact;
 use App\Models\Broksum;
 use App\Support\BrokerSummaryTransformer;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class BrokerSummaryImporter
 {
+    /**
+     * Columns declared unsigned in the broker_summary_facts schema.
+     *
+     * The net_* columns are deliberately absent: they are signed, and a
+     * negative net is the normal way to express distribution.
+     */
+    private const UNSIGNED_COLUMNS = [
+        'buy_lot',
+        'buy_volume',
+        'buy_value',
+        'buy_value_v',
+        'sell_lot',
+        'sell_volume',
+        'sell_value',
+        'sell_value_v',
+    ];
+
+    /**
+     * Largest value BIGINT UNSIGNED holds.
+     */
+    private const UNSIGNED_BIGINT_MAX = 18446744073709551615;
+
+    /**
+     * Fail with the offending record rather than letting the driver report a
+     * row number in an anonymous chunk.
+     *
+     * MariaDB answers both a negative and an overflow with the same
+     * SQLSTATE[22003] 1264 "Out of range value", so the message alone cannot
+     * tell them apart -- this says which it is, and for which broker and date.
+     *
+     * @param  array<int, array<string, mixed>>  $payload
+     */
+    private function guardMagnitudes(string $symbol, array $payload): void
+    {
+        foreach ($payload as $row) {
+            foreach (self::UNSIGNED_COLUMNS as $column) {
+                $value = $row[$column] ?? 0;
+
+                if (! is_int($value) && ! is_float($value)) {
+                    continue;
+                }
+
+                if ($value < 0) {
+                    throw new RuntimeException(sprintf(
+                        '%s %s on %s has a negative %s (%s). That column is unsigned, so the database will reject it.',
+                        $symbol,
+                        $row['broker_code'] ?? '?',
+                        $row['trade_date'] ?? '?',
+                        $column,
+                        $value,
+                    ));
+                }
+
+                if ($value > self::UNSIGNED_BIGINT_MAX) {
+                    throw new RuntimeException(sprintf(
+                        '%s %s on %s has a %s of %s, larger than the column can store. The source data looks wrong.',
+                        $symbol,
+                        $row['broker_code'] ?? '?',
+                        $row['trade_date'] ?? '?',
+                        $column,
+                        $value,
+                    ));
+                }
+            }
+        }
+    }
+
     /**
      * Import broker summary JSON files from disk into the broksums table.
      *
@@ -110,6 +178,12 @@ class BrokerSummaryImporter
                     'updated_at' => $timestamp,
                 ];
             }
+
+            // A rejected row is reported by the driver as "at row 25" of a
+            // 500-row chunk, which names neither the symbol nor the broker nor
+            // the field. Check the payload first so the failure can say what is
+            // actually wrong with which record.
+            $this->guardMagnitudes($symbol, $factsPayload);
 
             foreach (array_chunk($factsPayload, 500) as $chunk) {
                 BrokerSummaryFact::upsert(
