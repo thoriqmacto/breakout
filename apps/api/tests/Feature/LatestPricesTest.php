@@ -14,6 +14,46 @@ class LatestPricesTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var list<string> */
+    private array $seedDirs = [];
+
+    /**
+     * Build a throwaway seed directory and point csv.seed_dir at it.
+     *
+     * These used to be created under database_path('seeders/data'), inside the
+     * repository. Every run left the CSVs behind in the working tree, and
+     * three of them were committed by accident that way -- so the fixtures
+     * were both untracked litter and tracked files at the same time. A temp
+     * directory keeps the checkout clean.
+     */
+    private function makeSeedDir(string $name): string
+    {
+        $dir = sys_get_temp_dir().'/breakout-tests/'.$name.'-'.bin2hex(random_bytes(4));
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $this->seedDirs[] = $dir;
+        config(['csv.seed_dir' => $dir]);
+
+        return $dir;
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->seedDirs as $dir) {
+            foreach (glob($dir.'/*') ?: [] as $file) {
+                @unlink($file);
+            }
+            @rmdir($dir);
+        }
+
+        $this->seedDirs = [];
+
+        parent::tearDown();
+    }
+
     public function test_it_requires_authentication(): void
     {
         $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
@@ -76,12 +116,8 @@ class LatestPricesTest extends TestCase
 
     public function test_asset_sync_fetches_missing_data_when_outdated(): void
     {
-        $seedDir = database_path('seeders/data/test-sync');
-        if (! is_dir($seedDir)) {
-            mkdir($seedDir, 0755, true);
-        }
+        $seedDir = $this->makeSeedDir('sync');
         file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
-        config(['csv.seed_dir' => $seedDir]);
         Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
@@ -118,12 +154,8 @@ class LatestPricesTest extends TestCase
     {
         Carbon::setTestNow('2024-01-03');
 
-        $seedDir = database_path('seeders/data/test-eod');
-        if (! is_dir($seedDir)) {
-            mkdir($seedDir, 0755, true);
-        }
+        $seedDir = $this->makeSeedDir('eod');
         file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
-        config(['csv.seed_dir' => $seedDir]);
         Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
 
         $pyDir = resource_path('python/csv');
@@ -149,12 +181,8 @@ class LatestPricesTest extends TestCase
 
     public function test_asset_sync_skips_assets_with_price_sync_disabled(): void
     {
-        $seedDir = database_path('seeders/data/test-disabled-sync');
-        if (! is_dir($seedDir)) {
-            mkdir($seedDir, 0755, true);
-        }
+        $seedDir = $this->makeSeedDir('disabled-sync');
         file_put_contents($seedDir.'/AAA.csv', "date,open,high,low,close,volume\n2024-01-01,1,1,1,1,100\n");
-        config(['csv.seed_dir' => $seedDir]);
 
         Asset::create([
             'symbol' => 'AAA',
@@ -170,16 +198,12 @@ class LatestPricesTest extends TestCase
 
     public function test_asset_sync_historical_date_reupserts_specific_day_from_csv(): void
     {
-        $seedDir = database_path('seeders/data/test-historical-date');
-        if (! is_dir($seedDir)) {
-            mkdir($seedDir, 0755, true);
-        }
+        $seedDir = $this->makeSeedDir('historical-date');
 
         file_put_contents(
             $seedDir.'/AAA.csv',
             "date,open,high,low,close,volume\n2024-01-02,11,12,10,15,1000\n"
         );
-        config(['csv.seed_dir' => $seedDir]);
 
         $asset = Asset::create(['symbol' => 'AAA', 'name' => 'Asset AAA']);
         Price::create([
