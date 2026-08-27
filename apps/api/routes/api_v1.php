@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
+use App\Http\Controllers\Api\V1\PortfolioImportController;
 use App\Http\Controllers\Api\V1\PositionController;
 use App\Http\Controllers\Api\V1\ScheduledTaskController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
@@ -171,6 +172,17 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('portfolios/{portfolio}/allocations', [PortfolioController::class, 'allocations'])
         ->whereNumber('portfolio')
         ->name('portfolios.allocations');
+
+    // Stockbit JSON import. Preview writes nothing; the commit re-runs the
+    // same server-side analysis rather than trusting the previewed rows.
+    // Declared before the apiResource so neither path is swallowed by
+    // "portfolios/{portfolio}".
+    Route::post('portfolios/{portfolio}/imports/stockbit/preview', [PortfolioImportController::class, 'preview'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.imports.stockbit.preview');
+    Route::post('portfolios/{portfolio}/imports/stockbit', [PortfolioImportController::class, 'store'])
+        ->whereNumber('portfolio')
+        ->name('portfolios.imports.stockbit.store');
 
     Route::apiResource('portfolios', PortfolioController::class);
     Route::get('portfolios/{portfolio}/positions', [PositionController::class, 'index'])

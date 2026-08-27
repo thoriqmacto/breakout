@@ -20,8 +20,22 @@ class Position extends Model
         'fee_rate' => 'float',
         'fee_value' => 'float',
         'avg_price' => 'float',
-        'executed_at' => 'date',
+        // Datetime rather than date: several fills can land on one day, and
+        // the calculator's running average cost depends on their true order.
+        'executed_at' => 'datetime',
     ];
+
+    /**
+     * Rows the Stockbit history importer created from a real broker execution.
+     */
+    public const SOURCE_STOCKBIT = 'stockbit';
+
+    /**
+     * A synthetic opening position derived from a broker snapshot, created
+     * only when the user explicitly asked for it because no history covered
+     * the holding. Never to be mistaken for a real historical BUY.
+     */
+    public const SOURCE_STOCKBIT_SNAPSHOT = 'stockbit_snapshot';
 
     public function portfolio(): BelongsTo
     {

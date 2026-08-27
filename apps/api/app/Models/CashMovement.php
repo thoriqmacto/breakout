@@ -45,8 +45,20 @@ class CashMovement extends Model
         'id' => 'integer',
         'portfolio_id' => 'integer',
         'amount' => 'float',
-        'executed_at' => 'date',
+        // Matches positions: an imported dividend carries a broker timestamp.
+        'executed_at' => 'datetime',
     ];
+
+    /**
+     * Movements the Stockbit history importer created, e.g. cash dividends.
+     */
+    public const SOURCE_STOCKBIT = 'stockbit';
+
+    /**
+     * A base-cash correction written when the user reconciles against the
+     * broker's reported cash balance.
+     */
+    public const SOURCE_STOCKBIT_SNAPSHOT = 'stockbit_snapshot';
 
     public function portfolio(): BelongsTo
     {
