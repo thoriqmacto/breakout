@@ -18,7 +18,26 @@ import {
   fetchWatchlist,
   type WatchlistPayload,
   type WatchlistRow,
+  type WatchlistTopBroker,
 } from "@/lib/strategy-client"
+
+/**
+ * The range the broker figures cover.
+ *
+ * A broker summary is an aggregate over from..to, so the same net value can be
+ * one session or three months of accumulated flow. Labelling it is the whole
+ * point: unlabelled, the two read identically. Older rows carry no range and
+ * simply get no label.
+ */
+function brokerRangeLabel(brokers: WatchlistTopBroker[]): string | null {
+  const first = brokers[0]
+
+  if (!first?.from || !first?.to) {
+    return null
+  }
+
+  return first.from === first.to ? first.from : `${first.from} → ${first.to}`
+}
 
 type SortKey =
   | "score_total"
@@ -325,6 +344,11 @@ function RowGroup({ row, isOpen, onToggle }: RowGroupProps) {
               </div>
               <div>
                 <p className="font-semibold text-foreground">Top brokers</p>
+                {brokerRangeLabel(row.top_brokers) ? (
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {brokerRangeLabel(row.top_brokers)}
+                  </p>
+                ) : null}
                 <ul className="mt-1 space-y-1 text-muted-foreground">
                   {row.top_brokers.length === 0 ? (
                     <li>—</li>

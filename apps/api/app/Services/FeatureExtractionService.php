@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Asset;
 use App\Models\BandarDetectorSummary;
-use App\Models\BrokerSummaryFact;
 use App\Models\Price;
+use App\Services\Strategy\BrokerWindowResolver;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -29,6 +29,8 @@ class FeatureExtractionService
         'top1_sell_share',
         'seller_hhi',
     ];
+
+    public function __construct(private readonly BrokerWindowResolver $brokerWindows) {}
 
     /**
      * @return array<string, float|int>
@@ -109,13 +111,40 @@ class FeatureExtractionService
         $features = $this->defaultBrokerFeatures();
         $transactionType ??= (string) config('stockbit.defaults.transaction_type');
 
-        $bandarDetector = BandarDetectorSummary::query()
-            ->where('asset_id', $asset->id)
-            ->when($transactionType !== '', fn ($query) => $query->where('transaction_type', $transactionType))
-            ->whereDate('from_date', '<=', $date->toDateString())
-            ->whereDate('to_date', '>=', $date->toDateString())
-            ->orderByDesc('from_date')
-            ->first();
+        // One window answers both halves of this method. They used to disagree:
+        // the detector was resolved by range while the broker rows were an
+        // exact trade_date match, so a three-month turnover could end up as the
+        // denominator for a single day's numerators.
+        //
+        // asOf() also declines a window that ends after $date. The previous
+        // range query accepted one covering $date, which fed trading from after
+        // it into the features for that day.
+        $window = $this->brokerWindows->asOf($asset->id, $date, $transactionType);
+
+        $bandarDetector = $window?->bandarDetectorSummary;
+
+        if ($bandarDetector === null) {
+            // Detector rows imported before windows existed carry no link back
+            // to one. Same as-of and staleness rules, so the fallback cannot be
+            // a way in for data the window path would have refused.
+            $staleness = $this->brokerWindows->maxStalenessDays();
+
+            $bandarDetector = BandarDetectorSummary::query()
+                ->where('asset_id', $asset->id)
+                ->when($transactionType !== '', fn ($query) => $query->where('transaction_type', $transactionType))
+                ->whereDate('to_date', '<=', $date->toDateString())
+                ->when(
+                    $staleness !== null,
+                    fn ($query) => $query->whereDate(
+                        'to_date',
+                        '>=',
+                        $date->copy()->subDays($staleness)->toDateString(),
+                    ),
+                )
+                ->orderByDesc('to_date')
+                ->orderByDesc('from_date')
+                ->first();
+        }
 
         $turnoverValue = $bandarDetector ? $this->toNumber($bandarDetector->value) : 0.0;
         $turnoverVolume = $bandarDetector ? (int) $this->toNumber($bandarDetector->volume) : 0;
@@ -140,27 +169,27 @@ class FeatureExtractionService
         $features['top5_net_norm'] = $denom ? ($this->extractMetricAmount($metrics, 'top5') / $denom) : 0.0;
         $features['top10_net_norm'] = $denom ? ($this->extractMetricAmount($metrics, 'top10') / $denom) : 0.0;
 
-        $facts = BrokerSummaryFact::query()
-            ->where('asset_id', $asset->id)
-            ->whereDate('trade_date', $date->toDateString())
-            ->when($transactionType !== '', fn ($query) => $query->where('transaction_type', $transactionType))
-            ->get();
+        // Entries of the same window the detector came from. Both of Stockbit's
+        // lists hold net positions, already signed as the source gave them, so
+        // the sign still says which side a broker is on.
+        $entries = $window === null ? collect() : $window->entries;
 
         $buys = [];
         $sells = [];
         $brokerCodes = [];
 
-        foreach ($facts as $fact) {
-            $netValue = (float) ($fact->net_value ?? 0.0);
-            $brokerCodes[$fact->broker_code] = true;
+        foreach ($entries as $entry) {
+            $netValue = (float) ($entry->net_value ?? 0.0);
+            $brokerCodes[$entry->broker_code] = true;
 
             $row = [
                 'net_value' => $netValue,
-                'buy_value' => (float) ($fact->buy_value ?? 0.0),
-                'sell_value' => (float) ($fact->sell_value ?? 0.0),
-                'buy_value_v' => (float) ($fact->buy_value_v ?? 0.0),
-                'sell_value_v' => (float) ($fact->sell_value_v ?? 0.0),
-                'broker_type' => $fact->broker_type,
+                'gross_value' => abs((float) ($entry->gross_value ?? 0.0)),
+                // broker_type reaches the entry from the payload's "type" key.
+                // toFacts() read netbs_broker_type instead, which live payloads
+                // do not carry -- so foreign_net_norm, local_net_norm and
+                // gov_net_norm below were always zero on real data.
+                'broker_type' => $entry->broker_type,
             ];
 
             if ($netValue > 0) {
@@ -208,13 +237,16 @@ class FeatureExtractionService
         $features['top3_sell_share'] = $this->topSellShare($sortedSells, 3, $denom);
         $features['top5_sell_share'] = $this->topSellShare($sortedSells, 5, $denom);
 
-        $grossBuy = 0.0;
-        $grossSell = 0.0;
-        foreach ($facts as $fact) {
-            $grossBuy += $this->preferGrossValue($fact->buy_value_v, $fact->buy_value);
-            $grossSell += $this->preferGrossValue($fact->sell_value_v, $fact->sell_value);
+        $grossTotal = 0.0;
+
+        foreach ($entries as $entry) {
+            // Magnitudes: gross turnover has no side, and a sell entry's values
+            // arrive negative.
+            $grossTotal += $this->preferGrossValue(
+                abs((float) ($entry->gross_value ?? 0.0)),
+                abs((float) ($entry->net_value ?? 0.0)),
+            );
         }
-        $grossTotal = $grossBuy + $grossSell;
         $features['net_to_gross_ratio'] = $grossTotal > 0 ? (abs($avgAmt) / $grossTotal) : 0.0;
 
         $typeNet = [
@@ -223,12 +255,12 @@ class FeatureExtractionService
             'Pemerintah' => 0.0,
         ];
 
-        foreach ($facts as $fact) {
-            $type = (string) ($fact->broker_type ?? '');
+        foreach ($entries as $entry) {
+            $type = (string) ($entry->broker_type ?? '');
             if (! array_key_exists($type, $typeNet)) {
                 continue;
             }
-            $typeNet[$type] += (float) ($fact->net_value ?? 0.0);
+            $typeNet[$type] += (float) ($entry->net_value ?? 0.0);
         }
 
         $features['foreign_net_norm'] = $denom ? ($typeNet['Asing'] / $denom) : 0.0;

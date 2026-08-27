@@ -77,6 +77,22 @@ class BrokerSummaryWindow extends Model
     }
 
     /**
+     * Calendar days the window spans, inclusive of both endpoints.
+     *
+     * Calendar rather than trading days on purpose: the range endpoints are
+     * what Stockbit was asked for, and how many sessions fell inside them is
+     * not something the payload says. A single-day window is 1.
+     */
+    public function spanDays(): int
+    {
+        if ($this->from_date === null || $this->to_date === null) {
+            return 0;
+        }
+
+        return (int) round(abs($this->from_date->diffInDays($this->to_date))) + 1;
+    }
+
+    /**
      * Whether Stockbit returned fewer brokers than it says exist.
      *
      * The request limit caps each list, so a window can hold 25 of 42 buyers.
