@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AssetController;
+use App\Http\Controllers\Api\V1\AutomationController;
 use App\Http\Controllers\Api\V1\BacktestController;
 use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
@@ -8,7 +9,9 @@ use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PositionController;
+use App\Http\Controllers\Api\V1\ScheduledTaskController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
+use App\Http\Controllers\Api\V1\StockbitTokenController;
 use App\Http\Controllers\Api\V1\StrategyController;
 use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
@@ -84,6 +87,50 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
 
     // Trading days overview
     Route::get('trading-days', [TradingDayController::class, 'index']);
+
+    // Automation: the database-managed scheduler.
+    //
+    // A scheduled task stores an allowlisted Artisan command name plus a
+    // structured parameter map; nothing here accepts or executes a shell
+    // string. See config/automation.php for the allowlist.
+    Route::get('automation/status', [AutomationController::class, 'status'])
+        ->name('automation.status');
+
+    Route::get('automation/alerts', [AutomationController::class, 'alerts'])
+        ->name('automation.alerts');
+
+    Route::delete('automation/alerts/{alert}', [AutomationController::class, 'dismissAlert'])
+        ->whereNumber('alert')
+        ->name('automation.alerts.dismiss');
+
+    Route::get('automation/runs', [AutomationController::class, 'runs'])
+        ->name('automation.runs');
+
+    // The token is written here and never read back. GET reports status only:
+    // configured, source, fingerprint and expiry, never the bearer.
+    Route::get('automation/stockbit-token', [StockbitTokenController::class, 'show'])
+        ->name('automation.stockbit-token.show');
+
+    Route::put('automation/stockbit-token', [StockbitTokenController::class, 'renew'])
+        ->name('automation.stockbit-token.renew');
+
+    Route::delete('automation/stockbit-token', [StockbitTokenController::class, 'destroy'])
+        ->name('automation.stockbit-token.destroy');
+
+    Route::post('scheduled-tasks/{scheduledTask}/toggle', [ScheduledTaskController::class, 'toggle'])
+        ->whereNumber('scheduledTask')
+        ->name('scheduled-tasks.toggle');
+
+    Route::post('scheduled-tasks/{scheduledTask}/run', [ScheduledTaskController::class, 'run'])
+        ->whereNumber('scheduledTask')
+        ->name('scheduled-tasks.run');
+
+    Route::get('scheduled-tasks/{scheduledTask}/runs', [ScheduledTaskController::class, 'runs'])
+        ->whereNumber('scheduledTask')
+        ->name('scheduled-tasks.runs');
+
+    Route::apiResource('scheduled-tasks', ScheduledTaskController::class)
+        ->whereNumber('scheduled_task');
 
     // Strategy watchlist (read-only; produced by strategy:rank-watchlist)
     Route::get('strategy/watchlist', [StrategyWatchlistController::class, 'index'])

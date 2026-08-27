@@ -246,18 +246,21 @@ class BrokerSummaryImporter
     }
 
     /**
-     * Import broker summary JSON files from disk into the broksums table.
+     * Import every broker summary JSON file in the archive.
      *
-     * @return array{file_count:int,row_count:int,symbols:array<string,int>}
+     * This walks the whole directory and is the recovery path:
+     * `broker-summary:rebuild` uses it to reconstruct the canonical windows
+     * from years of archived responses. It is deliberately not what the
+     * weekly scheduler calls -- that job knows exactly which files it just
+     * produced and imports those with importPaths(), instead of re-reading the
+     * entire history every Friday.
+     *
+     * @return array{file_count:int,row_count:int,symbols:array<string,int>,imported:array<int,string>,skipped:array<int,string>}
      */
     public function importFromDisk(?string $disk = null, ?string $directory = null): array
     {
         $disk = $disk ?? (string) config('stockbit.save_disk', 'local');
         $directory = trim($directory ?? (string) config('stockbit.save_dir', 'broker_summary'), '/');
-
-        $fileCount = 0;
-        $rowCount = 0;
-        $symbols = [];
 
         try {
             $storage = Storage::disk($disk);
@@ -270,162 +273,233 @@ class BrokerSummaryImporter
                 'file_count' => 0,
                 'row_count' => 0,
                 'symbols' => [],
+                'imported' => [],
+                'skipped' => [],
             ];
         }
 
+        return $this->importPaths($paths, $disk);
+    }
+
+    /**
+     * Import a known set of archive files.
+     *
+     * The scheduler writes a handful of JSON files and knows their paths, so
+     * it should not pay to re-read and re-upsert the entire archive to get
+     * them into the database -- that cost grows with every week the system
+     * runs, and a Friday evening is the worst time to discover it.
+     *
+     * Re-importing the same file is a no-op in effect: a window is keyed on
+     * (asset, from_date, to_date, transaction_type) and its entries are
+     * replaced wholesale, so a retry converges rather than duplicating.
+     *
+     * @param  array<int, string>  $paths  Paths on $disk, as the scrape wrote them.
+     * @return array{file_count:int,row_count:int,symbols:array<string,int>,imported:array<int,string>,skipped:array<int,string>}
+     */
+    public function importPaths(array $paths, ?string $disk = null): array
+    {
+        $disk = $disk ?? (string) config('stockbit.save_disk', 'local');
+
+        $fileCount = 0;
+        $rowCount = 0;
+        $symbols = [];
+        $imported = [];
+        $skipped = [];
+
         foreach ($paths as $path) {
+            if (! is_string($path) || ! str_ends_with(strtolower($path), '.json')) {
+                continue;
+            }
+
             $fileCount++;
-            $symbol = $this->symbolFromPath($path);
-            if ($symbol === null) {
-                continue;
-            }
 
-            $contents = Storage::disk($disk)->get($path);
-            $decoded = json_decode($contents, true);
-            if (! is_array($decoded)) {
-                continue;
-            }
+            $outcome = $this->importFile($disk, $path);
 
-            $meta = $this->metaFromPath($path);
-            $transactionType = $meta['transaction_type'] ?? config('stockbit.defaults.transaction_type');
-
-            $window = BrokerSummaryTransformer::toWindow(
-                $symbol,
-                $decoded,
-                $meta['from_date'] ?? null,
-                $meta['to_date'] ?? null,
-                $transactionType,
-            );
-
-            $facts = BrokerSummaryTransformer::toFacts($symbol, $decoded, $transactionType);
-
-            if ($facts === [] && $window === null) {
-                continue;
-            }
-
-            $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
-            // firstOrCreate does not refresh DB-side defaults like
-            // sync_broker_summary into the in-memory model on first insert,
-            // so reload before reading the flag to avoid a false-negative
-            // skip on freshly created assets.
-            if ($asset->wasRecentlyCreated) {
-                $asset->refresh();
-            }
-            if (! $asset->sync_broker_summary) {
-                continue;
-            }
-            $timestamp = now();
-
-            // The canonical record. Written first so the detector and, for a
-            // genuine single day, the legacy projections can point at it.
-            $windowModel = $window === null
-                ? null
-                : $this->storeWindow($asset, $window, $path, $contents, $timestamp);
-
-            // broker_summary_facts and broksums can only express one date, so
-            // they are written solely for a genuine single-day window. Feeding
-            // them a range aggregate stamped with its start date is the bug
-            // this whole change exists to remove, and the strategy consumers
-            // reading trade_date as a trading day would carry it onwards.
-            $singleDay = $windowModel !== null && $windowModel->isSingleDay();
-
-            if ($window !== null && ! $singleDay) {
-                $rowCount += count($window['entries']);
-                $symbols[$symbol] = ($symbols[$symbol] ?? 0) + count($window['entries']);
+            if (! $outcome['imported']) {
+                $skipped[] = $path;
 
                 continue;
             }
 
-            $factsPayload = [];
-            $broksumPayload = [];
+            $imported[] = $path;
+            $rowCount += $outcome['rows'];
 
-            foreach ($facts as $fact) {
-                $factsPayload[] = [
-                    'asset_id' => $asset->id,
-                    'trade_date' => $fact['trade_date'],
-                    'broker_code' => $fact['broker_code'],
-                    'transaction_type' => $fact['transaction_type'],
-                    'broker_type' => $fact['broker_type'],
-                    'buy_lot' => $fact['buy_lot'],
-                    'buy_volume' => $fact['buy_volume'],
-                    'buy_value' => $fact['buy_value'],
-                    'buy_value_v' => $fact['buy_value_v'],
-                    'buy_avg_price' => $fact['buy_avg_price'],
-                    'sell_lot' => $fact['sell_lot'],
-                    'sell_volume' => $fact['sell_volume'],
-                    'sell_value' => $fact['sell_value'],
-                    'sell_value_v' => $fact['sell_value_v'],
-                    'sell_avg_price' => $fact['sell_avg_price'],
-                    'net_lot' => $fact['net_lot'],
-                    'net_volume' => $fact['net_volume'],
-                    'net_value' => $fact['net_value'],
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ];
-
-                $broksumPayload[] = [
-                    'asset_id' => $asset->id,
-                    'date' => $fact['trade_date'],
-                    'broker' => $fact['broker_code'],
-                    'net_value' => $fact['net_value'],
-                    'buy_value' => $fact['buy_value'],
-                    'buy_avg_price' => $fact['buy_avg_price'],
-                    'sell_value' => $fact['sell_value'],
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ];
+            if ($outcome['symbol'] !== null) {
+                $symbols[$outcome['symbol']] = ($symbols[$outcome['symbol']] ?? 0) + $outcome['rows'];
             }
-
-            // A rejected row is reported by the driver as "at row 25" of a
-            // 500-row chunk, which names neither the symbol nor the broker nor
-            // the field. Check the payload first so the failure can say what is
-            // actually wrong with which record.
-            $this->guardMagnitudes($symbol, $factsPayload);
-
-            foreach (array_chunk($factsPayload, 500) as $chunk) {
-                BrokerSummaryFact::upsert(
-                    $chunk,
-                    ['asset_id', 'trade_date', 'broker_code', 'transaction_type'],
-                    [
-                        'broker_type',
-                        'buy_lot',
-                        'buy_volume',
-                        'buy_value',
-                        'buy_value_v',
-                        'buy_avg_price',
-                        'sell_lot',
-                        'sell_volume',
-                        'sell_value',
-                        'sell_value_v',
-                        'sell_avg_price',
-                        'net_lot',
-                        'net_volume',
-                        'net_value',
-                        'updated_at',
-                    ]
-                );
-            }
-
-            foreach (array_chunk($broksumPayload, 500) as $chunk) {
-                Broksum::upsert(
-                    $chunk,
-                    ['asset_id', 'date', 'broker'],
-                    ['net_value', 'buy_value', 'buy_avg_price', 'sell_value', 'updated_at']
-                );
-            }
-
-            // The detector is written by storeWindow(), tied to the window it
-            // describes, so it is not repeated here.
-
-            $rowCount += count($factsPayload);
-            $symbols[$symbol] = ($symbols[$symbol] ?? 0) + count($factsPayload);
         }
 
         return [
             'file_count' => $fileCount,
             'row_count' => $rowCount,
             'symbols' => $symbols,
+            'imported' => $imported,
+            'skipped' => $skipped,
         ];
+    }
+
+    /**
+     * Import one archived response.
+     *
+     * @return array{imported:bool,rows:int,symbol:?string}
+     */
+    private function importFile(string $disk, string $path): array
+    {
+        $miss = ['imported' => false, 'rows' => 0, 'symbol' => null];
+
+        $symbol = $this->symbolFromPath($path);
+
+        if ($symbol === null) {
+            return $miss;
+        }
+
+        try {
+            $contents = Storage::disk($disk)->get($path);
+        } catch (\Throwable $exception) {
+            Log::warning('Broker summary file could not be read.', [
+                'file' => $path,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return $miss;
+        }
+
+        $decoded = json_decode((string) $contents, true);
+
+        if (! is_array($decoded)) {
+            return $miss;
+        }
+
+        $meta = $this->metaFromPath($path);
+        $transactionType = $meta['transaction_type'] ?? config('stockbit.defaults.transaction_type');
+
+        $window = BrokerSummaryTransformer::toWindow(
+            $symbol,
+            $decoded,
+            $meta['from_date'] ?? null,
+            $meta['to_date'] ?? null,
+            $transactionType,
+        );
+
+        $facts = BrokerSummaryTransformer::toFacts($symbol, $decoded, $transactionType);
+
+        if ($facts === [] && $window === null) {
+            return $miss;
+        }
+
+        $asset = Asset::firstOrCreate(['symbol' => $symbol], ['name' => $symbol]);
+        // firstOrCreate does not refresh DB-side defaults like
+        // sync_broker_summary into the in-memory model on first insert,
+        // so reload before reading the flag to avoid a false-negative
+        // skip on freshly created assets.
+        if ($asset->wasRecentlyCreated) {
+            $asset->refresh();
+        }
+        if (! $asset->sync_broker_summary) {
+            return $miss;
+        }
+
+        $timestamp = now();
+
+        // The canonical record. Written first so the detector and, for a
+        // genuine single day, the legacy projections can point at it.
+        $windowModel = $window === null
+            ? null
+            : $this->storeWindow($asset, $window, $path, (string) $contents, $timestamp);
+
+        // broker_summary_facts and broksums can only express one date, so
+        // they are written solely for a genuine single-day window. Feeding
+        // them a range aggregate stamped with its start date is the bug
+        // this whole change exists to remove, and the strategy consumers
+        // reading trade_date as a trading day would carry it onwards.
+        $singleDay = $windowModel !== null && $windowModel->isSingleDay();
+
+        if ($window !== null && ! $singleDay) {
+            return ['imported' => true, 'rows' => count($window['entries']), 'symbol' => $symbol];
+        }
+
+        $factsPayload = [];
+        $broksumPayload = [];
+
+        foreach ($facts as $fact) {
+            $factsPayload[] = [
+                'asset_id' => $asset->id,
+                'trade_date' => $fact['trade_date'],
+                'broker_code' => $fact['broker_code'],
+                'transaction_type' => $fact['transaction_type'],
+                'broker_type' => $fact['broker_type'],
+                'buy_lot' => $fact['buy_lot'],
+                'buy_volume' => $fact['buy_volume'],
+                'buy_value' => $fact['buy_value'],
+                'buy_value_v' => $fact['buy_value_v'],
+                'buy_avg_price' => $fact['buy_avg_price'],
+                'sell_lot' => $fact['sell_lot'],
+                'sell_volume' => $fact['sell_volume'],
+                'sell_value' => $fact['sell_value'],
+                'sell_value_v' => $fact['sell_value_v'],
+                'sell_avg_price' => $fact['sell_avg_price'],
+                'net_lot' => $fact['net_lot'],
+                'net_volume' => $fact['net_volume'],
+                'net_value' => $fact['net_value'],
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            $broksumPayload[] = [
+                'asset_id' => $asset->id,
+                'date' => $fact['trade_date'],
+                'broker' => $fact['broker_code'],
+                'net_value' => $fact['net_value'],
+                'buy_value' => $fact['buy_value'],
+                'buy_avg_price' => $fact['buy_avg_price'],
+                'sell_value' => $fact['sell_value'],
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+        }
+
+        // A rejected row is reported by the driver as "at row 25" of a
+        // 500-row chunk, which names neither the symbol nor the broker nor
+        // the field. Check the payload first so the failure can say what is
+        // actually wrong with which record.
+        $this->guardMagnitudes($symbol, $factsPayload);
+
+        foreach (array_chunk($factsPayload, 500) as $chunk) {
+            BrokerSummaryFact::upsert(
+                $chunk,
+                ['asset_id', 'trade_date', 'broker_code', 'transaction_type'],
+                [
+                    'broker_type',
+                    'buy_lot',
+                    'buy_volume',
+                    'buy_value',
+                    'buy_value_v',
+                    'buy_avg_price',
+                    'sell_lot',
+                    'sell_volume',
+                    'sell_value',
+                    'sell_value_v',
+                    'sell_avg_price',
+                    'net_lot',
+                    'net_volume',
+                    'net_value',
+                    'updated_at',
+                ]
+            );
+        }
+
+        foreach (array_chunk($broksumPayload, 500) as $chunk) {
+            Broksum::upsert(
+                $chunk,
+                ['asset_id', 'date', 'broker'],
+                ['net_value', 'buy_value', 'buy_avg_price', 'sell_value', 'updated_at']
+            );
+        }
+
+        // The detector is written by storeWindow(), tied to the window it
+        // describes, so it is not repeated here.
+
+        return ['imported' => true, 'rows' => count($factsPayload), 'symbol' => $symbol];
     }
 
     private function symbolFromPath(string $path): ?string

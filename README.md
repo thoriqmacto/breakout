@@ -42,6 +42,13 @@ This repository contains the code for **Breakout**, structured as a multi-app mo
   php artisan asset:sync --eod
   ```
 
+- Inspect the database-managed scheduler (see [Automation & Scheduling](#automation--scheduling)):
+  ```bash
+  php artisan scheduler:status          # every automation, its next run and last outcome
+  php artisan schedule:list             # the single static entry that drives them
+  php artisan scheduler:dispatch        # run whatever is due right now
+  ```
+
 ## Updating Asset Data (step-by-step)
 The Laravel console already includes helpers for refreshing the trading calendar, syncing OHLCV data, and checking integrity. Run them in this order when updating datasets:
 
@@ -257,6 +264,338 @@ By default a pull only fills in CSVs that are missing or older locally, so it wi
 - Throttling (`403 rateLimitExceeded`) and transient errors are retried with exponential backoff.
 - The Stockbit bearer token store stays on its own local disk and is deliberately **not** routed to Drive.
 - For a data pipeline, an S3-compatible store (Cloudflare R2, Backblaze B2) is technically a better fit than Drive, and `config/filesystems.php` already ships an `s3` disk. Because both go through the same Flysystem interface, switching is just `CSV_MIRROR_DISK=s3` / `SB_SAVE_DISK=s3`.
+
+## Automation & Scheduling
+
+Scheduled market-data work lives in the database, not in `routes/console.php`. Automations
+can be created, edited, enabled, disabled, deleted and run on demand from
+**`/dashboard/automation`**, and take effect on the next minute — no deploy required.
+
+### Timezone
+
+Every schedule and every market-day calculation is evaluated in **`Asia/Jakarta` (WIB, UTC+7)**,
+because that is the market this system follows.
+
+`config/app.php` still says `UTC`, and that is deliberate: timestamps are *stored* in UTC and the
+application's global timezone is not changed to make the scheduler work. What is Jakarta is the
+*interpretation* — `0 16 * * *` on a task whose timezone is `Asia/Jakarta` fires at 16:00 WIB
+(09:00 UTC) regardless of what the server clock is set to, and "today" for a trading-day
+condition is the Jakarta date, not the server's.
+
+Override with `AUTOMATION_TIMEZONE` if you ever need to; each task also carries its own
+`timezone` column.
+
+### Architecture
+
+```
+cron (every minute)
+  └─ php artisan schedule:run
+       └─ scheduler:dispatch                 ← the ONE static entry in routes/console.php
+            ├─ reads enabled rows from `scheduled_tasks`, in priority order
+            ├─ works out which occurrences are due, in each task's own timezone
+            ├─ evaluates the task's market condition against `trading_calendar`
+            ├─ takes a per-task lock, and a shared lock for bulk Stockbit jobs
+            └─ Artisan::call(<allowlisted command>, <structured parameters>)
+                 └─ writes a `scheduled_task_runs` row: status, timings, output, metadata
+```
+
+There is exactly one static scheduler entry. A second scheduling mechanism alongside the
+database one would mean two places to look when a job does not run.
+
+The previous hard-coded `asset:sync --eod` at 15:00 `Asia/Qatar` was **removed** — it competed
+with the database-managed daily OHLCV sync, which runs at 16:00 WIB and only on days the IDX
+actually traded.
+
+### Required production setup
+
+Cron must invoke Laravel's scheduler every minute. Add this to the deploy user's crontab:
+
+```cron
+* * * * * cd /var/www/breakout/apps/api && php artisan schedule:run >> /dev/null 2>&1
+```
+
+`scheduler:dispatch` runs due tasks in-process, in priority order, so a bulk scrape holds the
+tick until it finishes. It is registered `withoutOverlapping()->runInBackground()`, so the next
+minute's `schedule:run` returns immediately rather than queuing up behind it.
+
+**"Run now" from the dashboard is queued**, so a queue worker must be running for that button to
+do anything (scheduled runs do not need one):
+
+```ini
+; /etc/supervisor/conf.d/breakout-worker.conf
+[program:breakout-worker]
+command=php /var/www/breakout/apps/api/artisan queue:work --sleep=3 --tries=1 --timeout=7200
+directory=/var/www/breakout/apps/api
+user=www-data
+autostart=true
+autorestart=true
+stopwaitsecs=7300
+redirect_stderr=true
+stdout_logfile=/var/log/breakout-worker.log
+```
+
+`--tries=1` is intentional: the runner records the outcome on the run row, so a retry would
+re-execute an hour of API calls that already reported how they went.
+
+### Default seeded automations
+
+Installed by the migration that creates the tables, and restorable with
+`php artisan db:seed --class=AutomationSeeder`. All three are fully editable from the dashboard.
+
+| Name | Schedule | Condition | Command |
+| --- | --- | --- | --- |
+| Daily OHLCV Sync | 16:00 `Asia/Jakarta`, daily | `trading_day` | `automation:ohlcv-daily` |
+| Weekly Broker Summary | 16:00 `Asia/Jakarta`, daily | `last_trading_day_of_week` | `automation:broker-summary-weekly` |
+| Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | `automation:token-check` |
+
+In plain language:
+
+- **Every valid IDX trading day at 16:00 WIB** → update OHLCV for every asset with
+  `sync_price = true`.
+- **On the week's final valid IDX trading day at 16:00 WIB** → update OHLCV, then fetch and
+  import that week's broker summary. The two never run at the same time: the daily job has the
+  lower `priority` and both take a shared Stockbit lock, so the weekly one queues behind it.
+- **After successful persistence** → mirror the corresponding files to Google Drive.
+- **Every day at 09:00 WIB** → inspect the Stockbit token and warn when renewal is needed.
+
+### How trading-day conditions work
+
+Conditions are answered from the `trading_calendar` table, never from the shape of the week.
+
+- **`none`** — runs on every occurrence.
+- **`trading_day`** — resolves today in `Asia/Jakarta` and runs only if that date's row exists
+  and `is_trading_day = true`.
+- **`last_trading_day_of_week`** — takes the Monday–Sunday week containing today, lists the
+  dates in it with `is_trading_day = true`, and runs only when today equals the last of them.
+  The first and last of those dates also become the weekly scrape's `--from` and `--to`.
+
+A Monday holiday moves `from` to Tuesday; a Friday holiday moves `to` to Thursday and makes
+Thursday the day the weekly job runs. Neither is assumed — both come from the calendar.
+
+**Missing rows are not treated as holidays.** A date with no row is *unknown*, and to a plain
+query that is indistinguishable from "closed" — which would make Thursday look like the week's
+final trading day every time the calendar fell behind, and file a Monday–Thursday range as the
+week's summary. So an incomplete week produces a skipped run with reason
+`trading_calendar_incomplete`, surfaced in the Automation history and on the status header.
+Rebuild with:
+
+```bash
+php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
+php artisan trading-calendar:build --from=2015-01-01 --to=$(date +%F)
+```
+
+A week containing no trading day at all is skipped as `no_trading_days_in_week`.
+
+### Safe execution — no shell, no remote command injection
+
+The dashboard can schedule commands, but it can never describe a command *line*. A
+`scheduled_tasks` row stores an Artisan command **name** from the allowlist in
+`config/automation.php` plus a structured `{arguments, options}` map, and both are validated on
+write and again before execution. Execution goes through `Artisan::call()`; nothing is
+concatenated, quoted, or handed to a shell — there is no `exec()`, `shell_exec()`, `proc_open()`
+or `Process` anywhere on this path.
+
+Each allowlisted command declares its acceptable parameters and their types (`boolean`,
+`integer`, `date`, `enum`, `string` with a pattern, `symbol_list`). Anything undeclared, or a
+value of the wrong shape, is a 422.
+
+**The Stockbit bearer can never be stored as a task parameter.** `stockbit:scrape` is
+allowlisted *without* `--token`, and a name-level blocklist (`token`, `bearer`, `secret`,
+`password`, `api-key`, …) rejects it regardless of what the config says. The token is resolved at
+execution time from the existing encrypted store.
+
+To allow another command, add it to `config/automation.php` under `commands`.
+
+### Stockbit token lifecycle
+
+The existing token system remains the source of truth: `StockbitTokenResolver`,
+`StockbitTokenStore` (encrypted, on the local disk, never mirrored to Drive),
+`StockbitExodusClient::jwtExpiresAt()`, `stockbit:token:set` and `stockbit:token:status`. No
+second plaintext field was added anywhere, and no API returns the bearer.
+
+Every scheduled bulk Stockbit job **preflights the token before it starts**, and reports one of:
+
+| State | Meaning |
+| --- | --- |
+| `healthy` | Present, and comfortably above the warning threshold. |
+| `expiring_soon` | Present, but under `AUTOMATION_STOCKBIT_WARN_TTL_MINUTES` (default 720). |
+| `expired` | Present but past its `exp`. |
+| `missing` | Nothing stored. |
+| `expiry_unknown` | Present, with no readable `exp` claim. Bulk jobs are allowed. |
+
+A bulk job additionally requires at least `AUTOMATION_STOCKBIT_MIN_TTL_MINUTES` (default 90) of
+remaining lifetime. A token that expires twenty minutes into an hour-long scrape is not usable,
+and discovering that halfway through leaves a partial import behind. When the preflight fails,
+nothing is called: the run is recorded as **`blocked_token`** with a reason naming the remedy,
+and a persistent dashboard alert is raised.
+
+Renewing:
+
+```bash
+php artisan stockbit:token:status     # source, fingerprint, expiry — never the token
+php artisan stockbit:token:set        # paste, pipe, or --from-clipboard
+```
+
+…or from the token card on `/dashboard/automation`, which accepts a pasted JWT (a leading
+`Bearer ` is tolerated), rejects one that is already expired, persists through the same
+encrypted store, and clears the reminder.
+
+There is deliberately **no automated credential login or browser automation**. Renewal is a
+person pasting a token; what the automation can usefully do is notice early and say so.
+
+Because this project has no mail or push transport — and one token reminder is not a good reason
+to add a third-party notification dependency — the reminder is a row in `automation_alerts`,
+shown in the authenticated dashboard header on every page and on the Automation page. It is
+keyed on `(type, key)`, so a daily check updates one row instead of accumulating one per day, and
+a healthy token clears it.
+
+### Google Drive cold-storage synchronisation
+
+Two collections, one authoritative mirror path each — deliberately not two layers pushing the
+same files.
+
+**OHLCV seed CSVs.** `stockbit:scrape` already hydrates before its read/merge/write loop and
+flushes the CSVs it touched afterwards, via `BarCsvMirror` (`CSV_MIRROR_DISK`). The daily
+automation delegates to that rather than mirroring again, and reports the result on the run row.
+Only the tickers touched during the run are pushed, and a hash manifest means an unchanged file
+is not re-uploaded.
+
+**Broker-summary JSON.** New: `BrokerSummaryArchiveMirror`, plus a `broker-summary:mirror-push`
+command matching `bars:mirror-push`.
+
+```dotenv
+BROKER_SUMMARY_MIRROR_DISK=gdrive   # defaults to CSV_MIRROR_DISK; empty disables mirroring
+```
+
+```bash
+php artisan broker-summary:mirror-push --disk=gdrive
+php artisan broker-summary:mirror-push --disk=gdrive --since=2026-08-01
+```
+
+It preserves the path under `stockbit.save_dir`, compares **content** rather than filenames,
+verifies the remote copy after writing, retries throttling with backoff, and **never deletes or
+modifies the local file** — a successful upload changes nothing locally, and a failed one leaves
+the only good copy exactly where it was. The weekly job mirrors only the JSON it just wrote, and
+only after that JSON has been imported.
+
+A Drive failure is reported on the run (`gdrive` / `gdrive_broker_summary` in run metadata, shown
+in the history) and never fails the data run. Local market data is never destroyed because cold
+storage was unreachable.
+
+### Broker-summary import
+
+The weekly job imports **only the files it just produced**, via
+`BrokerSummaryImporter::importPaths()`. It does not run a full
+`broker-summary:rebuild` over the whole archive every Friday — a cost that grows with every week
+the system runs.
+
+`importFromDisk()` and `broker-summary:rebuild` are unchanged and remain the full-archive
+recovery path.
+
+Import is idempotent: a window is keyed on `(asset, from_date, to_date, transaction_type)` and
+its entries are replaced wholesale, so re-running a week converges rather than duplicating.
+
+**A multi-day Stockbit response is one aggregate over `from..to`** and is stored as exactly that
+— a multi-day `BrokerSummaryWindow`. It is never written into the day-shaped legacy tables
+(`broker_summary_facts`, `broksums`) stamped with Monday's or Friday's date. That rule is
+unchanged and is covered by tests.
+
+### Inspecting and diagnosing
+
+```bash
+php artisan schedule:list             # the single static entry that drives everything
+php artisan scheduler:status          # every database task: schedule, next run, last outcome
+php artisan scheduler:status --all    # including disabled ones
+php artisan scheduler:dispatch        # run whatever is due right now
+php artisan scheduler:dispatch --at="2026-08-28T09:00:00Z"   # evaluate as at a given moment
+php artisan stockbit:token:status     # token source, fingerprint and expiry
+```
+
+Diagnosing a missed run:
+
+1. **A `skipped` run exists** → the scheduler fired and the market condition said no. The
+   `skip_reason` says which: `not_trading_day`, `not_last_trading_day_of_week`,
+   `trading_calendar_incomplete`, `overlapping_run`, `stockbit_busy`, …
+2. **A `blocked_token` run exists** → the token preflight failed. Renew it; nothing was scraped.
+3. **No run at all** → the dispatcher never fired. Check that cron is invoking
+   `php artisan schedule:run` every minute, and compare *Last dispatched run* on the Automation
+   status header against the wall clock.
+4. **Status `success` with a `Partial` badge** → the run completed but did not do everything;
+   the run detail names the tickers that produced no bar, or the uploads that failed.
+5. **Run history is empty and the task shows "Never run"** → confirm the task is enabled and its
+   cron expression is valid (`scheduler:status` prints `invalid cron` when it is not).
+
+Structured logs are written under `automation.task.started`, `automation.task.finished`,
+`automation.dispatch.*`. Captured Artisan output is redacted of anything credential-shaped and
+truncated to `AUTOMATION_MAX_OUTPUT_LENGTH` characters (default 20,000, keeping the tail) before
+it is stored, so run history cannot grow without bound and a leaked bearer never reaches a
+browser.
+
+### Reliability guarantees
+
+| Concern | How it is handled |
+| --- | --- |
+| Same task overlapping itself | Per-task cache lock for the whole execution. |
+| Two bulk Stockbit jobs at once | Shared `automation:stockbit-bulk` lock; the second waits. |
+| The same occurrence running twice | Unique index on `(scheduled_task_id, scheduled_for)`. |
+| A missed minute | Catch-up window (`AUTOMATION_CATCH_UP_MINUTES`, default 5), still duplicate-safe. |
+| Repeated imports | Windows keyed on the range; entries replaced, not appended. |
+| Drive unreachable | Reported on the run; local files untouched; the run still succeeds. |
+| Token unusable | `blocked_token` before any API call, plus a persistent alert. |
+| Calendar unreadable or incomplete | Skip with a named reason. Never a guess. |
+| Secrets | No bearer in the scheduler DB, in run output, in logs, or in any API response. |
+| Shell injection | No shell. Allowlisted command names and validated structured parameters only. |
+
+### Automation environment variables
+
+```dotenv
+AUTOMATION_TIMEZONE=Asia/Jakarta
+AUTOMATION_CATCH_UP_MINUTES=5
+AUTOMATION_DISPATCH_BUDGET_SECONDS=3300
+AUTOMATION_TASK_LOCK_SECONDS=7200
+AUTOMATION_STOCKBIT_LOCK_SECONDS=7200
+AUTOMATION_STOCKBIT_LOCK_WAIT_SECONDS=3000
+AUTOMATION_MAX_OUTPUT_LENGTH=20000
+AUTOMATION_STOCKBIT_MIN_TTL_MINUTES=90
+AUTOMATION_STOCKBIT_WARN_TTL_MINUTES=720
+BROKER_SUMMARY_MIRROR_DISK=gdrive
+```
+
+### Deploying this feature
+
+```bash
+php artisan migrate --force        # creates the tables and installs the three automations
+php artisan config:clear
+# then add the crontab entry above, and a queue worker if you want "Run now"
+```
+
+No secrets belong in any of the above. The Stockbit token is set once with
+`php artisan stockbit:token:set` (or from the dashboard) and lives encrypted on the local disk.
+
+### API
+
+All under `/api/v1`, behind the existing `auth:sanctum,jwt` middleware.
+
+| Method | Path |
+| --- | --- |
+| `GET` | `/v1/scheduled-tasks` |
+| `POST` | `/v1/scheduled-tasks` |
+| `GET` | `/v1/scheduled-tasks/{id}` |
+| `PUT` / `PATCH` | `/v1/scheduled-tasks/{id}` |
+| `DELETE` | `/v1/scheduled-tasks/{id}` |
+| `POST` | `/v1/scheduled-tasks/{id}/toggle` |
+| `POST` | `/v1/scheduled-tasks/{id}/run` |
+| `GET` | `/v1/scheduled-tasks/{id}/runs` |
+| `GET` | `/v1/automation/status` |
+| `GET` | `/v1/automation/runs` |
+| `GET` | `/v1/automation/alerts` |
+| `DELETE` | `/v1/automation/alerts/{id}` |
+| `GET` | `/v1/automation/stockbit-token` |
+| `PUT` | `/v1/automation/stockbit-token` |
+| `DELETE` | `/v1/automation/stockbit-token` |
+
+`GET /v1/automation/stockbit-token` returns status only — configured, source, fingerprint
+(`****abcd`), expiry, remaining duration. There is no endpoint that returns the bearer.
 
 ## CI / CD
 

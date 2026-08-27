@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Concerns;
 
+use App\Services\Automation\RunMetadata;
 use App\Services\BarCsvMirror;
 
 /**
@@ -82,6 +83,13 @@ trait MirrorsSeedCsvs
 
         $result = $this->barCsvMirror()->flush($symbols, $disk);
 
+        // This trait is the one place seed CSVs are pushed to the mirror, so
+        // it is also the only honest place to report what that push did. A
+        // scheduled run needs the numbers as data, not as a line of console
+        // prose, and duplicating the flush in the automation layer purely to
+        // observe it would upload everything a second time.
+        $this->recordMirrorOutcome($result);
+
         if ($result['uploaded'] !== []) {
             $this->line(sprintf(
                 'Mirrored %d seed CSV(s) to [%s]: %s',
@@ -99,5 +107,24 @@ trait MirrorsSeedCsvs
                 implode(', ', $result['failed'])
             ));
         }
+    }
+
+    /**
+     * Hand the flush result to the scheduler's per-run metadata collector.
+     *
+     * Outside a scheduled run nothing reads it and this is a no-op write into
+     * a throwaway object, so a command invoked from a terminal is unaffected.
+     *
+     * @param  array{disk: ?string, uploaded: array<int, string>, skipped: array<int, string>, failed: array<int, string>}  $result
+     */
+    private function recordMirrorOutcome(array $result): void
+    {
+        app(RunMetadata::class)->set('gdrive', [
+            'disk' => $result['disk'],
+            'uploaded' => $result['uploaded'],
+            'skipped_unchanged' => count($result['skipped']),
+            'failed' => $result['failed'],
+            'status' => $result['failed'] === [] ? 'ok' : 'failed',
+        ]);
     }
 }
