@@ -29,7 +29,13 @@ class PositionResource extends JsonResource
             'fee_rate' => $this->fee_rate,
             'fee_value' => $this->fee_value,
             'avg_price' => $this->avg_price,
+            // Unchanged date string so existing callers keep working, plus
+            // the full timestamp: several fills can share a day and the order
+            // between them is what the cost basis depends on.
             'executed_at' => $this->executed_at?->toDateString(),
+            'executed_at_iso' => $this->executed_at?->toIso8601String(),
+            'source' => $this->source,
+            'external_id' => $this->external_id,
             'value' => $this->qty_shares * $this->avg_price,
         ];
     }

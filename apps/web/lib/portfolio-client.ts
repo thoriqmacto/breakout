@@ -29,6 +29,11 @@ export type PositionRecord = {
   fee_value: number
   avg_price: number
   executed_at: string | null
+  /** Full execution timestamp; several fills can share a date. */
+  executed_at_iso?: string | null
+  /** "stockbit" / "stockbit_snapshot" for imported rows, null when manual. */
+  source?: string | null
+  external_id?: string | null
   value?: number
 }
 
@@ -289,7 +294,10 @@ export type CashMovementRecord = {
   amount: number
   signed_amount: number
   executed_at: string | null
+  executed_at_iso?: string | null
   note: string | null
+  source?: string | null
+  external_id?: string | null
 }
 
 export type CashMovementPayload = {
@@ -380,4 +388,176 @@ export async function deleteCashMovement(
   if (!response.ok || !data || data.status !== "success") {
     throw new Error(extractErrorMessage(data, "Unable to delete cash movement."))
   }
+}
+
+/* ------------------------------------------------------------------------ *
+ * Stockbit JSON import
+ *
+ * Preview writes nothing; the commit re-runs the same analysis server-side, so
+ * nothing here is trusted as import input — these types only describe what the
+ * server decided so the dialog can render it.
+ * ------------------------------------------------------------------------ */
+
+export type ImportPayloadType = "history" | "snapshot"
+
+export type ImportRowStatus = "new" | "skipped_duplicate" | "skipped" | "error"
+
+export type ImportRow = {
+  external_id: string | null
+  command: string
+  symbol: string
+  status: string
+  executed_at: string | null
+  shares: number | null
+  price: number | null
+  fee: number | null
+  amount: number | null
+  net_amount: number | null
+  import_status: ImportRowStatus
+  reason: string | null
+  asset_id?: number | null
+  side?: "entry" | "exit"
+  fee_rate?: number
+  effective_unit_price?: number
+  net_amount_calculated?: number
+  kind?: string
+  note?: string
+}
+
+export type SnapshotReconciliationRow = {
+  symbol: string
+  asset_id: number | null
+  broker_shares: number
+  breakout_shares: number
+  shares_match: boolean
+  broker_average_price: number | null
+  breakout_average_cost: number | null
+  average_match: boolean | null
+  broker_amount_invested: number | null
+  breakout_cost_basis: number | null
+  invested_match: boolean | null
+  broker_market_value: number | null
+  breakout_market_value: number | null
+  market_value_match: boolean | null
+  broker_unrealized_pl: number | null
+  broker_latest_price: number | null
+  import_status: ImportRowStatus
+  reason: string | null
+  opening_position_eligible?: boolean
+}
+
+export type SnapshotCashReconciliation = {
+  broker_cash: number
+  current_base_cash: number
+  cash_movements_total: number
+  current_calculated_cash: number
+  proposed_base_cash: number
+  adjustment: number
+  already_reconciled: boolean
+  can_reconcile: boolean
+}
+
+export type ImportTotals = {
+  new: number
+  skipped_duplicate: number
+  skipped: number
+  error: number
+  rows: number
+}
+
+export type ImportAnalysis = {
+  type: ImportPayloadType
+  portfolio_id: number
+  trades: ImportRow[]
+  dividends: ImportRow[]
+  skipped: ImportRow[]
+  errors: ImportRow[]
+  warnings: string[]
+  missing_assets: string[]
+  snapshot: {
+    positions: SnapshotReconciliationRow[]
+    cash: SnapshotCashReconciliation | null
+    broker_summary: Record<string, number | null>
+  } | null
+  totals: ImportTotals
+  can_commit: boolean
+}
+
+export type ImportResult = ImportAnalysis & {
+  committed: boolean
+  created: { positions: number; cash_movements: number }
+  created_position_ids?: number[]
+  created_cash_movement_ids?: number[]
+  cash_balance_set_to?: number | null
+}
+
+export type ImportOptions = {
+  createSnapshotPositions?: boolean
+  reconcileCash?: boolean
+}
+
+function importBody(payload: string, options: ImportOptions) {
+  return JSON.stringify({
+    payload,
+    create_snapshot_positions: options.createSnapshotPositions ?? false,
+    reconcile_cash: options.reconcileCash ?? false,
+  })
+}
+
+export async function previewStockbitImport(
+  accessToken: string,
+  portfolioId: number,
+  payload: string,
+  options: ImportOptions = {},
+): Promise<ImportAnalysis> {
+  const response = await fetch(
+    buildApiUrl(`/v1/portfolios/${portfolioId}/imports/stockbit/preview`),
+    { method: "POST", headers: buildHeaders(accessToken), body: importBody(payload, options) },
+  )
+
+  const data = await parseJson<ApiResponse<ImportAnalysis>>(response)
+
+  if (!response.ok || !data || data.status !== "success" || !data.data) {
+    throw new Error(extractErrorMessage(data, "Unable to preview this import."))
+  }
+
+  return data.data
+}
+
+export async function commitStockbitImport(
+  accessToken: string,
+  portfolioId: number,
+  payload: string,
+  options: ImportOptions = {},
+): Promise<{ result: ImportResult; message: string }> {
+  const response = await fetch(buildApiUrl(`/v1/portfolios/${portfolioId}/imports/stockbit`), {
+    method: "POST",
+    headers: buildHeaders(accessToken),
+    body: importBody(payload, options),
+  })
+
+  const data = await parseJson<ApiResponse<ImportResult>>(response)
+
+  if (!response.ok || !data || data.status !== "success" || !data.data) {
+    throw new Error(extractErrorMessage(data, "Unable to import this payload."))
+  }
+
+  return {
+    result: data.data,
+    message: typeof data.message === "string" ? data.message : "Import complete.",
+  }
+}
+
+export const IMPORT_STATUS_LABELS: Record<ImportRowStatus, string> = {
+  new: "NEW",
+  skipped_duplicate: "DUPLICATE",
+  skipped: "SKIPPED",
+  error: "ERROR",
+}
+
+export const IMPORT_STATUS_TONE: Record<ImportRowStatus, string> = {
+  new: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+  skipped_duplicate: "bg-sky-500/10 text-sky-700 dark:text-sky-400",
+  skipped: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  error: "bg-destructive/10 text-destructive",
 }

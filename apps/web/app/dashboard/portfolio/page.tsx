@@ -1,12 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Edit, Loader2, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
+import { Edit, FileJson, Loader2, Plus, RefreshCcw, Save, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
 import { AddAssetButton } from "@/components/add-asset-button"
 import { CashMovementsCard } from "@/components/cash-movements-card"
 import { PortfolioSummaryCard } from "@/components/portfolio-summary-card"
+import { StockbitImportDialog } from "@/components/portfolio/stockbit-import-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -112,6 +113,7 @@ export default function PortfolioPage() {
   const [creatingPortfolio, setCreatingPortfolio] = useState(false)
   const [formState, setFormState] = useState<FormState>(emptyForm)
   const [summaryRevision, setSummaryRevision] = useState(0)
+  const [importOpen, setImportOpen] = useState(false)
 
   const handleAssetCreated = useCallback(
     (asset: AssetOption) => {
@@ -268,8 +270,10 @@ export default function PortfolioPage() {
   const sortedPositions = useMemo(
     () =>
       [...positions].sort((a, b) => {
-        const dateA = a.executed_at ? Date.parse(a.executed_at) : 0
-        const dateB = b.executed_at ? Date.parse(b.executed_at) : 0
+        // Prefer the full timestamp: imported fills can share a date, and the
+        // order between them is meaningful.
+        const dateA = Date.parse(a.executed_at_iso ?? a.executed_at ?? "") || 0
+        const dateB = Date.parse(b.executed_at_iso ?? b.executed_at ?? "") || 0
         return dateB - dateA
       }),
     [positions],
@@ -478,6 +482,16 @@ export default function PortfolioPage() {
 
   return (
     <div className="space-y-8">
+      {importOpen && portfolio && accessToken ? (
+        <StockbitImportDialog
+          accessToken={accessToken}
+          portfolioId={portfolio.id}
+          portfolioName={portfolio.name}
+          onClose={() => setImportOpen(false)}
+          onImported={() => refreshData(portfolio.id)}
+        />
+      ) : null}
+
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-semibold uppercase text-primary">
@@ -495,6 +509,17 @@ export default function PortfolioPage() {
           <Button type="button" className="gap-2" onClick={handleCreatePortfolio} disabled={creatingPortfolio}>
             {creatingPortfolio ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Plus className="size-4" aria-hidden />}
             New portfolio
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={() => setImportOpen(true)}
+            disabled={!portfolio}
+            title={portfolio ? undefined : "Select a portfolio first."}
+          >
+            <FileJson className="size-4" aria-hidden />
+            Import JSON
           </Button>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
