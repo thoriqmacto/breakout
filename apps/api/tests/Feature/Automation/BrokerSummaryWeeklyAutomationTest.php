@@ -78,7 +78,11 @@ class BrokerSummaryWeeklyAutomationTest extends TestCase
             (string) json_encode($claims)
         ), '+/', '-_'), '=');
 
-        return $encode(['alg' => 'HS256']).'.'.$encode(['exp' => Carbon::now()->addDays(3)->getTimestamp()]).'.sig';
+        // Comfortably beyond every date these tests travel to. A short
+        // expiry here silently turns a scrape into a blocked_token run,
+        // because the token is persisted at real "now" while the tests move
+        // the clock forward.
+        return $encode(['alg' => 'HS256']).'.'.$encode(['exp' => Carbon::now()->addDays(90)->getTimestamp()]).'.sig';
     }
 
     /**
@@ -89,8 +93,7 @@ class BrokerSummaryWeeklyAutomationTest extends TestCase
         for ($cursor = Carbon::parse($from); $cursor->lessThanOrEqualTo(Carbon::parse($to)); $cursor->addDay()) {
             $date = $cursor->toDateString();
 
-            TradingCalendarDay::create([
-                'date' => $date,
+            TradingCalendarDay::updateOrCreate(['date' => $date], [
                 'is_trading_day' => in_array($date, $tradingDates, true),
                 'is_weekend' => $cursor->dayOfWeekIso >= 6,
                 'is_holiday' => $cursor->dayOfWeekIso < 6 && ! in_array($date, $tradingDates, true),
@@ -395,6 +398,88 @@ class BrokerSummaryWeeklyAutomationTest extends TestCase
         }
 
         $this->assertSame(1, app(RunMetadata::class)->get('ticker_count'));
+    }
+
+    public function test_a_holiday_shortened_week_is_caught_up_on_the_next_weeks_first_trading_day(): void
+    {
+        $asset = Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
+
+        // Friday 28 August was a holiday, so the week's last trading day was
+        // Thursday — which Thursday itself could not know. Monday settles it.
+        $this->calendar(['2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27']);
+        $this->calendar(['2026-08-31'], '2026-08-31', '2026-08-31');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->with('BBCA', '2026-08-24', '2026-08-27', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+            ->andReturn($this->detectorResponse('2026-08-24', '2026-08-27'));
+
+        Carbon::setTestNow(Carbon::parse('2026-08-31 11:00:00', 'UTC'));
+
+        try {
+            Artisan::call('automation:broker-summary-weekly');
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertSame(TradingWeekResolver::MODE_CATCH_UP, $metadata['weekly_mode']);
+        $this->assertSame('2026-08-24', $metadata['range_from']);
+        $this->assertSame('2026-08-27', $metadata['range_to']);
+
+        $window = BrokerSummaryWindow::query()->where('asset_id', $asset->id)->sole();
+        $this->assertSame('2026-08-27', Carbon::parse($window->to_date)->toDateString());
+    }
+
+    public function test_a_week_already_summarised_is_not_caught_up_again(): void
+    {
+        Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
+
+        $this->calendar(['2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27']);
+        $this->calendar(['2026-08-31'], '2026-08-31', '2026-08-31');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        // Once for the catch-up, and never again on the second pass.
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->andReturn($this->detectorResponse('2026-08-24', '2026-08-27'));
+
+        Carbon::setTestNow(Carbon::parse('2026-08-31 11:00:00', 'UTC'));
+
+        try {
+            Artisan::call('automation:broker-summary-weekly');
+            Artisan::call('automation:broker-summary-weekly');
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertTrue($metadata['skipped']);
+        $this->assertSame('week_already_summarised', $metadata['skip_reason']);
+        $this->assertSame(1, BrokerSummaryWindow::query()->count());
+    }
+
+    public function test_a_normal_friday_still_summarises_the_current_week(): void
+    {
+        Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
+        $this->fullWeek();
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('marketDetectors')->andReturn($this->detectorResponse('2026-08-24', '2026-08-28'));
+
+        Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));
+
+        try {
+            Artisan::call('automation:broker-summary-weekly');
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $this->assertSame(TradingWeekResolver::MODE_CURRENT, app(RunMetadata::class)->get('weekly_mode'));
     }
 
     public function test_the_weekly_json_is_mirrored_to_google_drive_after_the_import(): void

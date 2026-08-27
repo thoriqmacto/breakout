@@ -149,6 +149,18 @@ return [
             ],
         ],
 
+        'automation:trading-calendar-refresh' => [
+            'label' => 'Trading calendar refresh',
+            'description' => 'Import recent trading days from Yahoo and rebuild trading_calendar up to the last observed trading day.',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [
+                'lookback' => ['type' => 'integer', 'min' => 1, 'max' => 3650, 'label' => 'Days of history to rebuild'],
+                'from' => ['type' => 'date', 'label' => 'Explicit start date'],
+                'skip-import' => ['type' => 'boolean', 'label' => 'Rebuild without calling Yahoo'],
+            ],
+        ],
+
         'stockbit:scrape' => [
             'label' => 'Stockbit scrape',
             'description' => 'The raw scraper. --token is deliberately not schedulable; the stored token is always used.',
@@ -270,12 +282,24 @@ return [
     */
     'defaults' => [
         [
+            'name' => 'Trading Calendar Refresh',
+            'slug' => 'trading-calendar-refresh',
+            'description' => 'Every day at 17:30 WIB, import recent trading days from Yahoo and rebuild the trading calendar up to the last observed trading day. Every market-day condition reads that calendar, so this runs before the jobs that depend on it. Condition "none" on purpose: a holiday is precisely when the calendar needs to record that it was one.',
+            'command' => 'automation:trading-calendar-refresh',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '30 17 * * *',
+            'condition' => 'none',
+            'priority' => 1,
+            'enabled' => true,
+            'sync_gdrive_after_success' => false,
+        ],
+        [
             'name' => 'Daily OHLCV Sync',
             'slug' => 'daily-ohlcv-sync',
-            'description' => 'Every IDX trading day at 16:00 WIB, scrape that day\'s daily bar for every price-synced asset and mirror the changed CSVs to Google Drive.',
+            'description' => 'Every IDX trading day at 18:00 WIB, scrape that day\'s daily bar for every price-synced asset and mirror the changed CSVs to Google Drive. Runs after the closing bell so the trading calendar has confirmed the day.',
             'command' => 'automation:ohlcv-daily',
             'parameters' => ['arguments' => [], 'options' => []],
-            'cron_expression' => '0 16 * * *',
+            'cron_expression' => '0 18 * * *',
             'condition' => 'trading_day',
             'priority' => 10,
             'enabled' => true,
@@ -284,10 +308,10 @@ return [
         [
             'name' => 'Weekly Broker Summary',
             'slug' => 'weekly-broker-summary',
-            'description' => 'On the final valid IDX trading day of each week at 16:00 WIB, fetch one aggregate broker-summary window covering that week, import it, and mirror the JSON to Google Drive. Runs after the daily OHLCV job.',
+            'description' => 'On the final valid IDX trading day of each week at 18:00 WIB, fetch one aggregate broker-summary window covering that week, import it, and mirror the JSON to Google Drive. Runs after the daily OHLCV job, and catches up a week that closed on a day the calendar could not confirm at the time.',
             'command' => 'automation:broker-summary-weekly',
             'parameters' => ['arguments' => [], 'options' => []],
-            'cron_expression' => '0 16 * * *',
+            'cron_expression' => '0 18 * * *',
             'condition' => 'last_trading_day_of_week',
             'priority' => 20,
             'enabled' => true,

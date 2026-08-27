@@ -7,6 +7,7 @@ use App\Models\ScheduledTask;
 use App\Models\ScheduledTaskRun;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -39,24 +40,25 @@ class ScheduledTaskApiTest extends TestCase
         Sanctum::actingAs(User::factory()->create());
     }
 
-    public function test_the_three_system_automations_are_installed_by_the_migration(): void
+    public function test_the_system_automations_are_installed_by_the_migrations(): void
     {
         $this->actAsUser();
 
         $slugs = ScheduledTask::query()->pluck('slug')->all();
 
+        $this->assertContains('trading-calendar-refresh', $slugs);
         $this->assertContains('daily-ohlcv-sync', $slugs);
         $this->assertContains('weekly-broker-summary', $slugs);
         $this->assertContains('stockbit-token-reminder', $slugs);
 
         $daily = ScheduledTask::query()->where('slug', 'daily-ohlcv-sync')->sole();
-        $this->assertSame('0 16 * * *', $daily->cron_expression);
+        $this->assertSame('0 18 * * *', $daily->cron_expression);
         $this->assertSame('Asia/Jakarta', $daily->timezone);
         $this->assertSame(ScheduledTask::CONDITION_TRADING_DAY, $daily->condition);
         $this->assertTrue($daily->enabled);
 
         $weekly = ScheduledTask::query()->where('slug', 'weekly-broker-summary')->sole();
-        $this->assertSame('0 16 * * *', $weekly->cron_expression);
+        $this->assertSame('0 18 * * *', $weekly->cron_expression);
         $this->assertSame(ScheduledTask::CONDITION_LAST_TRADING_DAY_OF_WEEK, $weekly->condition);
         $this->assertGreaterThan(
             $daily->priority,
@@ -67,6 +69,36 @@ class ScheduledTaskApiTest extends TestCase
         $reminder = ScheduledTask::query()->where('slug', 'stockbit-token-reminder')->sole();
         $this->assertSame('0 9 * * *', $reminder->cron_expression);
         $this->assertSame('Asia/Jakarta', $reminder->timezone);
+
+        // The calendar every market-day condition reads has to be refreshed
+        // before the jobs that read it, so it runs earlier and at the front of
+        // the priority order.
+        $refresh = ScheduledTask::query()->where('slug', 'trading-calendar-refresh')->sole();
+        $this->assertSame('30 17 * * *', $refresh->cron_expression);
+        $this->assertSame('Asia/Jakarta', $refresh->timezone);
+        $this->assertSame(ScheduledTask::CONDITION_NONE, $refresh->condition);
+        $this->assertTrue($refresh->enabled);
+        $this->assertLessThan(
+            $daily->priority,
+            $refresh->priority,
+            'The calendar refresh must run before the jobs whose conditions read it.',
+        );
+    }
+
+    public function test_the_daily_job_is_scheduled_after_the_calendar_refresh_on_the_same_day(): void
+    {
+        $this->actAsUser();
+
+        $refresh = ScheduledTask::query()->where('slug', 'trading-calendar-refresh')->sole();
+        $daily = ScheduledTask::query()->where('slug', 'daily-ohlcv-sync')->sole();
+
+        // Both are daily, so comparing the next occurrence is enough to catch
+        // an edit that put the refresh after the job it feeds.
+        $this->assertTrue(
+            $refresh->nextRunAt(Carbon::parse('2026-08-28 00:00:00', 'UTC'))
+                ->lessThan($daily->nextRunAt(Carbon::parse('2026-08-28 00:00:00', 'UTC'))),
+            'The refresh must come first on any given day.',
+        );
     }
 
     public function test_index_lists_tasks_with_the_command_catalogue(): void
@@ -218,7 +250,7 @@ class ScheduledTaskApiTest extends TestCase
         $this->putJson('/api/v1/scheduled-tasks/'.$task->id, ['cron_expression' => 'every friday please'])
             ->assertStatus(422);
 
-        $this->assertSame('0 16 * * *', $task->fresh()->cron_expression);
+        $this->assertSame('0 18 * * *', $task->fresh()->cron_expression);
     }
 
     public function test_a_task_can_be_toggled(): void
