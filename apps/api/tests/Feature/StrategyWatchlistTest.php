@@ -3,7 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Asset;
-use App\Models\BrokerSummaryFact;
+use App\Models\BrokerSummaryEntry;
+use App\Models\BrokerSummaryWindow;
 use App\Models\Metric;
 use App\Models\Price;
 use App\Models\User;
@@ -251,30 +252,39 @@ class StrategyWatchlistTest extends TestCase
     }
 
     /**
+     * Seed daily broker data the way the importer stores it: one single-day
+     * window per date, holding one entry per broker.
+     *
+     * A day is just a window with from_date === to_date, so this is the same
+     * fixture as before expressed in the model that replaced
+     * broker_summary_facts -- which now only receives genuinely single-day
+     * imports and so no longer feeds the strategy services on its own.
+     *
      * @param  array<int, array{date: string, broker: string, buy: int, sell: int, type?: string}>  $rows
      */
     private function seedBrokerFacts(int $assetId, array $rows): void
     {
         foreach ($rows as $r) {
-            BrokerSummaryFact::create([
+            $window = BrokerSummaryWindow::firstOrCreate([
                 'asset_id' => $assetId,
-                'trade_date' => $r['date'],
-                'broker_code' => $r['broker'],
+                'from_date' => $r['date'],
+                'to_date' => $r['date'],
                 'transaction_type' => 'TRANSACTION_TYPE_NET',
+            ]);
+
+            $net = $r['buy'] - $r['sell'];
+
+            $window->entries()->create([
+                'broker_code' => $r['broker'],
+                // Both of Stockbit's lists carry net positions, so the sign is
+                // what says which one a broker came from.
+                'side' => $net >= 0 ? BrokerSummaryEntry::SIDE_BUY : BrokerSummaryEntry::SIDE_SELL,
                 'broker_type' => $r['type'] ?? null,
-                'buy_lot' => 0,
-                'buy_volume' => $r['buy'],
-                'buy_value' => $r['buy'],
-                'buy_value_v' => 0,
-                'buy_avg_price' => null,
-                'sell_lot' => 0,
-                'sell_volume' => $r['sell'],
-                'sell_value' => $r['sell'],
-                'sell_value_v' => 0,
-                'sell_avg_price' => null,
+                'source_date' => $r['date'],
                 'net_lot' => 0,
-                'net_volume' => $r['buy'] - $r['sell'],
-                'net_value' => $r['buy'] - $r['sell'],
+                'net_value' => $net,
+                'gross_volume' => $r['buy'] + $r['sell'],
+                'gross_value' => $r['buy'] + $r['sell'],
             ]);
         }
     }

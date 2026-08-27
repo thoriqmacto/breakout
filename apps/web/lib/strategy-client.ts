@@ -3,6 +3,13 @@ import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 export type WatchlistTopBroker = {
   broker: string
   net_value: number
+  /**
+   * The range the figure covers. A broker summary is an aggregate over
+   * from..to, so a net value can be one session or three months of flow, and
+   * the two must not read the same.
+   */
+  from?: string | null
+  to?: string | null
 }
 
 export type WatchlistRow = {

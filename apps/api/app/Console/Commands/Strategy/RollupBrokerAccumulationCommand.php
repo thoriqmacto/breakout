@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\DB;
 class RollupBrokerAccumulationCommand extends Command
 {
     protected $signature = 'strategy:rollup-broker-accumulation
-        {--date= : Window end date (YYYY-MM-DD). Defaults to latest broker_summary_facts trade_date.}
-        {--windows=3,5,10,20 : Comma-separated window lengths in trading days}
+        {--date= : Window end date (YYYY-MM-DD). Defaults to the latest imported broker summary end date.}
+        {--windows=3,5,10,20 : Comma-separated window lengths in days}
         {--symbol=* : Restrict to one or more tickers (repeatable or comma-separated)}';
 
-    protected $description = 'Aggregate broker_summary_facts into multi-day accumulation windows ending on a date.';
+    protected $description = 'Aggregate imported broker summary windows into accumulation windows ending on a date.';
 
     public function handle(BrokerAccumulationAggregator $aggregator): int
     {
@@ -36,9 +36,10 @@ class RollupBrokerAccumulationCommand extends Command
         $result = $aggregator->rollup($date, $windows, $symbols);
 
         $this->info(sprintf(
-            'Rolled up %d windows across %d assets.',
+            'Rolled up %d windows across %d assets (%d at their own length).',
             $result['rows_written'],
-            $result['assets']
+            $result['assets'],
+            $result['native_rows']
         ));
 
         return self::SUCCESS;
@@ -57,9 +58,14 @@ class RollupBrokerAccumulationCommand extends Command
             }
         }
 
-        $latest = DB::table('broker_summary_facts')->max('trade_date');
+        // The window table is the source now, and it is a superset: the
+        // importer writes a window for every file and broker_summary_facts only
+        // for the genuinely single-day ones. Defaulting off facts would pick a
+        // stale date whenever the recent imports were ranges.
+        $latest = DB::table('broker_summary_windows')->max('to_date');
+
         if (! $latest) {
-            $this->warn('No rows found in broker_summary_facts. Provide --date explicitly.');
+            $this->warn('No imported broker summary windows found. Provide --date explicitly.');
 
             return null;
         }

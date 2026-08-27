@@ -34,7 +34,8 @@ class WatchlistRanker
 
     public function __construct(
         private readonly StrategyScoringService $scoring,
-        private readonly RiskCalculator $risk
+        private readonly RiskCalculator $risk,
+        private readonly BrokerWindowResolver $windows,
     ) {}
 
     /**
@@ -194,14 +195,41 @@ class WatchlistRanker
      */
     private function loadAccumulationWindows(array $assetIds, Carbon $scanDate, array $windows): array
     {
-        $rows = BrokerAccumulationWindow::query()
+        $fixed = BrokerAccumulationWindow::query()
             ->whereIn('asset_id', $assetIds)
             ->whereDate('end_date', $scanDate->toDateString())
             ->whereIn('window_days', $windows)
             ->get();
 
+        // Rows mirroring one imported window at its own length. A three-month
+        // broker summary cannot fill a 20-day rollup without claiming flow for
+        // days outside it, so it is offered here instead, at window_days = 92.
+        // brokerAccumulation() weights by window_days and does not care which
+        // lengths exist.
+        //
+        // end_date <= scanDate, never merely covering it: a window running past
+        // the scan date would feed later trading back into it, which flatters a
+        // backtest and is the same class of error as the netbs_date bug.
+        $native = BrokerAccumulationWindow::query()
+            ->whereIn('asset_id', $assetIds)
+            ->whereNotNull('source_window_id')
+            ->whereDate('end_date', '<=', $scanDate->toDateString())
+            ->whereDate('end_date', '>=', $scanDate->copy()->subDays($this->nativeStaleness())->toDateString())
+            ->orderByDesc('end_date')
+            ->get();
+
         $out = [];
-        foreach ($rows as $row) {
+        $seen = [];
+
+        foreach ($fixed->concat($native) as $row) {
+            $id = (int) $row->id;
+
+            if (isset($seen[$id])) {
+                continue;
+            }
+
+            $seen[$id] = true;
+
             $out[(int) $row->asset_id][] = [
                 'window_days' => (int) $row->window_days,
                 'avg_net_norm' => (float) $row->avg_net_norm,
@@ -211,6 +239,14 @@ class WatchlistRanker
         }
 
         return $out;
+    }
+
+    /**
+     * How far back a native rollup may have ended and still describe the scan.
+     */
+    private function nativeStaleness(): int
+    {
+        return $this->windows->maxStalenessDays() ?? 3650;
     }
 
     /**
@@ -292,18 +328,31 @@ class WatchlistRanker
      */
     private function topBrokersForAsset(int $assetId, Carbon $scanDate): array
     {
-        $rows = DB::table('broker_summary_facts')
-            ->where('asset_id', $assetId)
-            ->whereDate('trade_date', $scanDate->toDateString())
-            ->orderByDesc('net_value')
-            ->limit(3)
-            ->get(['broker_code', 'net_value']);
+        // The window that describes the scan date, which for daily imports is
+        // the single-day one and picks out exactly the rows the old
+        // whereDate('trade_date', $scanDate) query returned. Reading the window
+        // is what lets a ranged import contribute at all: broker_summary_facts
+        // now only receives genuinely single-day summaries.
+        $window = $this->windows->asOf(
+            $assetId,
+            $scanDate,
+            (string) config('stockbit.defaults.transaction_type'),
+        );
 
-        return $rows
-            ->map(static fn ($r) => [
-                'broker' => (string) $r->broker_code,
-                'net_value' => (float) $r->net_value,
+        if ($window === null) {
+            return [];
+        }
+
+        return $window->entries
+            ->sortByDesc(static fn ($entry): float => (float) ($entry->net_value ?? 0.0))
+            ->take(3)
+            ->map(static fn ($entry): array => [
+                'broker' => (string) $entry->broker_code,
+                'net_value' => (float) ($entry->net_value ?? 0.0),
+                'from' => $window->from_date?->toDateString(),
+                'to' => $window->to_date?->toDateString(),
             ])
+            ->values()
             ->all();
     }
 
