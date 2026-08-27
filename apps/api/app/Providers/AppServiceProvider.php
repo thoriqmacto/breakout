@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Exceptions\JwtException;
 use App\Models\User;
+use App\Services\Automation\RunMetadata;
 use App\Services\JwtService;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -22,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ClientInterface::class, static fn (): ClientInterface => new Client([
             'timeout' => 15,
         ]));
+
+        // Shared for the duration of a process so a command invoked through
+        // Artisan::call() writes into the same collector the scheduler reads
+        // back after the call returns.
+        $this->app->singleton(RunMetadata::class);
 
         $this->app->singleton(JwtService::class, function ($app) {
             $config = $app['config']->get('jwt');

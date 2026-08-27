@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
+import { AutomationAlertBanner } from "@/components/automation/alert-banner"
 import { useAuth } from "@/components/auth-provider"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -87,7 +88,6 @@ const navigation: NavigationItem[] = [
     label: "Automation",
     href: "/dashboard/automation",
     icon: Bot,
-    disabled: true,
   },
 ]
 
@@ -283,6 +283,14 @@ export default function DashboardLayout({
         </header>
 
         <main data-dashboard-main className="flex-1 px-6 py-8">
+          {/*
+            The Stockbit token is the single point of failure for every
+            scheduled market-data job, and it can only be renewed by a person.
+            Surfacing the warning on every authenticated page -- rather than
+            only on /dashboard/automation -- is what gives someone the chance
+            to act before the 16:00 WIB scrape stands down.
+          */}
+          <AutomationAlertBanner />
           {children}
         </main>
 
