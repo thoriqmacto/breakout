@@ -180,12 +180,37 @@ Everything below is opt-in. With the shipped defaults (`SB_SAVE_DISK=local`, `CS
 SB_SAVE_DISK=gdrive   # local (default) | gdrive | s3
 ```
 
-**OHLCV seed CSVs** (`database/seeders/data/historical/{SYMBOL}.csv`) are built on local disk and *mirrored* to the durable disk in batch:
+**OHLCV seed CSVs** (`{SYMBOL}.csv`) are built on local disk and *mirrored* to the durable disk in batch:
 
 ```dotenv
+CSV_SEED_DIR=            # empty uses database/seeders/data/historical
 CSV_MIRROR_DISK=gdrive   # empty (default) disables mirroring entirely
 CSV_MIRROR_PATH=seeds/historical
 ```
+
+> **On a server, set `CSV_SEED_DIR` to a path outside the working tree.**
+>
+> The default lives in `database/seeders/data/historical`, which is git-tracked
+> — right for the committed bootstrap data, wrong for accumulating market data.
+> The deploy runs `git reset --hard` in a persistent checkout, so every deploy
+> rewrites those files back to whatever was committed and discards every bar the
+> scheduler appended since. Point it somewhere the deploy cannot reach:
+>
+> ```dotenv
+> CSV_SEED_DIR=/var/www/breakout-data/historical
+> ```
+>
+> Moving an existing installation is a copy and a config cache rebuild:
+>
+> ```bash
+> mkdir -p /var/www/breakout-data/historical
+> cp database/seeders/data/historical/*.csv /var/www/breakout-data/historical/
+> # add CSV_SEED_DIR to .env, then
+> php artisan config:cache
+> php artisan bars:mirror-push --disk=gdrive   # confirm local and Drive agree
+> ```
+>
+> The committed CSVs stay where they are as bootstrap data for a fresh checkout.
 
 They are not written straight to Drive. The CSV flow is read-existing → merge → write-back, looped per symbol and per date chunk; doing that against Drive would cost an API call per iteration, invite `403 rateLimitExceeded`, and lose the atomic temp-file + `rename()` that makes a half-written CSV impossible. Instead each data-mutating command hydrates the local CSVs from the mirror before its loop and pushes the changed ones after it:
 
@@ -260,6 +285,7 @@ By default a pull only fills in CSVs that are missing or older locally, so it wi
 ### Notes
 
 - Repeat runs are cheap: a flush uploads only CSVs whose contents actually changed, tracked by a local hash manifest at `storage/app/bar-csv-mirror.json`. Delete that file (or use `--force`) to force a full re-upload.
+- When a local CSV has diverged from what was last mirrored, **bar coverage decides which copy wins, not modification time**. A `git reset --hard` rewrites a tracked CSV with a fresh mtime, so a file that had just lost a month of bars looked *newer* than the Drive copy still holding them — hydrate stood down and the following flush pushed the truncated file over the good backup. The copy with more rows now wins in both directions, so a run that extended a CSV and died before flushing also keeps its extra bars. `--force` still overrides for disaster recovery.
 - Mirror failures are logged and skipped, never fatal. By the time the flush runs, the database rows and local CSVs — the real output of a run — are already written.
 - Throttling (`403 rateLimitExceeded`) and transient errors are retried with exponential backoff.
 - The Stockbit bearer token store stays on its own local disk and is deliberately **not** routed to Drive.

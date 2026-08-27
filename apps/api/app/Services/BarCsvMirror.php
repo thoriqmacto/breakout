@@ -122,15 +122,18 @@ class BarCsvMirror
                     continue;
                 }
 
-                if (! $force && ! $this->remoteIsNewer($filesystem, $remotePath, $localPath)) {
+                $contents = $this->attempt(fn () => $filesystem->get($remotePath));
+
+                if ($contents === null) {
                     $result['skipped'][] = $symbol;
 
                     continue;
                 }
 
-                $contents = $this->attempt(fn () => $filesystem->get($remotePath));
-
-                if ($contents === null) {
+                // Local has diverged from what was last sent. Which copy wins
+                // is decided on how many bars each holds, never on mtime --
+                // see remoteHoldsMoreBars() for why the timestamp lies.
+                if (! $force && ! $this->remoteHoldsMoreBars((string) $contents, $localPath)) {
                     $result['skipped'][] = $symbol;
 
                     continue;
@@ -439,27 +442,64 @@ class BarCsvMirror
 
     /**
      * Whether the remote copy is worth downloading: the local file is absent,
-     * or the remote was modified more recently.
+     * or the remote holds strictly more bars than it.
+     *
+     * This used to compare modification times, and that was wrong in a way
+     * that quietly destroyed data. The seed CSVs live in a git-tracked
+     * directory and the deploy runs `git reset --hard`, so every deploy
+     * rewrites them back to whatever was committed -- with a *fresh mtime*.
+     * A file that had just lost a month of bars therefore looked newer than
+     * the Drive copy that still held them, hydrate stood down, and the flush
+     * at the end of the run pushed the truncated file over the good remote
+     * copy. The durable backup came out of the deploy poorer than it went in.
+     *
+     * Row count is the honest question for this data. These CSVs are an
+     * append-mostly series of daily bars, so the copy with more rows is the
+     * one that has seen more of the market. It also answers the mirror-image
+     * case correctly: a local file a crashed run left ahead of the mirror has
+     * more rows, so it is kept and pushed rather than overwritten.
+     *
+     * Equal counts keep the local copy: it is the working copy the run is
+     * about to extend, and flush() sends it back.
      */
-    private function remoteIsNewer(Filesystem $filesystem, string $remotePath, string $localPath): bool
+    private function remoteHoldsMoreBars(string $remoteContents, string $localPath): bool
     {
         if (! is_file($localPath)) {
             return true;
         }
 
-        try {
-            $remoteTime = $this->attempt(fn () => $filesystem->lastModified($remotePath));
-        } catch (Throwable) {
-            // Without a usable remote timestamp, prefer the local copy: the
-            // run is about to extend it, and flush() will push it back.
-            return false;
+        $localContents = file_get_contents($localPath);
+
+        if ($localContents === false) {
+            return true;
         }
 
-        if (! is_int($remoteTime) || $remoteTime <= 0) {
-            return false;
+        return $this->barRowCount($remoteContents) > $this->barRowCount($localContents);
+    }
+
+    /**
+     * Data rows in a seed CSV, excluding the header and any blank lines.
+     */
+    private function barRowCount(string $contents): int
+    {
+        $rows = 0;
+
+        foreach (preg_split('/\R/', $contents) ?: [] as $index => $line) {
+            $line = trim($line);
+
+            if ($line === '') {
+                continue;
+            }
+
+            // The first non-blank line is the "Date,Open,..." header.
+            if ($rows === 0 && $index === 0 && stripos($line, 'date') === 0) {
+                continue;
+            }
+
+            $rows++;
         }
 
-        return $remoteTime > (int) filemtime($localPath);
+        return $rows;
     }
 
     /**
