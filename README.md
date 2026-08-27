@@ -299,6 +299,11 @@ cron (every minute)
                  └─ writes a `scheduled_task_runs` row: status, timings, output, metadata
 ```
 
+The market-day conditions read `trading_calendar`, and the seeded
+`automation:trading-calendar-refresh` task is what keeps that table current — it runs earliest
+and at the front of the priority order, so the jobs that depend on it always see a fresh
+calendar. See *Keeping the trading calendar current* below.
+
 There is exactly one static scheduler entry. A second scheduling mechanism alongside the
 database one would mean two places to look when a job does not run.
 
@@ -339,24 +344,71 @@ re-execute an hour of API calls that already reported how they went.
 
 ### Default seeded automations
 
-Installed by the migration that creates the tables, and restorable with
-`php artisan db:seed --class=AutomationSeeder`. All three are fully editable from the dashboard.
+Installed by the migrations that create the tables, and restorable with
+`php artisan db:seed --class=AutomationSeeder`. All four are fully editable from the dashboard.
 
 | Name | Schedule | Condition | Command |
 | --- | --- | --- | --- |
-| Daily OHLCV Sync | 16:00 `Asia/Jakarta`, daily | `trading_day` | `automation:ohlcv-daily` |
-| Weekly Broker Summary | 16:00 `Asia/Jakarta`, daily | `last_trading_day_of_week` | `automation:broker-summary-weekly` |
+| Trading Calendar Refresh | 17:30 `Asia/Jakarta`, daily | `none` | `automation:trading-calendar-refresh` |
+| Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | `automation:ohlcv-daily` |
+| Weekly Broker Summary | 18:00 `Asia/Jakarta`, daily | `last_trading_day_of_week` | `automation:broker-summary-weekly` |
 | Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | `automation:token-check` |
 
 In plain language:
 
-- **Every valid IDX trading day at 16:00 WIB** → update OHLCV for every asset with
+- **Every day at 17:30 WIB** → refresh the trading calendar, so the conditions below have
+  something current to read. This runs first, on holidays too — a holiday is precisely when the
+  calendar needs to record that it was one.
+- **Every valid IDX trading day at 18:00 WIB** → update OHLCV for every asset with
   `sync_price = true`.
-- **On the week's final valid IDX trading day at 16:00 WIB** → update OHLCV, then fetch and
+- **On the week's final valid IDX trading day at 18:00 WIB** → update OHLCV, then fetch and
   import that week's broker summary. The two never run at the same time: the daily job has the
   lower `priority` and both take a shared Stockbit lock, so the weekly one queues behind it.
 - **After successful persistence** → mirror the corresponding files to Google Drive.
 - **Every day at 09:00 WIB** → inspect the Stockbit token and warn when renewal is needed.
+
+**Why 18:00 and not 16:00.** The calendar is derived from Yahoo's published `^JKSE` bars, so it
+cannot confirm that today traded until that bar exists. 16:00 WIB is the closing bell itself,
+which is too early for that to be true.
+
+### Keeping the trading calendar current
+
+Every market-day condition reads `trading_calendar`, and nothing else advances it. Because a
+missing row means *unknown* rather than *closed* (see below), a calendar that stops advancing
+does not fail loudly — it makes every dependent automation skip, quietly, forever. That is what
+`automation:trading-calendar-refresh` exists to prevent.
+
+Each run imports recent trading days from Yahoo, then rebuilds the calendar. It holds one rule:
+
+> Never write a calendar row for a date beyond the last day Yahoo actually has a bar for.
+
+`TradingCalendarBuilder` decides by absence — a weekday with no `trading_days` row becomes
+`is_holiday = true`. That is correct for a date the market has already traded past, and wrong
+for one it has not reached yet. Rebuilding through "today" before today's bar is published would
+positively record today as a holiday, and the conditions would then skip with a confident
+`not_trading_day` instead of an honest `trading_calendar_incomplete`. So the range is clamped to
+the last observed trading date and never guesses past it.
+
+The consequence is that the calendar always trails the market by however long Yahoo takes to
+publish. That lag is reported as `days_behind` on every run rather than hidden, and a lag beyond
+five days marks the run partial — it means the import has been failing and every market-day
+condition is skipping as a result.
+
+```bash
+php artisan automation:trading-calendar-refresh                  # what the scheduler runs
+php artisan automation:trading-calendar-refresh --lookback=365   # widen the rebuild window
+php artisan automation:trading-calendar-refresh --skip-import    # rebuild without calling Yahoo
+```
+
+A failed Yahoo import is reported but not fatal: the calendar is still rebuilt from the trading
+days already stored, because losing that because the network was down would be the worse outcome.
+
+For a first run, or after a long outage, seed the history directly:
+
+```bash
+php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
+php artisan trading-calendar:build --from=2015-01-01 --to=$(date +%F)
+```
 
 ### How trading-day conditions work
 
@@ -366,25 +418,43 @@ Conditions are answered from the `trading_calendar` table, never from the shape 
 - **`trading_day`** — resolves today in `Asia/Jakarta` and runs only if that date's row exists
   and `is_trading_day = true`.
 - **`last_trading_day_of_week`** — takes the Monday–Sunday week containing today, lists the
-  dates in it with `is_trading_day = true`, and runs only when today equals the last of them.
-  The first and last of those dates also become the weekly scrape's `--from` and `--to`.
+  dates in it with `is_trading_day = true`, and runs when today equals the last of them. The
+  first and last of those dates become the weekly scrape's `--from` and `--to`.
 
-A Monday holiday moves `from` to Tuesday; a Friday holiday moves `to` to Thursday and makes
-Thursday the day the weekly job runs. Neither is assumed — both come from the calendar.
+A Monday holiday moves `from` to Tuesday; a Friday holiday moves `to` to Thursday. Neither is
+assumed — both come from the calendar.
 
 **Missing rows are not treated as holidays.** A date with no row is *unknown*, and to a plain
 query that is indistinguishable from "closed" — which would make Thursday look like the week's
 final trading day every time the calendar fell behind, and file a Monday–Thursday range as the
 week's summary. So an incomplete week produces a skipped run with reason
-`trading_calendar_incomplete`, surfaced in the Automation history and on the status header.
-Rebuild with:
+`trading_calendar_incomplete`, surfaced in the Automation history and on the status header. A
+week containing no trading day at all is skipped as `no_trading_days_in_week`.
 
-```bash
-php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
-php artisan trading-calendar:build --from=2015-01-01 --to=$(date +%F)
-```
+#### The weekly catch-up
 
-A week containing no trading day at all is skipped as `no_trading_days_in_week`.
+That honesty has a cost, and the catch-up is what pays it.
+
+When Friday is a holiday, Thursday is the week's last trading day — but standing on Thursday the
+calendar has no row for Friday yet, so it cannot know that, and correctly refuses to guess. Left
+there, that week would never be summarised at all.
+
+So `last_trading_day_of_week` also passes on the **first trading day of a new week**, when the
+previous week is by then fully settled. The weekly job then summarises that previous week
+retrospectively, using its true `from`..`to`. Nothing predicts the future: both cases are decided
+from rows that already exist.
+
+Two guards keep this from misfiring:
+
+- Only the week's *opening* trading day catches up, so a Wednesday does not keep re-proposing a
+  week Monday already handled.
+- Before scraping, the job checks whether a `BrokerSummaryWindow` already exists for that exact
+  range. If it does, the run records `week_already_summarised` and costs one query. Asking the
+  canonical record rather than the run history means this survives the task being renamed,
+  recreated, or run by hand.
+
+The normal Friday path is untouched, and re-running it deliberately is still supported: the
+importer is idempotent, so it repairs a bad import rather than duplicating one.
 
 ### Safe execution — no shell, no remote command injection
 
@@ -509,13 +579,18 @@ php artisan scheduler:status --all    # including disabled ones
 php artisan scheduler:dispatch        # run whatever is due right now
 php artisan scheduler:dispatch --at="2026-08-28T09:00:00Z"   # evaluate as at a given moment
 php artisan stockbit:token:status     # token source, fingerprint and expiry
+php artisan automation:trading-calendar-refresh --skip-import   # rebuild the calendar in place
 ```
 
 Diagnosing a missed run:
 
 1. **A `skipped` run exists** → the scheduler fired and the market condition said no. The
    `skip_reason` says which: `not_trading_day`, `not_last_trading_day_of_week`,
-   `trading_calendar_incomplete`, `overlapping_run`, `stockbit_busy`, …
+   `trading_calendar_incomplete`, `week_already_summarised`, `overlapping_run`,
+   `stockbit_busy`, …
+   - `trading_calendar_incomplete` on *every* run means the calendar has stopped advancing.
+     Check the latest `trading-calendar-refresh` run: its `days_behind` says how far it has
+     fallen, and its `trading_days_import` status says whether Yahoo is reachable.
 2. **A `blocked_token` run exists** → the token preflight failed. Renew it; nothing was scraped.
 3. **No run at all** → the dispatcher never fired. Check that cron is invoking
    `php artisan schedule:run` every minute, and compare *Last dispatched run* on the Automation
@@ -543,6 +618,9 @@ browser.
 | Drive unreachable | Reported on the run; local files untouched; the run still succeeds. |
 | Token unusable | `blocked_token` before any API call, plus a persistent alert. |
 | Calendar unreadable or incomplete | Skip with a named reason. Never a guess. |
+| Calendar falling behind | Refreshed daily; the lag is reported as `days_behind`, never hidden. |
+| A weekday the market has not reached | Never written, so it can never be mistaken for a holiday. |
+| A week that closed on an unconfirmable day | Caught up on the next week's first trading day. |
 | Secrets | No bearer in the scheduler DB, in run output, in logs, or in any API response. |
 | Shell injection | No shell. Allowlisted command names and validated structured parameters only. |
 
@@ -564,8 +642,14 @@ BROKER_SUMMARY_MIRROR_DISK=gdrive
 ### Deploying this feature
 
 ```bash
-php artisan migrate --force        # creates the tables and installs the three automations
+php artisan migrate --force        # creates the tables and installs the four automations
 php artisan config:clear
+
+# Seed the calendar history once. Until trading_calendar covers the current
+# week, every market-day condition honestly skips as trading_calendar_incomplete.
+php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
+php artisan trading-calendar:build --from=2015-01-01 --to=$(date +%F)
+
 # then add the crontab entry above, and a queue worker if you want "Run now"
 ```
 

@@ -94,58 +94,69 @@ class ConditionEvaluator
      */
     private function lastTradingDayOfWeek(Carbon $moment): array
     {
-        $week = $this->calendar->describeLastTradingDayOfWeek($moment);
+        $opportunity = $this->calendar->describeWeeklyOpportunity($moment);
 
         $metadata = [
             'condition' => ScheduledTask::CONDITION_LAST_TRADING_DAY_OF_WEEK,
-            'market_date' => $week['date'],
+            'market_date' => $opportunity['date'],
             'timezone' => $this->calendar->timezone(),
-            'week_start' => $week['week_start'],
-            'week_end' => $week['week_end'],
-            'range_from' => $week['from'],
-            'range_to' => $week['to'],
-            'trading_days' => $week['trading_days'],
+            'week_start' => $opportunity['week_start'],
+            'week_end' => $opportunity['week_end'],
+            'range_from' => $opportunity['from'],
+            'range_to' => $opportunity['to'],
+            'trading_days' => $opportunity['trading_days'],
+            'weekly_mode' => $opportunity['mode'],
         ];
 
-        if ($week['status'] === TradingWeekResolver::STATUS_INCOMPLETE) {
-            $metadata['missing_dates'] = $week['missing_dates'];
+        if ($opportunity['mode'] === TradingWeekResolver::MODE_CURRENT) {
+            return $this->allow($metadata);
+        }
+
+        // The week that could not be recognised as it closed. When Friday is a
+        // holiday the calendar has no row for it on Thursday, so Thursday
+        // cannot know it was the week's last trading day -- and refuses to
+        // guess. The new week's opening trading day is the first moment the
+        // old week is settled enough to summarise.
+        if ($opportunity['mode'] === TradingWeekResolver::MODE_CATCH_UP) {
+            return $this->allow($metadata);
+        }
+
+        $reason = (string) $opportunity['reason'];
+
+        if ($reason === TradingWeekResolver::STATUS_INCOMPLETE) {
+            $metadata['missing_dates'] = $opportunity['missing_dates'];
 
             return [
                 'run' => false,
                 'reason' => TradingWeekResolver::STATUS_INCOMPLETE,
                 'message' => sprintf(
-                    'The trading calendar is missing %d day(s) of the week of %s (%s), so today cannot be confirmed as its final trading day. Rebuild it with "php artisan trading-calendar:build".',
-                    count($week['missing_dates']),
-                    $week['week_start'],
-                    implode(', ', array_slice($week['missing_dates'], 0, 7)),
+                    'The trading calendar is missing %d day(s) of the week of %s (%s), so today cannot be confirmed as its final trading day. Refresh it with "php artisan automation:trading-calendar-refresh".',
+                    count($opportunity['missing_dates']),
+                    $opportunity['week_start'],
+                    implode(', ', array_slice($opportunity['missing_dates'], 0, 7)),
                 ),
                 'metadata' => $metadata,
             ];
         }
 
-        if ($week['status'] === TradingWeekResolver::STATUS_NO_TRADING_DAYS) {
+        if ($reason === TradingWeekResolver::STATUS_NO_TRADING_DAYS) {
             return [
                 'run' => false,
                 'reason' => TradingWeekResolver::STATUS_NO_TRADING_DAYS,
-                'message' => sprintf('The week of %s contains no IDX trading day.', $week['week_start']),
+                'message' => sprintf('The week of %s contains no IDX trading day.', $opportunity['week_start']),
                 'metadata' => $metadata,
             ];
         }
 
-        if (! $week['is_last']) {
-            return [
-                'run' => false,
-                'reason' => 'not_last_trading_day_of_week',
-                'message' => sprintf(
-                    '%s is not the final trading day of its week; that is %s.',
-                    $week['date'],
-                    (string) $week['to'],
-                ),
-                'metadata' => $metadata,
-            ];
-        }
-
-        return $this->allow($metadata);
+        return [
+            'run' => false,
+            'reason' => 'not_last_trading_day_of_week',
+            'message' => sprintf(
+                '%s is neither the final trading day of its week nor the first of a new one with an unsummarised week behind it.',
+                $opportunity['date'],
+            ),
+            'metadata' => $metadata,
+        ];
     }
 
     /**
