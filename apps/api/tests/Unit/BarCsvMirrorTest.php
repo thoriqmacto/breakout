@@ -167,8 +167,13 @@ class BarCsvMirrorTest extends TestCase
         $this->assertFileDoesNotExist($this->seedDir.'/GHOST.csv');
     }
 
-    public function test_hydrate_keeps_a_local_file_that_is_not_older_than_the_remote(): void
+    public function test_hydrate_keeps_a_local_file_covering_the_same_bars_as_the_remote(): void
     {
+        // Same single bar on both sides, differing only in value. Coverage is
+        // equal, so the local working copy is kept -- the run is about to
+        // extend it and flush() sends it back. A remote edited outside this
+        // application is not something the mirror can detect either way; see
+        // the note in flush().
         $local = "Date,Open\n02/01/2024,999\n";
         Storage::disk('mirror')->put('seeds/historical/BBCA.csv', "Date,Open\n02/01/2024,100\n");
         $this->writeLocal('BBCA', $local);
@@ -181,14 +186,46 @@ class BarCsvMirrorTest extends TestCase
         $this->assertSame($local, file_get_contents($this->seedDir.'/BBCA.csv'));
     }
 
-    public function test_hydrate_overwrites_a_local_file_older_than_the_remote(): void
+    public function test_hydrate_overwrites_a_local_file_holding_fewer_bars_than_the_remote(): void
     {
-        $remote = "Date,Open\n02/01/2024,100\n";
+        // Deliberately stamped *newer* than the remote: a deploy's
+        // `git reset --hard` rewrites a tracked CSV with a fresh mtime, so the
+        // timestamp cannot be what decides this. Bar coverage can.
+        $remote = "Date,Open\n02/01/2024,100\n03/01/2024,101\n04/01/2024,102\n";
         Storage::disk('mirror')->put('seeds/historical/BBCA.csv', $remote);
-        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,999\n");
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,100\n");
+        touch($this->seedDir.'/BBCA.csv', time() + 600);
+
+        $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror');
+
+        $this->assertSame(['BBCA'], $result['hydrated']);
+        $this->assertSame($remote, file_get_contents($this->seedDir.'/BBCA.csv'));
+    }
+
+    public function test_hydrate_keeps_a_local_file_holding_more_bars_than_the_remote(): void
+    {
+        // The mirror image, and the reason coverage beats mtime in both
+        // directions: a run that extended the CSV and died before flushing
+        // must not have its extra bars pulled out from under it.
+        $local = "Date,Open\n02/01/2024,100\n03/01/2024,101\n";
+        Storage::disk('mirror')->put('seeds/historical/BBCA.csv', "Date,Open\n02/01/2024,100\n");
+        $this->writeLocal('BBCA', $local);
         touch($this->seedDir.'/BBCA.csv', time() - 86400);
 
         $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror');
+
+        $this->assertSame([], $result['hydrated']);
+        $this->assertSame($local, file_get_contents($this->seedDir.'/BBCA.csv'));
+    }
+
+    public function test_force_hydrate_ignores_bar_coverage(): void
+    {
+        // Disaster recovery: pull the mirror down whatever local holds.
+        $remote = "Date,Open\n02/01/2024,100\n";
+        Storage::disk('mirror')->put('seeds/historical/BBCA.csv', $remote);
+        $this->writeLocal('BBCA', "Date,Open\n02/01/2024,999\n03/01/2024,101\n");
+
+        $result = (new BarCsvMirror)->hydrate(['BBCA'], 'mirror', force: true);
 
         $this->assertSame(['BBCA'], $result['hydrated']);
         $this->assertSame($remote, file_get_contents($this->seedDir.'/BBCA.csv'));

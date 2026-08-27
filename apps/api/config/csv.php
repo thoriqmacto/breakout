@@ -3,7 +3,29 @@
 use App\Services\IdxTicks;
 
 return [
-    'seed_dir' => database_path('seeders/data/historical'), // put your 30 CSVs here
+    /*
+    |--------------------------------------------------------------------------
+    | OHLCV seed CSV directory
+    |--------------------------------------------------------------------------
+    |
+    | Where the per-symbol bar CSVs are read and written.
+    |
+    | The default lives inside the repository, which is right for development
+    | and for the committed bootstrap data. It is the wrong place on a server:
+    | the deploy runs `git reset --hard` in a persistent checkout, so every
+    | deploy rewrites those tracked files back to whatever was committed and
+    | discards every bar the scheduler has appended since.
+    |
+    | Point CSV_SEED_DIR at a path outside the working tree in production --
+    | somewhere the deploy cannot reach, e.g.
+    |
+    |     CSV_SEED_DIR=/var/www/breakout-data/historical
+    |
+    | The mirror is a backup, not a substitute for this: restoring from Drive
+    | costs an API call per symbol and only works while the mirror is healthy.
+    |
+    */
+    'seed_dir' => env('CSV_SEED_DIR') ?: database_path('seeders/data/historical'),
     'default_lot_size' => 100,
     'tick_size' => [IdxTicks::class, 'tickFor'], // according to the IDX variable tick ladder.
     'chunk_size' => 200, // number of rows to insert per batch
