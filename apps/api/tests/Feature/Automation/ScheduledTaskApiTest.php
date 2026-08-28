@@ -48,7 +48,8 @@ class ScheduledTaskApiTest extends TestCase
 
         $this->assertContains('trading-calendar-refresh', $slugs);
         $this->assertContains('daily-ohlcv-sync', $slugs);
-        $this->assertContains('weekly-broker-summary', $slugs);
+        $this->assertContains('daily-broker-summary', $slugs);
+        $this->assertContains('daily-analysis-refresh', $slugs);
         $this->assertContains('stockbit-token-reminder', $slugs);
 
         $daily = ScheduledTask::query()->where('slug', 'daily-ohlcv-sync')->sole();
@@ -57,14 +58,27 @@ class ScheduledTaskApiTest extends TestCase
         $this->assertSame(ScheduledTask::CONDITION_TRADING_DAY, $daily->condition);
         $this->assertTrue($daily->enabled);
 
-        $weekly = ScheduledTask::query()->where('slug', 'weekly-broker-summary')->sole();
-        $this->assertSame('0 18 * * *', $weekly->cron_expression);
-        $this->assertSame(ScheduledTask::CONDITION_LAST_TRADING_DAY_OF_WEEK, $weekly->condition);
+        $broker = ScheduledTask::query()->where('slug', 'daily-broker-summary')->sole();
+        $this->assertSame('0 18 * * *', $broker->cron_expression);
+        $this->assertSame(ScheduledTask::CONDITION_TRADING_DAY, $broker->condition);
+        $this->assertTrue($broker->enabled);
         $this->assertGreaterThan(
             $daily->priority,
-            $weekly->priority,
-            'The weekly job must run after the daily one, not alongside it.',
+            $broker->priority,
+            'The broker summary must run after the OHLCV sync, not alongside it.',
         );
+
+        // Everything the analysis refresh reads is written by the two scrapes
+        // ahead of it, so its priority has to put it last in the same pass.
+        $analysis = ScheduledTask::query()->where('slug', 'daily-analysis-refresh')->sole();
+        $this->assertSame('0 18 * * *', $analysis->cron_expression);
+        $this->assertSame(ScheduledTask::CONDITION_NONE, $analysis->condition);
+        $this->assertGreaterThan($broker->priority, $analysis->priority);
+
+        // Retired rather than deleted: the weekly job's run history is the
+        // record of every week already collected.
+        $weekly = ScheduledTask::query()->where('slug', 'weekly-broker-summary')->first();
+        $this->assertTrue($weekly === null || ! $weekly->enabled);
 
         $reminder = ScheduledTask::query()->where('slug', 'stockbit-token-reminder')->sole();
         $this->assertSame('0 9 * * *', $reminder->cron_expression);
@@ -245,7 +259,7 @@ class ScheduledTaskApiTest extends TestCase
     {
         $this->actAsUser();
 
-        $task = ScheduledTask::query()->where('slug', 'weekly-broker-summary')->sole();
+        $task = ScheduledTask::query()->where('slug', 'daily-broker-summary')->sole();
 
         $this->putJson('/api/v1/scheduled-tasks/'.$task->id, ['cron_expression' => 'every friday please'])
             ->assertStatus(422);

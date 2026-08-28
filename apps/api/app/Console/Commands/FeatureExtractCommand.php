@@ -113,9 +113,15 @@ class FeatureExtractCommand extends Command
             return [];
         }
 
+        // Compared as dates rather than as strings. A bar written through the
+        // query builder stores a plain "YYYY-MM-DD" while one written through
+        // the model stores "YYYY-MM-DD 00:00:00", and a BETWEEN over raw
+        // strings silently drops the final day in the second case -- so a
+        // range ending today would rebuild every day except today.
         return Price::query()
             ->where('asset_id', $assetId)
-            ->whereBetween('date', [$rangeStart->toDateString(), $rangeEnd->toDateString()])
+            ->whereDate('date', '>=', $rangeStart->toDateString())
+            ->whereDate('date', '<=', $rangeEnd->toDateString())
             ->orderBy('date')
             ->pluck('date')
             ->map(static fn ($value): Carbon => Carbon::parse($value))

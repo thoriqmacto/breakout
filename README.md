@@ -87,6 +87,12 @@ The Laravel console already includes helpers for refreshing the trading calendar
 ## Feature Extraction Usage
 Use the feature extraction command to persist daily OHLCV and broker metrics into `features_daily`.
 
+On a configured deployment you rarely need to run this by hand: the seeded **Daily Analysis
+Refresh** automation runs it every evening behind the scrapes, along with asset metrics, broker
+rollups, watchlist scores and the saved strategies. See
+[Automation & Scheduling](#automation--scheduling). The command below is still the way to rebuild
+a specific symbol or an arbitrary range.
+
 - Extract features for the latest trading day per asset:
   ```bash
   php artisan features:extract
@@ -371,14 +377,15 @@ re-execute an hour of API calls that already reported how they went.
 ### Default seeded automations
 
 Installed by the migrations that create the tables, and restorable with
-`php artisan db:seed --class=AutomationSeeder`. All four are fully editable from the dashboard.
+`php artisan db:seed --class=AutomationSeeder`. All five are fully editable from the dashboard.
 
-| Name | Schedule | Condition | Command |
-| --- | --- | --- | --- |
-| Trading Calendar Refresh | 17:30 `Asia/Jakarta`, daily | `none` | `automation:trading-calendar-refresh` |
-| Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | `automation:ohlcv-daily` |
-| Weekly Broker Summary | 18:00 `Asia/Jakarta`, daily | `last_trading_day_of_week` | `automation:broker-summary-weekly` |
-| Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | `automation:token-check` |
+| Name | Schedule | Condition | Priority | Command |
+| --- | --- | --- | --- | --- |
+| Trading Calendar Refresh | 17:30 `Asia/Jakarta`, daily | `none` | 1 | `automation:trading-calendar-refresh` |
+| Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | 5 | `automation:token-check` |
+| Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | 10 | `automation:ohlcv-daily` |
+| Daily Broker Summary | 18:00 `Asia/Jakarta`, daily | `trading_day` | 20 | `automation:broker-summary-daily` |
+| Daily Analysis Refresh | 18:00 `Asia/Jakarta`, daily | `none` | 30 | `automation:analysis-refresh` |
 
 In plain language:
 
@@ -386,16 +393,110 @@ In plain language:
   something current to read. This runs first, on holidays too — a holiday is precisely when the
   calendar needs to record that it was one.
 - **Every valid IDX trading day at 18:00 WIB** → update OHLCV for every asset with
-  `sync_price = true`.
-- **On the week's final valid IDX trading day at 18:00 WIB** → update OHLCV, then fetch and
-  import that week's broker summary. The two never run at the same time: the daily job has the
-  lower `priority` and both take a shared Stockbit lock, so the weekly one queues behind it.
+  `sync_price = true`, then bring every asset with `sync_broker_summary = true` up to the latest
+  valid trading day. The two scrapes never run at the same time: priority orders them and both
+  take a shared Stockbit lock, so the broker summary queues behind the OHLCV sync.
+- **Then, in the same pass** → recompute everything derived from what just landed:
+  `features_daily`, asset metrics, broker accumulation rollups, watchlist scores and the saved
+  rule-builder strategy runs. Priority 30 puts it last, so it always sees the day's imports.
 - **After successful persistence** → mirror the corresponding files to Google Drive.
 - **Every day at 09:00 WIB** → inspect the Stockbit token and warn when renewal is needed.
+
+The three 18:00 jobs run **in one dispatcher pass, in priority order, in the same process** —
+that is what makes "after" reliable. A separate later cron time would not: `scheduler:dispatch`
+is registered `withoutOverlapping()`, so a later occurrence arriving while the scrapes are still
+running would be dropped rather than queued.
+
+**Why the analysis refresh has no market-day condition.** It reads only what is already stored
+and costs no API quota, and it is a no-op when nothing has changed. On a day the calendar cannot
+confirm — when the two scrapes skip — it still picks up data that arrived late, instead of
+skipping alongside them.
 
 **Why 18:00 and not 16:00.** The calendar is derived from Yahoo's published `^JKSE` bars, so it
 cannot confirm that today traded until that bar exists. 16:00 WIB is the closing bell itself,
 which is too early for that to be true.
+
+### Daily broker summaries and backfill
+
+`automation:broker-summary-daily` resolves its range **per asset**, not globally:
+
+```
+from = the first trading day after that asset's newest stored window
+to   = the latest day `trading_calendar` records as having actually traded
+```
+
+In the steady state those are the same date, so the window is a single day and reaches
+`broker_summary_facts` and `broksums` like any daily import. After a gap they are not, and the
+gap is fetched as **one aggregate covering it** — one request per asset rather than one per
+missing session. That is what makes an asset sitting on a three-month aggregate, an asset added
+last week, and an asset collected yesterday all correct on the same run, with no separate
+backfill mode to remember.
+
+Assets needing the same range are grouped into one scrape invocation, so a normal evening is a
+single call covering every ticker. An asset already current is skipped without an API call.
+
+Two bounds keep a first run sane:
+
+- `--max-backfill-days` (default 120) caps how long a gap one run will request as a single
+  aggregate. A longer gap is walked forward a slice per night. An explicit `--from` is exempt.
+- A resumed range is snapped forward to the next actual session. The day after a Friday window is
+  a Saturday, and asking for `2026-08-29..2026-08-31` would file Monday's flow as a three-day
+  range that never reaches the daily projections.
+
+`to` is deliberately the last *observed* trading day and not today: on a trading evening before
+Yahoo publishes, the calendar still ends yesterday, and fetching through today anyway would file
+a partial session as a complete one. The lag is reported as `days_behind` and closes itself on
+the next run.
+
+Overlapping ranges are safe by construction. A window is keyed on
+`(asset, from_date, to_date, transaction_type)`, so a backfill aggregate and the days around it
+are separate rows that never overwrite each other, and re-running a range converges instead of
+duplicating. `BrokerWindowResolver` never sums overlapping windows into one rollup.
+
+`automation:broker-summary-weekly` still exists and still works if you want a week on purpose,
+but it is no longer part of the seeded schedule — the migration disables the seeded row rather
+than deleting it, so its run history survives.
+
+```bash
+php artisan automation:broker-summary-daily                        # what the scheduler runs
+php artisan automation:broker-summary-daily --tickers=BBCA --tickers=BRPT
+php artisan automation:broker-summary-daily --from=2026-01-01      # force a start for every ticker
+php artisan automation:broker-summary-daily --max-backfill-days=30 # ask for a smaller first slice
+php artisan automation:broker-summary-daily --no-import --no-mirror
+```
+
+### What the analysis refresh rebuilds
+
+`automation:analysis-refresh` runs five steps in dependency order, each individually skippable:
+
+| Step | Command | Reads | Writes |
+| --- | --- | --- | --- |
+| features | `features:extract` | prices, broker windows | `features_daily` |
+| metrics | `asset:metrics --all --persist` | prices, `features_daily` | `metrics` |
+| rollup | `strategy:rollup-broker-accumulation` | broker windows | `broker_accumulation_windows` |
+| watchlist | `strategy:rank-watchlist` | `features_daily`, `metrics`, rollups | `watchlist_scores` |
+| strategies | `strategy:run` | `features_daily` | `strategy_runs` |
+
+It also catches up rather than recomputing only today: it re-extracts from the newest date
+features already exist for through the newest date a price bar exists for, bounded by
+`--max-days` (default 10). The newest computed day is deliberately rebuilt too — the broker
+summary for a day is imported after the bars, so that day's features are the ones most likely to
+have been built from incomplete inputs.
+
+The scan date follows the **data**, not the clock: it is the newest date a price bar exists for.
+Claiming today when the scrape has not landed would date every derived row wrongly.
+
+A failing step is recorded on the run and the rest still run. These outputs are independent
+enough that abandoning the remaining four because the first struggled would leave more of the
+dashboard stale, not less. Every step is an upsert, so running it twice changes nothing.
+
+```bash
+php artisan automation:analysis-refresh                      # what the scheduler runs
+php artisan automation:analysis-refresh --date=2026-08-28    # one specific day
+php artisan automation:analysis-refresh --max-days=30        # widen the catch-up window
+php artisan automation:analysis-refresh --symbol=BBCA        # one ticker through every step
+php artisan automation:analysis-refresh --skip-strategies    # any step can be left out
+```
 
 ### Keeping the trading calendar current
 
@@ -458,6 +559,9 @@ week's summary. So an incomplete week produces a skipped run with reason
 week containing no trading day at all is skipped as `no_trading_days_in_week`.
 
 #### The weekly catch-up
+
+`last_trading_day_of_week` is no longer used by a seeded automation — the broker summary is
+collected daily now — but the condition remains available, and this is how it behaves.
 
 That honesty has a cost, and the catch-up is what pays it.
 
@@ -571,8 +675,8 @@ php artisan broker-summary:mirror-push --disk=gdrive --since=2026-08-01
 It preserves the path under `stockbit.save_dir`, compares **content** rather than filenames,
 verifies the remote copy after writing, retries throttling with backoff, and **never deletes or
 modifies the local file** — a successful upload changes nothing locally, and a failed one leaves
-the only good copy exactly where it was. The weekly job mirrors only the JSON it just wrote, and
-only after that JSON has been imported.
+the only good copy exactly where it was. The daily and weekly jobs mirror only the JSON they
+just wrote, and only after that JSON has been imported.
 
 A Drive failure is reported on the run (`gdrive` / `gdrive_broker_summary` in run metadata, shown
 in the history) and never fails the data run. Local market data is never destroyed because cold
@@ -580,16 +684,17 @@ storage was unreachable.
 
 ### Broker-summary import
 
-The weekly job imports **only the files it just produced**, via
-`BrokerSummaryImporter::importPaths()`. It does not run a full
-`broker-summary:rebuild` over the whole archive every Friday — a cost that grows with every week
-the system runs.
+The scheduled jobs import **only the files they just produced**, via
+`BrokerSummaryImporter::importPaths()`. They do not run a full `broker-summary:rebuild` over the
+whole archive every evening — a cost that grows with every day the system runs.
 
 `importFromDisk()` and `broker-summary:rebuild` are unchanged and remain the full-archive
 recovery path.
 
 Import is idempotent: a window is keyed on `(asset, from_date, to_date, transaction_type)` and
-its entries are replaced wholesale, so re-running a week converges rather than duplicating.
+its entries are replaced wholesale, so re-running a range converges rather than duplicating. It
+is also why a daily window and an overlapping backfill aggregate coexist as separate rows instead
+of overwriting each other.
 
 **A multi-day Stockbit response is one aggregate over `from..to`** and is stored as exactly that
 — a multi-day `BrokerSummaryWindow`. It is never written into the day-shaped legacy tables

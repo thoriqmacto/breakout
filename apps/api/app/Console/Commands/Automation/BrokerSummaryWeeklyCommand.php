@@ -2,22 +2,23 @@
 
 namespace App\Console\Commands\Automation;
 
+use App\Console\Commands\Automation\Concerns\FetchesBrokerSummaryWindows;
 use App\Models\BrokerSummaryWindow;
 use App\Services\Automation\RunMetadata;
 use App\Services\Automation\StockbitTokenHealth;
 use App\Services\Automation\TradingWeekResolver;
 use App\Services\BrokerSummaryArchiveMirror;
 use App\Services\BrokerSummaryImporter;
-use App\Support\AssetList;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 /**
- * The weekly broker summary, run at 16:00 WIB on the final valid trading day
- * of each IDX week.
+ * One aggregate broker-summary window covering a whole IDX trading week.
+ *
+ * No longer part of the seeded schedule: broker summaries are now collected
+ * daily by automation:broker-summary-daily, which gives the same coverage at
+ * one-day granularity. This is kept because a week is still a useful unit to
+ * ask for deliberately, and because a weekly row already in scheduled_tasks
+ * must keep working.
  *
  * The range is resolved from `trading_calendar`, never from the shape of the
  * week: a Monday holiday moves `from` to Tuesday and a Friday holiday moves
@@ -36,6 +37,8 @@ use Throwable;
  */
 class BrokerSummaryWeeklyCommand extends Command
 {
+    use FetchesBrokerSummaryWindows;
+
     protected $signature = 'automation:broker-summary-weekly
         {--from= : Week start override (YYYY-MM-DD)}
         {--to= : Week end override (YYYY-MM-DD)}
@@ -105,13 +108,13 @@ class BrokerSummaryWeeklyCommand extends Command
             count($tickers),
         ));
 
-        $exitCode = $this->scrape($tickers, $from, $to);
+        $exitCode = $this->scrapeWindow($tickers, $from, $to);
 
         // Deterministic: the scraper names each archive file
         // SYMBOL_from_to_TRANSACTIONTYPE.json, so the files this run produced
         // are known without walking the directory or trusting a timestamp.
         $expected = $this->expectedPaths($tickers, $from, $to);
-        $written = $this->existing($expected);
+        $written = $this->existingPaths($expected);
         $missing = array_values(array_diff($expected, $written));
 
         $metadata->merge([
@@ -119,7 +122,7 @@ class BrokerSummaryWeeklyCommand extends Command
             'window_files_written' => count($written),
             'failed_ticker_count' => count($missing),
             'failed_tickers' => array_slice(array_map(
-                static fn (string $path): string => strtoupper((string) explode('_', basename($path))[0]),
+                fn (string $path): string => $this->symbolOfPath($path),
                 $missing,
             ), 0, 50),
             'partial' => $missing !== [],
@@ -306,211 +309,5 @@ class BrokerSummaryWeeklyCommand extends Command
             ->whereDate('from_date', $from)
             ->whereDate('to_date', $to)
             ->exists();
-    }
-
-    /**
-     * @param  array<int, string>  $tickers
-     */
-    private function scrape(array $tickers, string $from, string $to): int
-    {
-        $parameters = [
-            '--market-detector' => true,
-            '--from' => $from,
-            '--to' => $to,
-            '--no-profile-sync' => true,
-        ];
-
-        // --all is the documented invocation and is used verbatim whenever the
-        // broker-summary setting excludes nothing. When it does exclude
-        // something, the narrowed list is passed instead, so a muted asset is
-        // not fetched only for the importer to discard it.
-        if ($tickers === AssetList::symbols()) {
-            $parameters['--all'] = true;
-        } else {
-            $parameters['tickers'] = $tickers;
-        }
-
-        if ($this->option('no-mirror')) {
-            $original = Config::get('csv.mirror_disk');
-            Config::set('csv.mirror_disk', null);
-
-            try {
-                return Artisan::call('stockbit:scrape', $parameters, $this->getOutput());
-            } finally {
-                Config::set('csv.mirror_disk', $original);
-            }
-        }
-
-        return Artisan::call('stockbit:scrape', $parameters, $this->getOutput());
-    }
-
-    /**
-     * @param  array<int, string>  $paths
-     */
-    private function importWindows(BrokerSummaryImporter $importer, array $paths, RunMetadata $metadata): void
-    {
-        if ($this->option('no-import')) {
-            $metadata->set('import', ['status' => 'skipped']);
-            $this->line('Import skipped (--no-import).');
-
-            return;
-        }
-
-        try {
-            // Only this run's files. Re-running the same week converges rather
-            // than duplicating: a window is keyed on
-            // (asset, from_date, to_date, transaction_type) and its entries are
-            // replaced wholesale.
-            $result = $importer->importPaths($paths, (string) config('stockbit.save_disk', 'local'));
-
-            $metadata->set('import', [
-                'status' => 'ok',
-                'files' => $result['file_count'],
-                'imported' => count($result['imported']),
-                'skipped' => count($result['skipped']),
-                'rows' => $result['row_count'],
-                'symbols' => count($result['symbols']),
-            ]);
-
-            $this->info(sprintf(
-                'Imported %d of %d broker-summary file(s) covering %d symbol(s).',
-                count($result['imported']),
-                $result['file_count'],
-                count($result['symbols']),
-            ));
-        } catch (Throwable $exception) {
-            // The archive on disk is intact; the import can be retried or
-            // recovered with broker-summary:rebuild.
-            $metadata->merge([
-                'import' => ['status' => 'failed', 'message' => $exception->getMessage()],
-                'error_summary' => 'The broker-summary import failed: '.$exception->getMessage(),
-            ]);
-
-            $this->error('Import failed: '.$exception->getMessage());
-        }
-    }
-
-    /**
-     * @param  array<int, string>  $paths
-     */
-    private function mirrorArchive(BrokerSummaryArchiveMirror $mirror, array $paths, RunMetadata $metadata): void
-    {
-        if ($this->option('no-mirror')) {
-            $metadata->set('gdrive_broker_summary', ['status' => 'skipped']);
-
-            return;
-        }
-
-        if (! $mirror->enabled()) {
-            $metadata->set('gdrive_broker_summary', ['status' => 'not_configured']);
-            $this->line('No broker-summary mirror disk is configured; the JSON stays local only.');
-
-            return;
-        }
-
-        try {
-            // Mirrored after the import, so cold storage only ever receives
-            // JSON that has already been safely written and read back.
-            $result = $mirror->mirror($paths);
-            $summary = $mirror->summarize($result);
-
-            $metadata->set('gdrive_broker_summary', $summary);
-
-            if ($result['failed'] !== []) {
-                // Reported, never fatal: the local archive is the source of
-                // truth and is untouched by a failed upload.
-                $metadata->set('error_summary', trim(sprintf(
-                    '%s %d broker-summary file(s) failed to reach Google Drive; the local copies are intact.',
-                    (string) $metadata->get('error_summary', ''),
-                    count($result['failed']),
-                )));
-
-                $this->warn(sprintf(
-                    '%d file(s) failed to upload to [%s]. The local JSON is intact.',
-                    count($result['failed']),
-                    (string) $result['disk'],
-                ));
-
-                return;
-            }
-
-            $this->info(sprintf(
-                'Mirrored %d file(s) to [%s], %d already up to date.',
-                count($result['uploaded']),
-                (string) $result['disk'],
-                count($result['skipped_unchanged']),
-            ));
-        } catch (Throwable $exception) {
-            $metadata->set('gdrive_broker_summary', ['status' => 'failed', 'message' => $exception->getMessage()]);
-            $this->warn('The Google Drive mirror failed: '.$exception->getMessage().' The local JSON is intact.');
-        }
-    }
-
-    /**
-     * The archive paths this window should have produced.
-     *
-     * @param  array<int, string>  $tickers
-     * @return array<int, string>
-     */
-    private function expectedPaths(array $tickers, string $from, string $to): array
-    {
-        $directory = trim((string) config('stockbit.save_dir', 'broker_summary'), '/');
-        $transactionType = config('stockbit.defaults.transaction_type');
-        $transactionType = is_string($transactionType) && $transactionType !== '' ? $transactionType : 'default';
-
-        return array_map(
-            static fn (string $ticker): string => sprintf(
-                '%s/%s_%s_%s_%s.json',
-                $directory,
-                $ticker,
-                $from,
-                $to,
-                $transactionType,
-            ),
-            $tickers,
-        );
-    }
-
-    /**
-     * @param  array<int, string>  $paths
-     * @return array<int, string>
-     */
-    private function existing(array $paths): array
-    {
-        $disk = Storage::disk((string) config('stockbit.save_disk', 'local'));
-
-        return array_values(array_filter($paths, static function (string $path) use ($disk): bool {
-            try {
-                return $disk->exists($path);
-            } catch (Throwable) {
-                return false;
-            }
-        }));
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function resolveTickers(): array
-    {
-        /** @var array<int, string> $option */
-        $option = $this->option('tickers') ?: [];
-
-        $tickers = $option !== [] ? $option : AssetList::brokerSummarySymbols();
-
-        $normalized = [];
-
-        foreach ($tickers as $ticker) {
-            $symbol = strtoupper(trim((string) $ticker));
-
-            if ($symbol !== '') {
-                $normalized[$symbol] = $symbol;
-            }
-        }
-
-        $normalized = array_values($normalized);
-        sort($normalized);
-
-        return $normalized;
     }
 }

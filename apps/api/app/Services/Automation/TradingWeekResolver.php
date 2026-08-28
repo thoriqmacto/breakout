@@ -88,6 +88,74 @@ class TradingWeekResolver
     }
 
     /**
+     * The most recent date the calendar positively records as a trading day,
+     * at or before $date.
+     *
+     * This is what "the latest valid trading day" means to a backfill: not
+     * today, and not the last date a row exists for, but the last date the
+     * market is recorded as having actually traded. Because the calendar is
+     * built from Yahoo's published bars it necessarily trails the market, so
+     * on a trading afternoon before publication this answers yesterday --
+     * which is correct, and is the whole reason a backfill catches up rather
+     * than assuming it is current.
+     *
+     * The lookback bounds the scan. A calendar that stopped advancing months
+     * ago should report "nothing recent" rather than quietly hand back a date
+     * from March and have a scrape request a hundred-day range for it.
+     */
+    public function latestTradingDayOnOrBefore(Carbon $date, int $lookbackDays = 30): ?Carbon
+    {
+        $day = $this->today($date);
+
+        $row = TradingCalendarDay::query()
+            ->whereDate('date', '<=', $day->toDateString())
+            ->whereDate('date', '>=', $day->copy()->subDays(max(0, $lookbackDays))->toDateString())
+            ->where('is_trading_day', true)
+            ->orderByDesc('date')
+            ->first();
+
+        return $row === null ? null : $this->marketDate($row->date);
+    }
+
+    /**
+     * The first date the calendar positively records as a trading day, at or
+     * after $date.
+     *
+     * A backfill resumes from the day after the last window it stored, and
+     * that day is very often a Saturday. Asking Stockbit for 29..31 August
+     * returns Monday's flow filed as a three-day range, which is then not a
+     * single-day window and so never reaches broker_summary_facts. Snapping
+     * forward to the next actual session keeps the steady state at one day
+     * per window, where the daily consumers can use it.
+     */
+    public function nextTradingDayOnOrAfter(Carbon $date, int $lookaheadDays = 30): ?Carbon
+    {
+        $day = $this->today($date);
+
+        $row = TradingCalendarDay::query()
+            ->whereDate('date', '>=', $day->toDateString())
+            ->whereDate('date', '<=', $day->copy()->addDays(max(0, $lookaheadDays))->toDateString())
+            ->where('is_trading_day', true)
+            ->orderBy('date')
+            ->first();
+
+        return $row === null ? null : $this->marketDate($row->date);
+    }
+
+    /**
+     * A stored calendar value as a Jakarta midnight.
+     *
+     * The column is cast to a date, which Eloquent hands back as a UTC
+     * midnight. Comparing that against today() -- a Jakarta midnight -- leaves
+     * the two seven hours apart, which is enough to cost a day off any
+     * lessThan()/diffInDays() the caller then performs.
+     */
+    private function marketDate(mixed $value): Carbon
+    {
+        return Carbon::parse(Carbon::parse($value)->toDateString(), $this->timezone())->startOfDay();
+    }
+
+    /**
      * The first and last valid trading dates of the Monday-Sunday week that
      * contains $date, in Asia/Jakarta.
      *
