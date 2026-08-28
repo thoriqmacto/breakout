@@ -170,6 +170,69 @@ class TradingWeekResolverTest extends TestCase
         $this->assertSame('2026-08-28', $week['to']);
     }
 
+    public function test_the_latest_trading_day_is_the_last_one_observed_not_today(): void
+    {
+        // The calendar stops on Thursday, which is what it looks like on a
+        // Friday evening before Yahoo has published the day's bar.
+        $this->calendar('2026-08-24', '2026-08-27', [
+            '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27',
+        ]);
+
+        $latest = $this->resolver->latestTradingDayOnOrBefore($this->moment('2026-08-28'));
+
+        $this->assertNotNull($latest);
+        $this->assertSame('2026-08-27', $latest->toDateString());
+        $this->assertSame('Asia/Jakarta', $latest->timezoneName);
+    }
+
+    public function test_the_latest_trading_day_skips_back_over_a_holiday(): void
+    {
+        // Friday is a holiday, so Thursday is the last day that traded.
+        $this->calendar('2026-08-24', '2026-08-30', [
+            '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27',
+        ]);
+
+        $latest = $this->resolver->latestTradingDayOnOrBefore($this->moment('2026-08-29'));
+
+        $this->assertSame('2026-08-27', $latest?->toDateString());
+    }
+
+    public function test_a_calendar_that_stopped_long_ago_reports_nothing_recent(): void
+    {
+        $this->calendar('2026-08-24', '2026-08-28', [
+            '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28',
+        ]);
+
+        // Two months on, the honest answer is "no recent trading day" rather
+        // than a date from August that would have a backfill request months.
+        $this->assertNull($this->resolver->latestTradingDayOnOrBefore($this->moment('2026-10-28'), 30));
+    }
+
+    public function test_the_next_trading_day_snaps_a_weekend_forward_to_monday(): void
+    {
+        $this->calendar('2026-08-24', '2026-08-31', [
+            '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28', '2026-08-31',
+        ]);
+
+        // The day after a Friday window is a Saturday. Asking Stockbit for
+        // 29..31 August returns Monday's flow filed as a three-day range.
+        $next = $this->resolver->nextTradingDayOnOrAfter($this->moment('2026-08-29'));
+
+        $this->assertSame('2026-08-31', $next?->toDateString());
+    }
+
+    public function test_the_next_trading_day_returns_a_trading_date_unchanged(): void
+    {
+        $this->calendar('2026-08-24', '2026-08-28', [
+            '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28',
+        ]);
+
+        $this->assertSame(
+            '2026-08-26',
+            $this->resolver->nextTradingDayOnOrAfter($this->moment('2026-08-26'))?->toDateString(),
+        );
+    }
+
     public function test_today_is_resolved_in_jakarta_not_in_the_application_timezone(): void
     {
         // 2026-08-27 23:30 UTC is already 2026-08-28 06:30 in Jakarta. A
