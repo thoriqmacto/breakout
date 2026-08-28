@@ -1,0 +1,774 @@
+{
+    "symbol": "PSAB",
+    "name": "J RESOURCES ASIA PASIFIK TBK",
+    "address": [
+        {
+            "id": "341",
+            "email": [
+                "corpsec@jresources.com"
+            ],
+            "fax": "(021) 515 3759",
+            "npwp": "0020.4395.8405.4000",
+            "phone": "(021) 515 3335",
+            "website": "www.jresources.com",
+            "key": "",
+            "lastupdate": "2026-03-27T14:38:43+07:00",
+            "value": "",
+            "office": "Equity Tower, 48th Floor, SCBD, Lot 9, Jalan Jenderal Sudirman Kav. 52-53, Jakarta Selatan 12190"
+        }
+    ],
+    "background": "PT. J Resources Asia Pasifik Tbk (PSAB) adalah perusahaan induk, yang terutama berinvestasi dan mengelola bisnis pertambangan emas bersama dengan bisnis logam mulia lainnya di wilayah Australasia. Perusahaan mulai beroperasi secara komersial pada tanggal 1 Mei 2002.  Perusahaan yang dahulu bergerak di bidang jasa katering ini berubah setelah bergabungnya Avocet Mining Plc. Pemegang saham pengendali utama Grup adalah Jimmy Budiarto.",
+    "history": {
+        "amount": "3 B",
+        "board": "Papan Pengembangan",
+        "date": "22 Apr 2003",
+        "price": "250",
+        "registrar": "",
+        "shares": "12,000,000",
+        "underwriters": [
+            "PT. Victoria Sekuritas"
+        ],
+        "administrative_bureau": "PT Adimitra Jasa Korpora",
+        "free_float": "7.47%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "31319181",
+                "key": "Commissioner",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "CHRISTIAN WIJAYANTO AJ"
+            }
+        ],
+        "director": [
+            {
+                "id": "31319185",
+                "key": "Director",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "ADI MARYONO"
+            },
+            {
+                "id": "31319184",
+                "key": "Director",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "SANJAYA J"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "31319182",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "ARIEF BUDI PRASETYANTO"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "31319180",
+                "key": "President Commissioner",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "JIMMY BUDIARTO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "31319183",
+                "key": "President Director",
+                "lastupdate": "2026-06-05T11:17:49+07:00",
+                "value": "EDI PERMADI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12531754",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:50+07:00",
+            "value": "{\"name\":\"Edi Permadi\",\"phone\":\"021-5153335\",\"email\":\"corpsec@jresources.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "7.5%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.98 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Mulia Bumi Persada",
+            "percentage": "99.79%",
+            "types": "Pertambangan",
+            "value": "192752"
+        },
+        {
+            "company": "PT Mulia Bumi Seruyung",
+            "percentage": "9979%",
+            "types": "Pertambangan",
+            "value": "47049"
+        },
+        {
+            "company": "PT J Resources Nusantara",
+            "percentage": "99.99%",
+            "types": "Perdagangan Umum dan Jasa",
+            "value": "942062116"
+        },
+        {
+            "company": "J Resources Netherland BV",
+            "percentage": "99.99%",
+            "types": "Investment",
+            "value": "146136798"
+        },
+        {
+            "company": "PT Sago Prima Pratama",
+            "percentage": "99.79%",
+            "types": "Pertambangan",
+            "value": "170813943"
+        },
+        {
+            "company": "PT Gorontalo Sejahtera Mining",
+            "percentage": "99.99%",
+            "types": "Pertambangan",
+            "value": "89113624"
+        },
+        {
+            "company": "PT J Resources Mining Services Indonesia",
+            "percentage": "99.97%",
+            "types": "Jasa Pertambangan",
+            "value": "4280638"
+        },
+        {
+            "company": "J & P Resources Gold OHQ (Malaysia) Sdn. Bhd.",
+            "percentage": "99.99%",
+            "types": "Jasa Pertambangan",
+            "value": "12035"
+        },
+        {
+            "company": "PT Arafura Surya Alam",
+            "percentage": "99.99%",
+            "types": "Pertambangan",
+            "value": "79259515"
+        },
+        {
+            "company": "PT J Resources Bolaang Mongondow",
+            "percentage": "79.99%",
+            "types": "Pertambangan",
+            "value": "400720336"
+        },
+        {
+            "company": "J Resources Gold (UK) Limited",
+            "percentage": "99.99%",
+            "types": "Pertambangan",
+            "value": "136941988"
+        },
+        {
+            "company": "Specific Resources Sdn. Bhd",
+            "percentage": "99.99%",
+            "types": "Pertambangan",
+            "value": "65768049"
+        },
+        {
+            "company": "Labuan Mining Services Ltd",
+            "percentage": "99.99%",
+            "types": "Jasa Pertambangan",
+            "value": "68"
+        },
+        {
+            "company": "PT Sulawesi Anugerah Jaya",
+            "percentage": "99.96%",
+            "types": "Pertambangan",
+            "value": "177284"
+        },
+        {
+            "company": "PT Sulawesi Bukit Anugerah",
+            "percentage": "99.96%",
+            "types": "Pertambangan",
+            "value": "177284"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "36,298",
+            "change": -91,
+            "change_formatted": "(-91)",
+            "change_value": "-91"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "36,389",
+            "change": 8883,
+            "change_formatted": "(+8,883)",
+            "change_value": "8883"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "27,506",
+            "change": -527,
+            "change_formatted": "(-527)",
+            "change_value": "-527"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "28,033",
+            "change": -6108,
+            "change_formatted": "(-6,108)",
+            "change_value": "-6108"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "34,141",
+            "change": 1271,
+            "change_formatted": "(+1,271)",
+            "change_value": "1271"
+        },
+        {
+            "shareholder_date": "27 Feb 2026",
+            "total_share": "32,870",
+            "change": -3194,
+            "change_formatted": "(-3,194)",
+            "change_value": "-3194"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "90%",
+            "name": "JIMMY BUDIARTO",
+            "value": "23.81 B",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        },
+        {
+            "percentage": "2.5%",
+            "name": "NSL-CLIENT SEGREGATED A/C",
+            "value": "661.50 M",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2003-04-22T00:00:00+07:00",
+    "ipo_price": 250,
+    "float": 7.47,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "341",
+                "email": [
+                    "corpsec@jresources.com"
+                ],
+                "fax": "(021) 515 3759",
+                "npwp": "0020.4395.8405.4000",
+                "phone": "(021) 515 3335",
+                "website": "www.jresources.com",
+                "key": "",
+                "lastupdate": "2026-03-27T14:38:43+07:00",
+                "value": "",
+                "office": "Equity Tower, 48th Floor, SCBD, Lot 9, Jalan Jenderal Sudirman Kav. 52-53, Jakarta Selatan 12190"
+            }
+        ],
+        "background": "PT. J Resources Asia Pasifik Tbk (PSAB) adalah perusahaan induk, yang terutama berinvestasi dan mengelola bisnis pertambangan emas bersama dengan bisnis logam mulia lainnya di wilayah Australasia. Perusahaan mulai beroperasi secara komersial pada tanggal 1 Mei 2002.  Perusahaan yang dahulu bergerak di bidang jasa katering ini berubah setelah bergabungnya Avocet Mining Plc. Pemegang saham pengendali utama Grup adalah Jimmy Budiarto.",
+        "history": {
+            "amount": "3 B",
+            "board": "Papan Pengembangan",
+            "date": "22 Apr 2003",
+            "price": "250",
+            "registrar": "",
+            "shares": "12,000,000",
+            "underwriters": [
+                "PT. Victoria Sekuritas"
+            ],
+            "administrative_bureau": "PT Adimitra Jasa Korpora",
+            "free_float": "7.47%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "31319181",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "CHRISTIAN WIJAYANTO AJ"
+                }
+            ],
+            "director": [
+                {
+                    "id": "31319185",
+                    "key": "Director",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "ADI MARYONO"
+                },
+                {
+                    "id": "31319184",
+                    "key": "Director",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "SANJAYA J"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "31319182",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "ARIEF BUDI PRASETYANTO"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "31319180",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "JIMMY BUDIARTO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "31319183",
+                    "key": "President Director",
+                    "lastupdate": "2026-06-05T11:17:49+07:00",
+                    "value": "EDI PERMADI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12531754",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:50+07:00",
+                "value": "{\"name\":\"Edi Permadi\",\"phone\":\"021-5153335\",\"email\":\"corpsec@jresources.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "7.5%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.98 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Mulia Bumi Persada",
+                "percentage": "99.79%",
+                "types": "Pertambangan",
+                "value": "192752"
+            },
+            {
+                "company": "PT Mulia Bumi Seruyung",
+                "percentage": "9979%",
+                "types": "Pertambangan",
+                "value": "47049"
+            },
+            {
+                "company": "PT J Resources Nusantara",
+                "percentage": "99.99%",
+                "types": "Perdagangan Umum dan Jasa",
+                "value": "942062116"
+            },
+            {
+                "company": "J Resources Netherland BV",
+                "percentage": "99.99%",
+                "types": "Investment",
+                "value": "146136798"
+            },
+            {
+                "company": "PT Sago Prima Pratama",
+                "percentage": "99.79%",
+                "types": "Pertambangan",
+                "value": "170813943"
+            },
+            {
+                "company": "PT Gorontalo Sejahtera Mining",
+                "percentage": "99.99%",
+                "types": "Pertambangan",
+                "value": "89113624"
+            },
+            {
+                "company": "PT J Resources Mining Services Indonesia",
+                "percentage": "99.97%",
+                "types": "Jasa Pertambangan",
+                "value": "4280638"
+            },
+            {
+                "company": "J & P Resources Gold OHQ (Malaysia) Sdn. Bhd.",
+                "percentage": "99.99%",
+                "types": "Jasa Pertambangan",
+                "value": "12035"
+            },
+            {
+                "company": "PT Arafura Surya Alam",
+                "percentage": "99.99%",
+                "types": "Pertambangan",
+                "value": "79259515"
+            },
+            {
+                "company": "PT J Resources Bolaang Mongondow",
+                "percentage": "79.99%",
+                "types": "Pertambangan",
+                "value": "400720336"
+            },
+            {
+                "company": "J Resources Gold (UK) Limited",
+                "percentage": "99.99%",
+                "types": "Pertambangan",
+                "value": "136941988"
+            },
+            {
+                "company": "Specific Resources Sdn. Bhd",
+                "percentage": "99.99%",
+                "types": "Pertambangan",
+                "value": "65768049"
+            },
+            {
+                "company": "Labuan Mining Services Ltd",
+                "percentage": "99.99%",
+                "types": "Jasa Pertambangan",
+                "value": "68"
+            },
+            {
+                "company": "PT Sulawesi Anugerah Jaya",
+                "percentage": "99.96%",
+                "types": "Pertambangan",
+                "value": "177284"
+            },
+            {
+                "company": "PT Sulawesi Bukit Anugerah",
+                "percentage": "99.96%",
+                "types": "Pertambangan",
+                "value": "177284"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "36,298",
+                "change": -91,
+                "change_formatted": "(-91)",
+                "change_value": "-91"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "36,389",
+                "change": 8883,
+                "change_formatted": "(+8,883)",
+                "change_value": "8883"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "27,506",
+                "change": -527,
+                "change_formatted": "(-527)",
+                "change_value": "-527"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "28,033",
+                "change": -6108,
+                "change_formatted": "(-6,108)",
+                "change_value": "-6108"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "34,141",
+                "change": 1271,
+                "change_formatted": "(+1,271)",
+                "change_value": "1271"
+            },
+            {
+                "shareholder_date": "27 Feb 2026",
+                "total_share": "32,870",
+                "change": -3194,
+                "change_formatted": "(-3,194)",
+                "change_value": "-3194"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "90%",
+                "name": "JIMMY BUDIARTO",
+                "value": "23.81 B",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            },
+            {
+                "percentage": "2.5%",
+                "name": "NSL-CLIENT SEGREGATED A/C",
+                "value": "661.50 M",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "JIMMY BUDIARTO"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "90.00%",
+                    "name": "JIMMY BUDIARTO",
+                    "value": "23,814,000,000",
+                    "badges": [],
+                    "id": "9523",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "23,814,000,000",
+                    "scrip": "0",
+                    "value_formatted": "23.81 B",
+                    "classification": "Investor"
+                },
+                {
+                    "percentage": "2.50%",
+                    "name": "NOMURA SINGAPORE",
+                    "value": "661,500,000",
+                    "badges": [],
+                    "id": "12494",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "661,500,000",
+                    "scrip": "0",
+                    "value_formatted": "661.50 M",
+                    "classification": "Investor"
+                },
+                {
+                    "percentage": "1.67%",
+                    "name": "SUWANTARA GOTAMA",
+                    "value": "441,987,294",
+                    "badges": [],
+                    "id": "12229",
+                    "type": "ID",
+                    "location": "Foreign",
+                    "nationality": "INDONESIAN",
+                    "domicile": "SINGAPORE",
+                    "scripless": "441,987,294",
+                    "scrip": "0",
+                    "value_formatted": "441.99 M",
+                    "classification": "Investor"
+                }
+            ],
+            "last_updated": "2026-08-27"
+        },
+        "classification": null
+    },
+    "profile_synced_at": "2026-08-27T11:16:32+00:00"
+}

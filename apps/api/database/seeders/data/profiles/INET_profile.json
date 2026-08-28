@@ -1,0 +1,602 @@
+{
+    "symbol": "INET",
+    "name": "Sinergi Inti Andalan Prima Tbk.",
+    "address": [
+        {
+            "id": "811",
+            "email": [
+                "info@sinergynetworks.co.id"
+            ],
+            "fax": "",
+            "npwp": "81.148.632.3-014.000",
+            "phone": "021-5265943/5835854",
+            "website": "www.siapnetworks.co.id",
+            "key": "",
+            "lastupdate": "2023-07-24T02:00:07+07:00",
+            "value": "",
+            "office": "Gedung Cyber 1 Lantai 10, Jl. Kuningan Barat No.8, Jakarta Selatan 12710"
+        }
+    ],
+    "background": "PT Sinergi Inti Andalan Prima (Perseroan) merupakan perusahaan yang memberikan layanan business to business (B2B) kepada para mitra Perseroan yang sebagaian besar merupakan perusahaan internet service provider (ISP) dengan market share lebih dari 100 perusahaan dari seluruh ISP di Indonesia yang jumlahnya mencapai 800 perusahaan. Para Pelanggan Perseroan tersebar diseluruh wilayah Indonesia dari ISP besar berskala Nasional sampai ISP didaerah yang bersekala kecil. Layanan yang perseroan tawarkan antara lain adalah layanan pusat data interkoneksi, layanan kolokasi, layanan local loop atau local access serta layanan IP Transit (NAP) bekerjasama dengan mitra Perseroan.\n\nSejak didirikan pada 2016, saat ini Perseroan telah berkembang cukup pesat dengan memiliki POP (point of presence) berjumlah 13 POP yang tersebar di 8 kota-kota besar di Indonesia mulai dari Jakarta, Bandung, Yogyakarta, Surabaya, Bali, Balikpapan, Medan dan Lampung dan 1 POP di Singapura. 13 POP yang ada merupakan lokasi dimana Perseroan dapat memberikan layanannya kepada pelanggan, bukan merupakan kantor perwakilan dari kantor pusat. Apabila dimisalkan dengan industri perbankan, maka POP dapat dimisalkan sebagai sebuah lokasi yang disitu ada mesin ATM dari Bank tertentu, bukan kantor cabang Bank tersebut.",
+    "history": {
+        "amount": "152 B",
+        "board": "Papan Pengembangan",
+        "date": "24 Jul 2023",
+        "price": "101",
+        "registrar": "",
+        "shares": "1,500,000,000",
+        "underwriters": [
+            "Shinhan Sekuritas Indonesia"
+        ],
+        "administrative_bureau": "PT Ficomindo Buana Registrar",
+        "free_float": "39.63%"
+    },
+    "key_executive": {
+        "commissioner": [],
+        "director": [
+            {
+                "id": "29572690",
+                "key": "Director",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "FIRDAUS ANDI WIBOWO"
+            },
+            {
+                "id": "29572689",
+                "key": "Director",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "FADZRI SENTOSA"
+            },
+            {
+                "id": "29572688",
+                "key": "Director",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "SEPTIAWAN"
+            },
+            {
+                "id": "29572687",
+                "key": "Director",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "SARIPUDIN, SE"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "29572691",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "CAHYANA AHMAD JAYADI"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "29572692",
+                "key": "President Commissioner",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "KEMAL AKBAR"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "29572686",
+                "key": "President Director",
+                "lastupdate": "2026-05-21T14:53:38+07:00",
+                "value": "MUHAMMAD ARIF"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "5340861",
+            "key": "",
+            "lastupdate": "2018-07-26T10:14:44+07:00",
+            "value": "{\"Name\":null,\"Phone\":null,\"Email\":null}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "59.771%",
+            "name": "PT ABADI KREASI UNGGUL NUSANTARA",
+            "value": "13.37 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        },
+        {
+            "percentage": "40.2289%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "9.00 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        }
+    ],
+    "subsidiary": [],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "156,414",
+            "change": -2138,
+            "change_formatted": "(-2,138)",
+            "change_value": "-2138"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "158,552",
+            "change": -3342,
+            "change_formatted": "(-3,342)",
+            "change_value": "-3342"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "161,894",
+            "change": -5516,
+            "change_formatted": "(-5,516)",
+            "change_value": "-5516"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "167,410",
+            "change": -361,
+            "change_formatted": "(-361)",
+            "change_value": "-361"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "167,771",
+            "change": -10161,
+            "change_formatted": "(-10,161)",
+            "change_value": "-10161"
+        },
+        {
+            "shareholder_date": "28 Feb 2026",
+            "total_share": "177,932",
+            "change": 4030,
+            "change_formatted": "(+4,030)",
+            "change_value": "4030"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.0001%",
+            "name": "MUHAMMAD ARIF",
+            "value": "23.33 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "SEPTIAWAN",
+            "value": "10.50 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": ""
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2023-07-24T00:00:00+07:00",
+    "ipo_price": 101,
+    "float": 39.63,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "811",
+                "email": [
+                    "info@sinergynetworks.co.id"
+                ],
+                "fax": "",
+                "npwp": "81.148.632.3-014.000",
+                "phone": "021-5265943/5835854",
+                "website": "www.siapnetworks.co.id",
+                "key": "",
+                "lastupdate": "2023-07-24T02:00:07+07:00",
+                "value": "",
+                "office": "Gedung Cyber 1 Lantai 10, Jl. Kuningan Barat No.8, Jakarta Selatan 12710"
+            }
+        ],
+        "background": "PT Sinergi Inti Andalan Prima (Perseroan) merupakan perusahaan yang memberikan layanan business to business (B2B) kepada para mitra Perseroan yang sebagaian besar merupakan perusahaan internet service provider (ISP) dengan market share lebih dari 100 perusahaan dari seluruh ISP di Indonesia yang jumlahnya mencapai 800 perusahaan. Para Pelanggan Perseroan tersebar diseluruh wilayah Indonesia dari ISP besar berskala Nasional sampai ISP didaerah yang bersekala kecil. Layanan yang perseroan tawarkan antara lain adalah layanan pusat data interkoneksi, layanan kolokasi, layanan local loop atau local access serta layanan IP Transit (NAP) bekerjasama dengan mitra Perseroan.\n\nSejak didirikan pada 2016, saat ini Perseroan telah berkembang cukup pesat dengan memiliki POP (point of presence) berjumlah 13 POP yang tersebar di 8 kota-kota besar di Indonesia mulai dari Jakarta, Bandung, Yogyakarta, Surabaya, Bali, Balikpapan, Medan dan Lampung dan 1 POP di Singapura. 13 POP yang ada merupakan lokasi dimana Perseroan dapat memberikan layanannya kepada pelanggan, bukan merupakan kantor perwakilan dari kantor pusat. Apabila dimisalkan dengan industri perbankan, maka POP dapat dimisalkan sebagai sebuah lokasi yang disitu ada mesin ATM dari Bank tertentu, bukan kantor cabang Bank tersebut.",
+        "history": {
+            "amount": "152 B",
+            "board": "Papan Pengembangan",
+            "date": "24 Jul 2023",
+            "price": "101",
+            "registrar": "",
+            "shares": "1,500,000,000",
+            "underwriters": [
+                "Shinhan Sekuritas Indonesia"
+            ],
+            "administrative_bureau": "PT Ficomindo Buana Registrar",
+            "free_float": "39.63%"
+        },
+        "key_executive": {
+            "commissioner": [],
+            "director": [
+                {
+                    "id": "29572690",
+                    "key": "Director",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "FIRDAUS ANDI WIBOWO"
+                },
+                {
+                    "id": "29572689",
+                    "key": "Director",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "FADZRI SENTOSA"
+                },
+                {
+                    "id": "29572688",
+                    "key": "Director",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "SEPTIAWAN"
+                },
+                {
+                    "id": "29572687",
+                    "key": "Director",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "SARIPUDIN, SE"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "29572691",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "CAHYANA AHMAD JAYADI"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "29572692",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "KEMAL AKBAR"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "29572686",
+                    "key": "President Director",
+                    "lastupdate": "2026-05-21T14:53:38+07:00",
+                    "value": "MUHAMMAD ARIF"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "5340861",
+                "key": "",
+                "lastupdate": "2018-07-26T10:14:44+07:00",
+                "value": "{\"Name\":null,\"Phone\":null,\"Email\":null}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "59.771%",
+                "name": "PT ABADI KREASI UNGGUL NUSANTARA",
+                "value": "13.37 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            },
+            {
+                "percentage": "40.2289%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "9.00 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            }
+        ],
+        "subsidiary": [],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "156,414",
+                "change": -2138,
+                "change_formatted": "(-2,138)",
+                "change_value": "-2138"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "158,552",
+                "change": -3342,
+                "change_formatted": "(-3,342)",
+                "change_value": "-3342"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "161,894",
+                "change": -5516,
+                "change_formatted": "(-5,516)",
+                "change_value": "-5516"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "167,410",
+                "change": -361,
+                "change_formatted": "(-361)",
+                "change_value": "-361"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "167,771",
+                "change": -10161,
+                "change_formatted": "(-10,161)",
+                "change_value": "-10161"
+            },
+            {
+                "shareholder_date": "28 Feb 2026",
+                "total_share": "177,932",
+                "change": 4030,
+                "change_formatted": "(+4,030)",
+                "change_value": "4030"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.0001%",
+                "name": "MUHAMMAD ARIF",
+                "value": "23.33 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "SEPTIAWAN",
+                "value": "10.50 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": ""
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "ADHIE M. MASARDI"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "59.77%",
+                    "name": "ABADI KREASI UNGGUL NUSANTARA",
+                    "value": "13,373,689,331",
+                    "badges": [],
+                    "id": "13798",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "13,373,689,331",
+                    "scrip": "0",
+                    "value_formatted": "13.37 B",
+                    "classification": "Corporate"
+                }
+            ],
+            "last_updated": "2026-08-27"
+        },
+        "classification": null
+    },
+    "profile_synced_at": "2026-08-27T16:17:00+00:00"
+}
