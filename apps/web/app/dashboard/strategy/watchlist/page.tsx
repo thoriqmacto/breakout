@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Loader2, RefreshCcw } from "lucide-react"
 
@@ -142,8 +143,18 @@ export default function StrategyWatchlistPage() {
         <CardHeader>
           <CardTitle>Strategy watchlist</CardTitle>
           <CardDescription>
-            Explainable scoring from broker accumulation, breakout confirmation, liquidity, and
-            risk/reward filters. Research only — no profit guarantee, no execution.
+            The raw persisted scores: broker accumulation, breakout confirmation, liquidity and
+            risk/reward, measured at the signal session&apos;s close. Research only — no profit
+            guarantee, no execution.
+          </CardDescription>
+          <CardDescription>
+            These same scores, with a next-session entry trigger, a stop, a target and the
+            risk/reward recomputed at the trigger rather than at the close, are on{" "}
+            <Link href="/dashboard/execution" className="font-medium underline">
+              Execution
+            </Link>
+            . A setup can clear its minimum here and fail it there, which is the difference that
+            matters.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

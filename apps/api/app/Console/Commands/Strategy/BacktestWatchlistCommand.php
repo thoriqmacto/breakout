@@ -15,9 +15,12 @@ class BacktestWatchlistCommand extends Command
         {--horizons=5,10,20 : Forward-return horizons in trading days}
         {--target-pct=0.035 : Hit threshold (e.g. 0.035 for +3.5%)}
         {--limit-per-day= : Optional cap on rows per scan day (top score first)}
+        {--entry=next_open : Fill model: next_open or breakout_trigger}
+        {--min-rr= : Reject a fill whose risk/reward at the price paid is below this (default: execution.min_rr)}
+        {--max-gap-pct= : Reject a fill that opens this far beyond the trigger, as a fraction}
         {--json : Emit a single JSON document instead of human-readable tables}';
 
-    protected $description = 'Replay persisted watchlist_scores against forward N-day returns. Reads only; no writes.';
+    protected $description = 'Replay persisted watchlist_scores against forward returns, entering on the session after the signal. Reads only; no writes.';
 
     public function handle(WatchlistBacktester $backtester): int
     {
@@ -45,7 +48,31 @@ class BacktestWatchlistCommand extends Command
         $limitPerDay = $this->option('limit-per-day');
         $limitPerDay = $limitPerDay === null || $limitPerDay === '' ? null : (int) $limitPerDay;
 
-        $report = $backtester->backtest($from, $to, $version, $horizons, $targetPct, $limitPerDay);
+        $entryMode = (string) $this->option('entry');
+
+        if (! in_array($entryMode, WatchlistBacktester::ENTRY_MODES, true)) {
+            $this->error('--entry must be one of: '.implode(', ', WatchlistBacktester::ENTRY_MODES));
+
+            return self::FAILURE;
+        }
+
+        $minRr = $this->option('min-rr');
+        $minRr = $minRr === null || $minRr === '' ? null : (float) $minRr;
+
+        $maxGap = $this->option('max-gap-pct');
+        $maxGap = $maxGap === null || $maxGap === '' ? null : (float) $maxGap;
+
+        $report = $backtester->backtest(
+            $from,
+            $to,
+            $version,
+            $horizons,
+            $targetPct,
+            $limitPerDay,
+            $entryMode,
+            $minRr,
+            $maxGap,
+        );
 
         if ($this->option('json')) {
             $this->line(json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -59,14 +86,35 @@ class BacktestWatchlistCommand extends Command
     private function printReport(array $report): int
     {
         $this->info(sprintf(
-            'Backtest %s → %s | version=%s | target=%.2f%% | horizons=[%s] | sample=%d',
+            'Backtest %s → %s | version=%s | entry=%s (T+1) | min R/R at fill=%.2f | target=%.2f%% | horizons=[%s] | sample=%d',
             $report['from'],
             $report['to'],
             $report['version'],
+            $report['entry_mode'],
+            $report['min_risk_reward'],
             $report['target_pct'] * 100,
             implode(',', $report['horizons']),
             $report['sample_size']
         ));
+
+        $flow = $report['flow'] ?? [];
+
+        if ($flow !== []) {
+            $this->newLine();
+            $this->line('<options=bold>Signal flow</>');
+            $this->table(
+                ['Signals', 'Filled', 'Never triggered', 'Rejected on R/R at fill', 'No stored risk levels', 'No next session', 'Missing data'],
+                [[
+                    $flow['signals'] ?? 0,
+                    $flow['triggered'] ?? 0,
+                    $flow['not_triggered'] ?? 0,
+                    $flow['rejected_risk_reward'] ?? 0,
+                    $flow['no_risk_levels'] ?? 0,
+                    $flow['no_next_session'] ?? 0,
+                    $flow['missing_data'] ?? 0,
+                ]]
+            );
+        }
 
         if ($report['sample_size'] === 0) {
             $this->warn('No observations. Have you persisted watchlist_scores for this range and version?');
@@ -77,12 +125,14 @@ class BacktestWatchlistCommand extends Command
         $this->newLine();
         $this->line('<options=bold>Baseline (all observations)</>');
         $this->table(
-            ['Horizon', 'Hit rate', 'Avg return', 'N'],
+            ['Horizon', 'Hit rate', 'Avg return', 'Avg MFE', 'Avg MAE', 'N'],
             array_map(static function (array $row): array {
                 return [
                     $row['horizon'].'d',
                     number_format(($row['hit_rate'] ?? 0) * 100, 2).'%',
                     number_format(($row['avg_return'] ?? 0) * 100, 2).'%',
+                    number_format(($row['avg_mfe'] ?? 0) * 100, 2).'%',
+                    number_format(($row['avg_mae'] ?? 0) * 100, 2).'%',
                     (int) ($row['n'] ?? 0),
                 ];
             }, $report['baseline'])
@@ -97,7 +147,9 @@ class BacktestWatchlistCommand extends Command
         $this->printGroupedRows($report['filter_combos'], 'combo');
 
         $this->newLine();
-        $this->line('Note: research only. Lift = bucket hit rate − baseline hit rate. Small N → noisy lift.');
+        $this->line('Note: research only. Entry is the session after the signal -- a score computed from');
+        $this->line('session T\'s close did not exist while T was trading. Lift = bucket hit rate − baseline');
+        $this->line('hit rate. Small N → noisy lift.');
 
         return self::SUCCESS;
     }

@@ -596,10 +596,25 @@ class StockbitPortfolioImporter
      * Work out the base cash balance that makes the calculator agree with the
      * broker.
      *
-     * Breakout stores a base cash figure and adds signed cash movements to it.
-     * Writing the broker's current cash straight into that base would count
-     * every imported dividend a second time, so the proposal is the broker's
-     * figure minus whatever the movements already contribute.
+     * Available cash is now three terms, not two:
+     *
+     *     available = base + non-trade movements + signed trade settlements
+     *
+     * so the base that reproduces the broker's reported figure is that figure
+     * minus *both* of the other terms:
+     *
+     *     proposed base = broker cash - movements - trade settlements
+     *
+     * Subtracting only the movements, as this did while cash was
+     * `base + movements`, would leave every imported buy and sell counted a
+     * second time -- once inside the broker's figure, which already reflects
+     * them, and once again when the calculator adds the trade term. On a
+     * portfolio with a year of imported history the two disagree by the entire
+     * traded volume.
+     *
+     * The settlement arithmetic is PositionPricing's, the same function the
+     * calculator sums at read time, so the amount removed here is by
+     * construction the amount added back.
      *
      * @param  array<string, mixed>  $summary
      * @return array<string, mixed>|null
@@ -612,24 +627,31 @@ class StockbitPortfolioImporter
             return null;
         }
 
-        $portfolio->loadMissing('cashMovements');
+        $portfolio->loadMissing(['cashMovements', 'positions']);
 
         $movementsTotal = 0.0;
         foreach ($portfolio->cashMovements as $movement) {
             $movementsTotal += $movement->signedAmount();
         }
 
+        $tradeTotal = 0.0;
+        foreach ($portfolio->positions as $position) {
+            $tradeTotal += $this->pricing->signedCashFlowForPosition($position);
+        }
+
         $currentBase = (float) ($portfolio->cash_balance ?? 0.0);
-        $proposedBase = (float) $brokerCash - $movementsTotal;
+        $currentCalculated = $currentBase + $movementsTotal + $tradeTotal;
+        $proposedBase = (float) $brokerCash - $movementsTotal - $tradeTotal;
 
         return [
             'broker_cash' => (float) $brokerCash,
             'current_base_cash' => $currentBase,
             'cash_movements_total' => round($movementsTotal, 2),
-            'current_calculated_cash' => round($currentBase + $movementsTotal, 2),
+            'trade_cash_flow_total' => round($tradeTotal, 2),
+            'current_calculated_cash' => round($currentCalculated, 2),
             'proposed_base_cash' => round($proposedBase, 2),
             'adjustment' => round($proposedBase - $currentBase, 2),
-            'already_reconciled' => $this->moneyMatches($currentBase + $movementsTotal, (float) $brokerCash),
+            'already_reconciled' => $this->moneyMatches($currentCalculated, (float) $brokerCash),
             'can_reconcile' => true,
         ];
     }

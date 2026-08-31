@@ -30,10 +30,14 @@ class AssetMetricsCommandTest extends TestCase
             ]);
         }
 
+        // The ratio columns are reported to four decimal places, matching the
+        // decimal(15,4) they are stored in. Two was the old precision and it
+        // collapsed 0.985 and 0.995 into the same 0.99, which then ranked as a
+        // tie.
         $this->artisan('asset:metrics', ['--sym' => 'AAA'])
             ->expectsTable(
-                ['Rank', 'Symbol', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14d', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars', 'PBAS', 'BAVG'],
-                [['1', 'AAA', '66', '42', '34', '67', '67', '2', '6500', '1057', '1.00899', '0.99', '0.99', 'Yes', '66', '', '']]
+                ['Rank', 'Symbol', 'As of', 'Close', 'MA50', 'MA100', '20wH', '55wH', 'ATR14', 'ROC13', 'AvgVol20', 'Vol/Avg20', 'Close/20wH', 'Close/55wH', 'IsUptrend?', 'Bars', 'PBAS', 'BAVG'],
+                [['1', 'AAA', '2024-03-06', '66', '42', '34', '67', '67', '2', '6500', '1057', '1.009', '0.9851', '0.9851', 'Yes', '66', '', '']]
             )->assertExitCode(0);
     }
 

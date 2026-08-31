@@ -130,9 +130,15 @@ class AnalysisRefreshCommand extends Command
                 'command' => 'asset:metrics',
                 // Always one of --all or --sym: with neither, asset:metrics
                 // prompts, and a scheduled run has nobody to answer it.
-                'parameters' => $symbols === []
-                    ? ['--all' => true, '--persist' => true]
-                    : ['--sym' => implode(',', $symbols), '--persist' => true],
+                // --as-of pins the cache to the same session everything else
+                // in this pass describes. Without it a catch-up run would
+                // rebuild features for an old date and then stamp the cache
+                // with today's, which is the mismatch the canonical snapshot
+                // service exists to prevent.
+                'parameters' => array_merge(
+                    ['--persist' => true, '--as-of' => $to->toDateString()],
+                    $symbols === [] ? ['--all' => true] : ['--sym' => implode(',', $symbols)],
+                ),
             ],
             'rollup' => [
                 'skip' => 'skip-rollup',

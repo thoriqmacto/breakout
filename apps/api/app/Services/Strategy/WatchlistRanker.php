@@ -4,21 +4,35 @@ namespace App\Services\Strategy;
 
 use App\Models\Asset;
 use App\Models\BrokerAccumulationWindow;
-use App\Models\Metric;
-use App\Models\Price;
 use App\Models\WatchlistScore;
+use App\Services\Analysis\AssetTechnicalSnapshotService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Orchestrates the per-symbol scoring pipeline:
- *   - Pull broker accumulation windows + features_daily + metrics + latest bar
+ *   - Pull broker accumulation windows + features_daily + an as-of technical
+ *     snapshot
  *   - Apply BAS / BCS / liquidity / risk-reward scoring
  *   - Persist to watchlist_scores (idempotent on (scan_date, symbol, version))
  *   - Return the ranked list with explainable rationale
  *
  * Pure-PHP scoring lives in StrategyScoringService and RiskCalculator.
  * This class is responsible for IO + composition only.
+ *
+ * The technical inputs -- ATR14, the 55-week high, the swing low, the close --
+ * come from AssetTechnicalSnapshotService built for the scan date. They used to
+ * be read out of the `metrics` table, which holds exactly one row per asset
+ * describing the *latest* session whatever date was being scored. Scoring
+ * 2026-04-01 therefore stopped it against today's ATR and today's 55-week high:
+ * information that did not exist on the day, quietly flattering every backfill
+ * and every backtest built on the result. `metrics` remains a cache of the
+ * latest snapshot and is never consulted here.
+ *
+ * Every evaluated asset is persisted. `top` bounds what the caller is handed
+ * back for display, not what research can later measure -- keeping only the
+ * best thirty rows made every historical statistic a statement about an
+ * already-selected population while reading like one about the universe.
  */
 class WatchlistRanker
 {
@@ -36,6 +50,7 @@ class WatchlistRanker
         private readonly StrategyScoringService $scoring,
         private readonly RiskCalculator $risk,
         private readonly BrokerWindowResolver $windows,
+        private readonly AssetTechnicalSnapshotService $snapshots,
     ) {}
 
     /**
@@ -81,18 +96,19 @@ class WatchlistRanker
 
         $windowsByAsset = $this->loadAccumulationWindows($assetIds, $scanDate, $windows);
         $featuresBySymbol = $this->loadFeatures($assetMap, $scanDate);
-        $metricsByAsset = Metric::query()->whereIn('asset_id', $assetIds)->get()->keyBy('asset_id');
-        $latestBarByAsset = $this->loadLatestBar($assetIds, $scanDate);
-        $swingLowByAsset = $this->loadSwingLows($assetIds, $scanDate);
+
+        // One batched pass, bounded per asset, computed strictly from bars at
+        // or before the scan date.
+        $snapshotByAsset = $this->snapshots->snapshotsForAssetsAsOf($assetMap, $scanDate);
+        $structuralRanks = $this->snapshots->structuralRanks($snapshotByAsset);
 
         $rows = [];
         foreach ($assetMap as $assetId => $asset) {
             $features = $featuresBySymbol[$asset->symbol] ?? null;
-            $metric = $metricsByAsset->get($assetId);
-            $bar = $latestBarByAsset[$assetId] ?? null;
+            $snapshot = $snapshotByAsset[$assetId] ?? null;
             $accWindows = $windowsByAsset[$assetId] ?? [];
 
-            if ($bar === null || $features === null) {
+            if ($snapshot === null || $features === null) {
                 continue;
             }
 
@@ -111,15 +127,11 @@ class WatchlistRanker
 
             $liquidity = $this->scoring->liquidityFilter($turnoverValue, $brokerCount, $minTurnover, $minBrokers);
 
-            $atr14 = $metric?->atr14 !== null ? (float) $metric->atr14 : null;
-            $high55 = $metric?->high55 !== null ? (float) $metric->high55 : null;
-            $swingLow = $swingLowByAsset[$assetId] ?? null;
-
             $riskBundle = $this->risk->compute(
-                close: (float) $bar->close,
-                atr14: $atr14,
-                swingLow: $swingLow,
-                high55: $high55,
+                close: $snapshot->close,
+                atr14: $snapshot->atr14,
+                swingLow: $snapshot->swingLow20,
+                high55: $snapshot->high55w,
             );
             $rrf = $this->scoring->riskRewardFilter($riskBundle['risk_reward'], $minRR);
             $totalBundle = $this->scoring->total($bas['score'], $bcs['score'], $liquidity['pass'], $rrf['pass']);
@@ -138,7 +150,7 @@ class WatchlistRanker
                 'symbol' => $asset->symbol,
                 'scan_date' => $scanDate->toDateString(),
                 'version' => $version,
-                'close' => (float) $bar->close,
+                'close' => $snapshot->close,
                 'net_value' => isset($accWindows[0]) ? (float) ($accWindows[0]['avg_net_norm'] ?? 0) * $turnoverValue : 0.0,
                 'vol_ratio_20' => (float) ($features->vol_ratio_20 ?? 0),
                 'breakout20' => (bool) $features->breakout20,
@@ -153,22 +165,27 @@ class WatchlistRanker
                 'top_brokers' => $topBrokers,
                 'reasons' => array_values($reasons),
                 'risk_notes' => $riskBundle['risk_notes'],
+                'snapshot' => $snapshot,
+                'structural_rank' => $structuralRanks[$asset->symbol] ?? null,
             ];
         }
 
         usort($rows, static function (array $a, array $b): int {
-            return $b['score_total'] <=> $a['score_total'];
+            $result = $b['score_total'] <=> $a['score_total'];
+
+            return $result === 0 ? ($a['symbol'] <=> $b['symbol']) : $result;
         });
 
-        $rows = array_slice($rows, 0, $top);
+        // Everything evaluated is persisted; only the caller's view is capped.
         $persisted = $this->persist($rows, $version);
 
         return [
             'scan_date' => $scanDate->toDateString(),
             'version' => $version,
             'evaluated' => count($assetMap),
+            'scored' => count($rows),
             'persisted' => $persisted,
-            'rows' => $rows,
+            'rows' => array_slice($rows, 0, $top),
         ];
     }
 
@@ -274,56 +291,6 @@ class WatchlistRanker
     }
 
     /**
-     * @param  array<int, int>  $assetIds
-     * @return array<int, object> asset_id => latest bar (close, date)
-     */
-    private function loadLatestBar(array $assetIds, Carbon $scanDate): array
-    {
-        $rows = Price::query()
-            ->whereIn('asset_id', $assetIds)
-            ->whereDate('date', '<=', $scanDate->toDateString())
-            ->orderByDesc('date')
-            ->get(['asset_id', 'date', 'close', 'high', 'low']);
-
-        $out = [];
-        foreach ($rows as $row) {
-            $assetId = (int) $row->asset_id;
-            if (! isset($out[$assetId])) {
-                $out[$assetId] = $row;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
-     * @param  array<int, int>  $assetIds
-     * @return array<int, float> asset_id => 20-day swing low
-     */
-    private function loadSwingLows(array $assetIds, Carbon $scanDate): array
-    {
-        $start = $scanDate->copy()->subDays(20)->toDateString();
-        $rows = DB::table('price_bars')
-            ->whereIn('asset_id', $assetIds)
-            ->whereDate('date', '>=', $start)
-            ->whereDate('date', '<=', $scanDate->toDateString())
-            ->select('asset_id')
-            ->selectRaw('MIN(low) as swing_low')
-            ->groupBy('asset_id')
-            ->get();
-
-        $out = [];
-        foreach ($rows as $row) {
-            $low = $row->swing_low;
-            if ($low !== null) {
-                $out[(int) $row->asset_id] = (float) $low;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
      * @return array<int, array{broker: string, net_value: float}>
      */
     private function topBrokersForAsset(int $assetId, Carbon $scanDate): array
@@ -363,6 +330,11 @@ class WatchlistRanker
     {
         $count = 0;
         foreach ($rows as $row) {
+            // Carried on the row for the caller, not stored: the snapshot is
+            // an object, and structural rank is a property of the universe
+            // being ranked rather than of this score.
+            unset($row['snapshot'], $row['structural_rank']);
+
             $row['version'] = $version;
             // Eloquent's `array` cast encodes for us; passing arrays here
             // avoids double-encoding the JSON columns.

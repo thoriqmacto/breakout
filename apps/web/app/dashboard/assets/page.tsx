@@ -105,7 +105,10 @@ const classNames = (
 const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
   {
     key: "rank",
-    label: "Rank",
+    // "Rank" alone invited the reading this page cannot support: how strong a
+    // stock is structurally says nothing about whether its current setup is
+    // actionable. That second question lives on the Execution workspace.
+    label: "Structural Rank",
     align: "left",
     headerStickyClassName: "sticky left-0 z-10 bg-muted/60",
     cellStickyClassName: "sticky left-0 z-10 bg-background",
@@ -822,11 +825,25 @@ export default function AssetsMetricsPage() {
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Asset Metrics</h1>
         <p className="text-sm text-muted-foreground">
-          Review ticker rankings sourced from the <code className="rounded bg-muted px-1 py-0.5">asset:metrics --all</code> command without
-          leaving the dashboard.
+          Structural strength for every ticker — trend, momentum, and where price sits against its
+          own 20- and 55-week highs. The same figures the{" "}
+          <code className="rounded bg-muted px-1 py-0.5">asset:metrics</code> command prints, from
+          the same calculation.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          This answers <em>which stocks are structurally strong</em>. For{" "}
+          <em>which setups may be actionable next session</em> — with an entry trigger, a stop, a
+          target and the risk/reward measured at the price you would actually pay — use{" "}
+          <Link href="/dashboard/execution" className="font-medium underline">
+            Execution
+          </Link>
+          .
         </p>
         <div className="flex flex-wrap items-center gap-2 pt-2">
           <AddAssetButton />
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link href="/dashboard/execution">Open Execution</Link>
+          </Button>
           <Button asChild variant="outline" size="sm" className="gap-2">
             <Link href="/dashboard/assets/settings">Asset Setting</Link>
           </Button>

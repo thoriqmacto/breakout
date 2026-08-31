@@ -242,10 +242,24 @@ class StockbitSnapshotImportTest extends TestCase
 
         $this->assertEqualsWithDelta(5_989_968.15, (float) $cash['broker_cash'], 0.01);
         $this->assertEqualsWithDelta(18_745.0, (float) $cash['cash_movements_total'], 0.01);
-        // Base must be the broker figure MINUS what the movements already add,
-        // so the calculated total lands exactly on the broker's number.
-        $this->assertEqualsWithDelta(5_971_223.15, (float) $cash['proposed_base_cash'], 0.01);
+
+        // The imported BUYs settle out of cash now, so the broker's figure
+        // already reflects them too.
+        $this->assertEqualsWithDelta(-19_128_650.0, (float) $cash['trade_cash_flow_total'], 0.01);
+
+        // Base must be the broker figure minus BOTH other terms, so the
+        // calculated total lands exactly on the broker's number. Subtracting
+        // only the movements, as this did while cash was base + movements,
+        // would count every imported trade twice.
+        $this->assertEqualsWithDelta(25_099_873.15, (float) $cash['proposed_base_cash'], 0.01);
         $this->assertFalse($cash['already_reconciled']);
+
+        // The proposal reproduces the broker's cash by construction.
+        $this->assertEqualsWithDelta(
+            (float) $cash['broker_cash'],
+            (float) $cash['proposed_base_cash'] + (float) $cash['cash_movements_total'] + (float) $cash['trade_cash_flow_total'],
+            0.01,
+        );
     }
 
     public function test_cash_is_untouched_unless_reconciliation_is_confirmed(): void
@@ -274,9 +288,10 @@ class StockbitSnapshotImportTest extends TestCase
 
         $this->commit($this->snapshot(), ['reconcile_cash' => true])->assertOk();
 
-        $this->assertEqualsWithDelta(5_971_223.15, (float) $this->portfolio->fresh()->cash_balance, 0.01);
+        $this->assertEqualsWithDelta(25_099_873.15, (float) $this->portfolio->fresh()->cash_balance, 0.01);
 
-        // What the user actually sees: base + movements == the broker's cash.
+        // What the user actually sees, and the only assertion that really
+        // matters: base + movements + trade settlements == the broker's cash.
         $summary = $this->getJson("/api/v1/portfolios/{$this->portfolio->id}/summary")->assertOk();
         $this->assertEqualsWithDelta(5_989_968.15, (float) $summary->json('data.cash_balance'), 0.01);
     }

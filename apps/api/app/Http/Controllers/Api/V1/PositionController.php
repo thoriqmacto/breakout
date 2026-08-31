@@ -7,6 +7,7 @@ use App\Http\Resources\PositionResource;
 use App\Models\Portfolio;
 use App\Models\Position;
 use App\Services\Portfolio\PositionPricing;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -43,6 +44,12 @@ class PositionController extends ApiController
 
         $payload = $this->preparePayload($validator->validated(), $portfolio);
 
+        $oversell = $this->oversellError($portfolio, $payload);
+
+        if ($oversell !== null) {
+            return $oversell;
+        }
+
         $position = $portfolio->positions()->create($payload);
 
         return ApiResponse::success(new PositionResource($position->load('asset')), 'Position created', 201);
@@ -70,6 +77,12 @@ class PositionController extends ApiController
         }
 
         $payload = $this->preparePayload($validator->validated(), $portfolio, $position);
+
+        $oversell = $this->oversellError($portfolio, $payload, $position);
+
+        if ($oversell !== null) {
+            return $oversell;
+        }
 
         $position->update($payload);
 
@@ -156,5 +169,70 @@ class PositionController extends ApiController
             'avg_price' => $pricing['avg_price'],
             'executed_at' => $input['executed_at'] ?? $position?->executed_at?->toDateTimeString(),
         ];
+    }
+
+    /**
+     * Refuse a manual exit larger than the holding it claims to close.
+     *
+     * The calculator matches an exit against the running quantity with
+     * `min(exit_qty, holding_qty)`, which keeps a bad row from producing a
+     * negative position -- but silently. The surplus shares simply vanish from
+     * the realized P/L, and the ledger goes on looking healthy while it no
+     * longer describes anything that happened. Refusing the write is the only
+     * way the person entering it finds out.
+     *
+     * This is a long-only portfolio: short selling is not modelled anywhere in
+     * the ledger, so an exit beyond the holding is a data-entry error rather
+     * than a position. Imported broker history is left alone -- it is a record
+     * of real executions and is reconciled through the importer's opening
+     * positions, not by rejecting it here.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    private function oversellError(Portfolio $portfolio, array $payload, ?Position $existing = null): ?JsonResponse
+    {
+        if (($payload['side'] ?? null) !== 'exit') {
+            return null;
+        }
+
+        // Only rows a person is entering by hand. A Stockbit row that arrives
+        // without its opening BUY is surfaced by the importer's reconciliation.
+        if (($payload['source'] ?? $existing?->source) !== null) {
+            return null;
+        }
+
+        $assetId = (int) ($payload['asset_id'] ?? $existing?->asset_id);
+        $executedAt = $payload['executed_at'] ?? $existing?->executed_at;
+
+        if ($assetId === 0 || $executedAt === null) {
+            return null;
+        }
+
+        $held = $portfolio->positions()
+            ->where('asset_id', $assetId)
+            ->where('executed_at', '<=', $executedAt)
+            ->when($existing !== null, fn ($query) => $query->where('id', '!=', $existing->id))
+            ->get(['side', 'qty_shares'])
+            ->reduce(static function (float $carry, Position $row): float {
+                return $row->side === 'entry'
+                    ? $carry + (float) $row->qty_shares
+                    : $carry - (float) $row->qty_shares;
+            }, 0.0);
+
+        $requested = (float) ($payload['qty_shares'] ?? 0.0);
+
+        // A hair of tolerance for fractional rounding, not for a real surplus.
+        if ($requested <= $held + 0.0001) {
+            return null;
+        }
+
+        return ApiResponse::error('Validation failed', 422, [
+            'qty_shares' => [sprintf(
+                'Cannot exit %s shares: only %s are held on %s. This portfolio is long-only.',
+                rtrim(rtrim(number_format($requested, 4, '.', ''), '0'), '.'),
+                rtrim(rtrim(number_format(max(0.0, $held), 4, '.', ''), '0'), '.'),
+                $executedAt instanceof \DateTimeInterface ? $executedAt->format('Y-m-d') : (string) $executedAt,
+            )],
+        ]);
     }
 }

@@ -101,9 +101,14 @@ class PortfolioApiTest extends TestCase
         $response->assertOk();
         $data = $response->json('data');
         $this->assertSame((int) $portfolio->id, $data['portfolio_id']);
-        $this->assertEquals(1_050_000.0, $data['cash_balance']);
+        // Buying 100 @ 10,000 settled 1,000,000 out of the cash account:
+        // 1,000,000 base + 50,000 dividend - 1,000,000 trade = 50,000.
+        $this->assertEquals(50_000.0, $data['cash_balance']);
+        $this->assertEquals(1_000_000.0, $data['base_cash_balance']);
+        $this->assertEquals(50_000.0, $data['non_trade_cash_flow']);
+        $this->assertEquals(-1_000_000.0, $data['trade_cash_flow']);
         $this->assertEquals(1_100_000.0, $data['total_market_value']);
-        $this->assertEquals(2_150_000.0, $data['total_equity']);
+        $this->assertEquals(1_150_000.0, $data['total_equity']);
         $this->assertEquals(100_000.0, $data['unrealized_pl']);
         $this->assertCount(1, $data['holdings']);
         $this->assertSame('BBCA', $data['holdings'][0]['symbol']);

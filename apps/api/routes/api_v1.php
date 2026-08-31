@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
+use App\Http\Controllers\Api\V1\ExecutionCandidateController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PortfolioImportController;
 use App\Http\Controllers\Api\V1\PositionController;
@@ -133,7 +134,16 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::apiResource('scheduled-tasks', ScheduledTaskController::class)
         ->whereNumber('scheduled_task');
 
-    // Strategy watchlist (read-only; produced by strategy:rank-watchlist)
+    // The execution workspace's single composed endpoint. Structural
+    // technicals, watchlist scores, features, broker windows and (optionally)
+    // portfolio holdings are assembled server-side so the page makes one
+    // request rather than one per row.
+    Route::get('execution/candidates', [ExecutionCandidateController::class, 'index'])
+        ->name('execution.candidates');
+
+    // Strategy watchlist (read-only; produced by strategy:rank-watchlist).
+    // Superseded by execution/candidates, which serves the same underlying
+    // scores with the plan and status attached; kept for existing consumers.
     Route::get('strategy/watchlist', [StrategyWatchlistController::class, 'index'])
         ->name('strategy.watchlist.index');
 
