@@ -8,7 +8,6 @@ import {
   Boxes,
   CalendarDays,
   HandCoins,
-  FileText,
   LayoutDashboard,
   LineChart,
   PanelLeft,
@@ -83,12 +82,6 @@ const navigation: NavigationItem[] = [
     label: "Backup Status",
     href: "/dashboard/backups",
     icon: DatabaseBackup,
-  },
-  {
-    label: "Reports",
-    href: "/dashboard/reports",
-    icon: FileText,
-    disabled: true,
   },
   {
     label: "Automation",

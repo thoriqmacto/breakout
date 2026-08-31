@@ -34,7 +34,8 @@ class TradingCalendarBuilder
         }
 
         $tradingDates = $this->tradingDay->newQuery()
-            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->whereDate('date', '>=', $startDate->toDateString())
+            ->whereDate('date', '<=', $endDate->toDateString())
             ->pluck('date')
             ->map(static fn ($date) => Carbon::parse($date)->toDateString())
             ->all();

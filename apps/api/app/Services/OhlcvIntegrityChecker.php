@@ -162,7 +162,8 @@ class OhlcvIntegrityChecker
         $rows = DB::table('price_bars')
             ->selectRaw('date, COUNT(*) as total')
             ->where('asset_id', $asset->id)
-            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->whereDate('date', '>=', $start->toDateString())
+            ->whereDate('date', '<=', $end->toDateString())
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -184,7 +185,8 @@ class OhlcvIntegrityChecker
     private function loadTradingDays(Carbon $start, Carbon $end): array
     {
         return $this->tradingDay->newQuery()
-            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->whereDate('date', '>=', $start->toDateString())
+            ->whereDate('date', '<=', $end->toDateString())
             ->orderBy('date')
             ->pluck('date')
             ->map(static fn ($date): string => Carbon::parse($date)->toDateString())
