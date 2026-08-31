@@ -16,6 +16,7 @@ import {
   Briefcase,
   DatabaseBackup,
   SlidersHorizontal,
+  Target,
   Terminal,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
@@ -57,6 +58,11 @@ const navigation: NavigationItem[] = [
     label: "Broker Summary",
     href: "/dashboard/broker-summary",
     icon: HandCoins,
+  },
+  {
+    label: "Execution",
+    href: "/dashboard/execution",
+    icon: Target,
   },
   {
     label: "Watchlist",

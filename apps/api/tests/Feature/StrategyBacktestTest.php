@@ -101,12 +101,16 @@ class StrategyBacktestTest extends TestCase
 
     public function test_filter_combos_split_observations(): void
     {
-        $this->seedTradingDays(['2026-04-01', '2026-04-02', '2026-04-03']);
+        // Four sessions, because entry is T+1: a signal on the second-to-last
+        // session fills on the last one and then has no session left to exit
+        // into.
+        $this->seedTradingDays(['2026-04-01', '2026-04-02', '2026-04-03', '2026-04-06']);
         $asset = Asset::create(['symbol' => 'AAA', 'name' => 'AAA']);
         $this->seedBars($asset->id, [
             ['date' => '2026-04-01', 'close' => 1000],
             ['date' => '2026-04-02', 'close' => 1010],
             ['date' => '2026-04-03', 'close' => 1100],
+            ['date' => '2026-04-06', 'close' => 1150],
         ]);
 
         $this->seedScore($asset->id, 'AAA', '2026-04-01', score: 60, lf: true, rrf: true);
@@ -114,7 +118,7 @@ class StrategyBacktestTest extends TestCase
 
         $report = app(WatchlistBacktester::class)->backtest(
             Carbon::parse('2026-04-01'),
-            Carbon::parse('2026-04-03'),
+            Carbon::parse('2026-04-06'),
             'v1',
             [1],
             0.035

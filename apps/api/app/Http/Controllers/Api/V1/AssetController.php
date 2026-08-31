@@ -7,12 +7,11 @@ use App\Http\Resources\AssetResource;
 use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
 use App\Models\Asset;
-use App\Models\BandarDetectorSummary;
 use App\Models\Metric;
+use App\Services\Analysis\AssetMetricProjector;
 use App\Services\AssetMetrics;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AssetController extends ApiController
@@ -37,10 +36,20 @@ class AssetController extends ApiController
         return ApiResponse::success(AssetResource::collection($query->get()));
     }
 
+    /**
+     * The cached structural metrics table, in canonical structural rank order.
+     *
+     * The ordering below is the SQL form of
+     * AssetTechnicalSnapshot::structuralSortKey(). It used to rank on PBAS in
+     * the second position where the CLI ranked on ROC13, so the same asset
+     * carried two different "Rank" values depending on which surface you
+     * opened. PBAS is a broker-accumulation signal and is scored in the
+     * execution pipeline; it has no place in a structural ordering.
+     */
     public function metricsIndex()
     {
         $metrics = Metric::orderByDesc('sort_uptrend')
-            ->orderByDesc('pbas')
+            ->orderByDesc('sort_roc13')
             ->orderByDesc('sort_close_vs_high55')
             ->orderByDesc('sort_close_vs_high20')
             ->orderByDesc('sort_vol_vs_avg20')
@@ -51,7 +60,10 @@ class AssetController extends ApiController
 
         foreach ($metrics as $index => $metric) {
             $rankedRows[] = [
+                // Kept as `rank` for existing consumers; `structural_rank` is
+                // the name the new surfaces use for the same number.
                 'rank' => $index + 1,
+                'structural_rank' => $index + 1,
                 'asset_id' => $metric->asset_id,
                 'symbol' => $metric->symbol,
                 'name' => $metric->name,
@@ -145,104 +157,34 @@ class AssetController extends ApiController
         );
     }
 
-    public function updateMetrics()
+    /**
+     * Recalculate the structural metrics cache.
+     *
+     * A thin caller: every figure and the ordering come from
+     * AssetMetricProjector, the same path `php artisan asset:metrics --persist`
+     * takes. This method used to carry its own copy of the moving-average,
+     * high, ATR, ROC and volume-ratio formulas, which had already drifted from
+     * the command's copy.
+     */
+    public function updateMetrics(AssetMetricProjector $projector)
     {
-        $updates = 0;
+        $updated = 0;
+        $removed = 0;
 
-        Asset::with(['prices' => function ($query) {
-            $query->orderBy('date');
-        }])->chunkById(50, function ($assets) use (&$updates) {
-            foreach ($assets as $asset) {
-                $prices = $asset->prices;
+        Asset::query()->orderBy('id')->chunkById(200, function ($assets) use ($projector, &$updated, &$removed) {
+            $rows = $projector->project($assets);
 
-                if ($prices->isEmpty()) {
-                    Metric::where('asset_id', $asset->id)->delete();
-
-                    continue;
-                }
-
-                $bars = AssetMetrics::buildDailyBars($prices);
-
-                if ($bars === []) {
-                    Metric::where('asset_id', $asset->id)->delete();
-
-                    continue;
-                }
-
-                $metrics = new AssetMetrics($bars);
-
-                $close = round($metrics->lastClose(), 2);
-                $ma50 = round($metrics->movingAverage(50), 0);
-                $ma100 = round($metrics->movingAverage(100), 0);
-                $high20 = round($metrics->periodHigh(20), 0);
-                $high55 = round($metrics->periodHigh(55), 0);
-                $atr14 = round($metrics->atr(14), 0);
-
-                $roc13 = null;
-                $rocLookback = 13 * 5;
-                if ($metrics->barCount() > $rocLookback) {
-                    $roc13 = round($metrics->rocWeeks(13), 2);
-                }
-
-                $avgVol20 = round($metrics->averageVolume(20), 0);
-                $lastVolume = round($metrics->lastVolume(), 0);
-                $volVsAvg20 = $avgVol20 > 0 ? round($lastVolume / $avgVol20, 2) : null;
-
-                $closeVsHigh20 = $high20 > 0 ? round($close / $high20, 2) : null;
-                $closeVsHigh55 = $high55 > 0 ? round($close / $high55, 2) : null;
-                $pbas = DB::table('features_daily')
-                    ->where('symbol', $asset->symbol)
-                    ->orderByDesc('date')
-                    ->value('pbas');
-                $pbas = $pbas === null ? null : (int) $pbas;
-                $latestDate = $prices->last()?->date;
-                $bavg = null;
-                if ($latestDate) {
-                    $bavg = BandarDetectorSummary::query()
-                        ->where('asset_id', $asset->id)
-                        ->whereNotNull('average_price')
-                        ->whereDate('from_date', '<=', $latestDate->toDateString())
-                        ->whereDate('to_date', '>=', $latestDate->toDateString())
-                        ->orderByDesc('from_date')
-                        ->value('average_price');
-                    $bavg = $bavg === null ? null : (float) $bavg;
-                }
-
-                Metric::updateOrCreate(
-                    ['asset_id' => $asset->id],
-                    [
-                        'symbol' => $asset->symbol,
-                        'name' => $asset->name,
-                        'close' => $close,
-                        'ma50' => $ma50,
-                        'ma100' => $ma100,
-                        'high20' => $high20,
-                        'high55' => $high55,
-                        'atr14' => $atr14,
-                        'roc13' => $roc13 === null ? null : (float) $roc13,
-                        'avg_vol20' => $avgVol20,
-                        'vol_vs_avg20' => $volVsAvg20,
-                        'close_vs_high20' => $closeVsHigh20,
-                        'close_vs_high55' => $closeVsHigh55,
-                        'uptrend' => $metrics->isUptrend(),
-                        'bars' => $metrics->barCount(),
-                        'pbas' => $pbas,
-                        'bavg' => $bavg,
-                        'sort_uptrend' => $metrics->isUptrend() ? 1 : 0,
-                        'sort_roc13' => (float) ($roc13 ?? 0.0),
-                        'sort_close_vs_high55' => (float) ($closeVsHigh55 ?? 0.0),
-                        'sort_close_vs_high20' => (float) ($closeVsHigh20 ?? 0.0),
-                        'sort_vol_vs_avg20' => (float) ($volVsAvg20 ?? 0.0),
-                    ]
-                );
-
-                $updates++;
-            }
+            $updated += $projector->persist($rows);
+            $removed += $projector->forgetMissing(
+                $assets->map(static fn (Asset $asset): int => (int) $asset->id)->all(),
+                $rows,
+            );
         });
 
         return ApiResponse::success(
             [
-                'updated' => $updates,
+                'updated' => $updated,
+                'removed' => $removed,
             ],
             'Metrics recalculated successfully'
         );

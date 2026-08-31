@@ -188,7 +188,15 @@ class StockbitImportTest extends TestCase
         $this->assertSame(CashMovement::KIND_DIVIDEND, $movement->kind);
         $this->assertSame(18_745.0, (float) $movement->amount);
         $this->assertSame('BRPT cash dividend — Rp1.63/share', $movement->note);
-        $this->assertSame(18_745.0, $summary['cash_balance']);
+
+        // The dividend is still the only non-trade movement, but cash now also
+        // carries what the two imported BUYs actually cost to settle. A fresh
+        // portfolio therefore goes negative on import until its opening cash is
+        // reconciled against the broker -- which is the honest state, and what
+        // the reconciliation step exists to fix.
+        $this->assertSame(18_745.0, $summary['non_trade_cash_flow']);
+        $this->assertEqualsWithDelta(-19_128_650.0, $summary['trade_cash_flow'], 0.01);
+        $this->assertEqualsWithDelta(-19_109_905.0, $summary['cash_balance'], 0.01);
     }
 
     public function test_a_full_round_trip_realizes_profit_net_of_both_fees(): void

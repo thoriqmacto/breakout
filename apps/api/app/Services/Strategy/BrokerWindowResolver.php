@@ -86,6 +86,54 @@ class BrokerWindowResolver
     }
 
     /**
+     * asOf() for many assets in one query.
+     *
+     * The per-asset form is one query each, which is fine for a single symbol
+     * and is four hundred round trips when the execution workspace builds a
+     * page. Same selection rule, applied in PHP over one result set.
+     *
+     * @param  array<int, int>  $assetIds
+     * @return array<int, BrokerSummaryWindow> keyed by asset id
+     */
+    public function asOfMany(array $assetIds, Carbon $date, ?string $transactionType = null): array
+    {
+        if ($assetIds === []) {
+            return [];
+        }
+
+        $query = BrokerSummaryWindow::query()
+            ->with(['entries', 'bandarDetectorSummary'])
+            ->whereIn('asset_id', $assetIds)
+            ->whereDate('to_date', '<=', $date->toDateString());
+
+        $staleness = $this->maxStalenessDays();
+
+        if ($staleness !== null) {
+            $query->whereDate('to_date', '>=', $date->copy()->subDays($staleness)->toDateString());
+        }
+
+        $this->constrainType($query, $transactionType);
+
+        $best = [];
+
+        foreach ($query->get() as $window) {
+            $assetId = (int) $window->asset_id;
+            $incumbent = $best[$assetId] ?? null;
+
+            // Latest end first, then the narrower range -- so a single-day
+            // summary still beats a three-month one that ended the same day.
+            if ($incumbent === null
+                || [$window->to_date->getTimestamp(), -$window->spanDays()]
+                    > [$incumbent->to_date->getTimestamp(), -$incumbent->spanDays()]
+            ) {
+                $best[$assetId] = $window;
+            }
+        }
+
+        return $best;
+    }
+
+    /**
      * Non-overlapping windows lying entirely inside [$start, $end].
      *
      * Contained rather than merely overlapping: a window that runs past $end

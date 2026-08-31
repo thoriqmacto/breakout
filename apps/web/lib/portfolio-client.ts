@@ -272,10 +272,28 @@ export type AllocationRow = {
   pct: number | null
 }
 
+export type PortfolioCashBreakdown = {
+  base_cash: number
+  trade_settlement: number
+  deposit: number
+  withdraw: number
+  fee: number
+  dividend: number
+  adjustment: number
+}
+
 export type PortfolioSummaryPayload = {
   portfolio_id: number
   base_ccy: string
+  /** What the portfolio opened with, before any of its trades. */
+  base_cash_balance: number
+  /** Deposits, withdrawals, dividends, standalone fees, adjustments. */
+  non_trade_cash_flow: number
+  /** -(qty*price + fee) per entry, +(qty*price - fee) per exit. */
+  trade_cash_flow: number
+  /** base + non-trade + trade. What is actually spendable. */
   cash_balance: number
+  cash_breakdown: PortfolioCashBreakdown
   total_market_value: number
   total_equity: number
   realized_pl: number

@@ -105,7 +105,7 @@ export function PortfolioSummaryCard({ accessToken, portfolioId, revision = 0 }:
         {summary ? (
           <>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-              <Stat label="Cash" value={formatIdr(summary.cash_balance)} />
+              <Stat label="Available cash" value={formatIdr(summary.cash_balance)} />
               <Stat label="Market value" value={formatIdr(summary.total_market_value)} />
               <Stat
                 label="Total equity"
@@ -123,6 +123,30 @@ export function PortfolioSummaryCard({ accessToken, portfolioId, revision = 0 }:
                 tone={summary.unrealized_pl}
               />
             </div>
+
+            <details className="rounded border bg-muted/20 px-3 py-2">
+              <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
+                How available cash is calculated
+              </summary>
+              <div className="mt-3 space-y-1 text-sm">
+                <CashLine label="Base cash (opening)" value={summary.base_cash_balance} />
+                <CashLine label="Deposits" value={summary.cash_breakdown.deposit} />
+                <CashLine label="Withdrawals" value={summary.cash_breakdown.withdraw} />
+                <CashLine label="Dividends" value={summary.cash_breakdown.dividend} />
+                <CashLine label="Standalone fees" value={summary.cash_breakdown.fee} />
+                <CashLine label="Adjustments" value={summary.cash_breakdown.adjustment} />
+                <CashLine label="Trade settlement" value={summary.trade_cash_flow} />
+                <div className="mt-2 flex items-center justify-between border-t pt-2 font-semibold">
+                  <span>Available cash</span>
+                  <span>{formatIdr(summary.cash_balance)}</span>
+                </div>
+                <p className="pt-2 text-xs text-muted-foreground">
+                  Buying settles cash out; selling settles it back in, less the fee. Realized P/L is
+                  reported separately and is never added to cash a second time — an exit&apos;s
+                  proceeds already contain it.
+                </p>
+              </div>
+            </details>
 
             <section>
               <h3 className="mb-2 text-sm font-medium text-muted-foreground">Holdings</h3>
@@ -206,6 +230,15 @@ type StatProps = {
   value: string
   emphasize?: boolean
   tone?: number
+}
+
+function CashLine({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={value < 0 ? "text-rose-600" : undefined}>{formatIdr(value)}</span>
+    </div>
+  )
 }
 
 function Stat({ label, value, emphasize, tone }: StatProps) {

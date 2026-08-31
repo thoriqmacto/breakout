@@ -92,4 +92,45 @@ class PositionPricing
             ? $gross - $feeValue
             : $gross + $feeValue;
     }
+
+    /**
+     * The same settlement, signed for a cash ledger.
+     *
+     *     entry  -(qty * price + fee)     buying costs money
+     *     exit   +(qty * price - fee)     selling returns money, less the fee
+     *
+     * This is the only place trade cash flow is expressed. The calculator sums
+     * it over the positions ledger and the Stockbit importer subtracts it when
+     * reconciling against a broker's reported balance; if the two derived it
+     * separately they would drift the moment either changed, and a portfolio's
+     * displayed cash would depend on which code path last touched it.
+     *
+     * Realized P/L is deliberately absent. An exit's proceeds already contain
+     * the gain or loss -- adding realized P/L to cash as well would count it
+     * twice.
+     */
+    public function signedCashFlow(string $side, float $qty, float $price, float $feeValue): float
+    {
+        $net = $this->netAmount($side, $qty, $price, $feeValue);
+
+        return strtolower($side) === self::SIDE_EXIT ? $net : -$net;
+    }
+
+    /**
+     * Signed settlement for one stored ledger row.
+     *
+     * Reads fee_value as the authority, which is what the row holds: the
+     * manual form derives it from a rate at write time and a broker import
+     * stores the exact money charged, so by the time a row exists the fee is
+     * money either way.
+     */
+    public function signedCashFlowForPosition(object $position): float
+    {
+        return $this->signedCashFlow(
+            (string) $position->side,
+            (float) $position->qty_shares,
+            (float) $position->price,
+            (float) ($position->fee_value ?? 0.0),
+        );
+    }
 }

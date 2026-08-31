@@ -322,11 +322,17 @@ class FeatureExtractionService
             return null;
         }
 
+        // The next $days *sessions*, not the next $days calendar days. The
+        // calendar form reached Wednesday from a Friday and Saturday from a
+        // Monday, so it almost never found five bars and the label came back
+        // null for most of the week -- a weekend distortion masquerading as
+        // missing data. A price bar exists only for a session, so taking the
+        // next N bars is the trading-day horizon.
         $futureBars = Price::query()
             ->where('asset_id', $asset->id)
             ->whereDate('date', '>', $date->toDateString())
-            ->whereDate('date', '<=', $date->copy()->addDays($days)->toDateString())
             ->orderBy('date')
+            ->limit($days)
             ->get(['high']);
 
         if ($futureBars->count() < $days) {

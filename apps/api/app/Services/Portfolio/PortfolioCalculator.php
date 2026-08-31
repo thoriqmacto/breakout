@@ -10,21 +10,52 @@ use Illuminate\Support\Collection;
 /**
  * Pure-PHP calculator that turns a Portfolio's positions + cash movements
  * into an explainable summary: holdings (running average cost, market
- * value, unrealized P/L), realized P/L from matched exits, total equity,
- * and allocation breakdowns by symbol and sector.
+ * value, unrealized P/L), realized P/L from matched exits, available cash,
+ * total equity, and allocation breakdowns by symbol and sector.
+ *
+ * Available cash is three terms:
+ *
+ *     base cash                what the portfolio opened with
+ *   + non-trade movements      deposits, withdrawals, dividends, standalone
+ *                              fees, manual adjustments
+ *   + signed trade settlements -(qty*price + fee) per entry,
+ *                              +(qty*price - fee) per exit
+ *   = available cash
+ *
+ * The third term is the one that was missing. Cash was `base + movements`
+ * only, so selling a holding correctly reduced the position and booked a
+ * realized gain while the money never appeared -- and buying one never cost
+ * anything. Total equity was wrong by the whole traded amount in both
+ * directions.
+ *
+ * Trade settlement is *derived* from the positions ledger rather than mirrored
+ * into synthetic cash_movement rows. That makes editing or deleting a position
+ * self-correcting: there is no second copy to keep in step, and no way for the
+ * two to disagree. cash_movements keeps its own job -- money that moves for
+ * reasons other than a trade.
+ *
+ * Realized P/L is reported separately and is never added to cash. An exit's
+ * proceeds already contain the gain or loss; adding it again would count it
+ * twice.
  *
  * No DB writes happen here. Callers eager-load positions.asset.latestPriceRecord
  * and cashMovements before invoking compute().
  */
 class PortfolioCalculator
 {
+    public function __construct(private readonly PositionPricing $pricing) {}
+
     /**
      * Build the full summary payload for a portfolio.
      *
      * @return array{
      *   portfolio_id: int,
      *   base_ccy: string,
+     *   base_cash_balance: float,
+     *   non_trade_cash_flow: float,
+     *   trade_cash_flow: float,
      *   cash_balance: float,
+     *   cash_breakdown: array<string, float>,
      *   total_market_value: float,
      *   total_equity: float,
      *   realized_pl: float,
@@ -80,14 +111,19 @@ class PortfolioCalculator
         }
         unset($holding);
 
-        $cashBalance = $this->cashBalance($portfolio, $cashMovements);
+        $cash = $this->cash($portfolio, $positions, $cashMovements);
 
         return [
             'portfolio_id' => (int) $portfolio->id,
             'base_ccy' => (string) $portfolio->base_ccy,
-            'cash_balance' => $this->round2($cashBalance),
+            'base_cash_balance' => $this->round2($cash['base']),
+            'non_trade_cash_flow' => $this->round2($cash['non_trade']),
+            'trade_cash_flow' => $this->round2($cash['trade']),
+            'cash_balance' => $this->round2($cash['available']),
+            'cash_breakdown' => $cash['breakdown'],
             'total_market_value' => $this->round2($marketValue),
-            'total_equity' => $this->round2($cashBalance + $marketValue),
+            // The identity the whole ledger has to satisfy.
+            'total_equity' => $this->round2($cash['available'] + $marketValue),
             'realized_pl' => $this->round2($realizedPl),
             'unrealized_pl' => $this->round2($unrealizedPl),
             'holdings' => array_values(array_filter(
@@ -165,17 +201,44 @@ class PortfolioCalculator
     }
 
     /**
+     * The cash ledger, in the three terms the summary reports.
+     *
+     * @param  Collection<int, Position>  $positions
      * @param  Collection<int, CashMovement>  $cashMovements
+     * @return array{base: float, non_trade: float, trade: float, available: float, breakdown: array<string, float>}
      */
-    private function cashBalance(Portfolio $portfolio, Collection $cashMovements): float
+    private function cash(Portfolio $portfolio, Collection $positions, Collection $cashMovements): array
     {
-        $balance = (float) ($portfolio->cash_balance ?? 0.0);
+        $base = (float) ($portfolio->cash_balance ?? 0.0);
+
+        $nonTrade = 0.0;
+        $breakdown = array_fill_keys(CashMovement::KINDS, 0.0);
 
         foreach ($cashMovements as $movement) {
-            $balance += $movement->signedAmount();
+            $signed = $movement->signedAmount();
+            $nonTrade += $signed;
+            $breakdown[$movement->kind] = ($breakdown[$movement->kind] ?? 0.0) + $signed;
         }
 
-        return $balance;
+        // Derived from the positions themselves, so a corrected or deleted
+        // position corrects the cash with it and nothing needs synchronising.
+        $trade = 0.0;
+
+        foreach ($positions as $position) {
+            $trade += $this->pricing->signedCashFlowForPosition($position);
+        }
+
+        $breakdown = array_map(fn (float $value): float => $this->round2($value), $breakdown);
+        $breakdown['base_cash'] = $this->round2($base);
+        $breakdown['trade_settlement'] = $this->round2($trade);
+
+        return [
+            'base' => $base,
+            'non_trade' => $nonTrade,
+            'trade' => $trade,
+            'available' => $base + $nonTrade + $trade,
+            'breakdown' => $breakdown,
+        ];
     }
 
     /**

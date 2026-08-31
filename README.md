@@ -153,6 +153,238 @@ Below is a quick reference for the feature abbreviations emitted by `features:ex
 - `dd_5d` — reserved placeholder for drawdown (currently null).
 
 
+## Analysis: structure, execution, and the line between them
+
+Two different questions used to share one word.
+
+**Structural strength** — *which stocks are strong relative to the universe?* Trend, momentum, and
+where price sits against its own 20- and 55-week highs. Slow-moving, and it says nothing about
+timing. Surfaced on `/dashboard/assets`, `asset:metrics`, and `GET /v1/assets/metrics` as
+**structural rank**.
+
+**Execution readiness** — *which current setups may be actionable next session?* Broker
+accumulation, breakout confirmation, liquidity, and a risk/reward measured at the price you would
+actually pay. Surfaced on `/dashboard/execution` and `GET /v1/execution/candidates` as
+**execution rank**.
+
+A stock can be structurally excellent and not executable. That is the ordinary case, and it is why
+one number could never serve both.
+
+### One canonical calculation
+
+`AssetTechnicalSnapshotService` is the only place a technical metric is computed. Before it, the
+same formulas were written three times — in `AssetMetricsCommand`, in
+`AssetController::updateMetrics()`, and implicitly in whatever the ranker read out of `metrics` —
+and they had already drifted:
+
+| | Old CLI ranking | Old API ranking |
+| --- | --- | --- |
+| 1 | uptrend | uptrend |
+| 2 | **ROC13** | **PBAS** |
+| 3 | close vs 55wH | close vs 55wH |
+| 4 | close vs 20wH | close vs 20wH |
+| 5 | volume ratio | volume ratio |
+
+Both columns were headed "Rank". The canonical ordering is the CLI's:
+`uptrend → ROC13 → close/55wH → close/20wH → volume ratio`, defined once in
+`AssetTechnicalSnapshot::structuralSortKey()`. PBAS is a broker-accumulation signal and is scored in
+the execution pipeline; it has no place in a structural ordering.
+
+The CLI, the API, the scheduler and the watchlist ranker are all thin callers of that one service.
+
+### As-of, never latest
+
+Every snapshot is built only from bars dated on or before the date requested, so a snapshot for
+2026-04-01 is identical whether or not the database also holds April, May and June. Retrieval is
+bounded at 300 bars (the deepest formula, the 55-week high, needs 275), so an asset with fifteen
+years of history costs the same as a new listing.
+
+The `metrics` table remains what it always was — a cache of the *latest* snapshot, one row per
+asset, convenient for a list view. It is never historical truth. `WatchlistRanker` used to take
+ATR14 and the 55-week high from it regardless of the scan date, so backfilling March scored March's
+trades against September's volatility and September's highs. It now reads an as-of snapshot.
+
+## Execution workspace
+
+`/dashboard/execution` is the one page for deciding what may be actionable next session. It composes
+rather than recomputes: technicals from the snapshot service, scores from the watchlist pipeline
+that already produced them, the entry plan from `ExecutionPlanner`.
+
+### T → T+1
+
+A signal computed from session **T**'s completed bar does not exist until T has closed. It therefore
+cannot be executed at T's close — that price is gone by the time the signal exists.
+
+Every candidate carries `signal_date` and `next_trading_date`, and the second comes from
+`trading_days`, never from signal date + 1. A Friday signal is actionable on Monday; a signal before
+a holiday on the day after it.
+
+### The planned entry trigger
+
+Rather than "buy because rank is high", each candidate names a level the next session must actually
+reach:
+
+```
+reference = max(signal session high, highest high of the 20 sessions before it)
+trigger   = one IDX tick above that reference
+```
+
+Both terms are known at T, and taking the higher means the trigger is always above everything that
+traded during the signal session — so a fill there is a continuation, never a retrospective fill at
+a price the signal itself caused. The 20-session reference is the same one
+`FeatureExtractionService` uses for `breakout20`, so a planned trigger and a stored feature cannot
+disagree.
+
+**Risk/reward is then recomputed at the trigger, not at the close.** The stop does not move when the
+entry does, so a setup can clear 2.0 R measured from Friday's close and fail it measured from the
+price you would really pay on Monday. Both numbers are shown: `planned_risk_reward` and
+`signal_close_risk_reward`. Only the first can make a candidate READY.
+
+### Statuses
+
+Rule-based and stated in full, applied in this order. Every candidate carries the reasons that
+decided it.
+
+| Status | Rule |
+| --- | --- |
+| **AVOID** | Hard distribution (`bandar_dist_hard`), or not a valid long setup, or no measurable invalidation level. Checked first: knowing a setup is broken does not depend on it being fresh. |
+| **STALE** | The signal is not from the latest completed session, or the broker window ends more than `execution.freshness.max_broker_lag_days` before it. |
+| **READY** | Fresh, in uptrend, liquidity filter passes, risk/reward filter passes, score ≥ `execution.min_score`, **and** risk/reward at the planned trigger ≥ `execution.min_rr`. |
+| **WATCH** | Anything else. Worth following, at least one rule unmet, no entry plan attached. |
+
+### Thresholds are configuration, not findings
+
+`config/execution.php`:
+
+```php
+'min_score'         => 75.0,  // where the UI already drew its "strong" band
+'min_rr'            => 2.0,
+'max_entry_gap_pct' => null,  // disabled by default
+```
+
+75 is adopted because the interface already treated it as meaningful, **not** because it has been
+shown to provide lift. Backtesting is what should decide that, which is why it is a config value
+with an env override rather than a constant.
+
+`max_entry_gap_pct` is null on purpose: no gap threshold has been validated here, and inventing one
+would dress a guess as a finding. The risk/reward recomputation is the real protection — a gap that
+ruins the reward fails `min_rr` on its own.
+
+## Backtesting from T+1
+
+`strategy:backtest-watchlist` enters on the session **after** the signal. The previous version
+entered at the signal session's close, so every statistic it produced was measured from a price
+that was already unavailable when the signal was generated — an edge borrowed from the future,
+spread evenly across every bucket.
+
+Two fill models:
+
+```bash
+php artisan strategy:backtest-watchlist --entry=next_open          # fill at T+1's open
+php artisan strategy:backtest-watchlist --entry=breakout_trigger   # fill only if T+1 trades through
+php artisan strategy:backtest-watchlist --entry=breakout_trigger --max-gap-pct=0.05
+php artisan strategy:backtest-watchlist --min-rr=2.0 --horizons=5,10,20
+```
+
+- **`next_open`** — the simplest honest assumption, and the floor any other model has to beat.
+- **`breakout_trigger`** — if T+1 never touches the trigger there is no trade; if it opens *above*
+  the trigger the fill is the open, never the trigger, because you cannot buy below the session's
+  first print.
+
+A fill is not automatically a trade. The risk levels were fixed at T, so a gap moves the entry
+without moving the stop: every fill is re-measured at the price paid and rejected if the resulting
+risk/reward falls below the minimum. The report's **signal flow** table counts what happened to
+every signal — filled, never triggered, rejected on R/R at the fill, no next session, missing data —
+so a promising-looking hit rate over four surviving trades is visible as exactly that.
+
+Horizons are counted in trading sessions from the entry, never in calendar days. The same correction
+was applied to `features_daily.y_hit_5d`, whose calendar-day window reached Wednesday from a Friday
+and Saturday from a Monday, so it almost never found five bars and returned null for most of the
+week.
+
+MFE and MAE come from the same bars and separate a flat winner from one that spent a week underwater.
+
+`strategy:rank-watchlist` now persists **every** evaluated asset; `--top` bounds only what the
+caller is handed back. Keeping just the best thirty rows made every later statistic a claim about an
+already-selected population while reading like one about the universe.
+
+## Portfolio cash accounting
+
+Available cash is three terms:
+
+```
+  base cash                 what the portfolio opened with
++ non-trade movements       deposits, withdrawals, dividends, standalone fees, adjustments
++ signed trade settlements  -(qty*price + fee) per entry, +(qty*price - fee) per exit
+= available cash
+```
+
+The third term used to be missing entirely. Cash was `base + movements` only, so **selling a
+holding correctly reduced the position and booked a realized gain while the money never
+appeared**, and buying one never cost anything. Total equity was wrong by the full traded amount in
+both directions.
+
+**Realized P/L is never added to cash.** An exit's proceeds already contain the gain or loss; adding
+it again would count it twice. It is reported separately, and the identity that must hold is:
+
+```
+total equity = available cash + current market value
+```
+
+Trade settlement is **derived** from the positions ledger, not mirrored into synthetic
+`cash_movements` rows. Editing or deleting a position therefore corrects the cash by itself: there
+is no second copy to keep in step. `cash_movements` keeps its own job — money that moves for reasons
+other than a trade.
+
+All of the arithmetic lives in `PositionPricing::signedCashFlow()`. The calculator sums it and the
+Stockbit importer subtracts it; deriving it separately in two places would let them drift.
+
+### Migrating existing balances
+
+Stored `cash_balance` values were entered and reconciled under the old formula — typically "what the
+broker says I have right now", with every historical trade already reflected. Switching formulas
+without touching them would subtract every historical purchase a second time.
+
+`2026_08_31_000100_rebase_portfolio_cash_for_trade_settlement` rebases the stored base by exactly
+the term being introduced:
+
+```
+new_base = old_base - historical_signed_trade_cash_flow
+```
+
+so the two formulas agree the instant the migration finishes:
+
+```
+  new_base + movements + trade_flow
+= (old_base - trade_flow) + movements + trade_flow
+= old_base + movements                              ← what was on screen a moment ago
+```
+
+**Displayed cash does not move.** From then on the term is live: the next trade moves the cash, and
+the base means what it says. A `cash_accounting_version` column guards against a second application,
+which would be silent and would look exactly like a large unexplained withdrawal.
+
+### Stockbit snapshot reconciliation
+
+Because available cash is now three terms, the base that reproduces a broker's reported figure is
+that figure minus **both** other terms:
+
+```
+proposed_base = broker_reported_cash - non_trade_movements - trade_settlements
+```
+
+Subtracting only the movements, as the importer did while cash was `base + movements`, would leave
+every imported buy and sell counted twice — once inside the broker's figure, which already reflects
+them, and once again when the calculator adds the trade term.
+
+### Long-only
+
+A manual exit larger than the holding it claims to close is rejected. The calculator matches with
+`min(exit_qty, holding_qty)`, which prevents a negative position but does so silently: the surplus
+shares vanish from the realized P/L and the ledger goes on looking healthy. Imported broker history
+is exempt — it is a record of real executions, reconciled through the importer's opening positions
+rather than by rejecting it.
+
 ## Accumulation Anomaly Scanner
 Use this command to scan for potential accumulation setups using your idea: daily price down on lower volume, lower-timeframe absorption proxy (PBAS/absorption flag), and anchored broker-flow confirmation.
 
@@ -788,6 +1020,22 @@ No secrets belong in any of the above. The Stockbit token is set once with
 `php artisan stockbit:token:set` (or from the dashboard) and lives encrypted on the local disk.
 
 ### API
+
+The execution workspace calls one composed endpoint:
+
+```
+GET /v1/execution/candidates
+    ?date=&version=&status[]=READY&status[]=WATCH&symbol[]=BBCA
+    &sector=&min_score=&min_rr=&portfolio_id=&limit=
+```
+
+It returns `signal_date`, `next_trading_date`, `version`, `thresholds`, `freshness`, `counts`,
+`rows` and a `disclaimer`. Everything is assembled server-side — technicals, scores, features,
+broker windows and (optionally) portfolio holdings — so the page makes one request rather than one
+per row, and the ranking cannot drift from the backend's.
+
+`portfolio_id` is authorised through `PortfolioPolicy` before any holding is attached.
+
 
 All under `/api/v1`, behind the existing `auth:sanctum,jwt` middleware.
 

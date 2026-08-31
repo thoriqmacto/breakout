@@ -298,6 +298,7 @@ return [
             'options' => [
                 'all' => ['type' => 'boolean'],
                 'sym' => ['type' => 'string', 'pattern' => '/^[A-Za-z0-9,.\- ]{1,512}$/'],
+                'as-of' => ['type' => 'date', 'label' => 'Structural snapshot as of this date'],
                 'persist' => ['type' => 'boolean'],
             ],
         ],
