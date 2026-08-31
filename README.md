@@ -56,7 +56,7 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```bash
    php artisan trading-days:build --from=2015-01-01 --to=$(date +%F)
    ```
-   Adjust the `--from` / `--to` range as needed; rerunning is idempotent and will rewrite `database/seeders/data/trading_days.php` when new rows are found.
+   Adjust the `--from` / `--to` range as needed; rerunning is idempotent and will rewrite `database/seeders/data/trading_days.php` when new rows are found (`--no-seeder-sync` skips that). See [Trading-day integrity](#trading-day-integrity) for what the command reports and why it can fail.
 
 2. **Sync OHLCV seeds and the database** – compare configured symbols to seed CSVs, optionally pull missing data via the Python scripts, and upsert bars into `price_bars`:
    ```bash
@@ -152,6 +152,97 @@ Below is a quick reference for the feature abbreviations emitted by `features:ex
 - `y_hit_5d` — classification label for +3.5% target within 5 trading days. Range: 1 (hit target), 0 (did not hit), null (insufficient data).
 - `dd_5d` — reserved placeholder for drawdown (currently null).
 
+
+## Trading-day integrity
+
+`trading_days` carries two different facts, and conflating them is what caused a
+production incident where a real session's IHSG close sat at NULL for days while
+every repair attempt reported success.
+
+| | Meaning |
+| --- | --- |
+| a row exists | that session happened — this is what the calendar and every market-day condition read |
+| `close` is a number | we know what the IHSG closed at |
+| `close` is NULL | we do **not** know. Not zero, and not a holiday. |
+
+Four invariants follow, and all four are enforced in code rather than by
+convention:
+
+1. **A known close is stronger information than an unknown one.** Unknown never
+   overwrites known.
+2. **A numeric close always repairs a NULL.** An incomplete row heals itself the
+   next time the provider supplies the figure — no manual SQL.
+3. **A missing close never makes a session look like a holiday.** The row's
+   existence is what records the session.
+4. **A command must not report success when the provider supplied a number the
+   database did not store.**
+
+### One writer
+
+Every path that touches `trading_days.close` goes through `TradingDayWriter`,
+which splits the write rather than trusting its caller: rows carrying a close are
+upserted and update the column, rows carrying none are inserted-or-ignored and
+cannot touch it. No database-specific SQL, so the guarantee is identical on
+SQLite and MariaDB.
+
+The Yahoo importer, the seeder and the automation refresh all use it. There is no
+second spelling of the rule to keep in step.
+
+### Fetch range vs persistence range
+
+The provider is asked for more than is stored:
+
+```
+requested:  2026-08-28 → 2026-08-31
+fetched:    2026-08-21 → 2026-08-31     (TRADING_DAYS_FETCH_BUFFER_DAYS, default 7)
+persisted:  2026-08-28 → 2026-08-31
+```
+
+A download window that begins exactly on the session you need has been observed
+to come back without it, which is how a repair silently does nothing: the row
+stays NULL because the date was never in the response. Records outside the
+requested range are discarded before any write, so widening the buffer changes
+what is fetched and never what is stored. Seven calendar days clears a weekend
+plus an ordinary market holiday.
+
+### Verified persistence
+
+`trading-days:build` gathers the provider's answer and the database's answer
+separately and compares them:
+
+```
+Yahoo returned (fetched from 2026-08-21):
+  3 trading sessions
+  3 with close values
+Database after import:
+  3 trading sessions
+  3 with close values
+  0 null closes
+Repaired null closes: 2026-08-28
+```
+
+If Yahoo supplied a close for a date the table still holds as NULL, the command
+**fails** rather than printing a count. If Yahoo simply had nothing for a
+session, that is a warning and the row stays honestly incomplete.
+`automation:trading-calendar-refresh` reports the same condition as
+`null_close_count` / `null_close_dates` and marks the run partial.
+
+### The date key
+
+`trading_days.date` is the primary key, and it is stored as a bare `Y-m-d`. It
+was not always: the model's `date` cast made Eloquent write
+`2026-08-28 00:00:00` while every query-builder write produced `2026-08-28`. On
+an engine that does not coerce the column those are two keys for one session, so
+an upsert never conflicted and inserted a second row whose NULL then shadowed the
+good close on any ordered read. A mutator normalises model writes, and
+`2026_09_01_000000_normalize_trading_day_date_keys` merges any rows already split
+across both spellings, keeping the known close.
+
+The same mismatch made a string `BETWEEN` drop its own upper bound — a stored
+`2026-08-31 00:00:00` sorts after the bare `2026-08-31` it is compared against —
+so every date-range read now compares as dates. In `ohlcv:check` the truncation
+had been happening on both sides at once and cancelling out; with one side fixed
+it surfaced as a bar that exists being reported missing.
 
 ## Analysis: structure, execution, and the line between them
 

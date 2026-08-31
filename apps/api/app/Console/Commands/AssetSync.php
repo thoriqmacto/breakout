@@ -725,7 +725,8 @@ class AssetSync extends Command
     {
         if (Schema::hasTable('trading_days')) {
             return TradingDay::query()
-                ->whereBetween('date', [$from, $to])
+                ->whereDate('date', '>=', $from)
+                ->whereDate('date', '<=', $to)
                 ->count();
         }
 

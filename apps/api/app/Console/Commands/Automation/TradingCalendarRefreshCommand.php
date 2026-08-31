@@ -6,6 +6,7 @@ use App\Models\TradingCalendarDay;
 use App\Models\TradingDay;
 use App\Services\Automation\RunMetadata;
 use App\Services\Automation\TradingWeekResolver;
+use App\Services\TradingDayWriter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -55,7 +56,7 @@ class TradingCalendarRefreshCommand extends Command
      */
     private const STALE_AFTER_DAYS = 5;
 
-    public function handle(TradingWeekResolver $calendar, RunMetadata $metadata): int
+    public function handle(TradingWeekResolver $calendar, RunMetadata $metadata, TradingDayWriter $writer): int
     {
         $today = $calendar->today();
 
@@ -161,6 +162,8 @@ class TradingCalendarRefreshCommand extends Command
 
         $this->line(sprintf('The calendar now covers %d day(s) across that range.', $covered));
 
+        $this->reportIncompleteCloses($writer, $from, $to, $metadata);
+
         if ($to->lessThan($today)) {
             // Expected most of the day: the market has not closed, or Yahoo has
             // not published yet. Said plainly so a skipped OHLCV run later is
@@ -186,6 +189,46 @@ class TradingCalendarRefreshCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Report sessions whose close the market has traded past but we still do
+     * not know.
+     *
+     * A trading date and a complete observation of it are different facts. The
+     * row's existence records that the session happened, which is what every
+     * market-day condition reads and what the calendar is derived from -- so a
+     * missing close must never make the day look like a holiday. But it does
+     * make the market data incomplete, and a run that leaves such a row behind
+     * is partial rather than clean: an unknown close that nothing surfaces is
+     * how one survived weeks of repair attempts.
+     */
+    private function reportIncompleteCloses(TradingDayWriter $writer, Carbon $from, Carbon $to, RunMetadata $metadata): void
+    {
+        $incomplete = $writer->incompleteDates($from->toDateString(), $to->toDateString());
+
+        $metadata->merge([
+            'null_close_count' => count($incomplete),
+            'null_close_dates' => array_slice($incomplete, 0, max(1, (int) config('trading_days.max_reported_dates', 20))),
+        ]);
+
+        if ($incomplete === []) {
+            return;
+        }
+
+        $message = sprintf(
+            'The IHSG close is still unknown for %d session(s) in %s..%s: %s. These remain valid trading days.',
+            count($incomplete),
+            $from->toDateString(),
+            $to->toDateString(),
+            implode(', ', array_slice($incomplete, 0, max(1, (int) config('trading_days.max_reported_dates', 20)))),
+        );
+
+        $metadata->merge(['partial' => true, 'error_summary' => trim(
+            (string) $metadata->get('error_summary', '').' '.$message
+        )]);
+
+        $this->warn($message);
     }
 
     /**

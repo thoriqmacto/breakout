@@ -67,7 +67,8 @@ class StrategyScanCommand extends Command
                 DB::table('features_daily')
                     ->select('symbol')
                     ->selectRaw("{$anchorAvgCast} as anchor_avg_net_norm")
-                    ->whereBetween('date', [$anchorDate->toDateString(), $scanDate->toDateString()])
+                    ->whereDate('date', '>=', $anchorDate->toDateString())
+                    ->whereDate('date', '<=', $scanDate->toDateString())
                     ->groupBy('symbol'),
                 'anchor',
                 fn ($join) => $join->on('anchor.symbol', '=', 'fd.symbol')

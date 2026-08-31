@@ -3,12 +3,14 @@
 namespace Tests\Feature\Automation;
 
 use App\Models\TradingCalendarDay;
-use App\Models\TradingDay;
 use App\Services\Automation\RunMetadata;
+use App\Services\TradingDayImportReport;
+use App\Services\TradingDayWriter;
 use App\Services\YahooTradingDays;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use RuntimeException;
 use Tests\TestCase;
@@ -65,20 +67,31 @@ class TradingCalendarRefreshTest extends TestCase
      *
      * @param  array<int, string>  $dates  Trading dates the import "discovers".
      */
-    private function stubYahoo(array $dates = [], ?RuntimeException $failure = null): void
+    private function stubYahoo(array $dates = [], ?RuntimeException $failure = null, array $withoutClose = []): void
     {
         $mock = Mockery::mock(YahooTradingDays::class);
 
         if ($failure !== null) {
             $mock->shouldReceive('import')->andThrow($failure);
         } else {
-            $mock->shouldReceive('import')->andReturnUsing(function () use ($dates): int {
-                foreach ($dates as $date) {
-                    $this->tradingDay($date);
-                }
+            $mock->shouldReceive('import')->andReturnUsing(
+                function (string $from = '2015-01-01', ?string $to = null) use ($dates, $withoutClose): TradingDayImportReport {
+                    $closes = [];
 
-                return count($dates);
-            });
+                    foreach ($dates as $date) {
+                        $known = ! in_array($date, $withoutClose, true);
+                        $this->tradingDay($date, $known ? 7000.0 : null);
+                        $closes[$date] = $known ? 7000.0 : null;
+                    }
+
+                    return new TradingDayImportReport(
+                        from: $from,
+                        to: $to ?? $from,
+                        fetchedFrom: $from,
+                        providerCloses: $closes,
+                    );
+                }
+            );
         }
 
         $this->app->instance(YahooTradingDays::class, $mock);
@@ -93,13 +106,16 @@ class TradingCalendarRefreshTest extends TestCase
      * upper bound -- a trap worth not reproducing in a fixture, because it
      * would make these tests disagree with production about which days exist.
      */
-    private function tradingDay(string $date): void
+    private function tradingDay(string $date, ?float $close = 7000.0): void
     {
-        TradingDay::query()->upsert(
-            [['date' => $date, 'close' => 7000, 'created_at' => now(), 'updated_at' => now()]],
-            ['date'],
-            ['close', 'updated_at'],
-        );
+        app(TradingDayWriter::class)->write([['date' => $date, 'close' => $close]]);
+
+        // The writer never downgrades, so an explicit "unknown" fixture has to
+        // clear the column directly -- which is the state the incident left
+        // behind and what these tests need to reproduce.
+        if ($close === null) {
+            DB::table('trading_days')->where('date', $date)->update(['close' => null]);
+        }
     }
 
     /**
@@ -270,6 +286,47 @@ class TradingCalendarRefreshTest extends TestCase
 
         $this->assertTrue($this->calendar()['2026-08-27']->is_trading_day);
         $this->assertSame('skipped', app(RunMetadata::class)->get('trading_days_import')['status']);
+    }
+
+    public function test_an_unknown_close_is_reported_as_partial_without_becoming_a_holiday(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-31 11:00:00', 'UTC'));
+
+        // The production shape: three sessions, the middle one's close unknown.
+        $this->stubYahoo(
+            ['2026-08-27', '2026-08-28', '2026-08-31'],
+            withoutClose: ['2026-08-28'],
+        );
+
+        Artisan::call('automation:trading-calendar-refresh', ['--lookback' => 10]);
+
+        $metadata = app(RunMetadata::class)->all();
+
+        $this->assertSame(1, $metadata['null_close_count']);
+        $this->assertSame(['2026-08-28'], $metadata['null_close_dates']);
+        $this->assertTrue($metadata['partial']);
+        $this->assertStringContainsString('2026-08-28', (string) $metadata['error_summary']);
+
+        // The session still happened. An unknown close must never be allowed
+        // to turn a real trading day into a holiday.
+        $calendar = $this->calendar();
+        $this->assertTrue($calendar['2026-08-28']->is_trading_day);
+        $this->assertFalse($calendar['2026-08-28']->is_holiday);
+    }
+
+    public function test_a_complete_range_reports_no_unknown_closes(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-31 11:00:00', 'UTC'));
+
+        $this->stubYahoo(['2026-08-27', '2026-08-28', '2026-08-31']);
+
+        Artisan::call('automation:trading-calendar-refresh', ['--lookback' => 10]);
+
+        $metadata = app(RunMetadata::class)->all();
+
+        $this->assertSame(0, $metadata['null_close_count']);
+        $this->assertSame([], $metadata['null_close_dates']);
+        $this->assertArrayNotHasKey('partial', $metadata);
     }
 
     public function test_the_market_date_is_resolved_in_jakarta(): void

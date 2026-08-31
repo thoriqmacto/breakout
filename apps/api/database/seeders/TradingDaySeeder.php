@@ -2,17 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\TradingDay;
+use App\Services\TradingDayWriter;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
+/**
+ * Restore the trading-day calendar from the checked-in seed file.
+ *
+ * The seed file is generated from whatever the database held when
+ * `trading-days:build` last ran, so it can contain sessions whose close was
+ * unknown at that moment. Seeding used to upsert those straight over the
+ * column, which meant `db:seed` could undo a Yahoo repair -- a session whose
+ * value had since been recovered would go back to NULL because a file written
+ * weeks earlier still said it was unknown.
+ *
+ * So the seeder writes through TradingDayWriter like every other path: it can
+ * add sessions and it can fill in closes, and it cannot turn a known close
+ * back into an unknown one.
+ */
 class TradingDaySeeder extends Seeder
 {
     private string $dataPath;
 
-    public function __construct()
+    public function __construct(private readonly ?TradingDayWriter $writer = null)
     {
         $this->dataPath = database_path('seeders/data/trading_days.php');
     }
@@ -33,10 +47,8 @@ class TradingDaySeeder extends Seeder
             return;
         }
 
-        $now = Carbon::now();
-
         $payload = collect($records)
-            ->map(function ($item) use ($now) {
+            ->map(function ($item) {
                 if (! is_array($item) || ! isset($item['date'])) {
                     return null;
                 }
@@ -60,8 +72,6 @@ class TradingDaySeeder extends Seeder
                 return [
                     'date' => $parsed,
                     'close' => $close === null ? null : (float) $close,
-                    'created_at' => $now,
-                    'updated_at' => $now,
                 ];
             })
             ->filter()
@@ -74,12 +84,19 @@ class TradingDaySeeder extends Seeder
             return;
         }
 
-        TradingDay::query()->upsert(
-            $payload,
-            ['date'],
-            ['close', 'updated_at']
-        );
+        $writer = $this->writer ?? app(TradingDayWriter::class);
+        $result = $writer->write($payload);
 
         $this->command?->info('Seeded '.count($payload).' trading day records.');
+
+        if ($result['repaired'] !== []) {
+            $this->command?->info('Filled in '.count($result['repaired']).' previously unknown close(s).');
+        }
+
+        if ($result['preserved'] !== []) {
+            $this->command?->info(
+                'Kept '.count($result['preserved']).' close(s) the seed file did not know; seeding never downgrades a known value.'
+            );
+        }
     }
 }
