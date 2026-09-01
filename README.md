@@ -171,11 +171,14 @@ convention:
 1. **A known close is stronger information than an unknown one.** Unknown never
    overwrites known.
 2. **A numeric close always repairs a NULL.** An incomplete row heals itself the
-   next time the provider supplies the figure — no manual SQL.
+   next time *any* source supplies the figure — the provider, or the
+   version-controlled ledger. No manual SQL.
 3. **A missing close never makes a session look like a holiday.** The row's
    existence is what records the session.
 4. **A command must not report success when the provider supplied a number the
    database did not store.**
+5. **A close that has ever been recorded must not be lost because one import
+   went badly.** The ledger is merged, never overwritten.
 
 ### One writer
 
@@ -187,6 +190,29 @@ SQLite and MariaDB.
 
 The Yahoo importer, the seeder and the automation refresh all use it. There is no
 second spelling of the rule to keep in step.
+
+### The checked-in ledger
+
+`database/seeders/data/trading_days.php` is the only copy of the calendar that
+lives outside the database, and it is version controlled — so a close it has
+recorded survives any number of bad provider responses. `TradingDayLedger` gives
+it the same rule the table has, in both directions:
+
+- **Reading.** When Yahoo will not supply a close the table is missing,
+  `trading-days:build` fills it from the ledger before writing the run off as
+  incomplete. Only dates the file already holds a number for are touched, so
+  there is nothing session-specific about it, and `--no-ledger-repair` turns it
+  off. This is the repair path that needs no network: if the value was ever
+  committed, the row can always be healed.
+- **Writing.** The file used to be rewritten from the database verbatim at the
+  end of every run. One import where the provider omitted a session's value was
+  therefore enough to erase the number from the ledger too — and with both
+  copies unknown, nothing was left to repair from. Writes now merge: a session
+  the database knows nothing about keeps whatever the file already recorded.
+
+`php artisan db:seed --class=TradingDaySeeder` applies the same repair on its
+own, which is the fastest way to restore a close the deployed database has lost
+but the repository still has.
 
 ### Fetch range vs persistence range
 
@@ -218,12 +244,14 @@ Database after import:
   3 trading sessions
   3 with close values
   0 null closes
-Repaired null closes: 2026-08-28
+Repaired null closes from Yahoo: 2026-08-28
 ```
 
 If Yahoo supplied a close for a date the table still holds as NULL, the command
-**fails** rather than printing a count. If Yahoo simply had nothing for a
-session, that is a warning and the row stays honestly incomplete.
+**fails** rather than printing a count. If Yahoo had nothing for a session, the
+ledger is asked next (`Repaired null closes from the checked-in ledger: …`), and
+only when neither knows the value is it a warning and the row stays honestly
+incomplete.
 `automation:trading-calendar-refresh` reports the same condition as
 `null_close_count` / `null_close_dates` and marks the run partial.
 

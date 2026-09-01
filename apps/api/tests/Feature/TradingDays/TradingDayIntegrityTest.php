@@ -83,6 +83,33 @@ class TradingDayIntegrityTest extends TestCase
         return $value === null ? null : (float) $value;
     }
 
+    /**
+     * What the checked-in ledger file currently records.
+     *
+     * @return array<string, float|null>
+     */
+    private function ledgerCloses(): array
+    {
+        $path = $this->seedDir.'/seeders/data/trading_days.php';
+
+        if (! File::exists($path)) {
+            return [];
+        }
+
+        $out = [];
+
+        foreach ((array) include $path as $record) {
+            $out[$record['date']] = $record['close'];
+        }
+
+        return $out;
+    }
+
+    private function writeLedger(string $body): void
+    {
+        File::put($this->seedDir.'/seeders/data/trading_days.php', "<?php\n\nreturn [\n".$body."\n];\n");
+    }
+
     public function test_the_build_command_repairs_the_august_28_production_state(): void
     {
         $this->seedDay('2026-08-27', 6521.75);
@@ -99,7 +126,7 @@ class TradingDayIntegrityTest extends TestCase
         $output = Artisan::output();
 
         $this->assertSame(0, $exit);
-        $this->assertStringContainsString('Repaired null closes: 2026-08-28', $output);
+        $this->assertStringContainsString('Repaired null closes from Yahoo: 2026-08-28', $output);
         $this->assertStringContainsString('0 null closes', $output);
 
         // Asserted from a fresh read: the incident happened after a reported upsert.
@@ -225,6 +252,118 @@ class TradingDayIntegrityTest extends TestCase
         $migration->up();
         $this->assertSame(2, DB::table('trading_days')->count());
         $this->assertEqualsWithDelta(6518.12109375, (float) $this->close('2026-08-28'), 0.000001);
+    }
+
+    /**
+     * The state the production database was actually left in: Yahoo will not
+     * return the session's close any more, so no amount of re-importing can
+     * repair it. The repository still has the number, and that is enough.
+     */
+    public function test_the_build_command_repairs_an_unknown_close_from_the_checked_in_ledger(): void
+    {
+        $this->seedDay('2026-08-28', null);
+        $this->writeLedger("    ['date' => '2026-08-28', 'close' => 6518.12109375],");
+
+        // The provider confirms the session traded and says nothing about its
+        // value -- the response that leaves a row stuck at NULL for ever.
+        $this->mockProvider([['date' => '2026-08-28', 'close' => null]]);
+
+        $exit = Artisan::call('trading-days:build', ['--from' => '2026-08-28', '--to' => '2026-08-28']);
+        $output = Artisan::output();
+
+        $this->assertSame(0, $exit);
+        $this->assertStringContainsString('Repaired null closes from the checked-in ledger: 2026-08-28', $output);
+        $this->assertStringContainsString('0 null closes', $output);
+        $this->assertEqualsWithDelta(6518.12109375, (float) $this->close('2026-08-28'), 0.000001);
+    }
+
+    public function test_the_ledger_repair_only_touches_dates_the_ledger_has_a_value_for(): void
+    {
+        $this->seedDay('2026-08-28', null);
+        $this->seedDay('2026-08-31', null);
+
+        // The ledger knows one session happened but not what it closed at, so
+        // it is no better informed than the database and must change nothing.
+        $this->writeLedger(
+            "    ['date' => '2026-08-28', 'close' => 6518.12109375],\n".
+            "    ['date' => '2026-08-31', 'close' => null],"
+        );
+
+        $this->mockProvider([
+            ['date' => '2026-08-28', 'close' => null],
+            ['date' => '2026-08-31', 'close' => null],
+        ]);
+
+        Artisan::call('trading-days:build', ['--from' => '2026-08-28', '--to' => '2026-08-31']);
+        $output = Artisan::output();
+
+        $this->assertEqualsWithDelta(6518.12109375, (float) $this->close('2026-08-28'), 0.000001);
+        $this->assertNull($this->close('2026-08-31'));
+        $this->assertStringContainsString('Database still contains NULL IHSG closes: 2026-08-31', $output);
+    }
+
+    public function test_the_ledger_repair_can_be_turned_off(): void
+    {
+        $this->seedDay('2026-08-28', null);
+        $this->writeLedger("    ['date' => '2026-08-28', 'close' => 6518.12109375],");
+
+        $this->mockProvider([['date' => '2026-08-28', 'close' => null]]);
+
+        Artisan::call('trading-days:build', [
+            '--from' => '2026-08-28',
+            '--to' => '2026-08-28',
+            '--no-ledger-repair' => true,
+        ]);
+
+        $this->assertNull($this->close('2026-08-28'));
+    }
+
+    /**
+     * The regression that made the incident unrecoverable rather than merely
+     * wrong: the run that could not repair the row went on to write the
+     * database out over the ledger, so the last copy of the close -- the one
+     * in version control -- was destroyed by the command meant to restore it.
+     */
+    public function test_the_seeder_file_rewrite_never_erases_a_close_the_database_lost(): void
+    {
+        $this->seedDay('2026-08-28', null);
+        $this->seedDay('2026-08-31', 6525.47802734375);
+        $this->writeLedger("    ['date' => '2026-08-28', 'close' => 6518.12109375],");
+
+        $this->mockProvider([['date' => '2026-08-31', 'close' => 6525.47802734375]]);
+
+        // Repair disabled so the database genuinely still holds NULL at the
+        // moment the file is written -- the exact ordering that lost the value.
+        Artisan::call('trading-days:build', [
+            '--from' => '2026-08-28',
+            '--to' => '2026-08-31',
+            '--no-ledger-repair' => true,
+        ]);
+        $output = Artisan::output();
+
+        $ledger = $this->ledgerCloses();
+
+        $this->assertArrayHasKey('2026-08-28', $ledger);
+        $this->assertEqualsWithDelta(6518.12109375, (float) $ledger['2026-08-28'], 0.000001);
+        $this->assertEqualsWithDelta(6525.47802734375, (float) $ledger['2026-08-31'], 0.000001);
+        $this->assertStringContainsString('Kept 1 ledger close(s) the database does not know: 2026-08-28', $output);
+    }
+
+    public function test_the_seeder_file_rewrite_records_new_sessions_and_fills_unknown_ones(): void
+    {
+        $this->writeLedger("    ['date' => '2026-08-28', 'close' => null],");
+
+        $this->mockProvider([
+            ['date' => '2026-08-28', 'close' => 6518.12109375],
+            ['date' => '2026-08-31', 'close' => 6525.47802734375],
+        ]);
+
+        Artisan::call('trading-days:build', ['--from' => '2026-08-28', '--to' => '2026-08-31']);
+
+        $ledger = $this->ledgerCloses();
+
+        $this->assertEqualsWithDelta(6518.12109375, (float) $ledger['2026-08-28'], 0.000001);
+        $this->assertEqualsWithDelta(6525.47802734375, (float) $ledger['2026-08-31'], 0.000001);
     }
 
     public function test_the_seeder_file_rewrite_can_be_skipped(): void

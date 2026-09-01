@@ -3,12 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\TradingDay;
+use App\Services\TradingDayLedger;
 use App\Services\TradingDayWriter;
 use App\Services\YahooTradingDays;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
 
 /**
  * Import IHSG sessions and closing values from Yahoo.
@@ -24,12 +23,23 @@ use Illuminate\Support\Facades\File;
  * So the provider's answer and the database's answer are gathered separately
  * and compared. If Yahoo supplied a number for a date and the table still
  * holds NULL for it, that is a failed import and the command says so.
+ *
+ * There is a second source, and it is the one that makes this recoverable at
+ * all. `database/seeders/data/trading_days.php` is version controlled, so a
+ * close it has recorded survives any number of bad provider responses. When
+ * Yahoo will not supply a value the table is missing, the ledger is asked
+ * before the run is written off as incomplete -- a repair that needs no
+ * network and no manual SQL, and that works for any date the file has ever
+ * held. The same ledger is written back at the end of the run, by merge
+ * rather than by overwrite, so an import that learned nothing about a session
+ * cannot erase what the file already knew about it.
  */
 class TradingDaysBuild extends Command
 {
     protected $signature = 'trading-days:build
         {--from=2015-01-01}
         {--to=}
+        {--no-ledger-repair : Do not fill remaining unknown closes from the checked-in trading-day ledger}
         {--no-seeder-sync : Import without rewriting database/seeders/data/trading_days.php}';
 
     protected $description = 'Populate the trading_days table using Yahoo Finance historical data, repairing unknown closes.';
@@ -37,6 +47,7 @@ class TradingDaysBuild extends Command
     public function __construct(
         private readonly YahooTradingDays $service,
         private readonly TradingDayWriter $writer,
+        private readonly TradingDayLedger $ledger,
     ) {
         parent::__construct();
     }
@@ -51,6 +62,14 @@ class TradingDaysBuild extends Command
         $fromDate = Carbon::parse($from)->toDateString();
         $toDate = Carbon::parse($to ?: Carbon::now()->toDateString())->toDateString();
 
+        $nullDates = $this->writer->incompleteDates($fromDate, $toDate);
+        $ledgerRepaired = $this->repairFromLedger($nullDates);
+
+        if ($ledgerRepaired !== []) {
+            // Re-read: the ledger pass has just changed what is incomplete.
+            $nullDates = $this->writer->incompleteDates($fromDate, $toDate);
+        }
+
         // Read the table back rather than trusting the write. The production
         // incident this reporting exists for looked like a successful upsert.
         $stored = TradingDay::query()
@@ -60,7 +79,6 @@ class TradingDaysBuild extends Command
             ->get(['date', 'close']);
 
         $storedWithClose = $stored->filter(static fn (TradingDay $day): bool => $day->close !== null)->count();
-        $nullDates = $this->writer->incompleteDates($fromDate, $toDate);
 
         $this->line(sprintf('Yahoo returned (fetched from %s):', $report->fetchedFrom));
         $this->line(sprintf('  %d trading sessions', $report->providerSessions()));
@@ -73,8 +91,15 @@ class TradingDaysBuild extends Command
 
         if ($report->repaired !== []) {
             $this->info(sprintf(
-                'Repaired null closes: %s',
+                'Repaired null closes from Yahoo: %s',
                 $this->summariseDates($report->repaired),
+            ));
+        }
+
+        if ($ledgerRepaired !== []) {
+            $this->info(sprintf(
+                'Repaired null closes from the checked-in ledger: %s',
+                $this->summariseDates($ledgerRepaired),
             ));
         }
 
@@ -105,16 +130,49 @@ class TradingDaysBuild extends Command
                 'Database still contains NULL IHSG closes: %s',
                 $this->summariseDates($nullDates),
             ));
-            $this->warn('Yahoo did not supply a close for these sessions; they remain incomplete.');
+            $this->warn('Neither Yahoo nor the checked-in ledger has a close for these sessions; they remain incomplete.');
         }
 
         try {
-            $this->syncSeederFile();
+            $this->syncLedgerFile();
         } catch (\Throwable $e) {
             $this->warn('Unable to update trading day seeder: '.$e->getMessage());
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Fill unknown closes from the version-controlled ledger.
+     *
+     * This is the same rule the writer enforces, sourced from the file instead
+     * of the provider: a close the repository has recorded is known
+     * information, and known always beats unknown. It cannot invent a value --
+     * only dates the ledger already holds a number for are touched -- so there
+     * is nothing here that is specific to any one session.
+     *
+     * @param  array<int, string>  $nullDates
+     * @return array<int, string> the dates actually repaired
+     */
+    private function repairFromLedger(array $nullDates): array
+    {
+        if ($nullDates === [] || $this->option('no-ledger-repair')) {
+            return [];
+        }
+
+        $closes = $this->ledger->knownCloses($nullDates);
+
+        if ($closes === []) {
+            return [];
+        }
+
+        $result = $this->writer->write(array_map(
+            static fn (string $date, float $close): array => ['date' => $date, 'close' => $close],
+            array_keys($closes),
+            array_values($closes),
+        ));
+
+        return $result['repaired'];
     }
 
     /**
@@ -131,7 +189,16 @@ class TradingDaysBuild extends Command
         return implode(', ', array_slice($dates, 0, $cap)).sprintf(' … and %d more', count($dates) - $cap);
     }
 
-    private function syncSeederFile(): void
+    /**
+     * Fold the table back into the ledger file.
+     *
+     * A merge, never a dump. The previous version wrote the database out
+     * verbatim, so a session the table held as NULL replaced whatever close
+     * the file had recorded for it -- destroying the only copy that was not
+     * dependent on the provider, and turning a recoverable gap into a
+     * permanent one.
+     */
+    private function syncLedgerFile(): void
     {
         if ($this->option('no-seeder-sync')) {
             $this->line('Seeder file left untouched (--no-seeder-sync).');
@@ -142,109 +209,45 @@ class TradingDaysBuild extends Command
         $records = TradingDay::query()
             ->orderBy('date')
             ->get(['date', 'close'])
-            ->map(function (TradingDay $day) {
+            ->map(function (TradingDay $day): array {
                 $date = $day->getAttribute('date');
 
-                if ($date instanceof Carbon) {
-                    $date = $date->toDateString();
-                } else {
-                    $date = Carbon::parse((string) $date)->toDateString();
-                }
-
                 return [
-                    'date' => $date,
+                    'date' => $date instanceof Carbon ? $date->toDateString() : Carbon::parse((string) $date)->toDateString(),
                     'close' => $day->getAttribute('close'),
                 ];
             })
             ->values()
             ->all();
 
-        if (count($records) === 0) {
+        if ($records === []) {
             $this->warn('No trading day records available to write to the seeder file.');
 
             return;
         }
 
-        $path = database_path('seeders/data/trading_days.php');
-        $existing = $this->readSeederData($path);
+        $result = $this->ledger->sync($records);
 
-        if ($existing !== null && $this->recordsAreEqual($existing, $records)) {
+        if ($result['preserved'] !== []) {
+            $this->line(sprintf(
+                'Kept %d ledger close(s) the database does not know: %s',
+                count($result['preserved']),
+                $this->summariseDates($result['preserved']),
+            ));
+        }
+
+        if (! $result['changed']) {
             $this->info('Trading day seeder data is already up to date.');
 
             return;
         }
 
-        File::ensureDirectoryExists(dirname($path));
-
-        $contents = "<?php\n\nreturn ".$this->exportArray($records).";\n";
-
-        if (File::put($path, $contents) === false) {
-            throw new \RuntimeException('Failed to write trading day seeder data.');
-        }
-
-        $this->info('Trading day seeder data saved to '.$path.'.');
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>|null
-     */
-    private function readSeederData(string $path): ?array
-    {
-        if (! File::exists($path)) {
-            return null;
-        }
-
-        $data = include $path;
-
-        if (! is_array($data)) {
-            return null;
-        }
-
-        return Collection::make($data)
-            ->map(function ($item) {
-                if (! is_array($item) || ! isset($item['date'])) {
-                    return null;
-                }
-
-                try {
-                    $date = Carbon::parse((string) $item['date'])->toDateString();
-                } catch (\Throwable) {
-                    return null;
-                }
-
-                return [
-                    'date' => $date,
-                    'close' => $item['close'] ?? null,
-                ];
-            })
-            ->filter()
-            ->values()
-            ->all();
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $first
-     * @param  array<int, array<string, mixed>>  $second
-     */
-    private function recordsAreEqual(array $first, array $second): bool
-    {
-        if (count($first) !== count($second)) {
-            return false;
-        }
-
-        return $first == $second; // phpcs:ignore
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $records
-     */
-    private function exportArray(array $records): string
-    {
-        $export = var_export($records, true);
-
-        $export = preg_replace('/^([ ]*)array \(/m', '$1[', $export);
-        $export = preg_replace('/\)(,?)$/m', ']$1', $export);
-
-        return str_replace('NULL', 'null', (string) $export);
+        $this->info(sprintf(
+            'Trading day seeder data saved to %s (%d sessions, %d added, %d filled in).',
+            $result['path'],
+            $result['total'],
+            count($result['added']),
+            count($result['filled']),
+        ));
     }
 }
