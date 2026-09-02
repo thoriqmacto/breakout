@@ -4,6 +4,7 @@ namespace App\Services\Execution;
 
 use App\Services\Analysis\AssetTechnicalSnapshot;
 use App\Services\IdxTicks;
+use App\Services\Strategy\RiskCalculator;
 use App\Services\Strategy\StrategyProfile;
 
 /**
@@ -118,11 +119,23 @@ class ExecutionPlanner
         // of room. Applying it at the close instead would let a breakout that
         // has already cleared its 55-week high claim the high itself as a
         // target that the entry has already passed.
-        $target = ($snapshot->high55w !== null && $snapshot->high55w > $trigger)
+        // The same rule RiskCalculator applies, from the same input. A high
+        // hundreds of times the trigger is a corporate action showing through
+        // unadjusted bars, and left unchecked it produces a huge planned R/R
+        // that sorts the symbol straight to the top of the candidate list.
+        $usableHigh = RiskCalculator::isUsableTarget($snapshot->high55w, $trigger);
+
+        $target = ($usableHigh && $snapshot->high55w > $trigger)
             ? $snapshot->high55w
             : $trigger * (1.0 + $minTargetPct);
 
-        if ($snapshot->high55w !== null && $snapshot->high55w <= $trigger) {
+        if ($snapshot->high55w !== null && ! $usableHigh) {
+            $notes[] = sprintf(
+                '55-week high (%.4f) is more than %.0fx the trigger and was rejected as a target; check for an unadjusted corporate action',
+                $snapshot->high55w,
+                RiskCalculator::MAX_TARGET_MULTIPLE,
+            );
+        } elseif ($snapshot->high55w !== null && $snapshot->high55w <= $trigger) {
             $notes[] = sprintf('55-week high (%.4f) is below the trigger; target set %.0f%% above it', $snapshot->high55w, $minTargetPct * 100);
         }
 
