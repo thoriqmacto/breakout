@@ -98,8 +98,10 @@ class ReconciliationReadiness
         $blockers = [];
         $warnings = [];
 
-        if ($manifest === []) {
-            $blockers[] = 'No reconciliation manifest exists yet. Run "php artisan data:reconcile --all".';
+        $localMissing = $manifest === [];
+
+        if ($localMissing) {
+            $blockers[] = 'No reconciliation manifest exists on this server. Run "php artisan data:reconcile --all".';
         } elseif (($summary['asset_count'] ?? 0) === 0) {
             $blockers[] = 'The reconciliation manifest describes no assets.';
         }
@@ -122,6 +124,15 @@ class ReconciliationReadiness
             $blockers[] = 'Cold storage could not be reached, so the off-server copy cannot be confirmed.';
         } elseif (! $remote['manifest_present']) {
             $blockers[] = 'No reconciliation manifest has been published to cold storage yet.';
+        } elseif ($localMissing) {
+            // Not "cold storage is behind" -- the opposite. Saying that here
+            // points at a push, and pushing would replace the one surviving
+            // copy with nothing. This state is recoverable, and the blocker
+            // should say which direction recovers it.
+            $blockers[] = 'Cold storage holds a reconciliation manifest that this server does not. '
+                .'Rebuild it with "php artisan data:reconcile --all", or recover from the published copy '
+                .'with "php artisan data:restore --all --disk='.($remote['disk'] ?? 'gdrive').'". '
+                .'Do not push: that would overwrite the published copy with nothing.';
         } elseif (! $remote['in_sync']) {
             $blockers[] = 'The published manifest differs from the local one, so cold storage is behind.';
         }

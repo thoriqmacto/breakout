@@ -9,6 +9,8 @@ use App\Models\Price;
 use App\Services\BackupStatus;
 use App\Services\Reconciliation\ReconciliationMirror;
 use App\Services\Reconciliation\ReconciliationService;
+use App\Services\Reconciliation\ReconciliationStore;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -352,6 +354,77 @@ class BackupReadinessApiTest extends TestCase
         $this->fetch('/api/v1/reconciliation/'.urlencode('../etc/passwd'))->assertStatus(404);
         $this->fetch('/api/v1/reconciliation/'.rawurlencode('A B'))->assertStatus(422);
         $this->fetch('/api/v1/reconciliation/'.str_repeat('A', 64))->assertStatus(422);
+    }
+
+    /**
+     * Cold storage holding a manifest this server does not is a *recoverable*
+     * state, and must not be reported as "cold storage is behind".
+     *
+     * That message points at a push, and pushing here would overwrite the one
+     * good remaining copy with nothing. The honest reading is the opposite:
+     * the local layer is the one that is missing, and the remote is the thing
+     * to restore from.
+     */
+    public function test_a_missing_local_manifest_against_a_published_one_points_at_restore(): void
+    {
+        $this->seedAsset('AAA', $this->dates());
+        $this->reconcile();
+
+        app(ReconciliationMirror::class)->push();
+
+        // The local layer is lost; cold storage still has it.
+        Storage::disk('local')->delete('reconciliation/manifest.json');
+
+        $response = $this->fetch('/api/v1/backup-status')->assertOk();
+
+        $blockers = $response->json('data.readiness.blockers');
+        $joined = implode(' | ', $blockers);
+
+        $this->assertStringContainsString('cold storage', strtolower($joined));
+        $this->assertStringContainsString('data:restore', $joined);
+
+        // The misleading one must be gone: nothing local exists to be behind.
+        $this->assertStringNotContainsString('cold storage is behind', $joined);
+
+        $this->assertFalse($response->json('data.mirror.in_sync'));
+        $this->assertTrue($response->json('data.mirror.manifest_present'));
+        $this->assertNull($response->json('data.mirror.local_manifest_hash'));
+    }
+
+    /**
+     * A write must never remove the previous document before replacing it.
+     *
+     * The store promises that a process dying mid-write leaves the previous
+     * complete file. It deleted the destination and then renamed the
+     * temporary over the gap, so a failure or a kill between the two left
+     * nothing at all -- and for the manifest that means the recovery index
+     * disappears while cold storage still advertises one.
+     *
+     * rename() already replaces atomically on POSIX, so the delete only ever
+     * opened that window. Asserted on the calls rather than by forcing a
+     * failure, because the failure modes that would prove it (an unwritable
+     * directory) are not reproducible as root.
+     */
+    public function test_the_store_never_deletes_a_document_before_replacing_it(): void
+    {
+        $disk = \Mockery::mock(Filesystem::class);
+
+        // The destination already holds a good document.
+        $disk->shouldReceive('exists')
+            ->andReturnUsing(static fn (string $path): bool => $path === 'reconciliation/manifest.json');
+        $disk->shouldReceive('get')
+            ->with('reconciliation/manifest.json')
+            ->andReturn('{"schema_version":1,"marker":"original"}');
+        $disk->shouldReceive('put')->once()->andReturn(true);
+        $disk->shouldReceive('move')->once()->andReturn(true);
+
+        // The guarantee.
+        $disk->shouldNotReceive('delete');
+
+        Storage::shouldReceive('disk')->andReturn($disk);
+
+        app(ReconciliationStore::class)
+            ->writeManifest(['schema_version' => 1, 'marker' => 'replacement']);
     }
 
     public function test_the_reconciliation_endpoints_require_authentication(): void

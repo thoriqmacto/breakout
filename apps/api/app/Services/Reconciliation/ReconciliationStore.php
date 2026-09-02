@@ -251,6 +251,16 @@ class ReconciliationStore
      *
      * The temporary lives in the same directory on purpose: a rename across
      * filesystems is a copy, and a copy is not atomic.
+     *
+     * The rename goes straight over the destination. It used to delete the
+     * destination first, which quietly gave away the guarantee this method
+     * exists to provide: between the delete and the move there was no file at
+     * all, so a failure or a kill in that window destroyed the previous
+     * complete document rather than preserving it. For the manifest that is
+     * the worst version of the bug -- the recovery index vanishes locally
+     * while cold storage still advertises one, and the dashboard then has to
+     * reason about a state that should not be reachable. POSIX rename()
+     * replaces an existing file atomically, so the delete bought nothing.
      */
     private function putAtomically(string $path, string $contents): void
     {
@@ -262,10 +272,6 @@ class ReconciliationStore
         }
 
         try {
-            if ($disk->exists($path)) {
-                $disk->delete($path);
-            }
-
             if (! $disk->move($temporary, $path)) {
                 throw new RuntimeException(sprintf('Could not move %s into place.', $temporary));
             }

@@ -232,7 +232,11 @@ export function ReadinessCards({
                     ? "Unreachable"
                     : mirror.in_sync
                       ? "Published copy matches"
-                      : "Published copy is behind"}
+                      : mirror.manifest_present && mirror.local_manifest_hash === null
+                        ? // Not "behind" -- the published copy is the one that
+                          // survived, and pushing here would destroy it.
+                          "Published copy is ahead of this server"
+                        : "Published copy is behind"}
               </CardDescription>
             </div>
           </div>

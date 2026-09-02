@@ -36,6 +36,30 @@ return [
             'serve' => true,
             'throw' => false,
             'report' => false,
+
+            /*
+            | Flysystem creates a "private" directory as 0700. That is wrong
+            | for this application, because the CLI and the web process are
+            | different users: artisan runs as the deploy user and PHP-FPM as
+            | www-data, so any directory the scheduler creates becomes one the
+            | API cannot even traverse. The file inside is group-readable and
+            | entirely innocent; the directory is what locks it away.
+            |
+            | It is a silent failure, which is what makes it worth configuring
+            | rather than remembering: Storage::exists() simply returns false,
+            | so a present, correct file reads as missing. That is how a fully
+            | built reconciliation layer reported itself as "not built yet"
+            | while cold storage held a copy of it.
+            |
+            | 0775/0664 matches storage/app/private itself, which is already
+            | deploy:www-data and group-writable. mkdir() still applies the
+            | umask, so this yields 0775 or 0755 depending on the host -- both
+            | traversable by the web group, which 0700 never is.
+            */
+            'permissions' => [
+                'file' => ['public' => 0644, 'private' => 0664],
+                'dir' => ['public' => 0755, 'private' => 0775],
+            ],
         ],
 
         'public' => [
