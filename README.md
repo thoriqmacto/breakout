@@ -389,6 +389,284 @@ with an env override rather than a constant.
 would dress a guess as a finding. The risk/reward recomputation is the real protection — a gap that
 ruins the reward fails `min_rr` on its own.
 
+## The execution strategy (execution-v2)
+
+Everything above describes the v1 watchlist: what a setup looks like today. The v2 profile adds the
+half that was missing — what setups like it have historically done, and how a position is managed
+once it exists.
+
+```
+BROKER ACCUMULATION -> SETUP -> TRIGGER -> POSITION
+  -> +5% PROFIT ACTIVATION -> 2% TRAILING STOP -> EXIT
+```
+
+**The +5% level is not a profit target and never a promise.** It is the threshold that switches the
+trailing stop on. What the system can honestly say about it is empirical:
+
+> P(+5% before stop) — the share of *comparable historical setups* that reached +5% before their
+> initial stop.
+
+That is a frequency measured over past data, not a prediction, not advice, and not a guarantee.
+
+### Broker windows, read as four questions
+
+The 3/5/10/20-day rollups in `broker_accumulation_windows` already existed. What changed is that
+they are no longer averaged into one number:
+
+| Window | Question |
+| --- | --- |
+| 3D | short-term acceleration |
+| 5D | near-term confirmation |
+| 10D | primary accumulation regime |
+| 20D | background accumulation regime |
+
+A length-weighted average answers "how much net buying" and cannot answer "for how long", and those
+differ exactly where it matters:
+
+```
+A:  3D +0.09   5D -0.01   10D -0.02   20D -0.03
+B:  3D +0.01   5D +0.01   10D +0.01   20D +0.01
+```
+
+The average ranks A above B on the strength of one unusual session. B is the one that looks like
+somebody accumulating. `BrokerFlowAnalyzer` reports `broker_persistence_ratio`,
+`positive_broker_windows`, `available_broker_windows`, `broker_acceleration`, `top3_net_norm`,
+`avg_net_norm`, consistency, active brokers and concentration, and classifies a **regime** from the
+medium-term windows only — 3D alone can never declare one.
+
+| Regime | Rule |
+| --- | --- |
+| `STRONG_ACCUMULATION` | every medium-term window positive **and** top-3 net ≥ `broker_strong_top3_norm` |
+| `ACCUMULATION` | more medium-term windows positive than negative |
+| `NEUTRAL` | no consistent direction, or no medium-term window at all |
+| `DISTRIBUTION` | more medium-term windows negative than positive |
+| `STRONG_DISTRIBUTION` | every medium-term window negative **and** top-3 net ≤ −`broker_strong_top3_norm` |
+
+A window counts as directional only beyond `broker_flow_epsilon`; below it the flow is noise.
+
+### Lifecycle statuses
+
+| Status | Meaning |
+| --- | --- |
+| `WATCH` | Broker flow is interesting; the price setup is not ready. |
+| `ARMED` | Accumulating and within `armed_distance_atr` of the breakout level. |
+| `TRIGGERED` | Breakout confirmed; actionable next session inside the entry zone. |
+| `NO_CHASE` | Triggered, but price has run past the entry zone. A state, not a hidden row. |
+| `HOLD` | Held, below the trailing activation level. |
+| `TRAILING` | Held above activation; the trailing stop is live. |
+| `EXIT` | An exit condition has been met on an open position. |
+| `AVOID` | Distributive regime, invalid plan, or risk beyond the ceiling. |
+| `STALE_DATA` | The signal is current; its broker or price inputs are not. |
+
+`READY`, `WATCH`, `AVOID` and `STALE` remain for v1 rows so stored history and the existing API
+contract keep their meaning. A symbol the portfolio already holds is reported as a holding and
+never simultaneously as an unrelated watchlist candidate.
+
+### Stale broker data blocks execution
+
+Analysis tolerates broker data a few sessions old; execution does not. Execution candidates require
+broker rollups within `max_broker_lag_days_execution` (default 1) of the signal session — otherwise
+the row is `STALE_DATA` and cannot be `TRIGGERED`. The looser
+`execution.freshness.max_broker_lag_days` still governs the v1 status.
+
+One session of *lead* is not staleness: the plan is for T+1, so a bar existing for T+1 is the
+situation the plan was written for.
+
+### Entry: a zone, not a price
+
+```
+trigger_price   = one IDX tick above max(signal high, prior 20-session high)
+entry_zone_low  = trigger_price
+entry_zone_high = trigger_price + max_entry_extension_atr × ATR14     (default 0.5 ATR)
+```
+
+Measured in ATR rather than percent, because "1% above" means different things on a quiet stock and
+a volatile one. Past the zone the setup may be fine and the entry is not — that is `NO_CHASE`.
+
+### Initial stop, and rejection rather than resizing
+
+```
+volatility stop = breakout_level − initial_stop_atr_multiple × ATR14   (default 1.0 ATR)
+structural stop = 20-session swing low
+initial_stop    = the tighter of the two that still sits below the trigger
+```
+
+Measured from the **breakout level**, not the close: the level is where the idea is, and sizing risk
+off an extended close would widen the stop on exactly the entries that deserve the tightest one.
+
+If `initial_risk_pct` exceeds `max_initial_risk_pct` (default 4%) the plan is **rejected**, not
+resized. Sizing down converts a bad setup into a small bad setup.
+
+### +5% activation, 2% trail, +3% floor
+
+Before activation the position is managed by its structural stop. Once the highest price since entry
+reaches `entry × 1.05`:
+
+```
+profit_floor  = entry × 1.03
+trailing_stop = highest_since_entry × 0.98
+effective_stop = max(profit_floor, trailing_stop)      and may never move down
+```
+
+Worked example:
+
+```
+entry 1000, high 1050
+trail  1050 × 0.98 = 1029
+floor  1000 × 1.03 = 1030
+stop   max(1029, 1030) = 1030
+```
+
+The floor is what makes activation worth having: a 2% trail off a price only just above +5% would
+sit at +2.9%, and one ordinary pullback would give the move back.
+
+**+3% is a price level, not a guaranteed return.** Gaps can open below it, fills slip, and fees come
+off whatever is realised. The engine models the first two — a session opening below the stop exits
+at the open, not at the stop — and `TradingCostModel` handles the third. The workspace shows the
+round-trip cost next to the floor for exactly this reason.
+
+Persisted per holding in `position_risk_states`: `highest_price_since_entry`, `trailing_active`,
+`trailing_activated_at`, `trailing_activation_price`, `profit_floor_price`, `trailing_stop_price`,
+`effective_stop_price`, `stop_updated_at`. Stored rather than recomputed because a stop derived
+fresh on each request has no memory of where it has already been, and the ratchet is the guarantee.
+
+### Broker deterioration while holding
+
+One window turning negative is not an exit.
+
+| Condition | Action |
+| --- | --- |
+| 5D and 10D still positive | `HOLD` |
+| 3D negative, medium-term still accumulating | `HOLD_TIGHTEN_STOP` |
+| 3D **and** 5D negative | `EXIT_WARNING` |
+| 3D and 5D negative **and** price structure weakening | `EXIT_WARNING` (higher severity) |
+
+Broker flow never moves the price stop on its own: the stop is where the idea is wrong, and broker
+flow is evidence about the idea, not about the level.
+
+### Historical outcomes and P(+5% before stop)
+
+`strategy:evaluate-outcomes` reconstructs every scored session as it stood, then looks forward.
+
+Two questions, deliberately answered by two separate passes:
+
+- **The probability pass** — fixed initial stop, no trailing, no costs. A property of the *setup*, so
+  it does not move when the trailing parameters are tuned.
+- **The lifecycle pass** — the real trailing engine and the real cost model. A property of the
+  *strategy*, and the basis for expectancy and profit factor.
+
+Stored per `(asset, signal_date, strategy_version)` in `strategy_signal_outcomes` with MFE/MAE at
+1/3/5/10/20 sessions, `hit_5pct`, `days_to_5pct`, `hit_stop_before_5pct`,
+`reached_5pct_before_stop`, the trailing outcome, gross and net return, and `resolved`.
+
+Comparability is the `setup_bucket`: broker regime × breakout state × volume band × initial-risk
+band. Probability is looked up by bucket, falling back to a coarser one (regime × breakout) when the
+exact bucket is thin — and the response says which was used.
+
+**Below `minimum_probability_sample` (default 30) no rate is shown at all**, only
+`INSUFFICIENT_SAMPLE`. A hit rate over eleven trades rendered to one decimal place invites a decision
+it cannot support. Unresolved trades are excluded rather than counted as misses, which would bias
+every statistic downward exactly at the recent end of the data.
+
+### Anti-look-ahead rules
+
+The strategy must be runnable for any historical scan date without reading anything later:
+
+- Technicals come from `AssetTechnicalSnapshotService`, which is as-of by construction. The `metrics`
+  table is a cache of the *latest* snapshot and is never consulted historically.
+- Broker rollups are filtered to `end_date <= signal_date`.
+- Probability lookups take an `as_of` and exclude outcomes whose signal date is not strictly earlier
+  — look-ahead laundered through a statistic is still look-ahead.
+- In `SignalOutcomeEvaluator` no object holds both halves: signal construction is handed nothing
+  dated after the signal session, the simulator nothing dated before the entry.
+
+Asserted directly in `tests/Feature/Strategy/SignalOutcomeEvaluatorTest.php`: rewrite the future
+bars and every signal field must be unchanged while the outcome fields move.
+
+### Daily-candle ambiguity
+
+Daily bars do not reveal intraday sequence:
+
+```
+Open 1090   High 1130   Low 1070   Close 1115
+```
+
+If a session's range contains both a new trailing high and the stop, the data cannot say which came
+first. `intraday_assumption` defaults to `conservative`: the stop is checked against the level in
+force at the *start* of the session, so such a day is an exit and the new high never gets to raise
+the stop that would have saved it. `optimistic` exists only so the cost of the assumption can be
+measured. Reported rates are therefore conservative rather than flattering.
+
+### Trading costs
+
+`config/strategy_profile.php` → `costs`: `buy_fee_pct` (0.15), `sell_fee_pct` (0.25),
+`slippage_pct` (0.10), `round_to_tick`. Slippage is applied as an adverse price adjustment on both
+sides — you buy a little higher and sell a little lower — then rounded back onto the IDX tick ladder
+*away* from the trade, so rounding cannot hand back part of the slippage. Both `gross_return_pct`
+and `net_return_pct` are always produced; the gap between them is itself information.
+
+### The parameter grid
+
+`strategy:backtest-execution` compares five activation/trailing/floor combinations **on identical
+signals**, split chronologically by trade count into in-sample, validation and out-of-sample.
+
+Reporting 5/2/3 on its own would answer a much easier question. What is worth knowing is whether it
+sits on a plateau — neighbours performing similarly, so the choice is robust — or on a spike, where
+half a point either way collapses the result and the number is noise mistaken for an edge. The grid
+is five cells, not five hundred: every extra cell is another chance to fit this particular history.
+
+```bash
+php artisan strategy:backtest-execution --from=2024-01-01 --to=2026-06-30
+```
+
+Drawdown assumes one equally weighted position at a time and no compounding.
+
+### Parameters
+
+Every tunable lives in `config/strategy_profile.php` and reaches services through a
+`StrategyProfile` value object, so a simulation can vary one without mutating global state and every
+stored outcome records the profile version that produced it.
+
+```php
+'version'                    => 'execution-v2',
+'broker_windows'             => [3, 5, 10, 20],
+'trail_activation_gain_pct'  => 5.0,
+'trailing_distance_pct'      => 2.0,
+'minimum_locked_profit_pct'  => 3.0,
+'max_entry_extension_atr'    => 0.5,
+'max_initial_risk_pct'       => 4.0,
+'min_volume_ratio'           => 1.3,
+'preferred_volume_ratio'     => 1.5,
+'min_close_position'         => 0.70,
+'minimum_probability_sample' => 30,
+```
+
+**None of these defaults is a validated edge.** They are starting points, and the grid exists so
+they can be argued with.
+
+### Running it
+
+```bash
+# Daily: the refresh already chains this behind the watchlist step.
+php artisan automation:analysis-refresh
+
+# Backfill forward outcomes over a longer history.
+php artisan strategy:evaluate-outcomes --from=2024-01-01 --to=2026-08-31
+
+# Compare parameters.
+php artisan strategy:backtest-execution --lookback=730
+
+# The workspace reads the result.
+open /dashboard/execution
+```
+
+`strategy:evaluate-outcomes` is idempotent per `(asset, signal_date, strategy_version)` and runs
+over a trailing window by default, which is what converts recent unresolved signals into answers as
+the bars arrive.
+
+> **Research and decision support only.** `P(+5% before stop)` is an empirical historical frequency,
+> not a prediction and not a guarantee. Nothing on these surfaces is advice.
+
 ## Backtesting from T+1
 
 `strategy:backtest-watchlist` enters on the session **after** the signal. The previous version

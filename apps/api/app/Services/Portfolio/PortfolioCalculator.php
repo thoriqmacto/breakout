@@ -167,6 +167,12 @@ class PortfolioCalculator
                 'avg_cost' => 0.0,
                 'cost_basis' => 0.0,
                 'last_executed_at' => null,
+                // When the current holding was opened from flat. Reset to
+                // null whenever the position closes, so a symbol bought,
+                // sold and bought again reports the second entry rather than
+                // the first -- which is what the profit lifecycle measures
+                // its highest-price-since-entry from.
+                'opened_at' => null,
             ];
             $h = &$byAsset[$assetId];
 
@@ -176,6 +182,10 @@ class PortfolioCalculator
             $side = (string) $position->side;
 
             if ($side === 'entry') {
+                if ($h['qty'] <= 0) {
+                    $h['opened_at'] = $position->executed_at?->toDateString();
+                }
+
                 $newQty = $h['qty'] + $qty;
                 if ($newQty > 0) {
                     $h['avg_cost'] = (($h['avg_cost'] * $h['qty']) + ($price * $qty) + $feeValue) / $newQty;
@@ -188,6 +198,10 @@ class PortfolioCalculator
                     $realizedPl += ($price - $h['avg_cost']) * $exitQty - $feeValue;
                     $h['qty'] -= $exitQty;
                     $h['cost_basis'] = $h['avg_cost'] * $h['qty'];
+
+                    if ($h['qty'] <= 0) {
+                        $h['opened_at'] = null;
+                    }
                 } else {
                     $realizedPl -= $feeValue;
                 }
@@ -265,6 +279,7 @@ class PortfolioCalculator
                 ? null
                 : $this->round4((float) $holding['unrealized_pl_pct']),
             'last_executed_at' => $holding['last_executed_at'],
+            'opened_at' => $holding['opened_at'] ?? null,
         ];
     }
 
