@@ -133,7 +133,7 @@ return [
             'options' => [
                 'date' => ['type' => 'date', 'label' => 'Treat this date as today'],
                 'tickers' => ['type' => 'symbol_list', 'label' => 'Limit to specific tickers'],
-                'max-backfill-days' => ['type' => 'integer', 'min' => 1, 'max' => 3650, 'label' => 'Longest gap requested as one aggregate'],
+                'max-backfill-sessions' => ['type' => 'integer', 'min' => 1, 'max' => 400, 'label' => 'Most trading sessions collected per ticker per run'],
                 'from' => ['type' => 'date', 'label' => 'Force this start date for every ticker'],
                 'no-import' => ['type' => 'boolean', 'label' => 'Scrape without importing'],
                 'no-mirror' => ['type' => 'boolean', 'label' => 'Skip the Google Drive mirror'],
@@ -151,6 +151,18 @@ return [
                 'tickers' => ['type' => 'symbol_list', 'label' => 'Limit to specific tickers'],
                 'no-import' => ['type' => 'boolean', 'label' => 'Scrape without importing'],
                 'no-mirror' => ['type' => 'boolean', 'label' => 'Skip the Google Drive mirror'],
+            ],
+        ],
+
+        'automation:data-reconciliation' => [
+            'label' => 'Data reconciliation',
+            'description' => 'Rebuild changed asset reconciliation documents, refresh the manifest, and mirror them to cold storage.',
+            'arguments' => [],
+            'options' => [
+                'symbol' => ['type' => 'symbol_list', 'label' => 'Restrict to specific tickers'],
+                'force' => ['type' => 'boolean', 'label' => 'Rebuild every asset regardless of its fingerprint'],
+                'verify' => ['type' => 'boolean', 'label' => 'Re-read each document and check it against the manifest'],
+                'no-mirror' => ['type' => 'boolean', 'label' => 'Skip the cold-storage mirror'],
             ],
         ],
 
@@ -343,7 +355,7 @@ return [
         [
             'name' => 'Daily Broker Summary',
             'slug' => 'daily-broker-summary',
-            'description' => 'Every IDX trading day at 18:00 WIB, bring every broker-summary asset up to the latest valid trading day and mirror the JSON to Google Drive. Each asset is fetched for whatever range it is actually missing, so a normal night is one session and a gap is backfilled as a single aggregate covering it. Runs after the daily OHLCV job on the shared Stockbit lock.',
+            'description' => 'Every IDX trading day at 18:00 WIB, bring every broker-summary asset up to the latest valid trading day and mirror the JSON to Google Drive. Every window it creates is a genuine single trading session: a gap is repaired session by session rather than as one aggregate, because an aggregate cannot be taken apart into the daily path through it. Tickers missing the same session share one request. Runs after the daily OHLCV job on the shared Stockbit lock.',
             'command' => 'automation:broker-summary-daily',
             'parameters' => ['arguments' => [], 'options' => []],
             'cron_expression' => '0 18 * * *',
@@ -351,6 +363,21 @@ return [
             'priority' => 20,
             'enabled' => true,
             'sync_gdrive_after_success' => true,
+        ],
+        [
+            'name' => 'Daily Data Reconciliation',
+            'slug' => 'daily-data-reconciliation',
+            'description' => 'Every day at 18:00 WIB, after the collectors have landed and before the analysis refresh, rebuild the canonical recovery layer for whatever changed and publish it to cold storage. Priority 25 is the whole point of the position: it reads what the scrapes just wrote, so running earlier would reconcile a half-collected evening and publish that as the recovery copy. Every asset is examined through a cheap fingerprint; only assets whose inputs actually moved are rebuilt or uploaded, so a normal night touches a handful of files.',
+            'command' => 'automation:data-reconciliation',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '0 18 * * *',
+            'condition' => 'none',
+            'priority' => 25,
+            'enabled' => true,
+            // The command mirrors the reconciliation layer itself, with the
+            // asset-then-manifest ordering the commit marker depends on. A
+            // generic post-run sync would not preserve that order.
+            'sync_gdrive_after_success' => false,
         ],
         [
             'name' => 'Daily Analysis Refresh',

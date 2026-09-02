@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\BandarDetectorSummary;
 use App\Models\Price;
 use App\Services\Strategy\BrokerWindowResolver;
+use App\Support\BrokerFlow;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -152,7 +153,7 @@ class FeatureExtractionService
         $features['turnover_value'] = $turnoverValue;
         $features['turnover_volume'] = $turnoverVolume;
         $features['accdist_score'] = $bandarDetector
-            ? $this->mapAccdistToScore((string) $bandarDetector->broker_accdist)
+            ? BrokerFlow::score((string) $bandarDetector->broker_accdist)
             : 0;
 
         $denom = $turnoverValue > 0 ? $turnoverValue : null;
@@ -748,20 +749,6 @@ class FeatureExtractionService
         $last = $slice[array_key_last($slice)];
 
         return ($last - $first) / ($lastN - 1);
-    }
-
-    private function mapAccdistToScore(string $value): int
-    {
-        $lower = strtolower(trim($value));
-        if ($lower !== '' && str_contains($lower, 'acc')) {
-            return 1;
-        }
-
-        if ($lower !== '' && str_contains($lower, 'dist')) {
-            return -1;
-        }
-
-        return 0;
     }
 
     private function toNumber(mixed $value): float

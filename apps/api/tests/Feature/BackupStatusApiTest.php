@@ -7,7 +7,13 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
- * Covers GET /api/v1/backup-status.
+ * Covers the deep report, GET /api/v1/backup-status/audit.
+ *
+ * The file-by-file comparison used to be what GET /api/v1/backup-status
+ * returned. It now lives behind an explicit action, because its cost grows
+ * with every archived broker-summary JSON and the ordinary page load should
+ * not pay it. The behaviour it asserts is unchanged, so these tests moved
+ * endpoint rather than moving goalposts.
  *
  * The rule every test here defends: a filename existing in both places is not
  * synchronisation. The first version of this suite asserted synced = 1 for a
@@ -61,10 +67,10 @@ class BackupStatusApiTest extends TestCase
      */
     private function historical(): array
     {
-        $response = $this->getJson('/api/v1/backup-status');
+        $response = $this->getJson('/api/v1/backup-status/audit');
 
         if ($response->status() === 401) {
-            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status');
+            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status/audit');
         }
 
         $response->assertOk();
@@ -220,10 +226,10 @@ class BackupStatusApiTest extends TestCase
             'filesystems.disks.gdrive.refreshToken' => '',
         ]);
 
-        $response = $this->getJson('/api/v1/backup-status');
+        $response = $this->getJson('/api/v1/backup-status/audit');
 
         if ($response->status() === 401) {
-            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status');
+            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status/audit');
         }
 
         $response->assertOk();
@@ -250,10 +256,10 @@ class BackupStatusApiTest extends TestCase
             'filesystems.disks.gdrive.refreshToken' => 'refresh-token-value',
         ]);
 
-        $response = $this->getJson('/api/v1/backup-status');
+        $response = $this->getJson('/api/v1/backup-status/audit');
 
         if ($response->status() === 401) {
-            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status');
+            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status/audit');
         }
 
         $body = $response->assertOk()->getContent();
@@ -268,10 +274,10 @@ class BackupStatusApiTest extends TestCase
         Storage::disk('local')->put('broker_summary/BBRI.json', '{}');
         Storage::disk('gdrive')->put('broker_summary/TLKM.csv', 'date,broker');
 
-        $response = $this->getJson('/api/v1/backup-status');
+        $response = $this->getJson('/api/v1/backup-status/audit');
 
         if ($response->status() === 401) {
-            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status');
+            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status/audit');
         }
 
         $response->assertOk()
@@ -287,5 +293,6 @@ class BackupStatusApiTest extends TestCase
     public function test_it_requires_authentication(): void
     {
         $this->getJson('/api/v1/backup-status')->assertUnauthorized();
+        $this->getJson('/api/v1/backup-status/audit')->assertUnauthorized();
     }
 }

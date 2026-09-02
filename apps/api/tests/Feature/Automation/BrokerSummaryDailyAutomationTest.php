@@ -218,40 +218,75 @@ class BrokerSummaryDailyAutomationTest extends TestCase
         $this->assertGreaterThan(0, BrokerSummaryFact::query()->count());
     }
 
-    public function test_a_gap_is_backfilled_as_one_aggregate_covering_it(): void
+    /**
+     * The semantic this sprint changed.
+     *
+     * A gap used to be repaired with one aggregate covering it, which is a
+     * valid archive record and is *not* the daily path through the gap. Now
+     * each missing session is collected on its own, so the accumulation
+     * trajectory survives.
+     */
+    public function test_a_gap_is_backfilled_as_individual_single_day_sessions(): void
     {
         $asset = Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
-        // The three-month aggregate case: current only to 26 August.
+        // A three-month aggregate ending 26 August. It is real history and is
+        // left alone -- but it is not daily history, so the daily cursor
+        // treats this asset as having none and starts at the latest session.
         $this->storeWindow($asset, '2026-05-26', '2026-08-26');
+        $this->storeWindow($asset, '2026-08-26', '2026-08-26');
         $this->twoWeeks();
         $this->stubProfileUpdater();
 
         $mock = $this->stockbit();
-        $mock->shouldReceive('marketDetectors')
-            ->once()
-            ->with('BBCA', '2026-08-27', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
-            ->andReturn($this->detectorResponse('2026-08-27', '2026-08-28'));
+
+        foreach (['2026-08-27', '2026-08-28'] as $session) {
+            $mock->shouldReceive('marketDetectors')
+                ->once()
+                ->with('BBCA', $session, $session, Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+                ->andReturn($this->detectorResponse($session, $session));
+        }
 
         $this->runOn('2026-08-28 11:00:00');
 
         $metadata = app(RunMetadata::class)->all();
-        $this->assertSame([['from' => '2026-08-27', 'to' => '2026-08-28', 'tickers' => 1]], $metadata['ranges']);
+
+        $this->assertSame(
+            [['date' => '2026-08-27', 'tickers' => 1], ['date' => '2026-08-28', 'tickers' => 1]],
+            $metadata['sessions'],
+        );
+        $this->assertSame(2, $metadata['session_count']);
         $this->assertSame(1, $metadata['backfilled_ticker_count']);
 
-        // The window it already held is untouched: a new range is a new row.
-        $this->assertSame(2, BrokerSummaryWindow::query()->where('asset_id', $asset->id)->count());
+        // Every window this run created is a genuine single day.
+        foreach (['2026-08-27', '2026-08-28'] as $session) {
+            $window = BrokerSummaryWindow::query()
+                ->where('asset_id', $asset->id)
+                ->whereDate('from_date', $session)
+                ->sole();
+
+            $this->assertTrue($window->isSingleDay());
+        }
+
+        // The pre-existing aggregate is untouched: it is a real archive
+        // record and deleting it would lose evidence.
+        $this->assertSame(
+            1,
+            BrokerSummaryWindow::query()
+                ->where('asset_id', $asset->id)
+                ->whereColumn('from_date', '!=', 'to_date')
+                ->count(),
+        );
     }
 
-    public function test_a_resumed_range_snaps_forward_to_the_next_session(): void
+    public function test_a_resumed_series_snaps_forward_to_the_next_session(): void
     {
         $asset = Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
         $this->storeWindow($asset, '2026-08-28', '2026-08-28');
         $this->twoWeeks();
         $this->stubProfileUpdater();
 
-        // The day after Friday is Saturday. Asking for 29..31 August would
-        // return Monday's flow filed as a three-day range, which never reaches
-        // the daily projections.
+        // The day after Friday is Saturday, which is not a session. The
+        // walk skips it and asks for Monday.
         $mock = $this->stockbit();
         $mock->shouldReceive('marketDetectors')
             ->once()
@@ -281,66 +316,115 @@ class BrokerSummaryDailyAutomationTest extends TestCase
         $this->assertSame(1, $metadata['up_to_date_ticker_count']);
     }
 
-    public function test_an_asset_with_no_history_is_bounded_by_max_backfill_days(): void
+    /**
+     * A newly tracked asset must not trigger a months-long nightly backfill.
+     *
+     * It gets a cursor at the latest confirmed session and grows forward from
+     * there; establishing history backwards is an explicit --from decision,
+     * because it is an API budget question rather than routine maintenance.
+     */
+    public function test_an_asset_with_no_daily_history_starts_a_cursor_rather_than_backfilling(): void
     {
         Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
         $this->twoWeeks();
         $this->stubProfileUpdater();
 
-        // 28 August minus five days is 23 August, a Sunday, so the range opens
-        // on the Monday session that follows it.
         $mock = $this->stockbit();
         $mock->shouldReceive('marketDetectors')
             ->once()
-            ->with('BBCA', '2026-08-24', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
-            ->andReturn($this->detectorResponse('2026-08-24', '2026-08-28'));
+            ->with('BBCA', '2026-08-28', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+            ->andReturn($this->detectorResponse('2026-08-28', '2026-08-28'));
+
+        $this->runOn('2026-08-28 11:00:00');
+
+        $metadata = app(RunMetadata::class)->all();
+
+        $this->assertSame(1, $metadata['cursor_established_count']);
+        $this->assertSame(['BBCA'], $metadata['cursor_established_tickers']);
+        $this->assertSame(1, $metadata['session_count']);
+    }
+
+    /**
+     * An explicit --from is a deliberate historical backfill, and is still
+     * collected as individual sessions rather than as one aggregate.
+     */
+    public function test_an_explicit_from_collects_individual_sessions_bounded_by_the_limit(): void
+    {
+        Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
+        $this->twoWeeks();
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+
+        // Five sessions requested, three allowed: the most recent three win,
+        // so the asset keeps moving forward rather than crawling.
+        foreach (['2026-08-26', '2026-08-27', '2026-08-28'] as $session) {
+            $mock->shouldReceive('marketDetectors')
+                ->once()
+                ->with('BBCA', $session, $session, Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+                ->andReturn($this->detectorResponse($session, $session));
+        }
 
         Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));
 
         try {
-            Artisan::call('automation:broker-summary-daily', ['--max-backfill-days' => 5]);
+            Artisan::call('automation:broker-summary-daily', [
+                '--from' => '2026-08-24',
+                '--max-backfill-sessions' => 3,
+            ]);
         } finally {
             Carbon::setTestNow();
         }
 
-        $this->assertSame(1, app(RunMetadata::class)->get('backfilled_ticker_count'));
+        $metadata = app(RunMetadata::class)->all();
+
+        $this->assertSame(3, $metadata['session_count']);
+        $this->assertSame(['BBCA'], $metadata['clamped_tickers']);
     }
 
-    public function test_assets_at_different_points_are_grouped_into_one_request_each(): void
+    /**
+     * Grouping is by session, so the invocation count follows the number of
+     * dates rather than tickers times dates.
+     */
+    public function test_tickers_missing_the_same_session_share_one_invocation(): void
     {
         $current = Asset::create(['symbol' => 'AAAA', 'name' => 'AAAA']);
         $behind = Asset::create(['symbol' => 'BBBB', 'name' => 'BBBB']);
         $alsoBehind = Asset::create(['symbol' => 'CCCC', 'name' => 'CCCC']);
 
         $this->storeWindow($current, '2026-08-27', '2026-08-27');
-        $this->storeWindow($behind, '2026-08-25', '2026-08-25');
-        $this->storeWindow($alsoBehind, '2026-08-25', '2026-08-25');
+        $this->storeWindow($behind, '2026-08-26', '2026-08-26');
+        $this->storeWindow($alsoBehind, '2026-08-26', '2026-08-26');
 
         $this->twoWeeks();
         $this->stubProfileUpdater();
 
         $mock = $this->stockbit();
-        $mock->shouldReceive('marketDetectors')
-            ->once()
-            ->with('AAAA', '2026-08-28', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
-            ->andReturn($this->detectorResponse('2026-08-28', '2026-08-28'));
-        $mock->shouldReceive('marketDetectors')
-            ->once()
-            ->with('BBBB', '2026-08-26', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
-            ->andReturn($this->detectorResponse('2026-08-26', '2026-08-28'));
-        $mock->shouldReceive('marketDetectors')
-            ->once()
-            ->with('CCCC', '2026-08-26', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
-            ->andReturn($this->detectorResponse('2026-08-26', '2026-08-28'));
+
+        // 27 August: the two tickers that are a session further behind.
+        foreach (['BBBB', 'CCCC'] as $symbol) {
+            $mock->shouldReceive('marketDetectors')
+                ->once()
+                ->with($symbol, '2026-08-27', '2026-08-27', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+                ->andReturn($this->detectorResponse('2026-08-27', '2026-08-27'));
+        }
+
+        // 28 August: all three.
+        foreach (['AAAA', 'BBBB', 'CCCC'] as $symbol) {
+            $mock->shouldReceive('marketDetectors')
+                ->once()
+                ->with($symbol, '2026-08-28', '2026-08-28', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+                ->andReturn($this->detectorResponse('2026-08-28', '2026-08-28'));
+        }
 
         $this->runOn('2026-08-28 11:00:00');
 
-        // Two ranges, oldest first, with the two equally-behind tickers sharing
-        // a single scrape invocation rather than getting one each.
+        // Two sessions, oldest first, with the tickers that share a session
+        // grouped into one scrape invocation rather than getting one each.
         $this->assertSame([
-            ['from' => '2026-08-26', 'to' => '2026-08-28', 'tickers' => 2],
-            ['from' => '2026-08-28', 'to' => '2026-08-28', 'tickers' => 1],
-        ], app(RunMetadata::class)->get('ranges'));
+            ['date' => '2026-08-27', 'tickers' => 2],
+            ['date' => '2026-08-28', 'tickers' => 3],
+        ], app(RunMetadata::class)->get('sessions'));
     }
 
     public function test_it_collects_to_the_last_observed_day_when_today_is_unconfirmed(): void

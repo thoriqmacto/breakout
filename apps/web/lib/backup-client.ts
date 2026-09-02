@@ -89,8 +89,95 @@ export type PushResult = {
   skipped: string[]
   failed: string[]
   rejected: string[]
+  /** Broker-summary pushes also report archive paths with no local file. */
+  missing?: string[]
   report: Report
 }
+
+/**
+ * The fast payload: recovery readiness, not a file-by-file comparison.
+ *
+ * `GET /v1/backup-status` answers "can I rebuild, and is the off-server copy
+ * current?" from three reads. The forensic per-file comparison is the same
+ * `Report` as before, now behind `GET /v1/backup-status/audit`, because its
+ * cost grows with every archived broker-summary JSON and the page should not
+ * get slower every day it is used.
+ */
+export type ReadinessStatus = "ready" | "degraded" | "not_ready"
+
+export type IntegrityStatus = "healthy" | "warning" | "error"
+
+/** Nothing here reports "in sync" from a filename; hashes are compared. */
+export type MirrorState = {
+  enabled: boolean
+  disk: string | null
+  reachable: boolean
+  manifest_present: boolean
+  manifest_hash: string | null
+  local_manifest_hash: string | null
+  in_sync: boolean
+  message: string | null
+}
+
+export type ManifestSummary = {
+  present: boolean
+  schema_version: number | null
+  generated_at: string | null
+  market_date: string | null
+  manifest_path: string
+  manifest_hash: string | null
+  asset_count: number
+  healthy: number
+  warning: number
+  error: number
+  with_gaps: number
+  ohlcv_current: number
+  broker_current: number
+  latest_ohlcv_date: string | null
+  latest_broker_daily_date: string | null
+}
+
+/**
+ * A flow balance always travels with the number of sessions it was computed
+ * from. "+3" over three available sessions and "+3" over twenty are different
+ * statements, and a reader given only the number cannot tell them apart.
+ */
+export type FlowRow = {
+  symbol: string
+  latest_broker_date: string | null
+  latest_accdist: string | null
+  flow_balance: number | null
+  available_sessions: number
+  required_sessions: number
+  price_return: number | null
+  daily_windows: number
+  integrity_status: IntegrityStatus
+}
+
+export type FlowSnapshot = {
+  window: number
+  ranked_count: number
+  accumulating: FlowRow[]
+  distributing: FlowRow[]
+  insufficient: FlowRow[]
+  insufficient_count: number
+  note: string
+}
+
+export type ReadinessReport = {
+  generated_at: string
+  google_drive: DriveHealth
+  reconciliation: ManifestSummary
+  mirror: MirrorState
+  raw_archive: { mirror_enabled: boolean; disk: string | null; path: string }
+  readiness: { status: ReadinessStatus; blockers: string[]; warnings: string[] }
+  flow_snapshot: FlowSnapshot
+}
+
+/** The deep audit returns the old report plus the readiness block. */
+export type AuditReport = Report & { readiness_report: ReadinessReport }
+
+export type MirrorCollection = "historical" | "broker_summary"
 
 /** Presentation for each state. Only "synced" is ever green. */
 export const STATE_LABELS: Record<BackupState, string> = {
@@ -122,20 +209,60 @@ function message(payload: ApiResponse<unknown> | null, fallback: string): string
   )
 }
 
-export async function fetchBackupReport(token: string, fresh = false): Promise<Report> {
-  const response = await fetch(buildApiUrl(`/v1/backup-status${fresh ? "?fresh=1" : ""}`), {
+async function get<T>(token: string, path: string, fallback: string): Promise<T> {
+  const response = await fetch(buildApiUrl(path), {
     headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
   })
-  const payload = await parseJson<ApiResponse<Report>>(response)
+  const payload = await parseJson<ApiResponse<T>>(response)
 
   if (!response.ok || !payload || payload.status !== "success") {
-    throw new Error(message(payload, "Unable to load backup status"))
+    throw new Error(message(payload, fallback))
   }
 
   return payload.data
 }
 
-export async function pushToDrive(token: string, symbols?: string[]): Promise<PushResult> {
+/** The default page load: three reads, whatever the archive size. */
+export function fetchReadiness(token: string): Promise<ReadinessReport> {
+  return get<ReadinessReport>(token, "/v1/backup-status", "Unable to load backup readiness")
+}
+
+/**
+ * The forensic comparison, only when the reader asks for it.
+ *
+ * `fresh` bypasses the server-side cache, which matters straight after a push:
+ * a cached report showing a file as still pending is worse than the calls it
+ * saved.
+ */
+export function fetchAudit(token: string, fresh = false): Promise<AuditReport> {
+  return get<AuditReport>(
+    token,
+    `/v1/backup-status/audit${fresh ? "?fresh=1" : ""}`,
+    "Unable to run the deep audit",
+  )
+}
+
+/** Retained for callers that want the old single-request behaviour. */
+export function fetchBackupReport(token: string, fresh = false): Promise<Report> {
+  return get<Report>(
+    token,
+    `/v1/backup-status?deep=1${fresh ? "&fresh=1" : ""}`,
+    "Unable to load backup status",
+  )
+}
+
+/**
+ * Push local copies to Drive.
+ *
+ * The client names symbols, never paths, and only for the historical
+ * collection; the broker-summary archive is enumerated server-side from the
+ * local listing, so the browser cannot reach a file the page did not offer.
+ */
+export async function pushToDrive(
+  token: string,
+  symbols?: string[],
+  collection: MirrorCollection = "historical",
+): Promise<PushResult> {
   const response = await fetch(buildApiUrl("/v1/backup-status/mirror-push"), {
     method: "POST",
     headers: {
@@ -144,8 +271,8 @@ export async function pushToDrive(token: string, symbols?: string[]): Promise<Pu
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      collection: "historical",
-      ...(symbols && symbols.length > 0 ? { symbols } : {}),
+      collection,
+      ...(collection === "historical" && symbols && symbols.length > 0 ? { symbols } : {}),
     }),
   })
   const payload = await parseJson<ApiResponse<PushResult>>(response)

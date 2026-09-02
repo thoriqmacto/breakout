@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\ExecutionCandidateController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PortfolioImportController;
 use App\Http\Controllers\Api\V1\PositionController;
+use App\Http\Controllers\Api\V1\ReconciliationController;
 use App\Http\Controllers\Api\V1\ScheduledTaskController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\StockbitTokenController;
@@ -25,6 +26,20 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
 
     Route::post('backup-status/mirror-push', [BackupStatusController::class, 'mirrorPush'])
         ->name('backup-status.mirror-push');
+
+    // The forensic file-by-file comparison, kept off the normal page load:
+    // its cost grows with every archived broker-summary JSON, and the
+    // readiness question the dashboard opens with does not need it.
+    Route::get('backup-status/audit', [BackupStatusController::class, 'audit'])
+        ->name('backup-status.audit');
+
+    // Reconciliation: the list reads only the manifest, and a document is
+    // opened when the reader asks for one asset.
+    Route::get('reconciliation', [ReconciliationController::class, 'index'])
+        ->name('reconciliation.index');
+
+    Route::get('reconciliation/{symbol}', [ReconciliationController::class, 'show'])
+        ->name('reconciliation.show');
 
     // Assets
     Route::get('assets/{asset}/latest-price', [AssetController::class, 'latestPrice'])

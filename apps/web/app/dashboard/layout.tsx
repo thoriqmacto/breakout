@@ -79,7 +79,7 @@ const navigation: NavigationItem[] = [
     icon: Terminal,
   },
   {
-    label: "Backup Status",
+    label: "Backups & Recovery",
     href: "/dashboard/backups",
     icon: DatabaseBackup,
   },

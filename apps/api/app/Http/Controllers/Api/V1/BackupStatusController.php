@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Resources\ApiResponse;
 use App\Services\BackupStatus;
 use App\Services\BarCsvMirror;
+use App\Services\BrokerSummaryArchiveMirror;
+use App\Services\Reconciliation\ReconciliationReadiness;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -26,7 +28,40 @@ class BackupStatusController extends ApiController
      */
     private const LOCK_SECONDS = 300;
 
-    public function index(Request $request, BackupStatus $status)
+    /**
+     * The fast path: infrastructure health and recovery readiness.
+     *
+     * Deliberately does *not* compare every raw file against its Drive copy.
+     * That comparison is genuinely useful and genuinely expensive -- one
+     * metadata call per file, growing with every broker-summary JSON ever
+     * written -- so paying it on every page load meant the page got slower
+     * every day it was used. The recovery question ("can I rebuild, and is
+     * the off-server copy current?") is answered from the reconciliation
+     * manifest in three reads, whatever the archive size.
+     *
+     * `deep=1` still returns the full comparison for callers that want the
+     * old behaviour in one request; `audit` is the dedicated endpoint.
+     */
+    public function index(Request $request, BackupStatus $status, ReconciliationReadiness $readiness)
+    {
+        $fresh = $request->boolean('fresh');
+
+        if ($request->boolean('deep')) {
+            return ApiResponse::success($this->deepReport($status, $readiness, $fresh));
+        }
+
+        return ApiResponse::success($readiness->report());
+    }
+
+    /**
+     * The forensic path: do the individual raw files actually match?
+     *
+     * Separated by cost rather than by subject. This walks both collections
+     * and compares content, which is the only way to catch a Drive copy that
+     * was silently truncated or edited -- and is why it is an explicit
+     * action rather than something the dashboard does while you read it.
+     */
+    public function audit(Request $request, BackupStatus $status, ReconciliationReadiness $readiness)
     {
         $fresh = $request->boolean('fresh');
 
@@ -34,7 +69,19 @@ class BackupStatusController extends ApiController
             Cache::forget(self::CACHE_KEY);
         }
 
-        return ApiResponse::success($this->report($status, $fresh));
+        return ApiResponse::success($this->deepReport($status, $readiness, $fresh));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function deepReport(BackupStatus $status, ReconciliationReadiness $readiness, bool $fresh): array
+    {
+        if ($fresh) {
+            Cache::forget(self::CACHE_KEY);
+        }
+
+        return $this->report($status, $fresh) + ['readiness_report' => $readiness->report()];
     }
 
     /**
@@ -45,13 +92,21 @@ class BackupStatusController extends ApiController
      * cannot reach a file the page did not offer -- and cannot reach outside
      * the seed directory at all.
      */
-    public function mirrorPush(Request $request, BackupStatus $status, BarCsvMirror $mirror)
-    {
+    public function mirrorPush(
+        Request $request,
+        BackupStatus $status,
+        BarCsvMirror $mirror,
+        BrokerSummaryArchiveMirror $archive,
+    ) {
         $validated = $request->validate([
-            'collection' => ['sometimes', 'string', 'in:historical'],
+            'collection' => ['sometimes', 'string', 'in:historical,broker_summary'],
             'symbols' => ['sometimes', 'array', 'max:500'],
             'symbols.*' => ['string', 'regex:/^[A-Za-z0-9._-]{1,32}$/'],
         ]);
+
+        if (($validated['collection'] ?? 'historical') === 'broker_summary') {
+            return $this->pushBrokerSummary($status, $archive);
+        }
 
         $lock = Cache::lock('backup-status:mirror-push', self::LOCK_SECONDS);
 
@@ -110,6 +165,58 @@ class BackupStatusController extends ApiController
                 'rejected' => $rejected,
                 'report' => $this->report($status, true),
             ], $this->summarize($result));
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Repair the raw broker-summary archive on Drive.
+     *
+     * The historical CSVs were the only actionable collection here, which
+     * left the larger and more fragile archive with no way to fix a missing
+     * or altered remote file short of shell access. It reuses
+     * BrokerSummaryArchiveMirror, so the upload keeps its read-back
+     * verification rather than trusting that `put` returned quietly.
+     *
+     * The browser names nothing: paths come from the local archive listing on
+     * the server, exactly as the historical push derives symbols from the
+     * report rather than from the request.
+     */
+    private function pushBrokerSummary(BackupStatus $status, BrokerSummaryArchiveMirror $archive)
+    {
+        $lock = Cache::lock('backup-status:mirror-push', self::LOCK_SECONDS);
+
+        if (! $lock->get()) {
+            return ApiResponse::error('A Google Drive mirror push is already in progress.', 409);
+        }
+
+        try {
+            // No disk name is passed: the archive mirror resolves its own from
+            // configuration, and naming one here would push to Drive on a
+            // server where archive mirroring is deliberately switched off.
+            if (! $archive->enabled()) {
+                return ApiResponse::error('The broker-summary archive mirror is not configured.', 503);
+            }
+
+            $result = $archive->mirrorAll();
+            // summarize() reports counts and formatted failure strings; the
+            // raw result carries the paths the response quotes back.
+            $summary = $archive->summarize($result);
+
+            return ApiResponse::success([
+                'uploaded' => $result['uploaded'] ?? [],
+                'skipped' => $result['skipped_unchanged'] ?? [],
+                'failed' => $summary['failed'] ?? [],
+                'missing' => $result['missing'] ?? [],
+                'rejected' => [],
+                'report' => $this->report($status, true),
+            ], sprintf(
+                'Uploaded %d, already current %d, failed %d.',
+                (int) $summary['uploaded'],
+                (int) $summary['skipped_unchanged'],
+                count($summary['failed'] ?? []),
+            ));
         } finally {
             $lock->release();
         }
