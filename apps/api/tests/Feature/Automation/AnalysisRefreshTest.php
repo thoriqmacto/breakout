@@ -132,9 +132,9 @@ class AnalysisRefreshTest extends TestCase
         $metadata = $this->refresh();
 
         $this->assertSame(
-            ['features', 'metrics', 'rollup', 'watchlist', 'strategies'],
+            ['features', 'metrics', 'rollup', 'watchlist', 'strategies', 'outcomes'],
             array_keys($metadata['steps']),
-            'The order is the dependency graph: features and rollups before the things that read them.',
+            'The order is the dependency graph: features and rollups before the things that read them, and the forward-outcome pass last because it walks the watchlist signals the step before it wrote.',
         );
 
         foreach ($metadata['steps'] as $name => $step) {

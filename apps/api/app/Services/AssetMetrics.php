@@ -221,6 +221,37 @@ class AssetMetrics
         return $sum / count($slice);
     }
 
+    /**
+     * Exponential moving average of closes over a number of days.
+     *
+     * Seeded with the simple average of the first `days` bars rather than
+     * with the first close, so the result does not depend on how far back the
+     * caller happened to load. With a single-close seed an EMA20 computed
+     * from 300 bars and one computed from 60 differ for dozens of sessions,
+     * which would make an as-of snapshot depend on the lookback window and
+     * quietly break the guarantee that a historical snapshot is reproducible.
+     *
+     * Returns 0.0 when there are fewer bars than the period, matching the
+     * other averages here: the caller treats 0.0 as unavailable.
+     */
+    public function exponentialMovingAverage(int $days): float
+    {
+        if ($days < 1 || count($this->bars) < $days) {
+            return 0.0;
+        }
+
+        $closes = array_map(fn ($b) => (float) $b['close'], $this->bars);
+        $seed = array_slice($closes, 0, $days);
+        $ema = array_sum($seed) / $days;
+        $multiplier = 2.0 / ($days + 1);
+
+        foreach (array_slice($closes, $days) as $close) {
+            $ema = ($close - $ema) * $multiplier + $ema;
+        }
+
+        return $ema;
+    }
+
     public function movingAverageTradingDays(int $days = 150): float
     {
         if (empty($this->bars)) {

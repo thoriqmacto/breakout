@@ -49,6 +49,12 @@ final class AssetTechnicalSnapshot
         public readonly ?float $priorHigh20,
         public readonly ?float $swingLow20,
         public readonly ?float $closePos,
+        public readonly ?float $ema20 = null,
+        public readonly ?float $ema50 = null,
+        public readonly ?float $priorHigh55 = null,
+        public readonly ?float $prevClose = null,
+        public readonly ?float $gapPct = null,
+        public readonly ?bool $compression = null,
         public readonly array $warnings = [],
     ) {}
 
@@ -63,6 +69,76 @@ final class AssetTechnicalSnapshot
     public function isBreakout20(): bool
     {
         return $this->priorHigh20 !== null && $this->close > $this->priorHigh20;
+    }
+
+    /**
+     * The same comparison against the fifty-five sessions before this one.
+     *
+     * Not to be confused with `high55w`, which is the fifty-five *week* high
+     * and a different level entirely. A close through the 55-session high is
+     * a stronger structural statement than one through the 20-session high,
+     * and reporting both lets a breakout be graded rather than merely
+     * detected.
+     */
+    public function isBreakout55(): bool
+    {
+        return $this->priorHigh55 !== null && $this->close > $this->priorHigh55;
+    }
+
+    /**
+     * How far the close sits below its breakout level, measured in ATR.
+     *
+     * Zero once the level has been cleared. This is what separates a setup
+     * worth watching from one worth arming: "3% below the level" means
+     * nothing without knowing what a normal session is worth, and on a stock
+     * whose ATR is 4% it means the next session could do it.
+     */
+    public function distanceToBreakoutAtr(): ?float
+    {
+        if ($this->priorHigh20 === null || $this->atr14 === null || $this->atr14 <= 0) {
+            return null;
+        }
+
+        if ($this->close >= $this->priorHigh20) {
+            return 0.0;
+        }
+
+        return round(($this->priorHigh20 - $this->close) / $this->atr14, 4);
+    }
+
+    /**
+     * Distance to the breakout level as a percentage of the close.
+     */
+    public function distanceToBreakoutPct(): ?float
+    {
+        if ($this->priorHigh20 === null || $this->close <= 0) {
+            return null;
+        }
+
+        if ($this->close >= $this->priorHigh20) {
+            return 0.0;
+        }
+
+        return round((($this->priorHigh20 - $this->close) / $this->close) * 100.0, 4);
+    }
+
+    /**
+     * Whether the short exponential average sits above the medium one --
+     * the trend-quality condition, kept separate from the 150-session
+     * `uptrend` flag because they disagree usefully during a turn.
+     */
+    public function emaAligned(): ?bool
+    {
+        if ($this->ema20 === null || $this->ema50 === null) {
+            return null;
+        }
+
+        return $this->ema20 >= $this->ema50;
+    }
+
+    public function aboveEma20(): ?bool
+    {
+        return $this->ema20 === null ? null : $this->close > $this->ema20;
     }
 
     /**
@@ -120,7 +196,18 @@ final class AssetTechnicalSnapshot
             'prior_high20' => $this->priorHigh20,
             'swing_low20' => $this->swingLow20,
             'close_pos' => $this->closePos,
+            'ema20' => $this->ema20,
+            'ema50' => $this->ema50,
+            'prior_high55' => $this->priorHigh55,
+            'prev_close' => $this->prevClose,
+            'gap_pct' => $this->gapPct,
+            'compression' => $this->compression,
             'breakout20' => $this->isBreakout20(),
+            'breakout55' => $this->isBreakout55(),
+            'distance_to_breakout_atr' => $this->distanceToBreakoutAtr(),
+            'distance_to_breakout_pct' => $this->distanceToBreakoutPct(),
+            'ema_aligned' => $this->emaAligned(),
+            'above_ema20' => $this->aboveEma20(),
             'warnings' => $this->warnings,
         ];
     }

@@ -54,7 +54,8 @@ class AnalysisRefreshCommand extends Command
         {--skip-metrics : Do not recompute asset metrics}
         {--skip-rollup : Do not rebuild broker accumulation windows}
         {--skip-watchlist : Do not rescore the watchlist}
-        {--skip-strategies : Do not re-run the saved rule-builder strategies}';
+        {--skip-strategies : Do not re-run the saved rule-builder strategies}
+        {--skip-outcomes : Do not re-evaluate forward signal outcomes}';
 
     protected $description = 'Recompute features, metrics, broker rollups, watchlist scores and strategy runs from the latest imported data.';
 
@@ -160,6 +161,21 @@ class AnalysisRefreshCommand extends Command
                 'skip' => 'skip-strategies',
                 'command' => 'strategy:run',
                 'parameters' => ['--date' => $to->toDateString()],
+            ],
+            // Last, and over a trailing window rather than just today's
+            // session. A signal generated this week has not had time to
+            // resolve, so re-evaluating recent sessions on every run is what
+            // turns those open rows into answers as the bars arrive. It also
+            // has to follow the watchlist step, which supplies the signal
+            // spine it walks.
+            'outcomes' => [
+                'skip' => 'skip-outcomes',
+                'command' => 'strategy:evaluate-outcomes',
+                'parameters' => array_filter([
+                    '--to' => $to->toDateString(),
+                    '--lookback' => (string) max(1, (int) config('automation.outcome_lookback_days', 120)),
+                    '--symbol' => $symbols === [] ? null : $symbols,
+                ]),
             ],
         ];
 

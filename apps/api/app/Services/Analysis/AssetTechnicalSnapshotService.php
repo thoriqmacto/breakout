@@ -202,6 +202,27 @@ class AssetTechnicalSnapshotService
         );
         $swingLow20 = $swingLows === [] ? null : min($swingLows);
 
+        // The 55-session breakout reference, built the same way as the
+        // 20-session one: the highest high of the sessions *before* this one,
+        // never including the bar being classified.
+        $priorHigh55 = null;
+        if (count($rows) >= 56) {
+            $priorHigh55 = max(array_map(
+                static fn (array $bar): float => (float) $bar['high'],
+                array_slice($rows, -56, 55),
+            ));
+        }
+
+        $ema20 = $this->positiveOrNull($metrics->exponentialMovingAverage(20));
+        $ema50 = $this->positiveOrNull($metrics->exponentialMovingAverage(50));
+
+        $prevClose = count($rows) >= 2 ? (float) $rows[count($rows) - 2]['close'] : null;
+        $gapPct = ($prevClose !== null && $prevClose > 0)
+            ? round(((float) $last['open'] - $prevClose) / $prevClose * 100.0, 4)
+            : null;
+
+        $compression = $this->compression($rows, $atr14, $close);
+
         $range = $high - $low;
         $closePos = $range > 0 ? round(($close - $low) / $range, 6) : null;
 
@@ -237,8 +258,56 @@ class AssetTechnicalSnapshotService
             priorHigh20: $priorHigh20 === null ? null : round($priorHigh20, 4),
             swingLow20: $swingLow20 === null ? null : round($swingLow20, 4),
             closePos: $closePos,
+            ema20: $ema20 === null ? null : round($ema20, 4),
+            ema50: $ema50 === null ? null : round($ema50, 4),
+            priorHigh55: $priorHigh55 === null ? null : round($priorHigh55, 4),
+            prevClose: $prevClose === null ? null : round($prevClose, 4),
+            gapPct: $gapPct,
+            compression: $compression,
             warnings: $warnings,
         );
+    }
+
+    /**
+     * Whether volatility is compressing: today's ATR as a percentage of close
+     * sitting below the mean of the same measure over the previous ten
+     * sessions.
+     *
+     * Deliberately the definition FeatureExtractionService already uses for
+     * its `compression` flag, so the stored feature and the snapshot cannot
+     * disagree about the same session. Computed over the last eleven
+     * positions only -- an ATR at each needs fourteen bars behind it, and
+     * measuring further back would cost a great deal to answer a question
+     * nobody asked.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    private function compression(array $rows, ?float $atr14, float $close): ?bool
+    {
+        if ($atr14 === null || $close <= 0 || count($rows) < 25) {
+            return null;
+        }
+
+        $history = [];
+
+        for ($offset = 1; $offset <= 10; $offset++) {
+            $slice = array_slice($rows, 0, count($rows) - $offset);
+
+            if (count($slice) < 15) {
+                return null;
+            }
+
+            $priorClose = (float) $slice[count($slice) - 1]['close'];
+            $priorAtr = (new AssetMetrics($slice))->atr(14);
+
+            if ($priorClose <= 0 || $priorAtr <= 0) {
+                return null;
+            }
+
+            $history[] = $priorAtr / $priorClose;
+        }
+
+        return ($atr14 / $close) < (array_sum($history) / count($history));
     }
 
     /**

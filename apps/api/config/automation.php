@@ -169,6 +169,7 @@ return [
                 'skip-rollup' => ['type' => 'boolean', 'label' => 'Do not rebuild broker accumulation windows'],
                 'skip-watchlist' => ['type' => 'boolean', 'label' => 'Do not rescore the watchlist'],
                 'skip-strategies' => ['type' => 'boolean', 'label' => 'Do not re-run saved strategies'],
+                'skip-outcomes' => ['type' => 'boolean', 'label' => 'Do not re-evaluate forward signal outcomes'],
             ],
         ],
 
