@@ -1084,6 +1084,24 @@ RECONCILIATION_CHUNK_SIZE=25                # assets per chunk; documents are st
 Every one has a working default. A deployment that already configured `CSV_MIRROR_DISK` gets
 reconciliation mirroring without setting anything new.
 
+### Directory permissions
+
+The CLI and the web process are different users: artisan runs as the deploy user, PHP-FPM as
+`www-data`. Flysystem creates a "private" directory as **0700**, so every directory the scheduler
+created was one the API could not traverse — and the failure is silent, because
+`Storage::exists()` simply returns `false`. A fully built reconciliation layer reported itself as
+*"not built yet"* on that basis, while cold storage held a published copy of it.
+
+`config/filesystems.php` now sets 0775/0664 on the `local` disk, matching `storage/app/private`
+itself, which is already `deploy:www-data` and group-writable. That fixes directories created from
+now on. **Directories created before it need a one-time fix:**
+
+```bash
+chmod -R g+rX storage/app/private
+# confirm the web process can traverse it
+sudo -u www-data test -r storage/app/private/reconciliation/manifest.json && echo readable
+```
+
 ### Deploying this feature
 
 ```bash
@@ -1735,6 +1753,24 @@ AUTOMATION_MAX_OUTPUT_LENGTH=20000
 AUTOMATION_STOCKBIT_MIN_TTL_MINUTES=90
 AUTOMATION_STOCKBIT_WARN_TTL_MINUTES=720
 BROKER_SUMMARY_MIRROR_DISK=gdrive
+```
+
+### Directory permissions
+
+The CLI and the web process are different users: artisan runs as the deploy user, PHP-FPM as
+`www-data`. Flysystem creates a "private" directory as **0700**, so every directory the scheduler
+created was one the API could not traverse — and the failure is silent, because
+`Storage::exists()` simply returns `false`. A fully built reconciliation layer reported itself as
+*"not built yet"* on that basis, while cold storage held a published copy of it.
+
+`config/filesystems.php` now sets 0775/0664 on the `local` disk, matching `storage/app/private`
+itself, which is already `deploy:www-data` and group-writable. That fixes directories created from
+now on. **Directories created before it need a one-time fix:**
+
+```bash
+chmod -R g+rX storage/app/private
+# confirm the web process can traverse it
+sudo -u www-data test -r storage/app/private/reconciliation/manifest.json && echo readable
 ```
 
 ### Deploying this feature
