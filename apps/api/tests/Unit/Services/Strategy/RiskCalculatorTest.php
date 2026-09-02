@@ -80,4 +80,72 @@ class RiskCalculatorTest extends TestCase
         $this->assertStringContainsString('swing-low=970', $result['risk_notes']);
         $this->assertStringContainsString('high55=1100', $result['risk_notes']);
     }
+
+    /**
+     * The production failure of 2026-09-02, with MLPT's real numbers.
+     *
+     * MLPT split roughly 1:27 on 2026-05-21 (close 20,475 -> 770) and the
+     * stored bars are unadjusted, so the 55-*week* high still reaches across
+     * the split to a pre-split 257,875. Used as a take-profit against a close
+     * of 1,260 that is a 205x target and an R/R of 12,830.75, which does not
+     * fit `watchlist_scores.risk_reward` (decimal(8,4), max 9999.9999). The
+     * insert threw and took the whole watchlist step down with it.
+     *
+     * A target 205x the close is not resistance, it is a corporate action
+     * showing through, so the honest answer is to decline it and say so.
+     */
+    public function test_an_implausible_high55_is_not_used_as_a_target(): void
+    {
+        $calc = new RiskCalculator;
+
+        $result = $calc->compute(
+            close: 1260.0,
+            atr14: 100.0,
+            swingLow: 1240.0,
+            high55: 257875.0,
+        );
+
+        // Falls back to the minimum-target rule rather than the bad high.
+        $this->assertSame(1386.0, $result['take_profit']);
+        $this->assertSame(1240.0, $result['invalidation_level']);
+
+        // risk = max(1260-1240, 0.5% of 1260) = 20; reward = 126 -> 6.3
+        $this->assertSame(6.3, $result['risk_reward']);
+
+        $this->assertStringContainsString('high55 rejected', $result['risk_notes']);
+        $this->assertStringContainsString('257875', $result['risk_notes']);
+    }
+
+    /** A real drawdown is still a real resistance level. */
+    public function test_a_plausible_high55_is_still_used(): void
+    {
+        $calc = new RiskCalculator;
+
+        // 5.3x, the largest genuine drawdown in the current universe (TPIA).
+        $result = $calc->compute(close: 1000.0, atr14: 20.0, swingLow: null, high55: 5300.0);
+
+        $this->assertSame(5300.0, $result['take_profit']);
+        $this->assertStringNotContainsString('rejected', $result['risk_notes']);
+    }
+
+    /**
+     * The ratio can never exceed what the column can store, whatever the
+     * inputs. Belt and braces behind the target check: a tight stop against a
+     * just-plausible target is the other way to a very large ratio.
+     */
+    public function test_the_ratio_is_bounded_to_what_the_column_can_hold(): void
+    {
+        $calc = new RiskCalculator;
+
+        $result = $calc->compute(
+            close: 1000.0,
+            atr14: null,
+            swingLow: 999.999,
+            high55: 9000.0,
+            minTargetPct: 0.10,
+        );
+
+        $this->assertNotNull($result['risk_reward']);
+        $this->assertLessThanOrEqual(RiskCalculator::MAX_RISK_REWARD, $result['risk_reward']);
+    }
 }

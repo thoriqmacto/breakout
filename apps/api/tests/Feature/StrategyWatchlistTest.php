@@ -10,12 +10,14 @@ use App\Models\Price;
 use App\Models\User;
 use App\Models\WatchlistScore;
 use App\Services\Strategy\BrokerAccumulationAggregator;
+use App\Services\Strategy\RiskCalculator;
 use App\Services\Strategy\WatchlistRanker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use RuntimeException;
 use Tests\TestCase;
 
 class StrategyWatchlistTest extends TestCase
@@ -85,6 +87,104 @@ class StrategyWatchlistTest extends TestCase
         $this->assertSame((int) $asset->id, (int) $persisted->asset_id);
         $this->assertEquals($row['score_total'], (float) $persisted->score_total);
         $this->assertIsArray($persisted->reasons);
+    }
+
+    /**
+     * The 2026-09-02 production failure, end to end.
+     *
+     * MLPT split roughly 1:27 on 2026-05-21 and the bars are stored
+     * unadjusted, so the 55-week window still reaches a pre-split high two
+     * hundred times the current price. Used as a take-profit that produced an
+     * R/R of 12,830.75, which does not fit `risk_reward` (decimal(8,4)).
+     *
+     * Note this cannot be reproduced by an overflow here: the suite runs on
+     * SQLite, which does not enforce DECIMAL precision, while production runs
+     * on MariaDB, which does. That difference is why the bad value reached
+     * production green. So the assertion is on the value itself -- it must be
+     * in range and it must be sane -- which holds on either driver.
+     */
+    public function test_a_split_contaminated_high_does_not_poison_the_score(): void
+    {
+        $this->seedFullAsset('MLPT');
+
+        // The pre-split bar, still inside the 55-week window.
+        Price::create([
+            'asset_id' => Asset::where('symbol', 'MLPT')->value('id'),
+            'date' => '2026-04-07',
+            'open' => 250_000,
+            'high' => 257_875,
+            'low' => 240_000,
+            'close' => 245_000,
+            'volume' => 500_000,
+        ]);
+
+        $result = app(WatchlistRanker::class)->rank(Carbon::parse($this->scanDate), [
+            'min_turnover' => 100_000,
+            'min_brokers' => 1,
+            'min_rr' => 0.5,
+            'top' => 10,
+        ]);
+
+        $this->assertSame([], $result['failed']);
+        $this->assertSame(1, $result['persisted']);
+
+        $row = $result['rows'][0];
+
+        // The unusable high is declined, and the row says so rather than
+        // quietly presenting a 200x target as a plan.
+        $this->assertLessThan(
+            RiskCalculator::MAX_RISK_REWARD,
+            (float) $row['risk_reward'],
+            'The ratio would not fit watchlist_scores.risk_reward on MariaDB.',
+        );
+        $this->assertLessThan(257_875.0, (float) $row['take_profit']);
+        $this->assertStringContainsString('high55 rejected', $row['risk_notes']);
+    }
+
+    /**
+     * One symbol that will not store must cost only that symbol.
+     *
+     * Rows are written in score order, so before this an exception part way
+     * through kept everything ranked above the bad symbol, dropped everything
+     * below it, and failed the step -- and which symbols survived depended on
+     * where the bad one happened to rank that day.
+     *
+     * The write is made to throw directly rather than through a column
+     * overflow, because the overflow that caused the outage is invisible on
+     * SQLite. What is under test is the isolation, not the cause.
+     */
+    public function test_one_unstorable_symbol_does_not_discard_the_others(): void
+    {
+        $this->seedFullAsset('AAAA');
+        $this->seedFullAsset('BOOM');
+        $this->seedFullAsset('ZZZZ');
+
+        WatchlistScore::saving(static function (WatchlistScore $score): void {
+            if ($score->symbol === 'BOOM') {
+                throw new RuntimeException('simulated storage failure');
+            }
+        });
+
+        try {
+            $result = app(WatchlistRanker::class)->rank(Carbon::parse($this->scanDate), [
+                'min_turnover' => 100_000,
+                'min_brokers' => 1,
+                'min_rr' => 0.5,
+                'top' => 10,
+            ]);
+        } finally {
+            WatchlistScore::flushEventListeners();
+        }
+
+        $this->assertSame(3, $result['scored']);
+        $this->assertSame(2, $result['persisted']);
+
+        // Named, not absorbed.
+        $this->assertArrayHasKey('BOOM', $result['failed']);
+        $this->assertStringContainsString('simulated storage failure', $result['failed']['BOOM']);
+
+        $stored = WatchlistScore::query()->pluck('symbol')->sort()->values()->all();
+        $this->assertSame(['AAAA', 'ZZZZ'], $stored);
     }
 
     public function test_endpoint_returns_persisted_rows_for_default_latest_date(): void

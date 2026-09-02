@@ -41,10 +41,24 @@ class RankWatchlistCommand extends Command
             'min_rr' => (float) $this->option('min-rr'),
         ]);
 
+        // Reported before anything else, and the command fails on them. A row
+        // that would not store is now isolated so the rest of the universe is
+        // still scored -- but a symbol quietly missing from the watchlist is
+        // the failure mode worth shouting about, not one to absorb.
+        $failed = $result['failed'] ?? [];
+
+        if ($failed !== []) {
+            $this->error(sprintf('%d symbol(s) could not be persisted:', count($failed)));
+
+            foreach ($failed as $symbol => $message) {
+                $this->line(sprintf('  %s: %s', $symbol, $message));
+            }
+        }
+
         if ($result['rows'] === []) {
             $this->warn(sprintf('No watchlist candidates evaluated for %s.', $result['scan_date']));
 
-            return self::SUCCESS;
+            return $failed === [] ? self::SUCCESS : self::FAILURE;
         }
 
         $this->info(sprintf(
@@ -74,7 +88,7 @@ class RankWatchlistCommand extends Command
         $this->newLine();
         $this->line('Note: outputs are research/watchlist support only — no profit guarantee, no execution.');
 
-        return self::SUCCESS;
+        return $failed === [] ? self::SUCCESS : self::FAILURE;
     }
 
     private function resolveDate(): ?Carbon

@@ -8,6 +8,7 @@ use App\Models\WatchlistScore;
 use App\Services\Analysis\AssetTechnicalSnapshotService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Orchestrates the per-symbol scoring pipeline:
@@ -177,14 +178,15 @@ class WatchlistRanker
         });
 
         // Everything evaluated is persisted; only the caller's view is capped.
-        $persisted = $this->persist($rows, $version);
+        $written = $this->persist($rows, $version);
 
         return [
             'scan_date' => $scanDate->toDateString(),
             'version' => $version,
             'evaluated' => count($assetMap),
             'scored' => count($rows),
-            'persisted' => $persisted,
+            'persisted' => $written['persisted'],
+            'failed' => $written['failed'],
             'rows' => array_slice($rows, 0, $top),
         ];
     }
@@ -326,9 +328,26 @@ class WatchlistRanker
     /**
      * @param  array<int, array<string, mixed>>  $rows
      */
-    private function persist(array $rows, string $version): int
+    /**
+     * Write the scored rows, one symbol at a time.
+     *
+     * A row that will not store is isolated rather than allowed to abort the
+     * pass. Rows are sorted by score before this runs, so an exception part
+     * way through used to persist everything above the offending symbol,
+     * discard everything below it, and fail the whole step -- and which
+     * symbols survived depended on where the bad one happened to rank.
+     *
+     * The failures are returned and reported, never swallowed: one symbol
+     * silently missing from the watchlist is the outcome this is meant to
+     * prevent, not the one it should cause.
+     *
+     * @return array{persisted: int, failed: array<string, string>}
+     */
+    private function persist(array $rows, string $version): array
     {
         $count = 0;
+        $failed = [];
+
         foreach ($rows as $row) {
             // Carried on the row for the caller, not stored: the snapshot is
             // an object, and structural rank is a property of the universe
@@ -341,17 +360,21 @@ class WatchlistRanker
             $row['top_brokers'] = $row['top_brokers'] ?? [];
             $row['reasons'] = $row['reasons'] ?? [];
 
-            WatchlistScore::updateOrCreate(
-                [
-                    'scan_date' => $row['scan_date'],
-                    'symbol' => $row['symbol'],
-                    'version' => $version,
-                ],
-                $row
-            );
-            $count++;
+            try {
+                WatchlistScore::updateOrCreate(
+                    [
+                        'scan_date' => $row['scan_date'],
+                        'symbol' => $row['symbol'],
+                        'version' => $version,
+                    ],
+                    $row
+                );
+                $count++;
+            } catch (Throwable $exception) {
+                $failed[$row['symbol']] = $exception->getMessage();
+            }
         }
 
-        return $count;
+        return ['persisted' => $count, 'failed' => $failed];
     }
 }

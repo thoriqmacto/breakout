@@ -317,6 +317,48 @@ the execution pipeline; it has no place in a structural ordering.
 
 The CLI, the API, the scheduler and the watchlist ranker are all thin callers of that one service.
 
+### Corporate actions and the long windows
+
+Bars are stored **unadjusted**: a split leaves pre-split and post-split prices in the same series,
+at face value. That is harmless for the short formulas and not harmless for the long ones. The
+55-week high looks back 275 sessions, so for most of a year after a split it still reaches prices
+from before it.
+
+MLPT is the worked example. It split roughly 1:27 on 2026-05-21 (close 20,475 → 770), and on
+2026-09-02 its 55-week high was still a pre-split 257,875 against a close of 1,260 — a multiple of
+205. Used as a take-profit that produced a risk/reward of 12,830.75, which does not fit
+`watchlist_scores.risk_reward` (`decimal(8,4)`), and the insert took the whole watchlist step down
+with it.
+
+Two guards, in `RiskCalculator`:
+
+- **`MAX_TARGET_MULTIPLE` (10.0).** A 55-week high more than ten times the reference price is not
+  resistance and is not used as a target; the row falls back to the minimum-target rule and
+  `risk_notes` records the rejected value. Ten is chosen from the data rather than taste: the
+  largest genuine drawdown in the current universe puts its 55-week high at 5.3× the close, and
+  the contaminated case sits at 205×, so the threshold has a wide margin either side of the gap.
+  `ExecutionPlanner` applies the same rule through `RiskCalculator::isUsableTarget()`, because it
+  builds its target from the same input and sorts candidates by the resulting ratio.
+- **`MAX_RISK_REWARD`.** A final ceiling matching what the column can store. The target check
+  already keeps the ratio far below it; reaching it means an input the class did not anticipate,
+  and capping beats aborting the pass.
+
+Neither guard repairs the series. **`close_vs_high55` is computed upstream and is still wrong for
+a split-contaminated symbol** — MLPT reads as 99.5% below its one-year high — and that field is
+the third structural sort key, so such a symbol is still mis-ranked. Detecting corporate actions,
+or storing an adjustment factor, is a separate piece of work.
+
+`strategy:rank-watchlist` also isolates per-symbol write failures now. Rows are written in score
+order, so an exception part way through used to keep everything above the offending symbol and
+discard everything below it — with which symbols survived depending on where the bad one happened
+to rank. Failures are collected, listed by symbol, and the command exits non-zero: one symbol
+missing from the watchlist should be loud, not absorbed.
+
+> **A note on the test suite.** The suite runs on SQLite, which does not enforce `DECIMAL`
+> precision; production runs on MariaDB, which does. An out-of-range decimal is therefore
+> invisible to CI, which is why this reached production green. Tests around numeric ranges assert
+> the *value*, not that the insert succeeds.
+
 ### As-of, never latest
 
 Every snapshot is built only from bars dated on or before the date requested, so a snapshot for
