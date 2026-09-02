@@ -194,9 +194,73 @@ class BackupMirrorPushTest extends TestCase
         $this->push(['symbols' => ['/etc/passwd']])->assertStatus(422);
     }
 
-    public function test_an_unsupported_collection_is_rejected(): void
+    public function test_an_unknown_collection_is_rejected(): void
     {
-        $this->push(['collection' => 'broker_summary'])->assertStatus(422);
+        $this->push(['collection' => 'everything'])->assertStatus(422);
+    }
+
+    /**
+     * With no archive mirror configured, a push says so rather than reporting
+     * a success that uploaded nothing.
+     */
+    public function test_a_broker_summary_push_without_a_configured_mirror_is_refused(): void
+    {
+        config(['automation.broker_summary_mirror_disk' => null]);
+
+        Storage::disk('local')->put('broker_summary/BBCA_2026-08-28_2026-08-28_ALL.json', '{"a":1}');
+
+        $this->push(['collection' => 'broker_summary'])->assertStatus(503);
+
+        $this->assertFalse(
+            Storage::disk('gdrive')->exists('broker_summary/BBCA_2026-08-28_2026-08-28_ALL.json'),
+        );
+    }
+
+    /**
+     * The browser names nothing. Paths come from the local archive listing on
+     * the server, so a symbol list in the request cannot narrow -- or widen --
+     * what is uploaded.
+     */
+    public function test_a_broker_summary_push_uploads_the_server_side_listing(): void
+    {
+        config(['automation.broker_summary_mirror_disk' => 'gdrive']);
+
+        Storage::disk('local')->put('broker_summary/BBCA_2026-08-28_2026-08-28_ALL.json', '{"a":1}');
+        Storage::disk('local')->put('broker_summary/TLKM_2026-08-28_2026-08-28_ALL.json', '{"b":2}');
+
+        $response = $this->push([
+            'collection' => 'broker_summary',
+            'symbols' => ['BBCA'],
+        ])->assertOk();
+
+        $uploaded = $response->json('data.uploaded');
+
+        $this->assertCount(2, $uploaded, 'The push honoured a browser-supplied symbol list.');
+
+        foreach (['BBCA', 'TLKM'] as $symbol) {
+            $path = "broker_summary/{$symbol}_2026-08-28_2026-08-28_ALL.json";
+
+            $this->assertTrue(Storage::disk('gdrive')->exists($path));
+            $this->assertSame(
+                Storage::disk('local')->get($path),
+                Storage::disk('gdrive')->get($path),
+            );
+        }
+    }
+
+    /** A second push re-uploads nothing: the remote bytes already match. */
+    public function test_a_repeated_broker_summary_push_skips_unchanged_files(): void
+    {
+        config(['automation.broker_summary_mirror_disk' => 'gdrive']);
+
+        Storage::disk('local')->put('broker_summary/BBCA_2026-08-28_2026-08-28_ALL.json', '{"a":1}');
+
+        $this->push(['collection' => 'broker_summary'])->assertOk();
+
+        $this->push(['collection' => 'broker_summary'])
+            ->assertOk()
+            ->assertJsonCount(0, 'data.uploaded')
+            ->assertJsonCount(1, 'data.skipped');
     }
 
     public function test_a_concurrent_push_is_refused(): void

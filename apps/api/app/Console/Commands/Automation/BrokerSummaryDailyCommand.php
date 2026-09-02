@@ -15,25 +15,41 @@ use Illuminate\Support\Carbon;
 
 /**
  * The daily broker summary: bring every asset up to the latest valid trading
- * day, whatever it is currently behind by.
+ * day, one genuine trading session at a time.
  *
- * The range is resolved per asset rather than globally, because assets are not
- * equally current. One added last month has nothing stored; one imported as a
- * three-month aggregate is current to the end of that aggregate; one collected
- * yesterday needs a single day. Asking a single question -- "what has this
- * asset not got yet?" -- gives all three the right range without a separate
- * backfill mode to remember to run.
+ * The range is resolved per asset, because assets are not equally current.
+ * One collected yesterday needs a single day; one that missed a week needs
+ * that week; one added last month has no daily history at all.
  *
- *   from = the first trading day after that asset's newest stored window
- *   to   = the latest day the calendar positively records as having traded
+ * **Every window this command creates is a single trading session.** That is
+ * the rule the whole daily pipeline now rests on, and it is a change from how
+ * this job first worked. It used to repair a multi-day gap by fetching one
+ * aggregate covering the whole of it -- cheaper, and a perfectly valid archive
+ * record, but not the same thing. Monday's flow, Tuesday's flow and
+ * Wednesday's flow are three observations; their sum over Monday to Wednesday
+ * is one. A range aggregate cannot be taken apart into the path through it,
+ * so an aggregate filed where daily observations belong silently destroys the
+ * accumulation/distribution trajectory it looks like it provides.
  *
- * In the steady state those are the same date, so the window is a single day
- * and reaches broker_summary_facts and broksums like any daily import. After
- * a gap they are not, and the gap is fetched as one aggregate covering it --
- * one request rather than one per missing session, which is the difference
- * between a backfill that completes tonight and one that spends a week of API
- * budget. A range aggregate is stored as exactly what it is, and every
- * consumer already reads windows by range.
+ * So a gap is repaired as individual sessions. Tickers missing the same
+ * session are grouped, which keeps the invocation count proportional to the
+ * number of *dates* rather than to tickers times dates: four hundred tickers
+ * missing three sessions is three scrapes, not twelve hundred.
+ *
+ * `--max-backfill-sessions` bounds what one run will ask for, and the most
+ * recent sessions are taken first so an asset keeps moving forward every
+ * night rather than crawling out of a long gap oldest-first.
+ *
+ * An asset with **no** genuine daily history is deliberately not given months
+ * of it by a nightly job. It gets a cursor -- the latest confirmed session --
+ * and grows a daily series forward from there. Establishing history backwards
+ * is an explicit, bounded operation via `--from`, because it is an API budget
+ * decision rather than routine maintenance.
+ *
+ * Existing multi-day aggregates are untouched and remain valid: they are real
+ * archive records and good evidence at their own length. The database
+ * legitimately holds both, and only `from_date === to_date` windows are ever
+ * treated as daily observations.
  *
  * `to` is deliberately the last *observed* trading day and not today. The
  * calendar is derived from published bars, so on a trading afternoon before
@@ -42,7 +58,7 @@ use Illuminate\Support\Carbon;
  * `days_behind` and closes itself on the next run.
  *
  * Nothing here is destructive. A window is keyed on
- * (asset, from_date, to_date, transaction_type), so re-running a range
+ * (asset, from_date, to_date, transaction_type), so re-running a session
  * converges on the same row instead of duplicating, and an asset that is
  * already current is skipped without an API call.
  */
@@ -53,7 +69,7 @@ class BrokerSummaryDailyCommand extends Command
     protected $signature = 'automation:broker-summary-daily
         {--date= : Treat this date as today (YYYY-MM-DD, default: today in Asia/Jakarta)}
         {--tickers=* : Limit the run to specific tickers}
-        {--max-backfill-days=120 : Longest gap one run will request as a single aggregate}
+        {--max-backfill-sessions=5 : Most trading sessions one run will collect per ticker}
         {--from= : Force this start date for every ticker, ignoring what is already stored}
         {--no-import : Scrape and archive without importing}
         {--no-mirror : Skip the Google Drive mirror for this run}
@@ -75,6 +91,15 @@ class BrokerSummaryDailyCommand extends Command
      * this the counts still tell the whole story.
      */
     private const MAX_REPORTED = 50;
+
+    /**
+     * Hard ceiling on how many sessions one range walk will enumerate.
+     *
+     * The per-run limit is `--max-backfill-sessions`; this is a guard on the
+     * walk itself, so an explicit `--from` years in the past cannot turn into
+     * an unbounded loop before the clamp is ever applied.
+     */
+    private const MAX_SESSION_SCAN = 400;
 
     public function handle(
         TradingWeekResolver $calendar,
@@ -163,10 +188,15 @@ class BrokerSummaryDailyCommand extends Command
             'backfilled_ticker_count' => count($plan['backfilled']),
             'clamped_ticker_count' => count($plan['clamped']),
             'clamped_tickers' => array_slice($plan['clamped'], 0, self::MAX_REPORTED),
-            'ranges' => array_slice(array_map(
+            'cursor_established_count' => count($plan['cursor_established']),
+            'cursor_established_tickers' => array_slice($plan['cursor_established'], 0, self::MAX_REPORTED),
+            'session_count' => count($plan['groups']),
+            // Every entry here is one trading session. The key is named
+            // `sessions` rather than `ranges` because a range is exactly what
+            // this job no longer produces.
+            'sessions' => array_slice(array_map(
                 static fn (array $group): array => [
-                    'from' => $group['from'],
-                    'to' => $group['to'],
+                    'date' => $group['from'],
                     'tickers' => count($group['tickers']),
                 ],
                 array_values($plan['groups']),
@@ -202,12 +232,20 @@ class BrokerSummaryDailyCommand extends Command
         }
 
         $this->info(sprintf(
-            'Collecting through %s: %d ticker(s) across %d range(s), %d already current.',
+            'Collecting through %s: %d ticker(s) across %d trading session(s), %d already current.',
             $to->toDateString(),
             count($tickers) - count($plan['up_to_date']),
             count($plan['groups']),
             count($plan['up_to_date']),
         ));
+
+        if ($plan['cursor_established'] !== []) {
+            $this->line(sprintf(
+                '  %d ticker(s) have no daily history yet and are starting a daily series at %s. Use --from to establish history backwards deliberately.',
+                count($plan['cursor_established']),
+                $to->toDateString(),
+            ));
+        }
 
         $exitCode = self::SUCCESS;
         $written = [];
@@ -215,11 +253,9 @@ class BrokerSummaryDailyCommand extends Command
 
         foreach ($plan['groups'] as $group) {
             $this->line(sprintf(
-                '  %s → %s for %d ticker(s)%s',
+                '  %s for %d ticker(s)',
                 $group['from'],
-                $group['to'],
                 count($group['tickers']),
-                $group['from'] === $group['to'] ? '' : ' (backfill)',
             ));
 
             $result = $this->scrapeWindow($group['tickers'], $group['from'], $group['to']);
@@ -293,65 +329,67 @@ class BrokerSummaryDailyCommand extends Command
      */
     private function plan(TradingWeekResolver $calendar, array $tickers, Carbon $to, ?Carbon $forced): array
     {
-        $latest = $this->latestStoredEnd($tickers, $calendar->timezone());
-        $maxBackfill = max(1, (int) $this->option('max-backfill-days'));
-        $floor = $to->copy()->subDays($maxBackfill);
+        $latestDaily = $this->latestStoredSingleDay($tickers, $calendar->timezone());
+        $maxSessions = max(1, (int) $this->option('max-backfill-sessions'));
 
         $groups = [];
         $upToDate = [];
         $backfilled = [];
         $clamped = [];
+        $cursorEstablished = [];
 
         foreach ($tickers as $ticker) {
-            $stored = $latest[$ticker] ?? null;
+            $cursor = $latestDaily[$ticker] ?? null;
 
             if ($forced !== null) {
+                // An explicit start date is a deliberate, bounded historical
+                // backfill. It is still collected as individual sessions --
+                // the point of the option is to obtain daily history, not to
+                // obtain one long aggregate faster.
                 $from = $forced->copy();
-            } elseif ($stored === null) {
-                // Nothing stored at all. One bounded aggregate gives the asset
-                // a usable history immediately; anything longer is a decision
-                // for broker-summary:rebuild or an explicit --from.
-                $from = $floor->copy();
+            } elseif ($cursor === null) {
+                // No genuine daily history. A nightly job must not decide on
+                // its own to request months of it, so the asset starts a
+                // daily series at the latest confirmed session and grows
+                // forward from there.
+                $from = $to->copy();
+                $cursorEstablished[] = $ticker;
             } else {
-                $from = $stored->copy()->addDay();
+                $from = $cursor->copy()->addDay();
             }
 
-            // The clamp is a safety valve on what the job decides for itself,
-            // so an explicit --from is exempt: someone asking for a specific
-            // range by hand means it.
-            if ($forced === null && $from->lessThan($floor)) {
-                // The gap is longer than one run is willing to ask for in a
-                // single aggregate. Taking the most recent slice of it keeps
-                // the asset moving forward every night rather than requesting
-                // a range Stockbit may refuse outright.
-                $from = $floor->copy();
-                $clamped[] = $ticker;
-            }
+            $sessions = $this->sessionsBetween($calendar, $from, $to);
 
-            // A resumed backfill almost always restarts on a Saturday. Asking
-            // for 29..31 August returns Monday's flow filed as a three-day
-            // range, which is then not a single-day window and never reaches
-            // the daily projections -- so snap to the session itself.
-            $from = $calendar->nextTradingDayOnOrAfter($from, self::CALENDAR_LOOKBACK_DAYS) ?? $from;
-
-            if ($from->greaterThan($to)) {
+            if ($sessions === []) {
                 $upToDate[] = $ticker;
 
                 continue;
             }
 
-            if (! $from->equalTo($to)) {
+            if (count($sessions) > $maxSessions) {
+                // Most recent first: an asset behind by a month is more
+                // useful current-with-a-hole than complete-but-stale, and the
+                // remaining sessions are collected on subsequent runs.
+                $sessions = array_slice($sessions, -$maxSessions);
+                $clamped[] = $ticker;
+            }
+
+            if (count($sessions) > 1 || ! $sessions[0]->equalTo($to)) {
                 $backfilled[] = $ticker;
             }
 
-            $key = $from->toDateString().'|'.$to->toDateString();
+            foreach ($sessions as $session) {
+                $date = $session->toDateString();
 
-            $groups[$key] ??= ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'tickers' => []];
-            $groups[$key]['tickers'][] = $ticker;
+                // Grouped by session, so the invocation count follows the
+                // number of dates rather than tickers times dates.
+                $groups[$date] ??= ['from' => $date, 'to' => $date, 'tickers' => []];
+                $groups[$date]['tickers'][] = $ticker;
+            }
         }
 
-        // Oldest range first, so a long backfill lands before the day that
-        // follows it and the archive is written in the order it is read.
+        // Oldest session first, so the archive is written in the order it is
+        // read and a partial run leaves a contiguous prefix.
         ksort($groups);
 
         return [
@@ -359,20 +397,58 @@ class BrokerSummaryDailyCommand extends Command
             'up_to_date' => $upToDate,
             'backfilled' => $backfilled,
             'clamped' => $clamped,
+            'cursor_established' => $cursorEstablished,
         ];
     }
 
     /**
-     * The newest window end date already stored for each ticker.
+     * The trading sessions in a closed range, oldest first.
+     *
+     * Walks the calendar rather than the clock: a weekend or an IDX holiday
+     * is not a session, and requesting one would file an empty or misdated
+     * response as though the market had traded.
+     *
+     * @return array<int, Carbon>
+     */
+    private function sessionsBetween(TradingWeekResolver $calendar, Carbon $from, Carbon $to): array
+    {
+        if ($from->greaterThan($to)) {
+            return [];
+        }
+
+        $sessions = [];
+        $cursor = $calendar->nextTradingDayOnOrAfter($from, self::CALENDAR_LOOKBACK_DAYS);
+
+        // A guard on the walk itself rather than on the calendar: a range
+        // measured in years would otherwise loop for as long as it takes.
+        $limit = self::MAX_SESSION_SCAN;
+
+        while ($cursor !== null && ! $cursor->greaterThan($to) && $limit-- > 0) {
+            $sessions[] = $cursor->copy();
+            $cursor = $calendar->nextTradingDayOnOrAfter($cursor->copy()->addDay(), self::CALENDAR_LOOKBACK_DAYS);
+        }
+
+        return $sessions;
+    }
+
+    /**
+     * The newest *single-day* window already stored for each ticker.
+     *
+     * Deliberately single-day only, and this is the change that makes the
+     * rest of the command work. The cursor used to be the newest window of
+     * any shape, so an asset holding a three-month aggregate ending last
+     * Friday looked current and was never given daily observations at all --
+     * the aggregate suppressed the very collection that would have produced
+     * the daily series. Asking specifically what daily history exists means
+     * an asset with only aggregates correctly reports none.
      *
      * Constrained to the configured transaction type: a different type is a
-     * different aggregate, not a different slice of the same one, so a window
-     * of another type says nothing about what this one is missing.
+     * different aggregate, not a different slice of the same one.
      *
      * @param  array<int, string>  $tickers
      * @return array<string, Carbon>
      */
-    private function latestStoredEnd(array $tickers, string $timezone): array
+    private function latestStoredSingleDay(array $tickers, string $timezone): array
     {
         $assetIds = Asset::query()
             ->whereIn('symbol', $tickers)
@@ -387,6 +463,7 @@ class BrokerSummaryDailyCommand extends Command
 
         $rows = BrokerSummaryWindow::query()
             ->whereIn('asset_id', array_values($assetIds))
+            ->whereColumn('from_date', '=', 'to_date')
             ->when($transactionType !== '', fn ($query) => $query->where('transaction_type', $transactionType))
             ->selectRaw('asset_id, MAX(to_date) as latest_to')
             ->groupBy('asset_id')
@@ -402,12 +479,11 @@ class BrokerSummaryDailyCommand extends Command
                 continue;
             }
 
-            // Read in the market's timezone so it lines up with the dates
-            // this command compares it against. Parsed as a UTC midnight
-            // instead, a stored 26 August sits seven hours *after* the Jakarta
-            // midnight of the 27th, and the asset reports itself up to date on
-            // the very day it is missing.
-            $latest[strtoupper((string) $symbol)] = $this->marketDate((string) $value, $timezone);
+            try {
+                $latest[$symbol] = Carbon::parse((string) $value, $timezone)->startOfDay();
+            } catch (\Throwable) {
+                continue;
+            }
         }
 
         return $latest;

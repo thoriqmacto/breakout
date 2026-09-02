@@ -42,6 +42,12 @@ This repository contains the code for **Breakout**, structured as a multi-app mo
   php artisan asset:sync --eod
   ```
 
+- Rebuild or restore the recovery layer (see [Data resilience](#data-resilience-the-three-layers)):
+  ```bash
+  php artisan data:reconcile --all --mirror   # rebuild what changed, publish to cold storage
+  php artisan data:restore --all --dry-run    # what a recovery would write
+  ```
+
 - Inspect the database-managed scheduler (see [Automation & Scheduling](#automation--scheduling)):
   ```bash
   php artisan scheduler:status          # every automation, its next run and last outcome
@@ -794,6 +800,276 @@ Optional filters:
 - `--limit=50` to expand result count.
 - `--min-net-norm` to tighten same-day absorption proxy from broker net-flow.
 
+## Data resilience: the three layers
+
+Losing the database has always been survivable — every bar and every broker summary came from a
+file, and the files are kept. What it was not, before this, was *quick*: recovery meant replaying
+thousands of scattered raw payloads through the importers and hoping the result matched. The
+reconciliation layer sits between the raw files and the database so a rebuild is a read, not a
+reprocessing run.
+
+| Layer | What it is | Authority |
+| --- | --- | --- |
+| **Raw archive** (`broker_summary/*.json`, `{SYMBOL}.csv`) | Every response exactly as it arrived | **Source of record.** Never deleted, never rewritten, never consumed. |
+| **Reconciliation** (`reconciliation/`) | One JSON document per asset, plus a manifest | **Canonical recovery copy.** Derived from the database, restorable back into it. |
+| **Database** (`price_bars`, `broker_summary_windows`, `features_daily`, …) | The query layer | **Working state.** Rebuildable from the layer above. |
+
+The direction only ever runs one way: raw → reconciliation → database, and `data:restore` walks
+it back. Reconciliation reads the raw files, it does not consume them; restoring never removes
+them; and the whole `reconciliation/` directory can be deleted and rebuilt from the database in
+one command. Nothing in it is the last copy of anything.
+
+Google Drive stays what it was — cold storage. The reconciliation documents are mirrored there,
+but the mirror is a copy of a derived layer, not the working database.
+
+### Layout
+
+```
+storage/app/
+  broker_summary/                          # raw archive, untouched by this feature
+    BBCA_2026-08-28_2026-08-28_TRANSACTION_TYPE_NET.json
+  reconciliation/
+    manifest.json                          # the index: one row per asset
+    assets/
+      BBCA.json                            # one document per asset
+      BBRI.json
+```
+
+One file per asset, not one enormous file. A universe of four hundred symbols means four hundred
+small documents and one manifest, so a nightly run rewrites and re-uploads only what changed, and
+a single corrupt document costs one asset rather than everything.
+
+### An asset document
+
+Abbreviated — the real file carries every stored bar and every broker entry:
+
+```json
+{
+  "schema_version": 1,
+  "symbol": "BBCA",
+  "generated_at": "2026-09-02T18:40:11+07:00",
+  "as_of_trading_date": "2026-09-01",
+  "source_fingerprint": "3f9c…",
+  "asset": { "symbol": "BBCA", "name": "Bank Central Asia", "sector": "Financials",
+             "sync_price": true, "sync_broker_summary": true },
+  "coverage": {
+    "ohlcv": { "first_date": "2011-01-03", "last_date": "2026-09-01", "rows": 3821,
+               "source_path": "/var/www/breakout-data/historical/BBCA.csv",
+               "source_exists": true, "source_hash": "b21e…", "source_size": 184213 },
+    "broker_summary": { "first_window_from": "2026-05-04", "last_window_to": "2026-09-01",
+                        "window_count": 84, "single_day_window_count": 81,
+                        "aggregate_window_count": 3, "latest_single_day": "2026-09-01",
+                        "daily_flow_sessions": 81 }
+  },
+  "integrity": {
+    "status": "healthy",
+    "warnings": [], "errors": [],
+    "missing_broker_sessions": [], "missing_broker_session_count": 0,
+    "duplicate_ohlcv_dates": [], "invalid_broker_ranges": [],
+    "duplicate_broker_windows": [], "missing_source_files": [],
+    "broker_lag_sessions": 0
+  },
+  "ohlcv": [
+    { "date": "2026-09-01", "open": 8000, "high": 8100, "low": 7950, "close": 8075, "volume": 91230400 }
+  ],
+  "broker_summary": {
+    "windows": [
+      { "from_date": "2026-09-01", "to_date": "2026-09-01", "is_single_day": true,
+        "transaction_type": "TRANSACTION_TYPE_NET",
+        "source_filename": "broker_summary/BBCA_2026-09-01_2026-09-01_TRANSACTION_TYPE_NET.json",
+        "source_hash": "9ab4…",
+        "bandar_detector": { "broker_accdist": "Accumulation", "accdist_score": 1, "…": "…" },
+        "entries": [ { "broker_code": "BK", "…": "…" } ] }
+    ],
+    "daily_flow": [
+      { "date": "2026-09-01", "broker_accdist": "Accumulation", "accdist_score": 1,
+        "turnover_value": 512300000000, "average_price": 8043.2 }
+    ]
+  },
+  "insight": {
+    "latest_broker_date": "2026-09-01", "latest_accdist": "Accumulation",
+    "latest_accdist_score": 1, "daily_sessions_total": 81,
+    "flow_balance_5d": 3, "available_daily_sessions_5d": 5, "price_return_5d": 0.0142,
+    "flow_balance_20d": 6, "available_daily_sessions_20d": 20, "price_return_20d": -0.0038
+  }
+}
+```
+
+Two things in there are load-bearing.
+
+`is_single_day` is **stored**, not derived on read, so no consumer can reach a different answer by
+comparing the dates its own way. `daily_flow` contains only windows where it is true: a range
+aggregate covers its whole window and is never split into the days inside it. Every flow number
+on the dashboard is computed from `daily_flow`, so an aggregate can never masquerade as a
+session.
+
+Every `flow_balance_Nd` travels with `available_daily_sessions_Nd`. "+3 over three available
+sessions" and "+3 over twenty" are different statements, and a reader given only the balance
+cannot tell them apart — so an asset without a full window is reported as *insufficient* rather
+than as neutral.
+
+### The manifest
+
+```json
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-02T18:40:12+07:00",
+  "market_date": "2026-09-01",
+  "summary": { "asset_count": 412, "healthy": 401, "warning": 9, "error": 2,
+               "with_gaps": 7, "ohlcv_current": 408, "broker_current": 396,
+               "latest_ohlcv_date": "2026-09-01", "latest_broker_daily_date": "2026-09-01" },
+  "assets": {
+    "BBCA": { "path": "reconciliation/assets/BBCA.json", "hash": "d41d…", "size": 812443,
+              "source_fingerprint": "3f9c…", "ohlcv_last": "2026-09-01", "ohlcv_rows": 3821,
+              "latest_broker_daily": "2026-09-01", "integrity_status": "healthy",
+              "gap_count": 0, "broker_lag_sessions": 0,
+              "flow_balance_5d": 3, "available_daily_sessions_5d": 5 }
+  }
+}
+```
+
+The manifest is what the dashboard reads. Everything the asset table shows is in a row, so
+listing four hundred assets is one file read rather than four hundred.
+
+### Rebuilding, and only what changed
+
+```bash
+php artisan data:reconcile --all              # rebuild what changed, write the manifest
+php artisan data:reconcile --symbol=BBCA      # one asset
+php artisan data:reconcile --all --dry-run    # report what would change, write nothing
+php artisan data:reconcile --all --verify     # re-read each document and check it
+php artisan data:reconcile --all --mirror     # and push to cold storage
+```
+
+Idempotence is the property the whole design rests on: running this twice with no new market data
+must rewrite nothing and upload nothing, or the nightly mirror re-uploads the universe every
+night and the incremental design buys nothing. Two independent mechanisms enforce it. A
+**fingerprint** per asset — bar count, first and last date, close sum, volume sum, each window's
+stored `source_hash`, and the seed CSV's size and mtime — decides whether to rebuild at all; the
+sums are there so a *corrected* close, which leaves the date extent untouched, still changes the
+fingerprint. And the store refuses to rewrite a file whose bytes already match, so even a forced
+rebuild that produces identical output leaves the hash and mtime where they were.
+
+JSON is serialised deterministically (no pretty-printing, keys in insertion order, unescaped
+slashes and unicode) so that byte comparison is meaningful in the first place.
+
+### Restoring
+
+```bash
+php artisan data:restore --all                # rebuild the database from the local layer
+php artisan data:restore --symbol=BBCA
+php artisan data:restore --all --disk=gdrive  # straight from cold storage
+php artisan data:restore --all --dry-run
+php artisan data:restore --all --skip-csv     # database only, leave the seed CSVs alone
+```
+
+Every document is validated before anything is written: the schema version must be one this
+build understands, the symbol inside must match the file it came from, the required sections must
+be present, and the content must hash to what the manifest recorded. A document that fails costs
+that asset and no other — the restore reports it and carries on rather than leaving the database
+half-rebuilt from a file it could not read.
+
+Restore is idempotent and non-destructive. Bars and windows are keyed the same way the importers
+key them, so running it twice converges; a range aggregate is restored as the aggregate it is;
+and the seed CSVs are rewritten through the same `CsvBars` writer the rest of the pipeline uses.
+
+### Nightly
+
+`automation:data-reconciliation` runs between collection and analysis — after the day's broker
+summaries land, before the derived pipelines read them — at priority 25 in the seeded schedule:
+
+```bash
+php artisan automation:data-reconciliation                 # what the scheduler runs
+php artisan automation:data-reconciliation --force --verify
+php artisan automation:data-reconciliation --no-mirror
+```
+
+The run record carries the assets checked, changed, skipped and failed, the manifest hash, and
+the mirror outcome. A mirror failure is reported as **degraded**: the local layer is complete and
+correct, and only the off-server copy is behind.
+
+### The mirror's commit order
+
+Documents are uploaded and each one verified by reading it back, and only then is the manifest
+uploaded. The manifest is the commit marker, so a manifest present in cold storage always
+describes documents that are already there. If any asset upload fails, the manifest is
+**withheld** and the previous one stays standing — a torn set is left looking like the older
+complete set rather than like a newer broken one.
+
+Nothing is ever called synchronised on the strength of a filename. The published manifest is
+compared by hash, and a remote that could not be reached is reported as unknown.
+
+### The dashboard
+
+`/dashboard/backups` opens on the question that matters at 3am — *can I rebuild, and is the
+off-server copy current?* — which is answered from the manifest and one remote hash, in a handful
+of reads that do not grow with the archive.
+
+The file-by-file comparison still exists and still catches a Drive copy that was silently
+truncated or edited. It moved behind an explicit **File-by-file audit** action, because it costs
+one metadata call per archived file and paying that on every page load meant the page got slower
+every day it was used.
+
+| Endpoint | Cost | Answers |
+| --- | --- | --- |
+| `GET /v1/backup-status` | three reads | Readiness, manifest health, mirror state, flow snapshot |
+| `GET /v1/backup-status?deep=1` | grows with the archive | Both, in one request |
+| `GET /v1/backup-status/audit` | grows with the archive | Does every raw file match its Drive copy? |
+| `POST /v1/backup-status/mirror-push` | — | Repair the historical CSVs or the raw archive on Drive |
+| `GET /v1/reconciliation` | one read | The asset table: filter, sort, page — all from the manifest |
+| `GET /v1/reconciliation/{symbol}` | one read | One asset's coverage, integrity and recent trajectory |
+
+Readiness is deliberately conservative. **Ready** requires a manifest that exists, describes
+assets, carries no errors, *and* matches what cold storage holds — any one of those failing is a
+recovery that would not complete, and the page names which.
+
+The push endpoints take symbols, never paths, and intersect them with what the server itself
+found; the raw-archive push enumerates the archive server-side and ignores anything the browser
+sends.
+
+### Configuration
+
+```dotenv
+RECONCILIATION_PATH=reconciliation          # directory on the local and remote disks
+RECONCILIATION_LOCAL_DISK=local
+RECONCILIATION_MIRROR_DISK=                 # falls back to CSV_MIRROR_DISK; empty disables the mirror
+RECONCILIATION_BROKER_LAG_WARNING=2         # sessions of broker lag before a warning
+RECONCILIATION_BROKER_LAG_ERROR=5           # …and before an error
+RECONCILIATION_MISSING_SESSION_LOOKBACK=30  # how far back gaps are looked for
+RECONCILIATION_CHUNK_SIZE=25                # assets per chunk; documents are still built one at a time
+```
+
+Every one has a working default. A deployment that already configured `CSV_MIRROR_DISK` gets
+reconciliation mirroring without setting anything new.
+
+### Deploying this feature
+
+```bash
+# 1. Pull and install as usual, then run the migration that seeds the schedule.
+php artisan migrate --force
+
+# 2. Build the layer for the first time. On a full universe this takes a few
+#    minutes and is safe to run while the app serves traffic; it only reads.
+php artisan data:reconcile --all
+
+# 3. Publish it to cold storage and confirm the manifest matches.
+php artisan data:reconcile --all --mirror
+php artisan data:reconcile --all --verify
+
+# 4. Confirm the dashboard agrees.
+#    /dashboard/backups should report "Recovery ready".
+```
+
+The nightly `daily-data-reconciliation` task is seeded enabled. Nothing else needs enabling, and
+no existing raw file is moved, renamed or reorganised by any of this.
+
+To rehearse a recovery, restore into a scratch database rather than the live one:
+
+```bash
+php artisan data:restore --all --dry-run     # what would be written
+php artisan data:restore --symbol=BBCA       # one asset, for real
+```
+
 ## Storage Backends
 
 Breakout keeps two different kinds of state, and they are stored differently on purpose.
@@ -1006,7 +1282,7 @@ re-execute an hour of API calls that already reported how they went.
 ### Default seeded automations
 
 Installed by the migrations that create the tables, and restorable with
-`php artisan db:seed --class=AutomationSeeder`. All five are fully editable from the dashboard.
+`php artisan db:seed --class=AutomationSeeder`. All six are fully editable from the dashboard.
 
 | Name | Schedule | Condition | Priority | Command |
 | --- | --- | --- | --- | --- |
@@ -1014,6 +1290,7 @@ Installed by the migrations that create the tables, and restorable with
 | Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | 5 | `automation:token-check` |
 | Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | 10 | `automation:ohlcv-daily` |
 | Daily Broker Summary | 18:00 `Asia/Jakarta`, daily | `trading_day` | 20 | `automation:broker-summary-daily` |
+| Daily Data Reconciliation | 18:00 `Asia/Jakarta`, daily | `none` | 25 | `automation:data-reconciliation` |
 | Daily Analysis Refresh | 18:00 `Asia/Jakarta`, daily | `none` | 30 | `automation:analysis-refresh` |
 
 In plain language:
@@ -1025,13 +1302,17 @@ In plain language:
   `sync_price = true`, then bring every asset with `sync_broker_summary = true` up to the latest
   valid trading day. The two scrapes never run at the same time: priority orders them and both
   take a shared Stockbit lock, so the broker summary queues behind the OHLCV sync.
+- **Then, still in the same pass** → rebuild the reconciliation documents for whatever changed
+  and publish them to cold storage. Priority 25 puts it after the day's collection and before the
+  derived pipelines, so the recovery copy describes the data the analysis is about to read. See
+  [Data resilience](#data-resilience-the-three-layers).
 - **Then, in the same pass** → recompute everything derived from what just landed:
   `features_daily`, asset metrics, broker accumulation rollups, watchlist scores and the saved
   rule-builder strategy runs. Priority 30 puts it last, so it always sees the day's imports.
 - **After successful persistence** → mirror the corresponding files to Google Drive.
 - **Every day at 09:00 WIB** → inspect the Stockbit token and warn when renewal is needed.
 
-The three 18:00 jobs run **in one dispatcher pass, in priority order, in the same process** —
+The four 18:00 jobs run **in one dispatcher pass, in priority order, in the same process** —
 that is what makes "after" reliable. A separate later cron time would not: `scheduler:dispatch`
 is registered `withoutOverlapping()`, so a later occurrence arriving while the scrapes are still
 running would be dropped rather than queued.
@@ -1047,30 +1328,40 @@ which is too early for that to be true.
 
 ### Daily broker summaries and backfill
 
-`automation:broker-summary-daily` resolves its range **per asset**, not globally:
+`automation:broker-summary-daily` resolves its range **per asset**, not globally, and every
+window it creates covers exactly one trading session:
 
 ```
-from = the first trading day after that asset's newest stored window
+from = the first trading session after that asset's newest stored single-day window
 to   = the latest day `trading_calendar` records as having actually traded
 ```
 
-In the steady state those are the same date, so the window is a single day and reaches
-`broker_summary_facts` and `broksums` like any daily import. After a gap they are not, and the
-gap is fetched as **one aggregate covering it** — one request per asset rather than one per
-missing session. That is what makes an asset sitting on a three-month aggregate, an asset added
-last week, and an asset collected yesterday all correct on the same run, with no separate
-backfill mode to remember.
+**Each session is fetched as its own window.** That is the rule the daily pipeline rests on, and
+it is a change from how this job first worked. It used to repair a multi-day gap with one
+aggregate covering the whole of it — cheaper, and a perfectly valid archive record, but not the
+same thing. Monday's flow, Tuesday's flow and Wednesday's flow are three observations; their sum
+over Monday to Wednesday is one. A range aggregate cannot be taken apart into the path through
+it, so an aggregate filed where daily observations belong silently destroys the
+accumulation/distribution trajectory it looks like it provides.
 
-Assets needing the same range are grouped into one scrape invocation, so a normal evening is a
-single call covering every ticker. An asset already current is skipped without an API call.
+Tickers missing the same session are grouped into one scrape invocation, so the number of calls
+tracks the number of *dates*, not tickers × dates: four hundred tickers missing three sessions is
+three scrapes, not twelve hundred. An asset already current is skipped without an API call.
 
 Two bounds keep a first run sane:
 
-- `--max-backfill-days` (default 120) caps how long a gap one run will request as a single
-  aggregate. A longer gap is walked forward a slice per night. An explicit `--from` is exempt.
-- A resumed range is snapped forward to the next actual session. The day after a Friday window is
-  a Saturday, and asking for `2026-08-29..2026-08-31` would file Monday's flow as a three-day
-  range that never reaches the daily projections.
+- `--max-backfill-sessions` (default 5) caps how many sessions one run collects per ticker. The
+  most recent are taken first, so an asset keeps moving forward every night rather than crawling
+  out of a long gap oldest-first.
+- An asset with **no** genuine daily history is not given months of it by a nightly job. It is
+  given a cursor — the latest confirmed session — and grows a daily series forward from there.
+  Establishing history backwards is an explicit, bounded operation via `--from`, because it is an
+  API budget decision rather than routine maintenance.
+
+Existing multi-day aggregates are untouched and stay valid. They are real archive records and
+good evidence at their own length; the database legitimately holds both, and only windows where
+`from_date === to_date` are ever treated as daily observations. Nothing fabricates individual
+days from an aggregate.
 
 `to` is deliberately the last *observed* trading day and not today: on a trading evening before
 Yahoo publishes, the calendar still ends yesterday, and fetching through today anyway would file
@@ -1078,19 +1369,24 @@ a partial session as a complete one. The lag is reported as `days_behind` and cl
 the next run.
 
 Overlapping ranges are safe by construction. A window is keyed on
-`(asset, from_date, to_date, transaction_type)`, so a backfill aggregate and the days around it
-are separate rows that never overwrite each other, and re-running a range converges instead of
-duplicating. `BrokerWindowResolver` never sums overlapping windows into one rollup.
+`(asset, from_date, to_date, transaction_type)`, so a legacy backfill aggregate and the daily
+sessions inside it are separate rows that never overwrite each other, and re-running a session
+converges instead of duplicating. `BrokerWindowResolver` never sums overlapping windows into one
+rollup.
+
+The run record reports `sessions` (each date with the ticker count collected for it),
+`session_count`, and — for assets that had no daily history at all —
+`cursor_established_count` and `cursor_established_tickers`.
 
 `automation:broker-summary-weekly` still exists and still works if you want a week on purpose,
 but it is no longer part of the seeded schedule — the migration disables the seeded row rather
 than deleting it, so its run history survives.
 
 ```bash
-php artisan automation:broker-summary-daily                        # what the scheduler runs
+php artisan automation:broker-summary-daily                            # what the scheduler runs
 php artisan automation:broker-summary-daily --tickers=BBCA --tickers=BRPT
-php artisan automation:broker-summary-daily --from=2026-01-01      # force a start for every ticker
-php artisan automation:broker-summary-daily --max-backfill-days=30 # ask for a smaller first slice
+php artisan automation:broker-summary-daily --from=2026-01-01          # force a start for every ticker
+php artisan automation:broker-summary-daily --max-backfill-sessions=10 # a bigger catch-up slice
 php artisan automation:broker-summary-daily --no-import --no-mirror
 ```
 
@@ -1453,6 +1749,16 @@ All under `/api/v1`, behind the existing `auth:sanctum,jwt` middleware.
 | `GET` | `/v1/automation/stockbit-token` |
 | `PUT` | `/v1/automation/stockbit-token` |
 | `DELETE` | `/v1/automation/stockbit-token` |
+| `GET` | `/v1/backup-status` |
+| `GET` | `/v1/backup-status/audit` |
+| `POST` | `/v1/backup-status/mirror-push` |
+| `GET` | `/v1/reconciliation` |
+| `GET` | `/v1/reconciliation/{symbol}` |
+
+The backup and reconciliation endpoints are described under
+[Data resilience](#data-resilience-the-three-layers); the short version is that
+`/v1/backup-status` is the cheap readiness answer and `/v1/backup-status/audit` is the expensive
+file-by-file one.
 
 `GET /v1/automation/stockbit-token` returns status only — configured, source, fingerprint
 (`****abcd`), expiry, remaining duration. There is no endpoint that returns the bearer.
