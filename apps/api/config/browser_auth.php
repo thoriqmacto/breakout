@@ -63,6 +63,16 @@ return [
     'chromium_path' => env('BROWSER_AUTH_CHROMIUM_PATH'),
 
     /*
+    | Where Playwright keeps its browsers. It defaults to the running user's
+    | home directory, which is the trap here: `npx playwright install` is run
+    | by the deploy user, and PHP-FPM runs as www-data and cannot read another
+    | user's home. Point both at a shared directory instead --
+    | PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright for the install, and this for
+    | the run -- or set chromium_path above at a system Chromium.
+    */
+    'browsers_path' => env('BROWSER_AUTH_BROWSERS_PATH', env('PLAYWRIGHT_BROWSERS_PATH')),
+
+    /*
     | Ceiling on one attempt. The Node side races its own timer, and the PHP
     | side allows a little more so the child reports its own failure rather
     | than being killed mid-sentence -- a killed child produces no JSON, and

@@ -1715,14 +1715,42 @@ Install and verify, on the server:
 ```bash
 cd apps/api/resources/browser
 npm install
-
-# Either let Playwright fetch its own Chromium...
-npx playwright install --with-deps chromium
-# ...or point at one already installed, which is much smaller:
-export BROWSER_AUTH_CHROMIUM_PATH=/usr/bin/chromium
-
 npm run smoke      # eight scenarios against a local fixture; no real portal, no credentials
 ```
+
+> **The setup user and the web server user are not the same, and that is where
+> this breaks.** `npm`, `npx` and the smoke test run as your deploy user;
+> the endpoint runs as `www-data` under PHP-FPM. Two things do not survive that
+> gap on their own:
+>
+> - **Chromium.** `npx playwright install` puts browsers under the running
+>   user's home, which PHP-FPM cannot read. Install to a shared path, or point
+>   at a system Chromium:
+>
+>   ```bash
+>   sudo PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+>       npx playwright install --with-deps chromium
+>   sudo chmod -R a+rX /opt/ms-playwright
+>   # then, in .env:
+>   #   BROWSER_AUTH_BROWSERS_PATH=/opt/ms-playwright
+>   # or, simpler, skip Playwright's copy entirely:
+>   #   BROWSER_AUTH_CHROMIUM_PATH=/usr/bin/chromium
+>   ```
+>
+> - **node itself**, which is often on the deploy user's PATH only. Set
+>   `BROWSER_AUTH_NODE_BINARY` to an absolute path (`which node`).
+>
+> `npm run smoke` passing proves nothing about `www-data`, because it ran as
+> you. Ask the question directly instead:
+>
+> ```bash
+> php artisan browser:check                    # as you
+> sudo -u www-data php artisan browser:check   # as the web server -- the one that matters
+> ```
+>
+> It checks configuration, the script, node, the module tree and then actually
+> launches a browser, naming whichever step fails. It contacts no portal and
+> takes no credentials, so it is safe to run at any time.
 
 Then configure:
 
