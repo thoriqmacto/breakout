@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react"
 import { KeyRound, ShieldAlert, TriangleAlert } from "lucide-react"
 
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -46,6 +47,7 @@ function errorCodeOf(payload: unknown): string | null {
  * a pasted token goes to.
  */
 export function BrowserLoginCard({ onTokenStored }: { onTokenStored?: () => void }) {
+  const { accessToken } = useAuth()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [busy, setBusy] = useState(false)
@@ -56,14 +58,30 @@ export function BrowserLoginCard({ onTokenStored }: { onTokenStored?: () => void
 
     if (busy || !username || !password) return
 
+    if (!accessToken) {
+      setOutcome({ kind: "error", message: "You are not signed in.", code: null })
+
+      return
+    }
+
     setBusy(true)
     setOutcome(null)
 
     try {
+      // A bearer header, like every other call in this app -- not a cookie.
+      // Asking the browser to attach credentials was wrong twice over: this
+      // API authenticates with a token rather than a session, and a
+      // credentialed request whose response carries no
+      // Access-Control-Allow-Credentials is rejected by the browser before the
+      // response is delivered -- which is what turned an ordinary request into
+      // an opaque CORS failure.
       const response = await fetch(buildApiUrl("/v1/automation/stockbit-token/browser-login"), {
         method: "POST",
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({ username, password }),
       })
 
