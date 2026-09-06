@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { BrowserLoginCard } from "@/components/browser-login-card"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 
 const DEFAULT_BASE_URL = "https://exodus.stockbit.com"
@@ -440,6 +441,8 @@ export default function ScrapersPage() {
           </form>
         </CardContent>
       </Card>
+
+      <BrowserLoginCard />
 
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

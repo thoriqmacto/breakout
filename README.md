@@ -1625,8 +1625,11 @@ php artisan stockbit:token:set        # paste, pipe, or --from-clipboard
 `Bearer ` is tolerated), rejects one that is already expired, persists through the same
 encrypted store, and clears the reminder.
 
-There is deliberately **no automated credential login or browser automation**. Renewal is a
-person pasting a token; what the automation can usefully do is notice early and say so.
+Renewal is a person pasting a token, and the automation's job is to notice early and say so.
+
+**Optionally**, a headless browser can do the signing in instead — see
+[Headless-browser login](#headless-browser-login). It is off by default, and the default is the
+recommendation: pasting a token means no password ever reaches this server.
 
 Because this project has no mail or push transport — and one token reminder is not a good reason
 to add a third-party notification dependency — the reminder is a row in `automation_alerts`,
@@ -1666,6 +1669,80 @@ just wrote, and only after that JSON has been imported.
 A Drive failure is reported on the run (`gdrive` / `gdrive_broker_summary` in run metadata, shown
 in the history) and never fails the data run. Local market data is never destroyed because cold
 storage was unreachable.
+
+### Headless-browser login
+
+Off by default. Turning it on lets `/dashboard/scrapers` sign in to the portal through a real
+Chromium and capture the bearer it issues, instead of a person copying one out of devtools.
+
+**Understand the trade before enabling it.** Today the worst case for this server is a leaked
+bearer, which expires. With this on, a portal password reaches the server on request — and a
+stolen password does not expire. It is also likely to be against the portal's terms of service.
+That is why it needs two environment variables set deliberately rather than a checkbox.
+
+What the implementation does with the credentials:
+
+- Used for **one attempt**, then discarded. Nothing stores them — no database column, no cache,
+  no log, no session.
+- Passed to the browser process on **stdin**, never as command-line arguments, which are
+  world-readable through `ps` for the lifetime of the process.
+- The child is started from an **argument array**, so there is no shell and nothing to inject
+  into, consistent with the scheduler's own rule about never executing a built string.
+- Only the **token** survives, through the same encrypted store a pasted token goes to. The
+  response carries status, fingerprint and expiry — never the bearer.
+- **No scheduled variant.** Automating renewal would mean storing the password, which is a
+  materially different decision; the token reminder still exists for that reason.
+
+The browser side lives in `apps/api/resources/browser/` and knows nothing about any particular
+site — the URL, the three selectors and the token key names are all configuration:
+
+```
+resources/browser/
+  token-extractor.mjs   the reusable extractBearerToken() function
+  extract-token.mjs     the CLI the PHP side runs: job on stdin, JSON on stdout
+  smoke-test.mjs        proves it against a fixture portal on localhost
+  package.json          playwright, isolated from the API's Vite dependencies
+```
+
+It watches for the token in two places, because a portal reveals it in either or both: the body
+of the login response, and the `Authorization` header of the first API call the app makes
+afterwards. Watching both is what makes it reliable rather than lucky — a portal that nests or
+renames the token in its body is still caught by the header, and one that redirects straight to a
+static page is still caught by the body.
+
+Install and verify, on the server:
+
+```bash
+cd apps/api/resources/browser
+npm install
+
+# Either let Playwright fetch its own Chromium...
+npx playwright install --with-deps chromium
+# ...or point at one already installed, which is much smaller:
+export BROWSER_AUTH_CHROMIUM_PATH=/usr/bin/chromium
+
+npm run smoke      # eight scenarios against a local fixture; no real portal, no credentials
+```
+
+Then configure:
+
+```dotenv
+BROWSER_AUTH_ENABLED=true
+BROWSER_AUTH_LOGIN_URL=https://portal.example.com/login
+BROWSER_AUTH_USERNAME_SELECTOR=input[type="email"]
+BROWSER_AUTH_PASSWORD_SELECTOR=input[type="password"]
+BROWSER_AUTH_SUBMIT_SELECTOR=button[type="submit"]
+BROWSER_AUTH_CHROMIUM_PATH=/usr/bin/chromium
+```
+
+Failures are reported by kind rather than as one generic error, because they need different
+fixes: `INVALID_CREDENTIALS` (or a second factor this cannot answer), `TIMEOUT`,
+`SELECTOR_NOT_FOUND` (the portal changed its markup), `TOKEN_NOT_FOUND` (signed in, but the token
+is named something not in `BROWSER_AUTH_TOKEN_KEYS`), and `BROWSER_LAUNCH_FAILED`.
+
+One login runs at a time — each is a Chromium process, and several at once is the quickest way to
+exhaust a small VPS — and attempts are capped at five per fifteen minutes so a wrong password
+cannot lock the portal account.
 
 ### Broker-summary import
 

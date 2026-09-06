@@ -1,0 +1,8 @@
+# Installed on the server, not committed. The API's own .gitignore does not
+# reach this directory, so without this the whole of Playwright would land in
+# the repository.
+node_modules/
+
+# Playwright's browser downloads, if it is left to fetch its own rather than
+# being pointed at one already on the box via BROWSER_AUTH_CHROMIUM_PATH.
+.cache/

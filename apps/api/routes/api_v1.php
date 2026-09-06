@@ -134,6 +134,12 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::delete('automation/stockbit-token', [StockbitTokenController::class, 'destroy'])
         ->name('automation.stockbit-token.destroy');
 
+    // Headless login: accepts portal credentials, uses them once, stores the
+    // bearer through the same encrypted path as a paste, and returns status
+    // only. Disabled unless BROWSER_AUTH_ENABLED is set.
+    Route::post('automation/stockbit-token/browser-login', [StockbitTokenController::class, 'browserLogin'])
+        ->name('automation.stockbit-token.browser-login');
+
     Route::post('scheduled-tasks/{scheduledTask}/toggle', [ScheduledTaskController::class, 'toggle'])
         ->whereNumber('scheduledTask')
         ->name('scheduled-tasks.toggle');
