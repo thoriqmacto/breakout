@@ -2,6 +2,7 @@
 
 namespace App\Services\Stockbit;
 
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -114,10 +115,16 @@ class BrowserTokenExtractor
 
         // An argument list. There is no shell here, so there is nothing to
         // escape and nothing to inject into.
+        //
+        // The environment is inherited and then added to, because PHP-FPM's is
+        // not the shell's: PLAYWRIGHT_BROWSERS_PATH in particular is usually
+        // set in the deploy user's profile and absent here, which is how a
+        // Chromium that works from the command line fails under the web
+        // server.
         $process = new Process(
             [(string) config('browser_auth.node_binary', 'node'), $script],
             dirname($script),
-            null,
+            $this->childEnvironment(),
             json_encode($job, JSON_THROW_ON_ERROR),
             $timeout,
         );
@@ -137,24 +144,28 @@ class BrowserTokenExtractor
             }
         }
 
-        return $this->interpret($process->getOutput());
+        return $this->interpret($process, [$password]);
     }
 
     /**
+     * @param  array<int, string>  $secrets  Redacted from anything surfaced.
      * @return array{token: string, source: string, elapsed_ms: int}
      *
      * @throws BrowserTokenExtractionException
      */
-    private function interpret(string $stdout): array
+    private function interpret(Process $process, array $secrets): array
     {
-        $decoded = json_decode(trim($stdout), true);
+        $decoded = json_decode(trim($process->getOutput()), true);
 
         if (! is_array($decoded)) {
-            // Deliberately does not echo stdout: if the child died badly, its
-            // output can contain anything, and this string reaches a user.
+            // The child writes JSON to stdout for every outcome it anticipates,
+            // so no JSON means it did not get far enough to have an opinion:
+            // node missing from PATH, the module tree unreadable, a segfault.
+            // The reason for that is on stderr, and throwing it away left the
+            // operator with "produced no readable result" and nowhere to go.
             throw new BrowserTokenExtractionException(
                 'UNREADABLE',
-                'The extraction process produced no readable result.',
+                $this->describeCrash($process, $secrets),
             );
         }
 
@@ -181,5 +192,85 @@ class BrowserTokenExtractor
             'source' => (string) ($decoded['source'] ?? 'unknown'),
             'elapsed_ms' => (int) ($decoded['elapsed_ms'] ?? 0),
         ];
+    }
+
+    /**
+     * Additions to the inherited environment, or null to inherit unchanged.
+     *
+     * @return array<string, string>|null
+     */
+    private function childEnvironment(): ?array
+    {
+        $browsers = config('browser_auth.browsers_path');
+
+        return is_string($browsers) && trim($browsers) !== ''
+            ? ['PLAYWRIGHT_BROWSERS_PATH' => trim($browsers)]
+            : null;
+    }
+
+    /**
+     * Remove the password from anything on its way to a person.
+     *
+     * The child redacts its own output, but stderr can come from node itself
+     * -- a stack trace quoting the payload, say -- which the child never sees.
+     *
+     * @param  array<int, string>  $secrets
+     */
+    private function redact(string $text, array $secrets): string
+    {
+        foreach ($secrets as $secret) {
+            if (is_string($secret) && strlen($secret) >= 3) {
+                $text = str_replace($secret, '[redacted]', $text);
+            }
+        }
+
+        return $text;
+    }
+
+    /**
+     * Say what actually went wrong when the child never spoke.
+     *
+     * The reader here is the person running the server, and the alternative
+     * is a dead end, so stderr is surfaced -- bounded, on one line, and with
+     * the password removed. Two failures are common enough to name outright,
+     * because both come from the CLI and the web process being different
+     * users: node absent from PHP-FPM's PATH, and Chromium installed into a
+     * home directory PHP-FPM cannot read.
+     *
+     * @param  array<int, string>  $secrets
+     */
+    private function describeCrash(Process $process, array $secrets): string
+    {
+        $stderr = trim($process->getErrorOutput());
+        $exitCode = $process->getExitCode();
+
+        if (str_contains($stderr, 'not found') && str_contains($stderr, 'node')) {
+            return 'Node could not be found by the web server user. It is usually on the '
+                .'deploy user\'s PATH only; set BROWSER_AUTH_NODE_BINARY to its absolute path.';
+        }
+
+        if (str_contains($stderr, 'Executable doesn\'t exist')
+            || str_contains($stderr, 'playwright install')) {
+            return 'Chromium was not found by the web server user. Browsers installed as the '
+                .'deploy user land in that user\'s home directory, which PHP-FPM cannot read; '
+                .'set BROWSER_AUTH_CHROMIUM_PATH, or install to a shared path and set '
+                .'BROWSER_AUTH_BROWSERS_PATH.';
+        }
+
+        if (str_contains($stderr, 'Cannot find module') || str_contains($stderr, 'ERR_MODULE_NOT_FOUND')) {
+            return 'The extraction script could not load its dependencies. Run "npm install" in '
+                .'resources/browser, and check the web server user can read node_modules.';
+        }
+
+        $excerpt = $stderr === ''
+            ? 'no output on stderr either'
+            : Str::limit((string) preg_replace('/\s+/', ' ', $this->redact($stderr, $secrets)), 400);
+
+        return sprintf(
+            'The extraction process exited with code %s and produced no readable result (%s). '
+            .'Run "php artisan browser:check" as the web server user to see which step fails.',
+            $exitCode === null ? 'unknown' : (string) $exitCode,
+            $excerpt,
+        );
     }
 }

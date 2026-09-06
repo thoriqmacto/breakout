@@ -231,6 +231,46 @@ class BrowserTokenLoginTest extends TestCase
         $this->attempt()->assertStatus(429);
     }
 
+    /**
+     * A child that never produced JSON has to say why.
+     *
+     * Everything the extractor anticipates is reported by the child as JSON on
+     * stdout, so no JSON at all means it did not get far enough to have an
+     * opinion -- and the reason is on stderr. Throwing that away left "the
+     * extraction process produced no readable result", which is true and
+     * useless, and it is what a missing node binary looked like in production.
+     */
+    public function test_a_child_that_cannot_start_reports_why_rather_than_shrugging(): void
+    {
+        config([
+            'browser_auth.enabled' => true,
+            'browser_auth.login_url' => 'https://portal.example.test/login',
+            // A binary that certainly is not there, standing in for node being
+            // on the deploy user's PATH but not the web server user's.
+            'browser_auth.node_binary' => '/nonexistent/node',
+        ]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have failed.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertNotSame(
+                'The extraction process produced no readable result.',
+                $exception->getMessage(),
+                'The failure was reported without saying what went wrong.',
+            );
+
+            $this->assertStringNotContainsString('a-secret-password', $exception->getMessage());
+
+            // Either the named diagnosis or, failing that, the exit code and a
+            // stderr excerpt -- both of which give somewhere to go.
+            $this->assertMatchesRegularExpression(
+                '/BROWSER_AUTH_NODE_BINARY|exited with code|could not be/i',
+                $exception->getMessage(),
+            );
+        }
+    }
+
     public function test_credentials_are_required(): void
     {
         $this->attempt(['username' => 'a@b.test'])->assertStatus(422);
