@@ -29,6 +29,7 @@ class BrowserTokenCommand extends Command
                             {--username= : The portal username or email}
                             {--stored : Use the credentials saved by stockbit:credentials}
                             {--session : Use the saved browser profile without logging in}
+                            {--screenshot= : Write a picture of the page here when no token is found}
                             {--dry-run : Report what was captured without storing it}';
 
     protected $description = 'Sign in to the portal with a headless browser and report what was captured.';
@@ -58,6 +59,12 @@ class BrowserTokenCommand extends Command
 
         if (! $sessionOnly && ($username === null || $password === null)) {
             return self::FAILURE;
+        }
+
+        $screenshot = $this->option('screenshot');
+
+        if (is_string($screenshot) && trim($screenshot) !== '') {
+            $extractor->screenshotPath = $this->resolveScreenshotPath(trim($screenshot));
         }
 
         $this->line(sprintf('Signing in to %s…', (string) config('browser_auth.login_url')));
@@ -98,6 +105,16 @@ class BrowserTokenCommand extends Command
         $this->line('  stored       yes, through the encrypted token store');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * A directory means "name the file yourself"; anything else is the file.
+     */
+    private function resolveScreenshotPath(string $given): string
+    {
+        return is_dir($given)
+            ? rtrim($given, '/').'/browser-token-'.date('Ymd-His').'.png'
+            : $given;
     }
 
     private function hasProfile(BrowserTokenExtractor $extractor): bool
@@ -143,6 +160,7 @@ class BrowserTokenCommand extends Command
                 : null,
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
+            'screenshot' => $evidence['screenshot'] ?? null,
         ] as $label => $value) {
             if (is_string($value) && $value !== '') {
                 $this->line(sprintf('  %-16s %s', $label, $value));
