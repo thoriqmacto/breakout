@@ -125,6 +125,7 @@ class BrowserTokenExtractor
 
         $job = [
             'login_url' => (string) config('browser_auth.login_url'),
+            'post_login_url' => config('browser_auth.post_login_url'),
             'username' => $username,
             'password' => $password,
             'selectors' => $selectors,

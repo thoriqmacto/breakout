@@ -1347,6 +1347,7 @@ Installed by the migrations that create the tables, and restorable with
 | Name | Schedule | Condition | Priority | Command |
 | --- | --- | --- | --- | --- |
 | Trading Calendar Refresh | 17:30 `Asia/Jakarta`, daily | `none` | 1 | `automation:trading-calendar-refresh` |
+| Stockbit Token Renewal | `:15` hourly | `none` | 5 | `automation:token-refresh` (seeded **disabled**; needs stored credentials) |
 | Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | 5 | `automation:token-check` |
 | Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | 10 | `automation:ohlcv-daily` |
 | Daily Broker Summary | 18:00 `Asia/Jakarta`, daily | `trading_day` | 20 | `automation:broker-summary-daily` |
@@ -1584,10 +1585,12 @@ Each allowlisted command declares its acceptable parameters and their types (`bo
 `integer`, `date`, `enum`, `string` with a pattern, `symbol_list`). Anything undeclared, or a
 value of the wrong shape, is a 422.
 
-**The Stockbit bearer can never be stored as a task parameter.** `stockbit:scrape` is
-allowlisted *without* `--token`, and a name-level blocklist (`token`, `bearer`, `secret`,
-`password`, `api-key`, …) rejects it regardless of what the config says. The token is resolved at
-execution time from the existing encrypted store.
+**Neither the Stockbit bearer nor the portal password can ever be stored as a task parameter.**
+`stockbit:scrape` is allowlisted *without* `--token`, and a name-level blocklist (`token`,
+`bearer`, `secret`, `password`, `api-key`, …) rejects it regardless of what the config says. The
+token is resolved at execution time from the existing encrypted store, and
+`automation:token-refresh` reads credentials from theirs — it is allowlisted with `--minutes` and
+`--force` and nothing else, so there is no door for a credential to come through.
 
 To allow another command, add it to `config/automation.php` under `commands`.
 
@@ -1690,8 +1693,9 @@ What the implementation does with the credentials:
   into, consistent with the scheduler's own rule about never executing a built string.
 - Only the **token** survives, through the same encrypted store a pasted token goes to. The
   response carries status, fingerprint and expiry — never the bearer.
-- **No scheduled variant.** Automating renewal would mean storing the password, which is a
-  materially different decision; the token reminder still exists for that reason.
+- **A scheduled variant exists, and is off until you store a password** — see
+  [Unattended renewal](#unattended-renewal). It is a materially different decision from the
+  one-shot login above, and is described separately for that reason.
 
 The browser side lives in `apps/api/resources/browser/` and knows nothing about any particular
 site — the URL, the three selectors and the token key names are all configuration:
@@ -1704,11 +1708,30 @@ resources/browser/
   package.json          playwright, isolated from the API's Vite dependencies
 ```
 
-It watches for the token in two places, because a portal reveals it in either or both: the body
-of the login response, and the `Authorization` header of the first API call the app makes
-afterwards. Watching both is what makes it reliable rather than lucky — a portal that nests or
-renames the token in its body is still caught by the header, and one that redirects straight to a
-static page is still caught by the body.
+It looks for the token in **three** places, because a portal reveals it in any of them and never
+announces which:
+
+1. **The body of the login response.** Caught even when the portal redirects straight to a static
+   page that makes no further call.
+2. **The `Authorization` header of any request the app makes.** Caught even when the portal
+   nests, renames, or never returns the token in a body. Listeners are attached to the browser
+   *context* rather than one page, so a login that finishes in a popup or a new tab still counts.
+3. **Web storage.** The case the first two miss entirely: a portal that authenticates, stores the
+   token, and then loads a page that fetches nothing. The app has the token the whole time; it
+   simply never puts it on the wire while anyone is watching. Only JWT-shaped values are
+   accepted, and a key naming itself the access token wins over one that merely holds a JWT —
+   otherwise a refresh token, which is also a JWT, gets stored and authenticates nothing.
+
+If a portal reveals it in none of those, `BROWSER_AUTH_POST_LOGIN_URL` opens a page of the app
+after signing in, which provokes the authenticated call that carries the bearer. This is the
+automated form of what a person does by hand: sign in, open a page that loads data, and read the
+`Authorization` header off the request in devtools.
+
+When nothing is found, the error says what was actually observed — how many requests carried an
+`Authorization` header, whether any carried a bearer that is not a JWT, how many keys were in web
+storage, and which hosts were contacted — because "no bearer token was seen" is true of four
+different situations that need four different fixes. Counts and host names only; never a header
+value, never a body.
 
 Install and verify, on the server:
 
@@ -1759,9 +1782,33 @@ BROWSER_AUTH_ENABLED=true
 BROWSER_AUTH_LOGIN_URL=https://portal.example.com/login
 BROWSER_AUTH_USERNAME_SELECTOR=input[type="email"]
 BROWSER_AUTH_PASSWORD_SELECTOR=input[type="password"]
-BROWSER_AUTH_SUBMIT_SELECTOR=button[type="submit"]
+BROWSER_AUTH_SUBMIT_SELECTOR='button[id="email-login-button"]'
 BROWSER_AUTH_CHROMIUM_PATH=/usr/bin/chromium
+# Optional: a page of the app to open after signing in, when the portal stores
+# the token rather than using it.
+BROWSER_AUTH_POST_LOGIN_URL=https://portal.example.com/
 ```
+
+**Quote the selector values.** A `.env` value is only literal inside quotes: unquoted, a value
+starting with `#` is a comment, dotenv returns an empty string, and `config()`'s default does not
+rescue it because `''` is not `null`. The symptom is `SELECTOR_NOT_FOUND` blaming the portal for
+markup that never changed. `browser:form` prints its suggestions already quoted, and
+`browser:check` prints the selectors **as the running app resolved them**, which is where a
+swallowed value — or a stale `config:cache` — becomes visible.
+
+Don't guess the selectors. Ask the page:
+
+```bash
+php artisan browser:form
+```
+
+It opens the configured login URL in the same browser a login uses, lists every field and button
+with its attributes, and prints the three lines to paste. It submits nothing and takes no
+credentials, and reads attribute *names* only — never values, which can hold a saved username. It
+reports the URL it **landed on** rather than the one configured, since a login page that redirects
+to an SSO host is a different page with different markup. Identity-provider buttons are demoted
+when proposing the submit control: "Login with Google" matches every hint the real button does,
+usually sits above it, and opens a popup this cannot drive.
 
 Failures are reported by kind rather than as one generic error, because they need different
 fixes: `INVALID_CREDENTIALS` (or a second factor this cannot answer), `TIMEOUT`,
@@ -1771,6 +1818,68 @@ is named something not in `BROWSER_AUTH_TOKEN_KEYS`), and `BROWSER_LAUNCH_FAILED
 One login runs at a time — each is a Chromium process, and several at once is the quickest way to
 exhaust a small VPS — and attempts are capped at five per fifteen minutes so a wrong password
 cannot lock the portal account.
+
+### Unattended renewal
+
+`automation:token-refresh` renews the bearer on a schedule, so a token that expires overnight
+does not take the morning's scrape with it.
+
+**This reverses a deliberate decision, and the reversal is the whole cost.** The token lifecycle
+was built so no password ever had to reach this server: renewal was a person pasting a token, and
+the worst a stolen disk could give up was a bearer that expires within hours. Unattended renewal
+means storing the password, and **a stolen password does not expire** — whoever holds the file
+and the app key holds the portal account until the password is changed. It is also more likely to
+be against the portal's terms of service than a single interactive login is. Nothing turns this
+on by itself.
+
+Enable it in two steps:
+
+```bash
+# 1. Store the credentials, as the user the scheduler runs as.
+sudo -u www-data php artisan stockbit:credentials
+#    Prompts for the password without echoing it. For a non-interactive install:
+#    printf '%s' "$PASSWORD" | php artisan stockbit:credentials --username=me --stdin
+
+# 2. Enable the "Stockbit Token Renewal" task on /dashboard/automation.
+```
+
+Undo is complete and immediate:
+
+```bash
+php artisan stockbit:credentials --status   # which account is stored — never the password
+php artisan stockbit:credentials --forget   # erase; renewal goes back to manual
+```
+
+How the credentials are held:
+
+- **Encrypted at rest** with the app key, through the same mechanism as the token store, on a
+  local disk that is never mirrored to Drive.
+- **Never a command argument**, and **never a scheduled-task parameter.** A task's parameters
+  live in the database and are shown in the dashboard, so `automation:token-refresh` accepts
+  exactly two options — `--minutes` and `--force` — and there is deliberately no way to pass
+  credentials through it. Arguments are also world-readable through `ps`, which is why the
+  password comes from a hidden prompt or stdin.
+- **Never returned by an API, never logged.** The refresh records status, fingerprint, expiry and
+  which of the three sources the token came from — nothing that could reconstruct the bearer, let
+  alone the password.
+
+What it does when it runs, hourly at :15:
+
+| Situation | Result |
+| --- | --- |
+| Token healthy, outside the renewal window | **No login.** A browser launch costs hundreds of megabytes and tens of seconds, and every needless login is another chance for the portal to notice a robot. |
+| Token missing, expired, or inside `BROWSER_AUTH_RENEW_BEFORE_MINUTES` (default 120) | Signs in, stores the new token, clears the reminder. |
+| Expiry unreadable | Renews. A token whose `exp` cannot be read may already be dead, and finding that out mid-scrape is what this exists to prevent. |
+| No credentials stored, or headless login switched off | **Raises the dashboard reminder** naming the remedy. |
+| Login fails — wrong password, a second factor, changed markup | **Raises the reminder** with the extractor's own diagnosis, and **keeps the existing token**, which may still have hours on it. |
+
+The hourly cadence is about noticing an expiry soon after it happens, not about logging in
+hourly: with a two-hour window, a failed attempt has roughly a dozen retries before the token
+actually dies.
+
+`automation:token-check` still runs daily at 09:00 and still raises the same reminder row, keyed
+on `(type, key)` so the two never stack. It is the fallback for everything renewal cannot handle,
+which is why both exist.
 
 ### Broker-summary import
 

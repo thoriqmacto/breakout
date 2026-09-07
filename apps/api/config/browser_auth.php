@@ -36,6 +36,17 @@ return [
     */
     'login_url' => env('BROWSER_AUTH_LOGIN_URL'),
 
+    /*
+    | A page of the app to open once logged in, so it makes the authenticated
+    | call that carries the bearer.
+    |
+    | Some portals sign in and land somewhere that loads no data, leaving the
+    | token in the app's hands but never on the wire. This is the automated
+    | form of what a person does by hand: open a page of the app and read the
+    | Authorization header off the request it makes.
+    */
+    'post_login_url' => env('BROWSER_AUTH_POST_LOGIN_URL'),
+
     'selectors' => [
         'username' => env('BROWSER_AUTH_USERNAME_SELECTOR', 'input[type="email"]'),
         'password' => env('BROWSER_AUTH_PASSWORD_SELECTOR', 'input[type="password"]'),
@@ -71,6 +82,15 @@ return [
     | the run -- or set chromium_path above at a system Chromium.
     */
     'browsers_path' => env('BROWSER_AUTH_BROWSERS_PATH', env('PLAYWRIGHT_BROWSERS_PATH')),
+
+    /*
+    | How long before expiry the scheduled renewal starts trying.
+    |
+    | Wide enough that a failed attempt has room for several retries before the
+    | token actually dies, narrow enough that a healthy token is not replaced
+    | for nothing. Two hours is roughly a dozen hourly attempts.
+    */
+    'renew_before_minutes' => (int) env('BROWSER_AUTH_RENEW_BEFORE_MINUTES', 120),
 
     /*
     | Ceiling on one attempt. The Node side races its own timer, and the PHP

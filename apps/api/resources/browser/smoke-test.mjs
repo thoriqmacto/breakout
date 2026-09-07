@@ -76,13 +76,79 @@ function loginPage(mode) {
 </body></html>`
 }
 
+/**
+ * A portal that behaves like the one this was pointed at in production.
+ *
+ * Login succeeds and lands on a page that loads no data, so nothing carries
+ * the bearer while anyone is watching. The token is in the app's hands the
+ * whole time -- in web storage -- and only reaches the wire when a page of the
+ * app is opened. That is the shape that produced TOKEN_NOT_FOUND against a
+ * login that had plainly worked.
+ */
+function quietLoginPage() {
+  return `<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <div id="status"></div>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+
+      if (!response.ok) {
+        document.getElementById('status').textContent = 'rejected';
+        return;
+      }
+
+      // Stored, not used. No further call is made from this page.
+      localStorage.setItem('sb_session', JSON.stringify({
+        access_token: ${JSON.stringify(FAKE_JWT)},
+        refresh_token: 'not-a-jwt',
+      }));
+      document.getElementById('f').remove();
+      document.getElementById('status').textContent = 'signed in';
+    });
+  </script>
+</body></html>`
+}
+
+/** The app page: opening it is what puts the bearer on the wire. */
+function appPage() {
+  return `<!doctype html>
+<html><body><div id="app">loading</div>
+  <script>
+    const session = JSON.parse(localStorage.getItem('sb_session') || '{}');
+    fetch('/api/me', { headers: { Authorization: 'Bearer ' + session.access_token } })
+      .then(() => { document.getElementById('app').textContent = 'ready' });
+  </script>
+</body></html>`
+}
+
 function startPortal(mode) {
   const server = createServer((request, response) => {
     const url = request.url ?? '/'
 
     if (url === '/login') {
       response.writeHead(200, { 'content-type': 'text/html' })
-      response.end(loginPage(mode))
+      response.end(mode === 'quiet' ? quietLoginPage() : loginPage(mode))
+
+      return
+    }
+
+    if (url === '/app') {
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(appPage())
 
       return
     }
@@ -192,6 +258,19 @@ async function scenarioWithSelectors(name, port, selectors) {
   }
 }
 
+/**
+ * Run one assertion that needs no fixture plumbing of its own.
+ */
+async function check(name, assert) {
+  try {
+    await assert()
+    console.log(`  ok   ${name}`)
+  } catch (failure) {
+    console.error(`  FAIL ${name}: ${failure.message}`)
+    process.exitCode = 1
+  }
+}
+
 function expect(condition, message) {
   if (!condition) throw new Error(message)
 }
@@ -289,7 +368,10 @@ async function runCli(job) {
 
 async function cliScenario(name, job, assert) {
   try {
-    assert(await runCli(job))
+    // Awaited: an async assertion that rejects here used to escape as an
+    // unhandled rejection, which kills the process rather than failing the
+    // scenario -- and takes the rest of the suite with it.
+    await assert(await runCli(job))
     console.log(`  ok   ${name}`)
   } catch (failure) {
     console.error(`  FAIL ${name}: ${failure.message}`)
@@ -377,6 +459,75 @@ async function runFormProbe(loginUrl) {
   })
 }
 
+/**
+ * A login that works, followed by silence.
+ *
+ * Both of these fail on the wire-only implementation: nothing carries the
+ * bearer while the extractor is watching, which is what produced
+ * TOKEN_NOT_FOUND in production against a login that had plainly succeeded.
+ */
+console.log('a portal that stores the token instead of using it:')
+
+{
+  const { server, port } = await startPortal('quiet')
+
+  try {
+    const QUIET_SELECTORS = {
+      username: 'input[name="username"]',
+      password: 'input[name="password"]',
+      submit: 'button[type="submit"]',
+    }
+
+    await check('the token is found in web storage when nothing carries it', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: QUIET_SELECTORS,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the wrong token came back')
+      expect(
+        result.source.startsWith('storage:'),
+        `expected a storage source, got ${result.source}`,
+      )
+    })
+
+    // And the other way round: opening a page of the app puts it on the wire,
+    // which is the automated form of reading it out of devtools.
+    await check('a post-login page makes the app send the bearer', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        postLoginUrl: `http://127.0.0.1:${port}/app`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: QUIET_SELECTORS,
+        // Short, so a pass here cannot be the storage poll arriving late.
+        timeoutMs: 12_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the wrong token came back')
+    })
+
+    // The refresh token is also a JWT-shaped string in that session object;
+    // taking it would store a token that authenticates nothing.
+    await check('the access token is preferred over other stored values', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: QUIET_SELECTORS,
+        timeoutMs: 12_000,
+      })
+
+      expect(result.token === FAKE_JWT, `stored the wrong value: ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
 console.log('the form probe, against the same fixture:')
 
 {
@@ -385,7 +536,7 @@ console.log('the form probe, against the same fixture:')
   try {
     const { code, stdout, stderr } = await runFormProbe(`http://127.0.0.1:${port}/login`)
 
-    await cliScenario('it proposes selectors that match the fixture form', {}, () => {
+    await check('it proposes selectors that match the fixture form', () => {
       expect(code === 0, `expected exit 0, got ${code}: ${stderr.slice(0, 300)}`)
 
       const report = JSON.parse(stdout)
@@ -433,9 +584,8 @@ const SSO_LOGIN_PAGE = `<!doctype html>
   </form>
 </body></html>`
 
-await cliScenario(
+await check(
   'an id-only field is proposed as [id=...], never #id, which a .env eats',
-  {},
   async () => {
     const { code, stdout, stderr } = await runFormProbe(
       `data:text/html,${encodeURIComponent(SSO_LOGIN_PAGE)}`,

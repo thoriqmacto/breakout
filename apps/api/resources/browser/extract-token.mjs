@@ -78,6 +78,7 @@ async function main() {
   try {
     const { token, source, elapsedMs } = await extractBearerToken({
       loginUrl: job.login_url,
+      postLoginUrl: job.post_login_url,
       username: job.username,
       password: job.password,
       selectors: {
