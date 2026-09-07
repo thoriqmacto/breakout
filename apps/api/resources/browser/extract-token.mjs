@@ -101,7 +101,14 @@ async function main() {
     const code = error instanceof TokenExtractionError ? error.code : 'UNEXPECTED'
 
     finish(
-      { ok: false, code, message: redact(error?.message ?? 'Unknown failure', secrets) },
+      {
+        ok: false,
+        code,
+        message: redact(error?.message ?? 'Unknown failure', secrets),
+        // Structured counts, so the parent can show the diagnosis without
+        // having to trust a free-form message.
+        ...(error?.evidence ? { evidence: error.evidence } : {}),
+      },
       1,
     )
   }

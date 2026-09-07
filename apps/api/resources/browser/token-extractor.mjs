@@ -32,10 +32,16 @@ export const ExtractionError = {
 }
 
 export class TokenExtractionError extends Error {
-  constructor(code, message, { cause } = {}) {
+  constructor(code, message, { cause, evidence } = {}) {
     super(message)
     this.name = 'TokenExtractionError'
     this.code = code
+    // Structured, so the caller can render it under its own rules rather than
+    // deciding whether a free-form message is safe to show. The PHP side
+    // deliberately does not surface child messages verbatim -- they can carry
+    // a URL, a selector, or portal markup -- which is exactly how the first
+    // version of this diagnosis got computed and then discarded.
+    if (evidence) this.evidence = evidence
     if (cause) this.cause = cause
   }
 }
@@ -107,10 +113,29 @@ export function redact(text, secrets = []) {
  * was made at all, one was made carrying something that is not a JWT, storage
  * was empty, or the app talks to a host the login never reached.
  */
+/**
+ * The evidence as plain data, safe to hand across a process boundary.
+ *
+ * Counts and host names only. A host name is the one identifier worth carrying
+ * -- it says whether the app ever talked to the API at all -- and it is
+ * already public: it is the site being logged into.
+ */
+export function summariseEvidence(evidence) {
+  return {
+    requests: evidence.requests,
+    authorization_headers: evidence.authorizationHeaders,
+    non_jwt_authorization: evidence.nonJwtAuthorization,
+    json_responses: evidence.jsonResponses,
+    storage_keys: evidence.storageKeys,
+    cookies: evidence.cookies,
+    hosts: [...evidence.hosts].slice(0, 8),
+  }
+}
+
 export function describeEvidence(evidence) {
   const hosts = [...evidence.hosts].slice(0, 6).join(', ')
 
-  if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0) {
+  if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0 && evidence.cookies === 0) {
     return 'No request carried an Authorization header and web storage was empty, so the app '
       + 'never used a token while this was watching. Set BROWSER_AUTH_POST_LOGIN_URL to a page '
       + `of the app that loads data. Hosts contacted: ${hosts || 'none'}.`
@@ -197,6 +222,34 @@ export async function findTokenInStorage(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
   )
 
   return { entries: entries.length, found: preferred ?? candidates[0] ?? null }
+}
+
+/**
+ * And the fourth place: a cookie.
+ *
+ * A portal that keeps its token in an httpOnly cookie shows it in neither web
+ * storage nor a readable header -- the browser attaches it without JavaScript
+ * ever touching it. Playwright can read those cookies where the page cannot,
+ * which is the one advantage a driven browser has over the page's own scripts.
+ */
+export async function findTokenInCookies(context, tokenKeys = DEFAULT_TOKEN_KEYS) {
+  const cookies = await context.cookies().catch(() => [])
+
+  const candidates = []
+
+  for (const cookie of cookies) {
+    const value = stripBearerPrefix(cookie?.value)
+
+    if (looksLikeJwt(value)) {
+      candidates.push({ key: cookie.name, token: value })
+    }
+  }
+
+  const preferred = candidates.find(({ key }) =>
+    tokenKeys.some((name) => new RegExp(name.replace(/[^a-z0-9]/gi, '.?'), 'i').test(key)),
+  )
+
+  return { entries: cookies.length, found: preferred ?? candidates[0] ?? null }
 }
 
 /**
@@ -341,6 +394,7 @@ export async function extractBearerToken(options) {
       jsonResponses: 0,
       hosts: new Set(),
       storageKeys: 0,
+      cookies: 0,
     }
 
     // Listeners go on the *context*, not the page. A portal that finishes
@@ -493,6 +547,16 @@ export async function extractBearerToken(options) {
         break
       }
 
+      const cookieScan = await findTokenInCookies(context, config.tokenKeys)
+
+      evidence.cookies = cookieScan.entries
+
+      if (cookieScan.found) {
+        outcome = { token: cookieScan.found.token, source: `cookie:${cookieScan.found.key}` }
+
+        break
+      }
+
       outcome = await Promise.race([
         tokenSeen,
         new Promise((resolve) => setTimeout(() => resolve(null), Math.min(1_000, Math.max(1, deadline - Date.now())))),
@@ -531,6 +595,7 @@ export async function extractBearerToken(options) {
       ExtractionError.TOKEN_NOT_FOUND,
       `Login appeared to succeed but no bearer token was seen within ${config.timeoutMs}ms. `
         + describeEvidence(evidence),
+      { evidence: summariseEvidence(evidence) },
     )
   } catch (error) {
     if (error instanceof TokenExtractionError) throw error

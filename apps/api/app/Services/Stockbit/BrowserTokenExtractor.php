@@ -198,7 +198,10 @@ class BrowserTokenExtractor
 
             throw new BrowserTokenExtractionException(
                 $code,
-                self::EXPLANATIONS[$code] ?? 'The headless login failed.',
+                trim(
+                    (self::EXPLANATIONS[$code] ?? 'The headless login failed.')
+                    .$this->describeEvidence($decoded['evidence'] ?? null)
+                ),
             );
         }
 
@@ -283,6 +286,52 @@ class BrowserTokenExtractor
     }
 
     /**
+     * Say what the browser actually saw, in the one place a person will read it.
+     *
+     * The child's own message is still not surfaced verbatim -- it can carry a
+     * URL, a selector, or a fragment of the portal's markup. But the counts it
+     * reports are none of those, and without them "no bearer token was seen"
+     * names four different situations with four different fixes and cannot
+     * distinguish them. The first version of this computed the diagnosis in the
+     * child and then discarded it here, which left the operator exactly where
+     * they started.
+     */
+    private function describeEvidence(mixed $evidence): string
+    {
+        if (! is_array($evidence)) {
+            return '';
+        }
+
+        $count = static fn (string $key): int => (int) ($evidence[$key] ?? 0);
+
+        $hosts = array_values(array_filter(
+            is_array($evidence['hosts'] ?? null) ? $evidence['hosts'] : [],
+            static fn ($host): bool => is_string($host) && $host !== '',
+        ));
+
+        $parts = [
+            sprintf('%d request(s)', $count('requests')),
+            sprintf('%d with an Authorization header', $count('authorization_headers')),
+            sprintf('%d web storage key(s)', $count('storage_keys')),
+            sprintf('%d cookie(s)', $count('cookies')),
+        ];
+
+        if ($count('non_jwt_authorization') > 0) {
+            $parts[] = sprintf(
+                '%d bearer(s) that are not JWTs',
+                $count('non_jwt_authorization'),
+            );
+        }
+
+        return sprintf(
+            ' Seen: %s.%s',
+            implode(', ', $parts),
+            $hosts === [] ? '' : ' Hosts: '.implode(', ', array_slice($hosts, 0, 8)).'.',
+        );
+    }
+
+    /**
+     * Additions to the inherited environment, or null to inherit unchanged.    /**
      * Additions to the inherited environment, or null to inherit unchanged.
      *
      * @return array<string, string>|null

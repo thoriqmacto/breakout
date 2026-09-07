@@ -1716,22 +1716,42 @@ announces which:
 2. **The `Authorization` header of any request the app makes.** Caught even when the portal
    nests, renames, or never returns the token in a body. Listeners are attached to the browser
    *context* rather than one page, so a login that finishes in a popup or a new tab still counts.
-3. **Web storage.** The case the first two miss entirely: a portal that authenticates, stores the
+3. **Web storage and cookies.** The cases the first two miss entirely: a portal that authenticates, stores the
    token, and then loads a page that fetches nothing. The app has the token the whole time; it
-   simply never puts it on the wire while anyone is watching. Only JWT-shaped values are
-   accepted, and a key naming itself the access token wins over one that merely holds a JWT —
-   otherwise a refresh token, which is also a JWT, gets stored and authenticates nothing.
+   simply never puts it on the wire while anyone is watching. Cookies are read through Playwright
+   rather than the page, so an `httpOnly` cookie — invisible to the site's own JavaScript — is
+   still found. Only JWT-shaped values are accepted, and a key naming itself the access token
+   wins over one that merely holds a JWT: otherwise a refresh token, which is also a JWT, gets
+   stored and authenticates nothing.
 
 If a portal reveals it in none of those, `BROWSER_AUTH_POST_LOGIN_URL` opens a page of the app
 after signing in, which provokes the authenticated call that carries the bearer. This is the
 automated form of what a person does by hand: sign in, open a page that loads data, and read the
 `Authorization` header off the request in devtools.
 
-When nothing is found, the error says what was actually observed — how many requests carried an
-`Authorization` header, whether any carried a bearer that is not a JWT, how many keys were in web
-storage, and which hosts were contacted — because "no bearer token was seen" is true of four
-different situations that need four different fixes. Counts and host names only; never a header
-value, never a body.
+When nothing is found, the error says what was actually observed — requests seen, how many
+carried an `Authorization` header, whether any carried a bearer that is not a JWT, how many web
+storage keys and cookies existed, and which hosts were contacted — because "no bearer token was
+seen" is true of several situations that need different fixes:
+
+```
+Signed in, but no bearer token was seen. … Seen: 42 request(s), 0 with an Authorization
+header, 3 web storage key(s), 5 cookie(s). Hosts: stockbit.com, exodus.stockbit.com.
+```
+
+These counts travel as **structured data**, not as the child's message. The child's own prose is
+still never surfaced — it can carry a URL, a selector, or a fragment of portal markup — but
+counts and host names are none of those.
+
+To iterate without a dashboard round trip for every attempt:
+
+```bash
+php artisan browser:token --dry-run     # sign in, report what was captured, store nothing
+php artisan browser:token --stored      # use the credentials saved for unattended renewal
+```
+
+The password comes from a hidden prompt and is used once. The token is never printed — only its
+fingerprint and which of the four sources it came from.
 
 Install and verify, on the server:
 
