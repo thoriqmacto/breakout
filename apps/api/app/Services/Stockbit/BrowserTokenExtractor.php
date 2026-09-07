@@ -79,7 +79,11 @@ class BrowserTokenExtractor
      *
      * @throws BrowserTokenExtractionException
      */
-    public function extract(string $username, string $password): array
+    /**
+     * @param  string|null  $username  Omitted when a saved profile is expected
+     *                                 to be signed in already.
+     */
+    public function extract(?string $username = null, ?string $password = null): array
     {
         if (! $this->enabled()) {
             throw new BrowserTokenExtractionException(
@@ -123,9 +127,20 @@ class BrowserTokenExtractor
 
         $timeout = max(10, (int) config('browser_auth.timeout_seconds', 60));
 
+        $profile = $this->profileDir();
+
+        if ($profile === null && ($username === null || $password === null)) {
+            throw new BrowserTokenExtractionException(
+                self::NOT_CONFIGURED,
+                'Credentials are required unless BROWSER_AUTH_PROFILE_DIR points at a saved '
+                .'browser profile that is already signed in.',
+            );
+        }
+
         $job = [
             'login_url' => (string) config('browser_auth.login_url'),
             'post_login_url' => config('browser_auth.post_login_url'),
+            'profile_dir' => $profile,
             'username' => $username,
             'password' => $password,
             'selectors' => $selectors,
@@ -168,7 +183,15 @@ class BrowserTokenExtractor
             }
         }
 
-        return $this->interpret($process, [$password]);
+        // A null password is not a secret to redact, and passing it as one
+        // would have str_replace() rewriting the empty string everywhere.
+        return $this->interpret(
+            $process,
+            array_values(array_filter(
+                [$password],
+                static fn (?string $value): bool => is_string($value) && $value !== '',
+            )),
+        );
     }
 
     /**
@@ -281,6 +304,47 @@ class BrowserTokenExtractor
         $process->run();
 
         return $process;
+    }
+
+    /**
+     * The profile directory, once it is usable, or null.
+     *
+     * Checked rather than trusted: a path that cannot be written to fails at
+     * browser launch with a message about the profile lock, which names
+     * neither the directory nor the user that could not write to it. The two
+     * users involved here are exactly the ones that have differed at every
+     * previous step of this feature.
+     */
+    public function profileDir(): ?string
+    {
+        $configured = config('browser_auth.profile_dir');
+
+        if (! is_string($configured) || trim($configured) === '') {
+            return null;
+        }
+
+        $path = rtrim(trim($configured), '/');
+
+        if (! is_dir($path) && ! @mkdir($path, 0775, true) && ! is_dir($path)) {
+            throw new BrowserTokenExtractionException(
+                self::NOT_CONFIGURED,
+                sprintf('The browser profile directory %s does not exist and could not be created.', $path),
+            );
+        }
+
+        if (! is_writable($path)) {
+            throw new BrowserTokenExtractionException(
+                self::NOT_CONFIGURED,
+                sprintf(
+                    'The browser profile directory %s is not writable by this user. Both the CLI '
+                    .'user and the web server user write to it: chgrp it to a shared group and '
+                    .'chmod g+rwxs.',
+                    $path,
+                ),
+            );
+        }
+
+        return $path;
     }
 
     public function probePath(string $filename): string

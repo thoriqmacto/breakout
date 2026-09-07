@@ -31,6 +31,7 @@ class BrowserAuthCheckCommand extends Command
         $checks = [
             'configuration' => $this->checkConfiguration($extractor),
             'selectors' => $this->checkSelectors($extractor),
+            'profile' => $this->checkProfile($extractor),
             'script' => $this->checkScript($extractor),
             'node' => $this->checkNode(),
             'dependencies' => $this->checkDependencies($extractor),
@@ -147,6 +148,38 @@ class BrowserAuthCheckCommand extends Command
                 array_keys($selectors),
                 $selectors,
             )),
+        ];
+    }
+
+    /**
+     * The saved profile, and whether *this* user can write to it.
+     *
+     * The CLI user and the web server user both drive the browser, and a
+     * profile only works if both can write to the same directory. When they
+     * cannot, Chromium fails on the profile lock with a message that names
+     * neither the directory nor the user -- the same shape of confusion the
+     * Chromium install produced, for the same reason.
+     *
+     * @return array{ok: bool, detail: string}
+     */
+    private function checkProfile(BrowserTokenExtractor $extractor): array
+    {
+        try {
+            $path = $extractor->profileDir();
+        } catch (\Throwable $exception) {
+            return ['ok' => false, 'detail' => $exception->getMessage()];
+        }
+
+        if ($path === null) {
+            return [
+                'ok' => true,
+                'detail' => 'none -- every run is a new device; set BROWSER_AUTH_PROFILE_DIR to keep one',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'detail' => sprintf('%s (writable by %s)', $path, $this->currentUser()),
         ];
     }
 

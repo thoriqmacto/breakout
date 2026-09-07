@@ -84,6 +84,24 @@ return [
     'browsers_path' => env('BROWSER_AUTH_BROWSERS_PATH', env('PLAYWRIGHT_BROWSERS_PATH')),
 
     /*
+    | A directory the browser keeps between runs.
+    |
+    | Without one, every run is a brand-new device: cookies, storage and
+    | whatever identity the portal assigned are discarded on close. A portal
+    | with a device-trust step can therefore never be satisfied -- approving
+    | the device achieves nothing, because the next run is a different device
+    | again.
+    |
+    | With one, the server signs in once, the device is approved through the
+    | portal's own flow, and later runs reuse that session without logging in
+    | at all -- which also means no password needs storing.
+    |
+    | Both the CLI user and the web server user write here, so it belongs
+    | outside either home directory, group-owned and group-writable.
+    */
+    'profile_dir' => env('BROWSER_AUTH_PROFILE_DIR'),
+
+    /*
     | How long before expiry the scheduled renewal starts trying.
     |
     | Wide enough that a failed attempt has room for several retries before the

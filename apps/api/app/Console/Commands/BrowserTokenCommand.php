@@ -28,6 +28,7 @@ class BrowserTokenCommand extends Command
     protected $signature = 'browser:token
                             {--username= : The portal username or email}
                             {--stored : Use the credentials saved by stockbit:credentials}
+                            {--session : Use the saved browser profile without logging in}
                             {--dry-run : Report what was captured without storing it}';
 
     protected $description = 'Sign in to the portal with a headless browser and report what was captured.';
@@ -43,9 +44,19 @@ class BrowserTokenCommand extends Command
             return self::FAILURE;
         }
 
-        [$username, $password] = $this->credentials($credentials);
+        // With a saved profile the session may already be there, and asking
+        // for a password to use one that is not needed would defeat the point.
+        $sessionOnly = $this->option('session') || (
+            $this->hasProfile($extractor) && ! $this->option('stored') && ! $this->option('username')
+                ? ! $this->confirm('A saved browser profile exists. Sign in again with a password?', false)
+                : false
+        );
 
-        if ($username === null || $password === null) {
+        [$username, $password] = $sessionOnly
+            ? [null, null]
+            : $this->credentials($credentials);
+
+        if (! $sessionOnly && ($username === null || $password === null)) {
             return self::FAILURE;
         }
 
@@ -72,6 +83,10 @@ class BrowserTokenCommand extends Command
         // tokens apart, useless to anyone who reads it over your shoulder.
         $this->line(sprintf('  fingerprint  …%s', substr($result['token'], -4)));
 
+        if ($sessionOnly) {
+            $this->line('  signed in    from the saved profile, with no password');
+        }
+
         if ($this->option('dry-run')) {
             $this->newLine();
             $this->warn('Dry run: the token was not stored.');
@@ -83,6 +98,17 @@ class BrowserTokenCommand extends Command
         $this->line('  stored       yes, through the encrypted token store');
 
         return self::SUCCESS;
+    }
+
+    private function hasProfile(BrowserTokenExtractor $extractor): bool
+    {
+        try {
+            return $extractor->profileDir() !== null;
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->warn($exception->getMessage());
+
+            return false;
+        }
     }
 
     /**

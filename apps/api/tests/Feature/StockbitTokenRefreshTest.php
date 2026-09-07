@@ -60,6 +60,8 @@ class StockbitTokenRefreshTest extends TestCase
     {
         $this->mock(BrowserTokenExtractor::class, function ($mock) use ($token) {
             $mock->shouldReceive('enabled')->andReturn(true);
+            // No saved profile: these cases are about the stored-credential path.
+            $mock->shouldReceive('profileDir')->andReturn(null);
             $mock->shouldReceive('extract')
                 ->andReturn(['token' => $token, 'source' => 'storage:sb_session', 'elapsed_ms' => 4200]);
         });
@@ -69,6 +71,7 @@ class StockbitTokenRefreshTest extends TestCase
     {
         $this->mock(BrowserTokenExtractor::class, function ($mock) use ($code, $message) {
             $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andReturn(null);
             $mock->shouldReceive('extract')
                 ->andThrow(new BrowserTokenExtractionException($code, $message));
         });
@@ -106,6 +109,7 @@ class StockbitTokenRefreshTest extends TestCase
 
         $this->mock(BrowserTokenExtractor::class, function ($mock) {
             $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andReturn(null);
             $mock->shouldNotReceive('extract');
         });
 
@@ -125,12 +129,40 @@ class StockbitTokenRefreshTest extends TestCase
         $this->assertSame($fresh, app(StockbitTokenResolver::class)->resolve());
     }
 
-    public function test_without_credentials_it_raises_the_reminder_rather_than_passing_quietly(): void
+    public function test_without_credentials_or_a_profile_it_raises_the_reminder(): void
     {
+        config(['browser_auth.profile_dir' => null]);
+
         $this->assertSame(1, Artisan::call('automation:token-refresh'));
 
         $this->assertSame(1, $this->openAlerts());
         $this->assertStringContainsString('stockbit:credentials', Artisan::output());
+    }
+
+    /**
+     * A saved profile removes the reason to store a password at all.
+     *
+     * Renewal through a session the portal already trusts is strictly better
+     * than renewal through stored credentials: a stolen disk gives up a
+     * session that can be revoked rather than a password that cannot. So an
+     * available profile must be enough on its own.
+     */
+    public function test_a_saved_profile_renews_without_any_stored_password(): void
+    {
+        $fresh = $this->jwt(time() + 86_400);
+
+        $this->mock(BrowserTokenExtractor::class, function ($mock) use ($fresh) {
+            $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andReturn('/tmp/browser-profile');
+            // Called with no credentials whatsoever, which is the point.
+            $mock->shouldReceive('extract')
+                ->with(null, null)
+                ->andReturn(['token' => $fresh, 'source' => 'cookie:credentialStorage', 'elapsed_ms' => 1200]);
+        });
+
+        $this->assertSame(0, Artisan::call('automation:token-refresh'));
+        $this->assertSame($fresh, app(StockbitTokenResolver::class)->resolve());
+        $this->assertSame(0, $this->openAlerts());
     }
 
     public function test_a_failed_login_raises_the_reminder_and_keeps_the_old_token(): void

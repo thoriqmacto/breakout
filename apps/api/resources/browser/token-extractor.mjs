@@ -68,6 +68,12 @@ const DEFAULTS = {
   // A page of the app to open after logging in, to provoke the authenticated
   // call that carries the bearer. Empty means "do not navigate".
   postLoginUrl: undefined,
+  // A directory the browser keeps between runs. Without one, every run is a
+  // brand-new device: cookies, storage and whatever identity the portal
+  // assigned are all discarded on close, so a device-trust prompt can never be
+  // satisfied -- approving the device changes nothing, because the next run is
+  // a different device again.
+  profileDir: undefined,
   // Point at a Chromium that is already on the box. Playwright otherwise
   // downloads its own (~400MB plus system libraries), which is a lot to put
   // on a small VPS when the distribution already ships one.
@@ -130,6 +136,7 @@ export function summariseEvidence(evidence) {
     title: evidence.title,
     login_form_gone: evidence.loginFormGone,
     url_after_submit: evidence.urlAfterSubmit,
+    used_existing_session: evidence.usedExistingSession,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -475,7 +482,13 @@ export async function extractBearerToken(options) {
   const config = { ...DEFAULTS, ...supplied }
   const { loginUrl, username, password, selectors } = config
 
-  for (const [name, value] of Object.entries({ loginUrl, username, password })) {
+  // Credentials are required only when a login is going to happen. With a
+  // profile that is already signed in there is nothing to type, and demanding
+  // a password anyway would mean storing one to do something that does not
+  // need it.
+  const required = config.profileDir ? { loginUrl } : { loginUrl, username, password }
+
+  for (const [name, value] of Object.entries(required)) {
     if (typeof value !== 'string' || value === '') {
       throw new TokenExtractionError(
         ExtractionError.NAVIGATION_FAILED,
@@ -512,12 +525,29 @@ export async function extractBearerToken(options) {
     }
   })
 
+  let context
+
   try {
+    const launchOptions = {
+      headless: config.headless,
+      ...(config.executablePath ? { executablePath: config.executablePath } : {}),
+    }
+
     try {
-      browser = await chromium.launch({
-        headless: config.headless,
-        ...(config.executablePath ? { executablePath: config.executablePath } : {}),
-      })
+      if (config.profileDir) {
+        // A persistent context *is* the browser: it owns the profile
+        // directory, so cookies and storage outlive the run and the portal
+        // sees the same device next time.
+        context = await chromium.launchPersistentContext(config.profileDir, {
+          ...launchOptions,
+          ...(config.userAgent ? { userAgent: config.userAgent } : {}),
+        })
+      } else {
+        browser = await chromium.launch(launchOptions)
+        context = await browser.newContext(
+          config.userAgent ? { userAgent: config.userAgent } : {},
+        )
+      }
     } catch (error) {
       throw new TokenExtractionError(
         ExtractionError.BROWSER_LAUNCH_FAILED,
@@ -527,10 +557,7 @@ export async function extractBearerToken(options) {
       )
     }
 
-    const context = await browser.newContext(
-      config.userAgent ? { userAgent: config.userAgent } : {},
-    )
-    const page = await context.newPage()
+    const page = context.pages()[0] ?? (await context.newPage())
     page.setDefaultTimeout(config.navigationTimeoutMs)
 
     // Records whether the portal actively rejected the credentials, so a
@@ -565,6 +592,8 @@ export async function extractBearerToken(options) {
       // Recorded immediately after the submit, before any navigation of ours.
       loginFormGone: false,
       urlAfterSubmit: null,
+      // True when the saved profile was already signed in and no login ran.
+      usedExistingSession: false,
     }
 
     // Listeners go on the *context*, not the page. A portal that finishes
@@ -654,26 +683,49 @@ export async function extractBearerToken(options) {
       )
     }
 
-    try {
-      await page.fill(selectors.username, username)
-      await page.fill(selectors.password, password)
-    } catch (error) {
-      throw new TokenExtractionError(
-        ExtractionError.SELECTOR_NOT_FOUND,
-        'The username or password field was not found. '
-          + `Check the selectors against ${loginUrl}: ${redact(error.message, secrets)}`,
-        { cause: error },
-      )
-    }
+    // A portal that already knows this profile sends /login straight to the
+    // app, so there is no form to fill. Logging in again anyway would trip the
+    // device check on every scheduled run -- the exact thing the profile
+    // exists to stop.
+    const loginFormPresent = await page
+      .locator(selectors.password)
+      .first()
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false)
 
-    try {
-      await page.click(selectors.submit)
-    } catch (error) {
-      throw new TokenExtractionError(
-        ExtractionError.SELECTOR_NOT_FOUND,
-        `The submit control was not found: ${redact(error.message, secrets)}`,
-        { cause: error },
-      )
+    evidence.usedExistingSession = !loginFormPresent
+
+    if (loginFormPresent) {
+      if (typeof username !== 'string' || username === '' || typeof password !== 'string' || password === '') {
+        throw new TokenExtractionError(
+          ExtractionError.INVALID_CREDENTIALS,
+          'The portal is asking for a login and no credentials were supplied. The saved '
+            + 'profile is signed out: run this once with credentials to sign in again.',
+          { evidence: summariseEvidence(evidence) },
+        )
+      }
+
+      try {
+        await page.fill(selectors.username, username)
+        await page.fill(selectors.password, password)
+      } catch (error) {
+        throw new TokenExtractionError(
+          ExtractionError.SELECTOR_NOT_FOUND,
+          'The username or password field was not found. '
+            + `Check the selectors against ${loginUrl}: ${redact(error.message, secrets)}`,
+          { cause: error },
+        )
+      }
+
+      try {
+        await page.click(selectors.submit)
+      } catch (error) {
+        throw new TokenExtractionError(
+          ExtractionError.SELECTOR_NOT_FOUND,
+          `The submit control was not found: ${redact(error.message, secrets)}`,
+          { cause: error },
+        )
+      }
     }
 
     const deadline = startedAt + config.timeoutMs
@@ -687,14 +739,18 @@ export async function extractBearerToken(options) {
     // "Signed in" on no evidence whatsoever. A portal that silently refuses a
     // login -- a device check, a captcha, a rejected password -- looked
     // identical to one that signed in and hid its token.
-    const settleMs = Math.min(5_000, config.timeoutMs)
+    if (evidence.usedExistingSession) {
+      evidence.loginFormGone = true
+    } else {
+      await page.waitForTimeout(Math.min(2_000, config.timeoutMs))
 
-    await page.waitForTimeout(Math.min(2_000, settleMs))
+      evidence.loginFormGone = !(await page
+        .locator(selectors.password)
+        .first()
+        .isVisible()
+        .catch(() => false))
+    }
 
-    evidence.loginFormGone = !(await page
-      .locator(selectors.password)
-      .isVisible()
-      .catch(() => false))
     evidence.urlAfterSubmit = page.url()
 
     // Give the login call itself a moment to come back before doing anything
@@ -816,7 +872,13 @@ export async function extractBearerToken(options) {
     )
   } finally {
     // Unconditional: a browser left running is a zombie holding hundreds of
-    // megabytes, and on a scheduler it is one per run.
-    await browser?.close().catch(() => {})
+    // megabytes, and on a scheduler it is one per run. A persistent context
+    // owns its own browser, and closing it is also what flushes the profile to
+    // disk -- skip it and the session that was just established is lost.
+    if (config.profileDir) {
+      await context?.close().catch(() => {})
+    } else {
+      await browser?.close().catch(() => {})
+    }
   }
 }
