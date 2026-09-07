@@ -180,6 +180,36 @@ class BrowserTokenEvidenceTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * "Mentions a token but yielded none" is a different fault entirely.
+     *
+     * A store whose contents name a token is a decoding problem -- the session
+     * is right there and the scan could not read it. A run with no such store
+     * has no session at all. Reporting only "0 cookies held a JWT" collapses
+     * the two, and they are fixed at opposite ends.
+     */
+    public function test_a_store_that_claims_a_token_is_named(): void
+    {
+        $exception = $this->failureFor((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 512,
+                'authorization_headers' => 0,
+                'storage_keys' => 20,
+                'cookies' => 10,
+                'hosts' => ['stockbit.com'],
+                'claimed_token' => ['credentialStorage'],
+            ],
+        ]));
+
+        $this->assertStringContainsString(
+            'credentialStorage mention a token but none could be read',
+            $exception->getMessage(),
+        );
+    }
+
     public function test_the_password_never_appears_in_the_diagnosis(): void
     {
         $exception = $this->failureFor((string) json_encode([

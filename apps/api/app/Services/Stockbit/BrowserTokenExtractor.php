@@ -326,6 +326,21 @@ class BrowserTokenExtractor
             );
         }
 
+        // The most useful sentence there is when it applies: a store that
+        // mentions a token but yielded none is a decoding problem, and no such
+        // store at all means there is no session to decode. Opposite fixes.
+        $claimed = array_values(array_filter(
+            is_array($evidence['claimed_token'] ?? null) ? $evidence['claimed_token'] : [],
+            static fn ($name): bool => is_string($name) && $name !== '',
+        ));
+
+        if ($claimed !== []) {
+            $parts[] = sprintf(
+                'and %s mention a token but none could be read from them',
+                implode(', ', array_slice($claimed, 0, 6)),
+            );
+        }
+
         return sprintf(
             ' Seen: %s.%s',
             implode(', ', $parts),

@@ -120,6 +120,7 @@ class BrowserTokenCommand extends Command
             'storage keys' => $evidence['storage_key_names'] ?? null,
             'cookies' => $evidence['cookie_names'] ?? null,
             'indexeddb' => $evidence['indexeddb_names'] ?? null,
+            'claim a token' => $evidence['claimed_token'] ?? null,
         ] as $label => $names) {
             if (! is_array($names) || $names === []) {
                 continue;
