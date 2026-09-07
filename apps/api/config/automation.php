@@ -195,6 +195,17 @@ return [
             ],
         ],
 
+        'automation:token-refresh' => [
+            'label' => 'Stockbit token renewal',
+            'description' => 'Sign in to Stockbit with a headless browser and store a fresh bearer token when the current one is missing, expired or close to expiring. Requires credentials stored by "php artisan stockbit:credentials"; there is deliberately no way to supply them here, because a scheduled task\'s parameters are stored in the database and shown in the dashboard.',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [
+                'minutes' => ['type' => 'integer', 'min' => 1, 'max' => 20160, 'label' => 'Renew when fewer minutes remain'],
+                'force' => ['type' => 'boolean', 'label' => 'Renew even when the token is still healthy'],
+            ],
+        ],
+
         'automation:trading-calendar-refresh' => [
             'label' => 'Trading calendar refresh',
             'description' => 'Import recent trading days from Yahoo and rebuild trading_calendar up to the last observed trading day.',
@@ -389,6 +400,18 @@ return [
             'condition' => 'none',
             'priority' => 30,
             'enabled' => true,
+            'sync_gdrive_after_success' => false,
+        ],
+        [
+            'name' => 'Stockbit Token Renewal',
+            'slug' => 'stockbit-token-renewal',
+            'description' => 'Every hour, renew the Stockbit bearer if it is missing, expired, or within the renewal window. A browser launch is expensive and every unnecessary login is another chance for the portal to notice a robot, so a healthy token is a no-op -- the hourly cadence is about catching an expiry soon after it happens, not about logging in hourly. Disabled until credentials are stored by "php artisan stockbit:credentials"; without them it raises the same dashboard reminder the daily check does.',
+            'command' => 'automation:token-refresh',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '15 * * * *',
+            'condition' => 'none',
+            'priority' => 5,
+            'enabled' => false,
             'sync_gdrive_after_success' => false,
         ],
         [

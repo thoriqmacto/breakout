@@ -59,6 +59,9 @@ const DEFAULTS = {
   urlHints: DEFAULT_URL_HINTS,
   tokenKeys: DEFAULT_TOKEN_KEYS,
   userAgent: undefined,
+  // A page of the app to open after logging in, to provoke the authenticated
+  // call that carries the bearer. Empty means "do not navigate".
+  postLoginUrl: undefined,
   // Point at a Chromium that is already on the box. Playwright otherwise
   // downloads its own (~400MB plus system libraries), which is a lot to put
   // on a small VPS when the distribution already ships one.
@@ -94,6 +97,106 @@ export function redact(text, secrets = []) {
   }
 
   return output
+}
+
+/**
+ * Turn what was observed into the next thing to try.
+ *
+ * "No bearer token was seen" is true of four different situations that need
+ * four different fixes, and the counts separate them: no authenticated call
+ * was made at all, one was made carrying something that is not a JWT, storage
+ * was empty, or the app talks to a host the login never reached.
+ */
+export function describeEvidence(evidence) {
+  const hosts = [...evidence.hosts].slice(0, 6).join(', ')
+
+  if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0) {
+    return 'No request carried an Authorization header and web storage was empty, so the app '
+      + 'never used a token while this was watching. Set BROWSER_AUTH_POST_LOGIN_URL to a page '
+      + `of the app that loads data. Hosts contacted: ${hosts || 'none'}.`
+  }
+
+  if (evidence.nonJwtAuthorization > 0) {
+    return `${evidence.nonJwtAuthorization} request(s) carried a bearer that is not a JWT, so it `
+      + 'was rejected as the wrong kind of token. That portal issues an opaque token this cannot '
+      + 'check the expiry of.'
+  }
+
+  if (evidence.authorizationHeaders === 0) {
+    return `Web storage held ${evidence.storageKeys} key(s), none of them a JWT, and no request `
+      + `carried an Authorization header. ${evidence.jsonResponses} JSON response(s) were parsed. `
+      + `Hosts contacted: ${hosts || 'none'}. Try BROWSER_AUTH_TOKEN_KEYS, or point `
+      + 'BROWSER_AUTH_POST_LOGIN_URL at a page that loads data.'
+  }
+
+  return `${evidence.authorizationHeaders} authorized request(s) were seen but none yielded a `
+    + `usable token. Hosts contacted: ${hosts || 'none'}.`
+}
+
+/**
+ * Look for the token where a single-page app usually keeps it.
+ *
+ * Watching the wire misses a portal that authenticates once, stores the token,
+ * and makes no further authenticated call while this is watching -- which is
+ * exactly what a login page that lands on a static dashboard does. The app
+ * still has the token; it is in web storage.
+ *
+ * Only JWT-shaped values are accepted, so a CSRF nonce or a session id under a
+ * key called "token" is not mistaken for one, and nothing else in storage is
+ * read back or reported.
+ */
+export async function findTokenInStorage(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
+  const entries = await page
+    .evaluate(() => {
+      const collected = []
+
+      for (const storage of [window.localStorage, window.sessionStorage]) {
+        try {
+          for (let index = 0; index < storage.length; index += 1) {
+            const key = storage.key(index)
+            collected.push([key, storage.getItem(key)])
+          }
+        } catch {
+          // Storage can be denied outright; the other sources still apply.
+        }
+      }
+
+      return collected
+    })
+    .catch(() => [])
+
+  const candidates = []
+
+  for (const [key, raw] of entries) {
+    if (typeof raw !== 'string' || raw === '') continue
+
+    // Stored bare, which is the common case.
+    const bare = stripBearerPrefix(raw)
+
+    if (looksLikeJwt(bare)) {
+      candidates.push({ key, token: bare })
+
+      continue
+    }
+
+    // Or stored as JSON, which is the other common case: a session object
+    // with the access token as one field among several.
+    try {
+      const token = findTokenInBody(JSON.parse(raw), tokenKeys)
+
+      if (token) candidates.push({ key, token })
+    } catch {
+      // Not JSON, so not a session object.
+    }
+  }
+
+  // A key naming itself as the access token beats one that merely contains a
+  // JWT: a refresh token is also a JWT and is the wrong one to take.
+  const preferred = candidates.find(({ key }) =>
+    tokenKeys.some((name) => new RegExp(name.replace(/[^a-z0-9]/gi, '.?'), 'i').test(key)),
+  )
+
+  return { entries: entries.length, found: preferred ?? candidates[0] ?? null }
 }
 
 /**
@@ -226,8 +329,26 @@ export async function extractBearerToken(options) {
     // difference between "fix your password" and "the site is down".
     let credentialsRejected = false
 
+    // What was seen, for the case where nothing was found. Names and counts
+    // only -- never a header value, never a body. Without this, "no bearer
+    // token was seen" is unfalsifiable from the outside: it cannot say
+    // whether the app made no authenticated call, made one this never saw, or
+    // made one carrying something that is not a JWT.
+    const evidence = {
+      requests: 0,
+      authorizationHeaders: 0,
+      nonJwtAuthorization: 0,
+      jsonResponses: 0,
+      hosts: new Set(),
+      storageKeys: 0,
+    }
+
+    // Listeners go on the *context*, not the page. A portal that finishes
+    // login in a popup or a new tab makes its authenticated calls from a page
+    // this function never created, and a page-scoped listener sees none of
+    // them.
     // The first source: the body of any authentication-shaped response.
-    page.on('response', async (response) => {
+    context.on('response', async (response) => {
       if (settled) return
 
       const url = response.url()
@@ -250,6 +371,8 @@ export async function extractBearerToken(options) {
 
         if (!type.includes('json')) return
 
+        evidence.jsonResponses += 1
+
         const buffer = await response.body()
 
         if (buffer.byteLength > MAX_BODY_BYTES) return
@@ -267,18 +390,34 @@ export async function extractBearerToken(options) {
 
     // The second source, and in practice the more dependable one: the app
     // using the token it was just given.
-    page.on('request', (request) => {
+    context.on('request', (request) => {
+      evidence.requests += 1
+
+      try {
+        evidence.hosts.add(new URL(request.url()).host)
+      } catch {
+        // A request URL that will not parse tells us nothing; skip it.
+      }
+
       if (settled) return
 
       const header = request.headers().authorization ?? request.headers().Authorization
 
       if (typeof header !== 'string' || !/^Bearer\s+/i.test(header)) return
 
+      evidence.authorizationHeaders += 1
+
       const token = stripBearerPrefix(header)
 
       if (looksLikeJwt(token)) {
         resolveToken({ token, source: 'request-header' })
+
+        return
       }
+
+      // A bearer that is not a JWT: worth counting, because it means the
+      // capture is working and the shape test is what rejected it.
+      evidence.nonJwtAuthorization += 1
     })
 
     try {
@@ -313,15 +452,52 @@ export async function extractBearerToken(options) {
       )
     }
 
-    // No sleeps. Either a listener sees a token, or the clock runs out --
-    // and the settled flag means a token arriving during teardown is still
-    // the answer rather than a race.
-    const remaining = Math.max(1_000, config.timeoutMs - (Date.now() - startedAt))
+    const deadline = startedAt + config.timeoutMs
 
-    const outcome = await Promise.race([
+    // Give the login call itself a moment to come back before doing anything
+    // else, so a portal that returns the token in its login response is
+    // answered by the listeners without a second navigation.
+    let outcome = await Promise.race([
       tokenSeen,
-      new Promise((resolve) => setTimeout(() => resolve(null), remaining)),
+      new Promise((resolve) => setTimeout(() => resolve(null), Math.min(8_000, config.timeoutMs))),
     ])
+
+    // Then provoke the call the app makes when it uses the token.
+    //
+    // Some portals authenticate and land on a page that makes no further API
+    // call, so nothing carries the bearer while this is watching. Opening a
+    // page of the app that does -- the same thing a person does when they
+    // read the token out of devtools -- puts it on the wire.
+    if (!outcome && typeof config.postLoginUrl === 'string' && config.postLoginUrl !== '') {
+      await page
+        .goto(config.postLoginUrl, { waitUntil: 'domcontentloaded' })
+        .catch(() => {})
+
+      outcome = await Promise.race([
+        tokenSeen,
+        new Promise((resolve) => setTimeout(() => resolve(null), Math.min(8_000, Math.max(0, deadline - Date.now())))),
+      ])
+    }
+
+    // Finally, look where the app keeps it. Polled rather than awaited
+    // because web storage fires no event this side of the browser, and a
+    // single look would race the app writing it.
+    while (!outcome && Date.now() < deadline) {
+      const scan = await findTokenInStorage(page, config.tokenKeys)
+
+      evidence.storageKeys = scan.entries
+
+      if (scan.found) {
+        outcome = { token: scan.found.token, source: `storage:${scan.found.key}` }
+
+        break
+      }
+
+      outcome = await Promise.race([
+        tokenSeen,
+        new Promise((resolve) => setTimeout(() => resolve(null), Math.min(1_000, Math.max(1, deadline - Date.now())))),
+      ])
+    }
 
     if (outcome) {
       return { ...outcome, elapsedMs: Date.now() - startedAt }
@@ -354,7 +530,7 @@ export async function extractBearerToken(options) {
     throw new TokenExtractionError(
       ExtractionError.TOKEN_NOT_FOUND,
       `Login appeared to succeed but no bearer token was seen within ${config.timeoutMs}ms. `
-        + 'The portal may name its token differently -- try adjusting the token keys.',
+        + describeEvidence(evidence),
     )
   } catch (error) {
     if (error instanceof TokenExtractionError) throw error
