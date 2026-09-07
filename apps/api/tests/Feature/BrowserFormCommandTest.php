@@ -72,9 +72,22 @@ class BrowserFormCommandTest extends TestCase
 
         $output = Artisan::output();
 
-        $this->assertStringContainsString('BROWSER_AUTH_USERNAME_SELECTOR=input[name="username"]', $output);
-        $this->assertStringContainsString('BROWSER_AUTH_PASSWORD_SELECTOR=input[name="password"]', $output);
-        $this->assertStringContainsString('BROWSER_AUTH_SUBMIT_SELECTOR=button[type="submit"]', $output);
+        // Quoted, because a .env value is only literal inside quotes. The
+        // first run of this command proposed `#username`, which is a comment
+        // to dotenv: the variable arrived empty and the login blamed the
+        // portal for markup that had not changed.
+        $this->assertStringContainsString(
+            'BROWSER_AUTH_USERNAME_SELECTOR=\'input[name="username"]\'',
+            $output,
+        );
+        $this->assertStringContainsString(
+            'BROWSER_AUTH_PASSWORD_SELECTOR=\'input[name="password"]\'',
+            $output,
+        );
+        $this->assertStringContainsString(
+            'BROWSER_AUTH_SUBMIT_SELECTOR=\'button[type="submit"]\'',
+            $output,
+        );
 
         // Where it ended up, not where it was pointed: a login URL that
         // redirects to an SSO host is a different page with different markup,

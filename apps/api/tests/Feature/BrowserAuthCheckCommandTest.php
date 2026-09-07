@@ -42,6 +42,50 @@ class BrowserAuthCheckCommandTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * The resolved selectors, so a swallowed value is visible rather than inferred.
+     */
+    public function test_it_reports_a_selector_that_resolved_to_nothing(): void
+    {
+        config([
+            'browser_auth.enabled' => true,
+            'browser_auth.login_url' => 'https://portal.example.test/login',
+            'browser_auth.selectors.username' => '',
+            'browser_auth.selectors.password' => 'input[name="password"]',
+            'browser_auth.selectors.submit' => 'button[type="submit"]',
+            'browser_auth.node_binary' => $this->stubNodeReporting('irrelevant'),
+        ]);
+
+        $this->assertSame(1, Artisan::call('browser:check', ['--json' => true]));
+
+        $checks = json_decode(Artisan::output(), true);
+
+        $this->assertFalse($checks['selectors']['ok']);
+        $this->assertStringContainsString(
+            'BROWSER_AUTH_USERNAME_SELECTOR',
+            $checks['selectors']['detail'],
+        );
+    }
+
+    public function test_it_prints_the_selectors_a_login_would_actually_use(): void
+    {
+        config([
+            'browser_auth.enabled' => true,
+            'browser_auth.login_url' => 'https://portal.example.test/login',
+            'browser_auth.selectors.username' => 'input[id="username"]',
+            'browser_auth.selectors.password' => 'input[name="password"]',
+            'browser_auth.selectors.submit' => 'button[id="email-login-button"]',
+            'browser_auth.node_binary' => $this->stubNodeReporting('irrelevant'),
+        ]);
+
+        Artisan::call('browser:check', ['--json' => true]);
+
+        $checks = json_decode(Artisan::output(), true);
+
+        $this->assertTrue($checks['selectors']['ok']);
+        $this->assertStringContainsString('input[id="username"]', $checks['selectors']['detail']);
+    }
+
     public function test_a_browser_in_another_users_home_is_named_along_with_the_fix(): void
     {
         $missing = '/var/www/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell';

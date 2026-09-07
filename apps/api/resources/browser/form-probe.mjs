@@ -29,6 +29,16 @@ const USERNAME_HINTS = /user|email|e-mail|login|account|phone|mobile|msisdn|nik|
 const SUBMIT_HINTS = /log\s?in|sign\s?in|masuk|lanjut|continue|next|submit/i
 
 /**
+ * Identity providers, which label their buttons exactly like the real one.
+ *
+ * "Login with Google" matches every hint "Login" does, sits above it in the
+ * DOM on most login pages, and drives a completely different flow -- a popup
+ * this cannot fill in. Demoted hard rather than merely outranked, because the
+ * password form is sometimes labelled less obviously than the SSO buttons.
+ */
+const IDENTITY_PROVIDERS = /google|facebook|apple|microsoft|github|twitter|linkedin|whatsapp|sso|oauth/i
+
+/**
  * Prefer a selector that survives a redeploy.
  *
  * Framework-generated class names and ids change every build, so name and
@@ -38,7 +48,11 @@ const SUBMIT_HINTS = /log\s?in|sign\s?in|masuk|lanjut|continue|next|submit/i
 function selectorFor(field) {
   if (field.testId) return `[data-testid="${field.testId}"]`
   if (field.name) return `${field.tag}[name="${field.name}"]`
-  if (field.id) return `#${field.id}`
+  // `[id="x"]` rather than `#x`, deliberately. These are pasted into a .env,
+  // where an unquoted value starting with # is a comment: dotenv hands back an
+  // empty string and the login fails claiming the portal changed its markup.
+  // An attribute selector matches identically and carries no such trap.
+  if (field.id) return `${field.tag}[id="${field.id}"]`
   if (field.autocomplete) return `${field.tag}[autocomplete="${field.autocomplete}"]`
   if (field.type) return `${field.tag}[type="${field.type}"]`
 
@@ -62,12 +76,21 @@ function scoreUsername(field) {
 }
 
 function scoreSubmit(control) {
+  const identity = [control.text, control.id, control.name, control.testId]
+    .filter((value) => typeof value === 'string')
+    .join(' ')
+
+  if (IDENTITY_PROVIDERS.test(identity)) return -1
+
   let score = 0
 
   if (control.type === 'submit') score += 3
   if (SUBMIT_HINTS.test(control.text ?? '')) score += 4
   if (SUBMIT_HINTS.test(control.name ?? '')) score += 2
   if (SUBMIT_HINTS.test(control.testId ?? '')) score += 2
+  // "Login" over "Login to continue with something else": a control whose
+  // whole label is the action is likelier to be the action.
+  if ((control.text ?? '').trim().length <= 12) score += 1
   if (control.visible) score += 1
   if (control.disabled) score -= 1
 

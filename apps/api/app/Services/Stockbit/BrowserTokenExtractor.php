@@ -36,6 +36,9 @@ class BrowserTokenExtractor
 
     public const NOT_CONFIGURED = 'NOT_CONFIGURED';
 
+    /** The three selectors the login form is driven by. */
+    public const SELECTOR_ROLES = ['username', 'password', 'submit'];
+
     /**
      * Messages worth showing a person, keyed by what the Node side reported.
      *
@@ -94,17 +97,37 @@ class BrowserTokenExtractor
             );
         }
 
+        $selectors = $this->selectors();
+
+        // A blank selector is not the portal changing its markup, and saying
+        // so would send whoever reads it to the wrong place. It is a value
+        // that never arrived: most often a .env line beginning with `#`, which
+        // dotenv reads as a comment and hands back as an empty string.
+        $missing = array_keys(array_filter($selectors, static fn (string $value): bool => $value === ''));
+
+        if ($missing !== []) {
+            throw new BrowserTokenExtractionException(
+                self::NOT_CONFIGURED,
+                sprintf(
+                    'No %s configured. %s is empty -- if the value starts with "#", '
+                    .'wrap it in single quotes, because dotenv reads an unquoted # as a '
+                    .'comment. Run `php artisan browser:form` for values that can be pasted.',
+                    implode(' or ', $missing),
+                    implode(' and ', array_map(
+                        static fn (string $role): string => 'BROWSER_AUTH_'.strtoupper($role).'_SELECTOR',
+                        $missing,
+                    )),
+                ),
+            );
+        }
+
         $timeout = max(10, (int) config('browser_auth.timeout_seconds', 60));
 
         $job = [
             'login_url' => (string) config('browser_auth.login_url'),
             'username' => $username,
             'password' => $password,
-            'selectors' => [
-                'username' => (string) config('browser_auth.selectors.username'),
-                'password' => (string) config('browser_auth.selectors.password'),
-                'submit' => (string) config('browser_auth.selectors.submit'),
-            ],
+            'selectors' => $selectors,
             // The child gets the shorter budget so it can report its own
             // timeout; PHP's is the backstop for a child that wedged.
             'timeout_ms' => ($timeout - 5) * 1000,
@@ -192,6 +215,27 @@ class BrowserTokenExtractor
             'source' => (string) ($decoded['source'] ?? 'unknown'),
             'elapsed_ms' => (int) ($decoded['elapsed_ms'] ?? 0),
         ];
+    }
+
+    /**
+     * The selectors as this process actually resolved them.
+     *
+     * Read through one method so `browser:check` reports the same values a
+     * login would use rather than re-reading config its own way -- the gap
+     * between "what the .env says" and "what the app got" is exactly where a
+     * swallowed value or a stale config cache hides.
+     *
+     * @return array<string, string>
+     */
+    public function selectors(): array
+    {
+        $selectors = [];
+
+        foreach (self::SELECTOR_ROLES as $role) {
+            $selectors[$role] = trim((string) config('browser_auth.selectors.'.$role));
+        }
+
+        return $selectors;
     }
 
     /**

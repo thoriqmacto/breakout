@@ -30,6 +30,7 @@ class BrowserAuthCheckCommand extends Command
     {
         $checks = [
             'configuration' => $this->checkConfiguration($extractor),
+            'selectors' => $this->checkSelectors($extractor),
             'script' => $this->checkScript($extractor),
             'node' => $this->checkNode(),
             'dependencies' => $this->checkDependencies($extractor),
@@ -107,6 +108,46 @@ class BrowserAuthCheckCommand extends Command
         }
 
         return ['ok' => true, 'detail' => 'enabled, login URL set'];
+    }
+
+    /**
+     * What the running app resolved, not what the .env file says.
+     *
+     * Those differ more often than they should. A value starting with `#` is a
+     * comment to dotenv and arrives empty; a cached config ignores .env
+     * entirely until it is re-cached. Both look like a correct .env and a
+     * portal that changed its markup, so the resolved values are printed here
+     * where the difference is visible.
+     *
+     * @return array{ok: bool, detail: string}
+     */
+    private function checkSelectors(BrowserTokenExtractor $extractor): array
+    {
+        $selectors = $extractor->selectors();
+        $missing = array_keys(array_filter($selectors, static fn (string $value): bool => $value === ''));
+
+        if ($missing !== []) {
+            return [
+                'ok' => false,
+                'detail' => sprintf(
+                    'empty: %s. A .env value starting with "#" is read as a comment -- '
+                    .'single-quote it. `browser:form` prints values that can be pasted.',
+                    implode(', ', array_map(
+                        static fn (string $role): string => 'BROWSER_AUTH_'.strtoupper($role).'_SELECTOR',
+                        $missing,
+                    )),
+                ),
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'detail' => implode('  ', array_map(
+                static fn (string $role, string $value): string => $role.'='.$value,
+                array_keys($selectors),
+                $selectors,
+            )),
+        ];
     }
 
     /**

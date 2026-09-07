@@ -129,8 +129,11 @@ class BrowserFormCommand extends Command
             'BROWSER_AUTH_PASSWORD_SELECTOR' => $suggestion['password'] ?? null,
             'BROWSER_AUTH_SUBMIT_SELECTOR' => $suggestion['submit'] ?? null,
         ] as $name => $value) {
+            // Single-quoted, always. A .env value is only literal inside
+            // quotes: unquoted, a leading # makes the whole line a comment and
+            // the variable silently arrives empty.
             $this->line(is_string($value) && $value !== ''
-                ? sprintf('  %s=%s', $name, $value)
+                ? sprintf("  %s='%s'", $name, $value)
                 : sprintf('  <fg=red>%s= (nothing on the page matched)</>', $name));
         }
 
