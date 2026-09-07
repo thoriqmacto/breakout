@@ -79,6 +79,7 @@ async function main() {
     const { token, source, elapsedMs } = await extractBearerToken({
       loginUrl: job.login_url,
       postLoginUrl: job.post_login_url,
+      profileDir: job.profile_dir,
       username: job.username,
       password: job.password,
       selectors: {

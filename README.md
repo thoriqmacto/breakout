@@ -1839,10 +1839,61 @@ One login runs at a time — each is a Chromium process, and several at once is 
 exhaust a small VPS — and attempts are capped at five per fifteen minutes so a wrong password
 cannot lock the portal account.
 
+### Being a device the portal recognises
+
+A portal with a device-trust step — Stockbit's `trustedDevice`, and the Alibaba device-fingerprint
+and captcha endpoints alongside it — will not issue a session to a browser it does not know. The
+headless run hit exactly that: the login form submitted, the app rendered, and **not one request
+reached the API host**, because the app was running signed out.
+
+The reason approving the device could never have helped is that **there was nothing to approve
+twice**. Each run launched a fresh browser and threw it away: new cookies, new storage, new
+identity. Every run was a different device, forever.
+
+```dotenv
+# Written by both the CLI user and the web server user, so it lives outside
+# either home directory.
+BROWSER_AUTH_PROFILE_DIR=/var/lib/breakout/browser-profile
+```
+
+```bash
+sudo mkdir -p /var/lib/breakout/browser-profile
+sudo chgrp -R www-data /var/lib/breakout/browser-profile
+sudo chmod -R g+rwXs /var/lib/breakout/browser-profile
+```
+
+Then sign in **once**, approve the device through the portal's own notification, and check that
+the session persisted:
+
+```bash
+php artisan browser:token --dry-run     # signs in; approve the device when the portal asks
+php artisan browser:token --session     # no password: proves the profile carried the session
+```
+
+The second command is the one that matters. It supplies no credentials at all — if it captures a
+token, the profile is trusted and every later run can do the same.
+
+This is the front door, not a way around it: the device becomes trusted through the portal's
+approval flow rather than by pretending to be a browser it is not. Whether a portal's terms permit
+automated access at all is a question for its terms, not for this README.
+
+`browser:check` reports the profile and whether the user running it can write there — the two
+users differing is the failure this feature has produced at every previous step:
+
+```
+ ok  profile        /var/lib/breakout/browser-profile (writable by www-data)
+```
+
 ### Unattended renewal
 
 `automation:token-refresh` renews the bearer on a schedule, so a token that expires overnight
 does not take the morning's scrape with it.
+
+**With a saved profile, no password is stored at all.** The renewal opens the app through the
+existing session and takes the token the app is already using; it never touches the login form.
+That is strictly better than stored credentials — what a stolen disk gives up is then a session
+you can revoke, rather than a password you cannot — so the credential store below is the fallback
+for portals with no device-trust step, not the recommended path.
 
 **This reverses a deliberate decision, and the reversal is the whole cost.** The token lifecycle
 was built so no password ever had to reach this server: renewal was a person pasting a token, and
@@ -1890,7 +1941,9 @@ What it does when it runs, hourly at :15:
 | Token healthy, outside the renewal window | **No login.** A browser launch costs hundreds of megabytes and tens of seconds, and every needless login is another chance for the portal to notice a robot. |
 | Token missing, expired, or inside `BROWSER_AUTH_RENEW_BEFORE_MINUTES` (default 120) | Signs in, stores the new token, clears the reminder. |
 | Expiry unreadable | Renews. A token whose `exp` cannot be read may already be dead, and finding that out mid-scrape is what this exists to prevent. |
-| No credentials stored, or headless login switched off | **Raises the dashboard reminder** naming the remedy. |
+| A saved profile that is still signed in | **No login at all** — the session is reused and the token read from it. |
+| The saved profile has been signed out | Falls back to stored credentials if there are any; otherwise raises the reminder. |
+| No profile, no credentials, or headless login switched off | **Raises the dashboard reminder** naming the remedy. |
 | Login fails — wrong password, a second factor, changed markup | **Raises the reminder** with the extractor's own diagnosis, and **keeps the existing token**, which may still have hours on it. |
 
 The hourly cadence is about noticing an expiry soon after it happens, not about logging in

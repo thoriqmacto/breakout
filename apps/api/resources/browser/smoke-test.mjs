@@ -12,6 +12,8 @@
  */
 
 import { createServer } from 'node:http'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -190,6 +192,53 @@ function startPortal(mode) {
         })
         response.end(JSON.stringify({ data: { status: 'ok' } }))
       })
+
+      return
+    }
+
+    if (url === '/trusted-login') {
+      // Recognises the browser by its own cookie: a device it has seen before
+      // is sent straight to the app, exactly as a trusted-device flow does.
+      const known = (request.headers.cookie ?? '').includes('deviceTrusted=1')
+
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(known
+        ? `<!doctype html>
+<html><body><div id="app">signed in</div>
+  <script>
+    const session = JSON.parse(localStorage.getItem('sb_session') || '{}');
+    fetch('/api/me', { headers: { Authorization: 'Bearer ' + session.access_token } });
+  </script>
+</body></html>`
+        : `<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+      if (!response.ok) return;
+      // The device is remembered, and the session stored, the way a portal
+      // does once it has decided to trust the browser.
+      document.cookie = 'deviceTrusted=1; Path=/; Max-Age=86400';
+      localStorage.setItem('sb_session', JSON.stringify({
+        access_token: ${JSON.stringify(FAKE_JWT)},
+      }));
+      document.getElementById('f').remove();
+    });
+  </script>
+</body></html>`)
 
       return
     }
@@ -680,6 +729,58 @@ console.log('a session object rather than a bare token:')
     })
   } finally {
     server.close()
+  }
+}
+
+/**
+ * The point of a persistent profile: be the same device twice.
+ *
+ * Without one, every run is a new browser -- new cookies, new storage, new
+ * identity -- so a portal that asks you to approve a device can never be
+ * satisfied: approving it changes nothing, because the next run is a
+ * different device again.
+ */
+console.log('a portal that recognises a device it has seen before:')
+
+{
+  const { server, port } = await startPortal('quiet')
+  const profileDir = await mkdtemp(join(tmpdir(), 'browser-auth-profile-'))
+
+  const SELECTORS_TRUSTED = {
+    username: 'input[name="username"]',
+    password: 'input[name="password"]',
+    submit: 'button[type="submit"]',
+  }
+
+  try {
+    await check('the first run logs in and leaves the device remembered', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/trusted-login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: SELECTORS_TRUSTED,
+        profileDir,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the first run did not get a token')
+    })
+
+    await check('the second run reuses the session and never asks for a password', async () => {
+      // No credentials at all. If the profile did not persist, the portal
+      // serves the login form and this fails -- which is the assertion.
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/trusted-login`,
+        selectors: SELECTORS_TRUSTED,
+        profileDir,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the saved profile did not carry the session')
+    })
+  } finally {
+    server.close()
+    await rm(profileDir, { recursive: true, force: true })
   }
 }
 

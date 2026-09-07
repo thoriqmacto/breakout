@@ -81,7 +81,13 @@ class TokenRefreshCommand extends Command
             );
         }
 
-        if ($stored === null) {
+        // A saved profile that is still signed in needs no password at all,
+        // which is the better arrangement by some distance: the thing a
+        // stolen disk gives up is then a session that can be revoked, not a
+        // password that cannot.
+        $hasProfile = $this->hasProfile($extractor);
+
+        if ($stored === null && ! $hasProfile) {
             return $this->standDown(
                 $alerts,
                 $metadata,
@@ -89,13 +95,16 @@ class TokenRefreshCommand extends Command
                 $credentials->exists()
                     ? 'Stored credentials could not be decrypted with this APP_KEY. Run '
                         .'`php artisan stockbit:credentials` to replace them.'
-                    : 'No stored credentials, so the token cannot be renewed automatically. Run '
-                        .'`php artisan stockbit:credentials`, or renew by hand.',
+                    : 'No saved browser profile and no stored credentials, so the token cannot be '
+                        .'renewed automatically. Set BROWSER_AUTH_PROFILE_DIR and sign in once, or '
+                        .'run `php artisan stockbit:credentials`.',
             );
         }
 
+        $metadata->merge(['profile' => $hasProfile]);
+
         try {
-            $result = $extractor->extract($stored['username'], $stored['password']);
+            $result = $extractor->extract($stored['username'] ?? null, $stored['password'] ?? null);
         } catch (BrowserTokenExtractionException $exception) {
             // The extractor's message is already redacted and already says
             // what to do about each failure kind, so it is carried through
@@ -134,6 +143,22 @@ class TokenRefreshCommand extends Command
         ));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Is there a saved profile to sign in through?
+     *
+     * A misconfigured directory throws rather than answering, and that is not
+     * this method's business to report -- the extraction will raise it with
+     * the path and the user in the message.
+     */
+    private function hasProfile(BrowserTokenExtractor $extractor): bool
+    {
+        try {
+            return $extractor->profileDir() !== null;
+        } catch (BrowserTokenExtractionException) {
+            return false;
+        }
     }
 
     /**
