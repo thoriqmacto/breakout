@@ -80,6 +80,15 @@ class BrowserTokenExtractor
      * @throws BrowserTokenExtractionException
      */
     /**
+     * Where to write a picture of the page when a run finds no token.
+     *
+     * Opt-in and caller-chosen: a screenshot of a signed-in portal is exactly
+     * as sensitive as the page it shows, so nothing writes one unless somebody
+     * asked for it and said where.
+     */
+    public ?string $screenshotPath = null;
+
+    /**
      * @param  string|null  $username  Omitted when a saved profile is expected
      *                                 to be signed in already.
      */
@@ -141,6 +150,7 @@ class BrowserTokenExtractor
             'login_url' => (string) config('browser_auth.login_url'),
             'post_login_url' => config('browser_auth.post_login_url'),
             'profile_dir' => $profile,
+            'screenshot_path' => $this->screenshotPath,
             'username' => $username,
             'password' => $password,
             'selectors' => $selectors,

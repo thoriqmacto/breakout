@@ -74,6 +74,11 @@ const DEFAULTS = {
   // satisfied -- approving the device changes nothing, because the next run is
   // a different device again.
   profileDir: undefined,
+  // Where to write a picture of the page when the run does not end in a
+  // token. Names and URLs describe a page; a screenshot *is* the page, and a
+  // captcha, a spinner and an error toast are one glance apart while being
+  // several rounds apart by inference.
+  screenshotPath: undefined,
   // Point at a Chromium that is already on the box. Playwright otherwise
   // downloads its own (~400MB plus system libraries), which is a lot to put
   // on a small VPS when the distribution already ships one.
@@ -136,6 +141,7 @@ export function summariseEvidence(evidence) {
     title: evidence.title,
     login_form_gone: evidence.loginFormGone,
     url_after_submit: evidence.urlAfterSubmit,
+    screenshot: evidence.screenshot,
     used_existing_session: evidence.usedExistingSession,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
@@ -592,6 +598,7 @@ export async function extractBearerToken(options) {
       // Recorded immediately after the submit, before any navigation of ours.
       loginFormGone: false,
       urlAfterSubmit: null,
+      screenshot: null,
       // True when the saved profile was already signed in and no login ran.
       usedExistingSession: false,
     }
@@ -790,6 +797,14 @@ export async function extractBearerToken(options) {
     // page of the app that does -- the same thing a person does when they
     // read the token out of devtools -- puts it on the wire.
     if (!outcome && typeof config.postLoginUrl === 'string' && config.postLoginUrl !== '') {
+      // Let the portal finish first. A login that is mid-redirect when this
+      // navigates elsewhere never gets to set its session, and the result is
+      // indistinguishable from a login that was refused -- this code would
+      // have caused exactly the symptom it is looking for.
+      await page
+        .waitForURL((url) => !url.href.startsWith(loginUrl), { timeout: 10_000 })
+        .catch(() => {})
+
       await page
         .goto(config.postLoginUrl, { waitUntil: 'domcontentloaded' })
         .catch(() => {})
@@ -846,6 +861,16 @@ export async function extractBearerToken(options) {
 
     if (outcome) {
       return { ...outcome, elapsedMs: Date.now() - startedAt }
+    }
+
+    // Nothing was found. Take the picture before the browser closes.
+    if (config.screenshotPath) {
+      await page
+        .screenshot({ path: config.screenshotPath, fullPage: true })
+        .then(() => {
+          evidence.screenshot = config.screenshotPath
+        })
+        .catch(() => {})
     }
 
     evidence.landedUrl = page.url()
