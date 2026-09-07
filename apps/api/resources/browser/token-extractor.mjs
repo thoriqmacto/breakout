@@ -742,16 +742,38 @@ export async function extractBearerToken(options) {
     if (evidence.usedExistingSession) {
       evidence.loginFormGone = true
     } else {
-      await page.waitForTimeout(Math.min(2_000, config.timeoutMs))
+      // Polled, not sampled once. A single look a fixed moment after the click
+      // asks the question before the portal has answered it: a login that goes
+      // through a device check or a captcha takes longer than any interval
+      // short enough to be worth waiting, and reporting "still on the form"
+      // then means calling a slow success a rejected password.
+      const submitDeadline = Date.now() + Math.min(25_000, config.timeoutMs)
 
-      evidence.loginFormGone = !(await page
-        .locator(selectors.password)
-        .first()
-        .isVisible()
-        .catch(() => false))
+      while (Date.now() < submitDeadline) {
+        // A token settles it outright: whatever the form is doing, the login
+        // worked.
+        if (settled) break
+
+        // The portal saying no is also an answer, and waiting out the rest of
+        // the window after a 401 only delays reporting it.
+        if (credentialsRejected) break
+
+        evidence.loginFormGone = !(await page
+          .locator(selectors.password)
+          .first()
+          .isVisible()
+          .catch(() => false))
+
+        if (evidence.loginFormGone) break
+
+        await page.waitForTimeout(500)
+      }
+
+      if (settled) evidence.loginFormGone = true
     }
 
     evidence.urlAfterSubmit = page.url()
+    evidence.title = await page.title().catch(() => null)
 
     // Give the login call itself a moment to come back before doing anything
     // else, so a portal that returns the token in its login response is
@@ -826,10 +848,13 @@ export async function extractBearerToken(options) {
       return { ...outcome, elapsedMs: Date.now() - startedAt }
     }
 
+    evidence.landedUrl = page.url()
+
     if (credentialsRejected) {
       throw new TokenExtractionError(
         ExtractionError.INVALID_CREDENTIALS,
         'The portal rejected those credentials.',
+        { evidence: summariseEvidence(evidence) },
       )
     }
 
@@ -837,14 +862,12 @@ export async function extractBearerToken(options) {
     // token never crossed the wire in a shape we recognised". They need
     // different fixes: the first is usually credentials or an extra step
     // such as MFA, the second is usually the token key names.
-    evidence.landedUrl = page.url()
-    evidence.title = await page.title().catch(() => null)
-
     if (!evidence.loginFormGone) {
       throw new TokenExtractionError(
         ExtractionError.INVALID_CREDENTIALS,
         'Still on the login form after submitting. The credentials were probably rejected, '
-          + 'or the portal asked for a second factor this cannot answer.',
+          + 'or the portal asked for a second factor or a captcha this cannot answer.',
+        { evidence: summariseEvidence(evidence) },
       )
     }
 

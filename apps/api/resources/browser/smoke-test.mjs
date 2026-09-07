@@ -196,6 +196,45 @@ function startPortal(mode) {
       return
     }
 
+    if (url === '/slow-login') {
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(`<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+      if (!response.ok) return;
+      // A device check, a captcha round trip -- whatever the portal does
+      // between accepting a password and showing the app. Longer than any
+      // fixed interval short enough to be worth waiting for.
+      //
+      // No token is stored, deliberately: the credentials check is only
+      // reached when nothing was captured, so a fixture that hands over a
+      // token returns early and never exercises it. That is what made the
+      // first version of this scenario pass against the bug it was written
+      // for.
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+      document.getElementById('f').remove();
+    });
+  </script>
+</body></html>`)
+
+      return
+    }
+
     if (url === '/trusted-login') {
       // Recognises the browser by its own cookie: a device it has seen before
       // is sent straight to the app, exactly as a trusted-device flow does.
@@ -781,6 +820,55 @@ console.log('a portal that recognises a device it has seen before:')
   } finally {
     server.close()
     await rm(profileDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * A login that works, slowly.
+ *
+ * Sampling the form once at a fixed moment after the click asks the question
+ * before the portal has answered it, and a device check or a captcha takes
+ * longer than any interval short enough to be worth waiting. That reported a
+ * slow success as a rejected password.
+ */
+console.log('a login that takes its time:')
+
+{
+  const { server, port } = await startPortal('quiet')
+
+  try {
+    await check('a slow sign-in is not reported as rejected credentials', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/slow-login`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: {
+            username: 'input[name="username"]',
+            password: 'input[name="password"]',
+            submit: 'button[type="submit"]',
+          },
+          timeoutMs: 20_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'this fixture yields no token, so it must fail')
+
+      // The distinction that matters: the password was accepted and the form
+      // did go away -- just not within any fixed interval worth waiting. A
+      // single sample reports this as a rejected password and sends whoever
+      // reads it to check their credentials, which are fine.
+      expect(
+        error.code === ExtractionError.TOKEN_NOT_FOUND,
+        `expected TOKEN_NOT_FOUND, got ${error.code}: ${error.message}`,
+      )
+    })
+  } finally {
+    server.close()
   }
 }
 
