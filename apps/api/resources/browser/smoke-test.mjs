@@ -416,4 +416,54 @@ console.log('the form probe, against the same fixture:')
   }
 }
 
+/**
+ * A page shaped like the portal this was actually pointed at: the username
+ * field carries only an id, and the identity-provider buttons are labelled
+ * "Login with ..." and sit above the real one.
+ */
+const SSO_LOGIN_PAGE = `<!doctype html>
+<html><head><title>Portal</title></head><body>
+  <form>
+    <input type="text" id="username" placeholder="Email or username">
+    <input type="password" name="password" id="password" placeholder="Password">
+    <button id="buttonSupport"></button>
+    <button id="google-login-button">Login with Google</button>
+    <button id="facebook-login-button">Login with Facebook</button>
+    <button id="email-login-button">Login</button>
+  </form>
+</body></html>`
+
+await cliScenario(
+  'an id-only field is proposed as [id=...], never #id, which a .env eats',
+  {},
+  async () => {
+    const { code, stdout, stderr } = await runFormProbe(
+      `data:text/html,${encodeURIComponent(SSO_LOGIN_PAGE)}`,
+    )
+
+    expect(code === 0, `expected exit 0, got ${code}: ${stderr.slice(0, 300)}`)
+
+    const { suggestion } = JSON.parse(stdout)
+
+    for (const [role, value] of Object.entries(suggestion)) {
+      expect(
+        typeof value === 'string' && !value.startsWith('#'),
+        `${role} was proposed as ${value}: an unquoted # is a comment in a .env`,
+      )
+    }
+
+    expect(
+      suggestion.username === 'input[id="username"]',
+      `username selector was ${suggestion.username}`,
+    )
+
+    // The one that matters: every SSO button matches the same hints the real
+    // control does, and drives a flow this cannot complete.
+    expect(
+      suggestion.submit === 'button[id="email-login-button"]',
+      `submit selector was ${suggestion.submit}, not the password form's button`,
+    )
+  },
+)
+
 console.log(process.exitCode === 1 ? 'FAILED' : 'all scenarios passed')

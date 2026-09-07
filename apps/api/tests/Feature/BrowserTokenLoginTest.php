@@ -313,6 +313,48 @@ class BrowserTokenLoginTest extends TestCase
         }
     }
 
+    /**
+     * A blank selector is this server's, and must not blame the portal.
+     *
+     * `browser:form` proposed `#username`, which is exactly right as a CSS
+     * selector and a comment in a .env file: dotenv returns an empty string,
+     * config's default never applies because '' is not null, and the login
+     * failed saying the portal had changed its markup. It had not. Nothing
+     * about the message pointed at the one line that was wrong.
+     */
+    public function test_a_selector_that_arrived_empty_names_the_variable(): void
+    {
+        config([
+            'browser_auth.enabled' => true,
+            'browser_auth.login_url' => 'https://portal.example.test/login',
+            // What dotenv hands back for `BROWSER_AUTH_USERNAME_SELECTOR=#username`.
+            'browser_auth.selectors.username' => '',
+            'browser_auth.selectors.password' => 'input[name="password"]',
+            'browser_auth.selectors.submit' => 'button[type="submit"]',
+            // If a browser is launched at all, this fails loudly rather than
+            // quietly proving the wrong thing.
+            'browser_auth.node_binary' => '/nonexistent/node',
+        ]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have been refused before launching a browser.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertSame(BrowserTokenExtractor::NOT_CONFIGURED, $exception->failureCode);
+            $this->assertStringContainsString(
+                'BROWSER_AUTH_USERNAME_SELECTOR',
+                $exception->getMessage(),
+                'The message must name the variable that is empty.',
+            );
+            $this->assertStringContainsString('single quotes', $exception->getMessage());
+            $this->assertStringNotContainsString(
+                'changed its markup',
+                $exception->getMessage(),
+                'An empty .env value is not the portal changing its markup.',
+            );
+        }
+    }
+
     public function test_credentials_are_required(): void
     {
         $this->attempt(['username' => 'a@b.test'])->assertStatus(422);
