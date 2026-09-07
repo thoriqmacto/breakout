@@ -176,13 +176,55 @@ class BrowserTokenLoginTest extends TestCase
     }
 
     /** A portal that is slow or down is not the operator's mistake. */
-    public function test_an_extraction_failure_is_a_502_with_a_machine_readable_code(): void
+    public function test_a_portal_that_never_answered_is_a_504_with_a_machine_readable_code(): void
     {
         $this->failingExtractor(BrowserTokenExtractor::TIMEOUT, 'The login did not finish in time.');
 
         $this->attempt()
-            ->assertStatus(502)
+            ->assertStatus(504)
             ->assertJsonPath('errors.code.0', BrowserTokenExtractor::TIMEOUT);
+    }
+
+    /**
+     * A misconfiguration here must not be dressed up as an upstream fault.
+     *
+     * Every failure used to answer 502, which says the portal gave a bad
+     * response. For a selector that matches nothing the portal was reached
+     * perfectly and answered fine -- the three .env selectors are wrong. The
+     * wrong code cost real time twice, sending the operator to look at nginx
+     * and at Stockbit for a problem that was on this server both times.
+     */
+    public function test_a_selector_that_matches_nothing_is_this_servers_fault(): void
+    {
+        $this->failingExtractor(
+            'SELECTOR_NOT_FOUND',
+            'A field on the login form was not found.',
+        );
+
+        $this->attempt()
+            ->assertStatus(500)
+            ->assertJsonPath('errors.code.0', 'SELECTOR_NOT_FOUND');
+    }
+
+    public function test_a_browser_that_cannot_start_is_this_servers_fault(): void
+    {
+        $this->failingExtractor(
+            BrowserTokenExtractor::BROWSER_LAUNCH_FAILED,
+            'Chromium could not start on this server.',
+        );
+
+        $this->attempt()->assertStatus(500);
+    }
+
+    /** Reached, signed in, and answered with nothing usable: still theirs. */
+    public function test_a_missing_token_stays_a_502(): void
+    {
+        $this->failingExtractor(
+            BrowserTokenExtractor::TOKEN_NOT_FOUND,
+            'Signed in, but no bearer token was seen.',
+        );
+
+        $this->attempt()->assertStatus(502);
     }
 
     public function test_an_expired_token_is_refused_rather_than_stored(): void

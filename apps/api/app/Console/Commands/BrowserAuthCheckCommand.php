@@ -193,35 +193,14 @@ class BrowserAuthCheckCommand extends Command
      */
     private function checkChromium(BrowserTokenExtractor $extractor): array
     {
-        $directory = dirname($extractor->scriptPath());
-        $probe = $directory.'/launch-probe.mjs';
+        $probe = $extractor->probePath('launch-probe.mjs');
 
         if (! is_file($probe)) {
             return ['ok' => false, 'detail' => sprintf('missing at %s', $probe)];
         }
 
-        $environment = [];
-        $browsers = config('browser_auth.browsers_path');
-        $chromium = config('browser_auth.chromium_path');
-
-        if (is_string($browsers) && trim($browsers) !== '') {
-            $environment['PLAYWRIGHT_BROWSERS_PATH'] = trim($browsers);
-        }
-
-        if (is_string($chromium) && trim($chromium) !== '') {
-            $environment['BROWSER_AUTH_CHROMIUM_PATH'] = trim($chromium);
-        }
-
-        $process = new Process(
-            [(string) config('browser_auth.node_binary', 'node'), $probe],
-            $directory,
-            $environment === [] ? null : $environment,
-            null,
-            60,
-        );
-
         try {
-            $process->run();
+            $process = $extractor->runProbe('launch-probe.mjs', 60);
         } catch (\Throwable $exception) {
             return ['ok' => false, 'detail' => $exception->getMessage()];
         }
