@@ -174,6 +174,54 @@ function startPortal(mode) {
       return
     }
 
+    if (url === '/api/auth/wrapped-login' && request.method === 'POST') {
+      const chunks = []
+      request.on('data', (chunk) => chunks.push(chunk))
+      request.on('end', () => {
+        // A session object, percent-encoded, the way a cookie carrying more
+        // than one field has to be. Nothing here is a bare JWT.
+        const session = encodeURIComponent(
+          JSON.stringify({ access_token: FAKE_JWT, refresh_token: 'not-a-jwt', user: { id: 1 } }),
+        )
+
+        response.writeHead(200, {
+          'content-type': 'application/json',
+          'set-cookie': `credentialStorage=${session}; Path=/`,
+        })
+        response.end(JSON.stringify({ data: { status: 'ok' } }))
+      })
+
+      return
+    }
+
+    if (url === '/wrapped-login') {
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(`<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await fetch('/api/auth/wrapped-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+      document.getElementById('f').remove();
+    });
+  </script>
+</body></html>`)
+
+      return
+    }
+
     if (url === '/api/auth/cookie-login' && request.method === 'POST') {
       const chunks = []
       request.on('data', (chunk) => chunks.push(chunk))
@@ -596,6 +644,38 @@ console.log('a portal that keeps the token in an httpOnly cookie:')
       expect(
         result.source.startsWith('cookie:'),
         `expected a cookie source, got ${result.source}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+console.log('a session object rather than a bare token:')
+
+{
+  const { server, port } = await startPortal('quiet')
+
+  try {
+    await check('a percent-encoded session cookie yields the access token', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/wrapped-login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: {
+          username: 'input[name="username"]',
+          password: 'input[name="password"]',
+          submit: 'button[type="submit"]',
+        },
+        timeoutMs: 15_000,
+      })
+
+      // Not the refresh token, which sits beside it in the same object and
+      // would authenticate nothing.
+      expect(result.token === FAKE_JWT, `got the wrong value from ${result.source}`)
+      expect(
+        result.source.startsWith('cookie:credentialStorage'),
+        `expected the credential cookie, got ${result.source}`,
       )
     })
   } finally {

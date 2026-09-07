@@ -124,6 +124,7 @@ export function summariseEvidence(evidence) {
   return {
     storage_key_names: evidence.storageKeyNames,
     cookie_names: evidence.cookieNames,
+    claimed_token: evidence.claimedToken,
     indexeddb_names: evidence.indexedDbNames,
     landed_url: evidence.landedUrl,
     title: evidence.title,
@@ -164,6 +165,81 @@ export function describeEvidence(evidence) {
 }
 
 /**
+ * Pull a token out of a stored value, whatever wrapping it arrived in.
+ *
+ * A cookie is percent-encoded by definition, and an app that keeps a session
+ * object rather than a bare string stores JSON -- so the value that holds the
+ * token frequently looks like nothing at all until it is decoded. Checking
+ * only for a bare JWT is what let a cookie named `credentialStorage` sit in
+ * plain sight while the scan reported no token in any cookie.
+ *
+ * Each layer is tried in turn and failures are ignored: a value that is not
+ * encoded is simply itself.
+ */
+export function unwrapToken(raw, tokenKeys = DEFAULT_TOKEN_KEYS) {
+  if (typeof raw !== 'string' || raw === '') return null
+
+  const candidates = [raw]
+
+  try {
+    const decoded = decodeURIComponent(raw)
+
+    if (decoded !== raw) candidates.push(decoded)
+  } catch {
+    // Not percent-encoded, or malformed. The raw value still stands.
+  }
+
+  // Some apps base64 the session object before storing it. Only attempted on
+  // values that could be base64 at all, so this cannot spend time on prose.
+  if (/^[A-Za-z0-9+/=_-]{16,}$/.test(raw) && !looksLikeJwt(raw)) {
+    try {
+      candidates.push(atob(raw.replace(/-/g, '+').replace(/_/g, '/')))
+    } catch {
+      // Not base64.
+    }
+  }
+
+  for (const candidate of candidates) {
+    const bare = stripBearerPrefix(candidate)
+
+    if (looksLikeJwt(bare)) return bare
+
+    try {
+      const token = findTokenInBody(JSON.parse(candidate), tokenKeys)
+
+      if (token) return token
+    } catch {
+      // Not JSON at this layer.
+    }
+  }
+
+  return null
+}
+
+/**
+ * Does this value at least *claim* to hold a token?
+ *
+ * The difference that matters when nothing is found: a store holding a
+ * token-shaped key whose value this could not use is a parsing problem, and a
+ * store holding nothing of the sort means there is no session to find. Those
+ * need opposite fixes, and only the name of the offending key can tell them
+ * apart.
+ */
+export function mentionsToken(raw, tokenKeys = DEFAULT_TOKEN_KEYS) {
+  if (typeof raw !== 'string' || raw === '') return false
+
+  let text = raw
+
+  try {
+    text = decodeURIComponent(raw)
+  } catch {
+    // Keep the raw text.
+  }
+
+  return tokenKeys.some((key) => text.toLowerCase().includes(key.toLowerCase()))
+}
+
+/**
  * Look for the token where a single-page app usually keeps it.
  *
  * Watching the wire misses a portal that authenticates once, stores the token,
@@ -196,28 +272,18 @@ export async function findTokenInStorage(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
     .catch(() => [])
 
   const candidates = []
+  const claimed = []
 
   for (const [key, raw] of entries) {
-    if (typeof raw !== 'string' || raw === '') continue
+    const token = unwrapToken(raw, tokenKeys)
 
-    // Stored bare, which is the common case.
-    const bare = stripBearerPrefix(raw)
-
-    if (looksLikeJwt(bare)) {
-      candidates.push({ key, token: bare })
+    if (token) {
+      candidates.push({ key, token })
 
       continue
     }
 
-    // Or stored as JSON, which is the other common case: a session object
-    // with the access token as one field among several.
-    try {
-      const token = findTokenInBody(JSON.parse(raw), tokenKeys)
-
-      if (token) candidates.push({ key, token })
-    } catch {
-      // Not JSON, so not a session object.
-    }
+    if (mentionsToken(raw, tokenKeys)) claimed.push(key)
   }
 
   // A key naming itself as the access token beats one that merely contains a
@@ -229,6 +295,7 @@ export async function findTokenInStorage(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
   return {
     entries: entries.length,
     names: entries.map(([key]) => key).filter((key) => typeof key === 'string').slice(0, 40),
+    claimed,
     found: preferred ?? candidates[0] ?? null,
   }
 }
@@ -293,19 +360,9 @@ export async function findTokenInIndexedDb(page, tokenKeys = DEFAULT_TOKEN_KEYS)
     .catch(() => ({ names: [], values: [] }))
 
   for (const raw of result.values) {
-    const bare = stripBearerPrefix(raw)
+    const token = unwrapToken(raw, tokenKeys)
 
-    if (looksLikeJwt(bare)) {
-      return { names: result.names, found: { key: 'indexeddb', token: bare } }
-    }
-
-    try {
-      const token = findTokenInBody(JSON.parse(raw), tokenKeys)
-
-      if (token) return { names: result.names, found: { key: 'indexeddb', token } }
-    } catch {
-      // Not JSON.
-    }
+    if (token) return { names: result.names, found: { key: 'indexeddb', token } }
   }
 
   return { names: result.names, found: null }
@@ -323,13 +380,18 @@ export async function findTokenInCookies(context, tokenKeys = DEFAULT_TOKEN_KEYS
   const cookies = await context.cookies().catch(() => [])
 
   const candidates = []
+  const claimed = []
 
   for (const cookie of cookies) {
-    const value = stripBearerPrefix(cookie?.value)
+    const token = unwrapToken(cookie?.value, tokenKeys)
 
-    if (looksLikeJwt(value)) {
-      candidates.push({ key: cookie.name, token: value })
+    if (token) {
+      candidates.push({ key: cookie.name, token })
+
+      continue
     }
+
+    if (mentionsToken(cookie?.value, tokenKeys)) claimed.push(cookie.name)
   }
 
   const preferred = candidates.find(({ key }) =>
@@ -339,6 +401,7 @@ export async function findTokenInCookies(context, tokenKeys = DEFAULT_TOKEN_KEYS
   return {
     entries: cookies.length,
     names: cookies.map((cookie) => cookie?.name).filter((name) => typeof name === 'string').slice(0, 40),
+    claimed,
     found: preferred ?? candidates[0] ?? null,
   }
 }
@@ -491,6 +554,9 @@ export async function extractBearerToken(options) {
       // "logged in and stored it somewhere unexpected" from "never logged in".
       storageKeyNames: [],
       cookieNames: [],
+      // Keys whose contents mention a token but yielded none: a parsing
+      // problem, as distinct from having no session at all.
+      claimedToken: [],
       indexedDbNames: [],
       landedUrl: null,
       title: null,
@@ -640,6 +706,7 @@ export async function extractBearerToken(options) {
 
       evidence.storageKeys = scan.entries
       evidence.storageKeyNames = scan.names
+      evidence.claimedToken = [...new Set([...evidence.claimedToken, ...scan.claimed])]
 
       if (scan.found) {
         outcome = { token: scan.found.token, source: `storage:${scan.found.key}` }
@@ -651,6 +718,7 @@ export async function extractBearerToken(options) {
 
       evidence.cookies = cookieScan.entries
       evidence.cookieNames = cookieScan.names
+      evidence.claimedToken = [...new Set([...evidence.claimedToken, ...cookieScan.claimed])]
 
       if (cookieScan.found) {
         outcome = { token: cookieScan.found.token, source: `cookie:${cookieScan.found.key}` }
