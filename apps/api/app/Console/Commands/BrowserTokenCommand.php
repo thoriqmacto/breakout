@@ -20,7 +20,7 @@ use Illuminate\Console\Command;
  * This is the same code path with the diagnosis in front of you.
  *
  * The password is read from a hidden prompt and used once. The token is never
- * printed -- only its fingerprint, expiry, and which of the four sources it
+ * printed -- only its fingerprint, expiry, and which of the five sources it
  * came from.
  */
 class BrowserTokenCommand extends Command

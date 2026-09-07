@@ -533,6 +533,48 @@ export async function extractBearerToken(options) {
 
   let context
 
+  // Assigned once the page exists; declared out here so the catch can reach
+  // it. A timeout unwinds through the catch, and that is the path whose
+  // screenshot matters most.
+  let capture = async () => {}
+
+  // What was seen, for the case where nothing was found. Names and counts
+  // only -- never a header value, never a body. Without this, "no bearer
+  // token was seen" is unfalsifiable from the outside: it cannot say
+  // whether the app made no authenticated call, made one this never saw, or
+  // made one carrying something that is not a JWT.
+  //
+  // Out here with capture, and for the same reason: the catch has to be able
+  // to summarise what was seen, and a const inside the try is not in scope
+  // there -- which fails as a ReferenceError that replaces the real error
+  // with a worse one.
+  const evidence = {
+    requests: 0,
+    authorizationHeaders: 0,
+    nonJwtAuthorization: 0,
+    jsonResponses: 0,
+    hosts: new Set(),
+    storageKeys: 0,
+    cookies: 0,
+    // Names, never values. A key called "sb_session" says the app has a
+    // session; the count 15 says nothing at all. This is what separates
+    // "logged in and stored it somewhere unexpected" from "never logged in".
+    storageKeyNames: [],
+    cookieNames: [],
+    // Keys whose contents mention a token but yielded none: a parsing
+    // problem, as distinct from having no session at all.
+    claimedToken: [],
+    indexedDbNames: [],
+    landedUrl: null,
+    title: null,
+    // Recorded immediately after the submit, before any navigation of ours.
+    loginFormGone: false,
+    urlAfterSubmit: null,
+    screenshot: null,
+    // True when the saved profile was already signed in and no login ran.
+    usedExistingSession: false,
+  }
+
   try {
     const launchOptions = {
       headless: config.headless,
@@ -564,44 +606,30 @@ export async function extractBearerToken(options) {
     }
 
     const page = context.pages()[0] ?? (await context.newPage())
+
+    /**
+     * Photograph the page, once, on whichever path ends the run badly.
+     *
+     * A timeout is the failure that most needs a picture and the one least
+     * likely to reach a screenshot written at a single exit -- so this is
+     * called from the ordinary no-token path and from the catch alike.
+     */
+    capture = async () => {
+      if (!config.screenshotPath || evidence.screenshot) return
+
+      await page
+        .screenshot({ path: config.screenshotPath, fullPage: true })
+        .then(() => {
+          evidence.screenshot = config.screenshotPath
+        })
+        .catch(() => {})
+    }
     page.setDefaultTimeout(config.navigationTimeoutMs)
 
     // Records whether the portal actively rejected the credentials, so a
     // wrong password is reported as such instead of as a timeout -- the
     // difference between "fix your password" and "the site is down".
     let credentialsRejected = false
-
-    // What was seen, for the case where nothing was found. Names and counts
-    // only -- never a header value, never a body. Without this, "no bearer
-    // token was seen" is unfalsifiable from the outside: it cannot say
-    // whether the app made no authenticated call, made one this never saw, or
-    // made one carrying something that is not a JWT.
-    const evidence = {
-      requests: 0,
-      authorizationHeaders: 0,
-      nonJwtAuthorization: 0,
-      jsonResponses: 0,
-      hosts: new Set(),
-      storageKeys: 0,
-      cookies: 0,
-      // Names, never values. A key called "sb_session" says the app has a
-      // session; the count 15 says nothing at all. This is what separates
-      // "logged in and stored it somewhere unexpected" from "never logged in".
-      storageKeyNames: [],
-      cookieNames: [],
-      // Keys whose contents mention a token but yielded none: a parsing
-      // problem, as distinct from having no session at all.
-      claimedToken: [],
-      indexedDbNames: [],
-      landedUrl: null,
-      title: null,
-      // Recorded immediately after the submit, before any navigation of ours.
-      loginFormGone: false,
-      urlAfterSubmit: null,
-      screenshot: null,
-      // True when the saved profile was already signed in and no login ran.
-      usedExistingSession: false,
-    }
 
     // Listeners go on the *context*, not the page. A portal that finishes
     // login in a popup or a new tab makes its authenticated calls from a page
@@ -737,6 +765,14 @@ export async function extractBearerToken(options) {
 
     const deadline = startedAt + config.timeoutMs
 
+    // Every wait from here is measured against the run's own budget, not
+    // against a constant. Waits written as fixed intervals add up: this
+    // function grew a 25-second form poll, two 8-second settles and a
+    // 10-second redirect wait on top of a 30-second navigation, against a
+    // 55-second budget, and the parent killed the child mid-run -- which
+    // reports as a portal timeout and takes the diagnostic screenshot with it.
+    const remaining = (want) => Math.max(0, Math.min(want, deadline - Date.now()))
+
     // Whether the form is still there, asked *now*, before this function
     // navigates anywhere of its own accord.
     //
@@ -754,7 +790,7 @@ export async function extractBearerToken(options) {
       // through a device check or a captcha takes longer than any interval
       // short enough to be worth waiting, and reporting "still on the form"
       // then means calling a slow success a rejected password.
-      const submitDeadline = Date.now() + Math.min(25_000, config.timeoutMs)
+      const submitDeadline = Date.now() + remaining(25_000)
 
       while (Date.now() < submitDeadline) {
         // A token settles it outright: whatever the form is doing, the login
@@ -787,7 +823,7 @@ export async function extractBearerToken(options) {
     // answered by the listeners without a second navigation.
     let outcome = await Promise.race([
       tokenSeen,
-      new Promise((resolve) => setTimeout(() => resolve(null), Math.min(8_000, config.timeoutMs))),
+      new Promise((resolve) => setTimeout(() => resolve(null), remaining(8_000))),
     ])
 
     // Then provoke the call the app makes when it uses the token.
@@ -802,7 +838,7 @@ export async function extractBearerToken(options) {
       // indistinguishable from a login that was refused -- this code would
       // have caused exactly the symptom it is looking for.
       await page
-        .waitForURL((url) => !url.href.startsWith(loginUrl), { timeout: 10_000 })
+        .waitForURL((url) => !url.href.startsWith(loginUrl), { timeout: Math.max(1, remaining(10_000)) })
         .catch(() => {})
 
       await page
@@ -811,7 +847,7 @@ export async function extractBearerToken(options) {
 
       outcome = await Promise.race([
         tokenSeen,
-        new Promise((resolve) => setTimeout(() => resolve(null), Math.min(8_000, Math.max(0, deadline - Date.now())))),
+        new Promise((resolve) => setTimeout(() => resolve(null), remaining(8_000))),
       ])
     }
 
@@ -855,7 +891,7 @@ export async function extractBearerToken(options) {
 
       outcome = await Promise.race([
         tokenSeen,
-        new Promise((resolve) => setTimeout(() => resolve(null), Math.min(1_000, Math.max(1, deadline - Date.now())))),
+        new Promise((resolve) => setTimeout(() => resolve(null), Math.max(1, remaining(1_000)))),
       ])
     }
 
@@ -863,15 +899,7 @@ export async function extractBearerToken(options) {
       return { ...outcome, elapsedMs: Date.now() - startedAt }
     }
 
-    // Nothing was found. Take the picture before the browser closes.
-    if (config.screenshotPath) {
-      await page
-        .screenshot({ path: config.screenshotPath, fullPage: true })
-        .then(() => {
-          evidence.screenshot = config.screenshotPath
-        })
-        .catch(() => {})
-    }
+    await capture()
 
     evidence.landedUrl = page.url()
 
@@ -903,20 +931,31 @@ export async function extractBearerToken(options) {
       { evidence: summariseEvidence(evidence) },
     )
   } catch (error) {
-    if (error instanceof TokenExtractionError) throw error
+    // Every failing path gets the same treatment, rather than each throw site
+    // remembering to ask for it. A TokenExtractionError raised inside the try
+    // -- an unreachable portal, a missing selector -- used to be re-thrown
+    // untouched, so the failures that most needed a picture of the page were
+    // the ones that never got one.
+    await capture()
+
+    if (error instanceof TokenExtractionError) {
+      if (error.evidence === undefined) error.evidence = summariseEvidence(evidence)
+
+      throw error
+    }
 
     if (/timeout/i.test(error?.message ?? '')) {
       throw new TokenExtractionError(
         ExtractionError.TIMEOUT,
         `Timed out after ${Date.now() - startedAt}ms: ${redact(error.message, secrets)}`,
-        { cause: error },
+        { cause: error, evidence: summariseEvidence(evidence) },
       )
     }
 
     throw new TokenExtractionError(
       ExtractionError.NAVIGATION_FAILED,
       redact(error?.message ?? 'Unknown failure', secrets),
-      { cause: error },
+      { cause: error, evidence: summariseEvidence(evidence) },
     )
   } finally {
     // Unconditional: a browser left running is a zombie holding hundreds of

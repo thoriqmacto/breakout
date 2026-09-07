@@ -1746,19 +1746,33 @@ counts and host names are none of those.
 To iterate without a dashboard round trip for every attempt:
 
 ```bash
-php artisan browser:token --dry-run     # sign in, report what was captured, store nothing
-php artisan browser:token --stored      # use the credentials saved for unattended renewal
+php artisan browser:token --dry-run              # sign in, report what was captured, store nothing
+php artisan browser:token --stored               # use the credentials saved for unattended renewal
+php artisan browser:token --screenshot=/tmp      # photograph the page when nothing is found
 ```
 
 The password comes from a hidden prompt and is used once. The token is never printed — only its
-fingerprint and which of the four sources it came from.
+fingerprint and which of the five sources it came from.
+
+`--screenshot` is worth reaching for early. Several rounds of this feature went into inferring
+what the browser was looking at from key names, cookie names and host lists; a captcha, a spinner,
+a device-approval prompt and a signed-in app are one glance apart and several rounds apart by
+inference. Give it a directory and it names the file; give it a path and it uses that. It is
+opt-in because a picture of a signed-in portal is exactly as sensitive as the page it shows.
+
+If a run reports `[TIMEOUT]` and leaves no picture, the run was killed rather than finishing —
+raise `BROWSER_AUTH_TIMEOUT_SECONDS`. The budget has to outlast the whole sequence: page load,
+the wait for the login form to go, whatever device check or captcha sits between accepting a
+password and showing the app, a redirect, and then the search for the token. The default of 150
+seconds allows for all of it; a shorter one does not fail faster in any useful sense, it fails as
+a timeout, which says nothing about why.
 
 Install and verify, on the server:
 
 ```bash
 cd apps/api/resources/browser
 npm install
-npm run smoke      # eight scenarios against a local fixture; no real portal, no credentials
+npm run smoke      # 22 scenarios against a local fixture; no real portal, no credentials
 ```
 
 > **The setup user and the web server user are not the same, and that is where
