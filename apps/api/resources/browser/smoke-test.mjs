@@ -146,6 +146,51 @@ function startPortal(mode) {
       return
     }
 
+    if (url === '/cookie-login') {
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(`<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await fetch('/api/auth/cookie-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+      document.getElementById('f').remove();
+    });
+  </script>
+</body></html>`)
+
+      return
+    }
+
+    if (url === '/api/auth/cookie-login' && request.method === 'POST') {
+      const chunks = []
+      request.on('data', (chunk) => chunks.push(chunk))
+      request.on('end', () => {
+        // httpOnly: unreadable from the page, and never echoed in the body.
+        // The browser will attach it, but nothing this side of Playwright can
+        // see it -- which is the whole point of the scenario.
+        response.writeHead(200, {
+          'content-type': 'application/json',
+          'set-cookie': `access_token=${FAKE_JWT}; Path=/; HttpOnly`,
+        })
+        response.end(JSON.stringify({ data: { status: 'ok' } }))
+      })
+
+      return
+    }
+
     if (url === '/app') {
       response.writeHead(200, { 'content-type': 'text/html' })
       response.end(appPage())
@@ -522,6 +567,36 @@ console.log('a portal that stores the token instead of using it:')
       })
 
       expect(result.token === FAKE_JWT, `stored the wrong value: ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
+console.log('a portal that keeps the token in an httpOnly cookie:')
+
+{
+  const { server, port } = await startPortal('quiet')
+
+  try {
+    await check('the token is read from the cookie the page itself cannot see', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/cookie-login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: {
+          username: 'input[name="username"]',
+          password: 'input[name="password"]',
+          submit: 'button[type="submit"]',
+        },
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the wrong token came back')
+      expect(
+        result.source.startsWith('cookie:'),
+        `expected a cookie source, got ${result.source}`,
+      )
     })
   } finally {
     server.close()
