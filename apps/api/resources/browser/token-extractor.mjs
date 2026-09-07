@@ -122,6 +122,11 @@ export function redact(text, secrets = []) {
  */
 export function summariseEvidence(evidence) {
   return {
+    storage_key_names: evidence.storageKeyNames,
+    cookie_names: evidence.cookieNames,
+    indexeddb_names: evidence.indexedDbNames,
+    landed_url: evidence.landedUrl,
+    title: evidence.title,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -221,7 +226,89 @@ export async function findTokenInStorage(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
     tokenKeys.some((name) => new RegExp(name.replace(/[^a-z0-9]/gi, '.?'), 'i').test(key)),
   )
 
-  return { entries: entries.length, found: preferred ?? candidates[0] ?? null }
+  return {
+    entries: entries.length,
+    names: entries.map(([key]) => key).filter((key) => typeof key === 'string').slice(0, 40),
+    found: preferred ?? candidates[0] ?? null,
+  }
+}
+
+/**
+ * The fifth place: IndexedDB.
+ *
+ * A single-page app with an offline story keeps its session here rather than
+ * in localStorage, and nothing about it is visible to a request listener or a
+ * storage scan. Bounded deliberately: a handful of databases, a handful of
+ * records each, because this runs against a site whose storage is not ours to
+ * assume anything about.
+ */
+export async function findTokenInIndexedDb(page, tokenKeys = DEFAULT_TOKEN_KEYS) {
+  const result = await page
+    .evaluate(async (keys) => {
+      const names = []
+      const values = []
+
+      if (!('indexedDB' in window) || typeof indexedDB.databases !== 'function') {
+        return { names, values }
+      }
+
+      const databases = (await indexedDB.databases().catch(() => [])) ?? []
+
+      for (const { name } of databases.slice(0, 8)) {
+        if (!name) continue
+
+        names.push(name)
+
+        const database = await new Promise((resolve) => {
+          const request = indexedDB.open(name)
+          request.onsuccess = () => resolve(request.result)
+          request.onerror = () => resolve(null)
+          // A database mid-upgrade would block forever otherwise.
+          request.onblocked = () => resolve(null)
+        })
+
+        if (!database) continue
+
+        for (const store of [...database.objectStoreNames].slice(0, 8)) {
+          try {
+            const records = await new Promise((resolve) => {
+              const request = database.transaction(store, 'readonly').objectStore(store).getAll(undefined, 50)
+              request.onsuccess = () => resolve(request.result ?? [])
+              request.onerror = () => resolve([])
+            })
+
+            for (const record of records) {
+              values.push(typeof record === 'string' ? record : JSON.stringify(record))
+            }
+          } catch {
+            // A store that will not open is simply not where the token is.
+          }
+        }
+
+        database.close()
+      }
+
+      return { names, values }
+    }, tokenKeys)
+    .catch(() => ({ names: [], values: [] }))
+
+  for (const raw of result.values) {
+    const bare = stripBearerPrefix(raw)
+
+    if (looksLikeJwt(bare)) {
+      return { names: result.names, found: { key: 'indexeddb', token: bare } }
+    }
+
+    try {
+      const token = findTokenInBody(JSON.parse(raw), tokenKeys)
+
+      if (token) return { names: result.names, found: { key: 'indexeddb', token } }
+    } catch {
+      // Not JSON.
+    }
+  }
+
+  return { names: result.names, found: null }
 }
 
 /**
@@ -249,7 +336,11 @@ export async function findTokenInCookies(context, tokenKeys = DEFAULT_TOKEN_KEYS
     tokenKeys.some((name) => new RegExp(name.replace(/[^a-z0-9]/gi, '.?'), 'i').test(key)),
   )
 
-  return { entries: cookies.length, found: preferred ?? candidates[0] ?? null }
+  return {
+    entries: cookies.length,
+    names: cookies.map((cookie) => cookie?.name).filter((name) => typeof name === 'string').slice(0, 40),
+    found: preferred ?? candidates[0] ?? null,
+  }
 }
 
 /**
@@ -395,6 +486,14 @@ export async function extractBearerToken(options) {
       hosts: new Set(),
       storageKeys: 0,
       cookies: 0,
+      // Names, never values. A key called "sb_session" says the app has a
+      // session; the count 15 says nothing at all. This is what separates
+      // "logged in and stored it somewhere unexpected" from "never logged in".
+      storageKeyNames: [],
+      cookieNames: [],
+      indexedDbNames: [],
+      landedUrl: null,
+      title: null,
     }
 
     // Listeners go on the *context*, not the page. A portal that finishes
@@ -540,6 +639,7 @@ export async function extractBearerToken(options) {
       const scan = await findTokenInStorage(page, config.tokenKeys)
 
       evidence.storageKeys = scan.entries
+      evidence.storageKeyNames = scan.names
 
       if (scan.found) {
         outcome = { token: scan.found.token, source: `storage:${scan.found.key}` }
@@ -550,9 +650,20 @@ export async function extractBearerToken(options) {
       const cookieScan = await findTokenInCookies(context, config.tokenKeys)
 
       evidence.cookies = cookieScan.entries
+      evidence.cookieNames = cookieScan.names
 
       if (cookieScan.found) {
         outcome = { token: cookieScan.found.token, source: `cookie:${cookieScan.found.key}` }
+
+        break
+      }
+
+      const indexedScan = await findTokenInIndexedDb(page, config.tokenKeys)
+
+      evidence.indexedDbNames = indexedScan.names
+
+      if (indexedScan.found) {
+        outcome = { token: indexedScan.found.token, source: 'indexeddb' }
 
         break
       }
@@ -578,6 +689,9 @@ export async function extractBearerToken(options) {
     // token never crossed the wire in a shape we recognised". They need
     // different fixes: the first is usually credentials or an extra step
     // such as MFA, the second is usually the token key names.
+    evidence.landedUrl = page.url()
+    evidence.title = await page.title().catch(() => null)
+
     const stillOnLoginForm = await page
       .locator(selectors.password)
       .isVisible()

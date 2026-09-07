@@ -56,6 +56,7 @@ class BrowserTokenCommand extends Command
         } catch (BrowserTokenExtractionException $exception) {
             $this->newLine();
             $this->error(sprintf('[%s] %s', $exception->failureCode, $exception->getMessage()));
+            $this->reportEvidence($exception->evidence);
 
             return self::FAILURE;
         }
@@ -82,6 +83,60 @@ class BrowserTokenCommand extends Command
         $this->line('  stored       yes, through the encrypted token store');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Names and landing page, which counts alone cannot supply.
+     *
+     * "15 web storage key(s)" narrowed the problem and then stopped: it cannot
+     * distinguish a session stored under an unexpected name from no session at
+     * all. The names can, and a key called "sb_session" answers in one glance
+     * what another round of counting would not. Names only -- a key name is
+     * structure, its value is the secret.
+     *
+     * This is the terminal, in front of the operator, so it prints more than
+     * the API's one-line summary does.
+     *
+     * @param  array<string, mixed>|null  $evidence
+     */
+    private function reportEvidence(?array $evidence): void
+    {
+        if ($evidence === null) {
+            return;
+        }
+
+        $this->newLine();
+
+        foreach ([
+            'landed on' => $evidence['landed_url'] ?? null,
+            'page title' => $evidence['title'] ?? null,
+        ] as $label => $value) {
+            if (is_string($value) && $value !== '') {
+                $this->line(sprintf('  %-16s %s', $label, $value));
+            }
+        }
+
+        foreach ([
+            'storage keys' => $evidence['storage_key_names'] ?? null,
+            'cookies' => $evidence['cookie_names'] ?? null,
+            'indexeddb' => $evidence['indexeddb_names'] ?? null,
+        ] as $label => $names) {
+            if (! is_array($names) || $names === []) {
+                continue;
+            }
+
+            $this->line(sprintf(
+                '  %-16s %s',
+                $label,
+                implode(', ', array_map(static fn ($name): string => (string) $name, $names)),
+            ));
+        }
+
+        $this->newLine();
+        $this->line(
+            '<fg=gray>Names only; no values are read back. If none of these looks like a '
+            .'session, the login did not complete -- check the landing page above.</>'
+        );
     }
 
     /**
