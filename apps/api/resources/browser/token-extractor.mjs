@@ -128,6 +128,8 @@ export function summariseEvidence(evidence) {
     indexeddb_names: evidence.indexedDbNames,
     landed_url: evidence.landedUrl,
     title: evidence.title,
+    login_form_gone: evidence.loginFormGone,
+    url_after_submit: evidence.urlAfterSubmit,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -560,6 +562,9 @@ export async function extractBearerToken(options) {
       indexedDbNames: [],
       landedUrl: null,
       title: null,
+      // Recorded immediately after the submit, before any navigation of ours.
+      loginFormGone: false,
+      urlAfterSubmit: null,
     }
 
     // Listeners go on the *context*, not the page. A portal that finishes
@@ -673,6 +678,25 @@ export async function extractBearerToken(options) {
 
     const deadline = startedAt + config.timeoutMs
 
+    // Whether the form is still there, asked *now*, before this function
+    // navigates anywhere of its own accord.
+    //
+    // It used to be asked at the end, which was fine until BROWSER_AUTH_POST_-
+    // LOGIN_URL existed: from then on the check ran after we had navigated
+    // away ourselves, so it could never be true, and every failure claimed
+    // "Signed in" on no evidence whatsoever. A portal that silently refuses a
+    // login -- a device check, a captcha, a rejected password -- looked
+    // identical to one that signed in and hid its token.
+    const settleMs = Math.min(5_000, config.timeoutMs)
+
+    await page.waitForTimeout(Math.min(2_000, settleMs))
+
+    evidence.loginFormGone = !(await page
+      .locator(selectors.password)
+      .isVisible()
+      .catch(() => false))
+    evidence.urlAfterSubmit = page.url()
+
     // Give the login call itself a moment to come back before doing anything
     // else, so a portal that returns the token in its login response is
     // answered by the listeners without a second navigation.
@@ -760,12 +784,7 @@ export async function extractBearerToken(options) {
     evidence.landedUrl = page.url()
     evidence.title = await page.title().catch(() => null)
 
-    const stillOnLoginForm = await page
-      .locator(selectors.password)
-      .isVisible()
-      .catch(() => false)
-
-    if (stillOnLoginForm) {
+    if (!evidence.loginFormGone) {
       throw new TokenExtractionError(
         ExtractionError.INVALID_CREDENTIALS,
         'Still on the login form after submitting. The credentials were probably rejected, '
@@ -775,7 +794,7 @@ export async function extractBearerToken(options) {
 
     throw new TokenExtractionError(
       ExtractionError.TOKEN_NOT_FOUND,
-      `Login appeared to succeed but no bearer token was seen within ${config.timeoutMs}ms. `
+      `The login form was left behind but no bearer token was seen within ${config.timeoutMs}ms. `
         + describeEvidence(evidence),
       { evidence: summariseEvidence(evidence) },
     )

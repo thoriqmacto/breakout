@@ -108,6 +108,13 @@ class BrowserTokenCommand extends Command
         $this->newLine();
 
         foreach ([
+            // What the page was immediately after submitting, before this
+            // navigated anywhere: the only observation that speaks to whether
+            // the login itself worked.
+            'after submit' => $evidence['url_after_submit'] ?? null,
+            'form gone' => array_key_exists('login_form_gone', $evidence)
+                ? ($evidence['login_form_gone'] ? 'yes' : 'no -- the login was refused')
+                : null,
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
         ] as $label => $value) {
