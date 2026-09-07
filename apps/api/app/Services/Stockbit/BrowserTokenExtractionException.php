@@ -14,8 +14,16 @@ use RuntimeException;
  */
 class BrowserTokenExtractionException extends RuntimeException
 {
-    public function __construct(public readonly string $failureCode, string $message)
-    {
+    /**
+     * @param  array<string, mixed>|null  $evidence  What the browser observed,
+     *                                               for a caller that can show
+     *                                               more than one sentence.
+     */
+    public function __construct(
+        public readonly string $failureCode,
+        string $message,
+        public readonly ?array $evidence = null,
+    ) {
         // Not `$code`: Exception already declares one, as a non-readonly int,
         // and redeclaring it is a fatal error rather than a shadow.
         parent::__construct($message);

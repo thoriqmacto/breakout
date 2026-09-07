@@ -196,12 +196,15 @@ class BrowserTokenExtractor
         if (($decoded['ok'] ?? false) !== true) {
             $code = is_string($decoded['code'] ?? null) ? $decoded['code'] : 'UNEXPECTED';
 
+            $evidence = is_array($decoded['evidence'] ?? null) ? $decoded['evidence'] : null;
+
             throw new BrowserTokenExtractionException(
                 $code,
                 trim(
                     (self::EXPLANATIONS[$code] ?? 'The headless login failed.')
-                    .$this->describeEvidence($decoded['evidence'] ?? null)
+                    .$this->describeEvidence($evidence)
                 ),
+                $evidence,
             );
         }
 

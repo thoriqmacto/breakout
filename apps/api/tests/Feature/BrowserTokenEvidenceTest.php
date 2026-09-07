@@ -141,6 +141,45 @@ class BrowserTokenEvidenceTest extends TestCase
         $this->assertStringNotContainsString('Seen:', $exception->getMessage());
     }
 
+    /**
+     * Counts localise the problem; names identify it.
+     *
+     * "15 web storage key(s)" cannot separate a session stored under an
+     * unexpected name from no session at all, and those need opposite fixes.
+     * The names travel too, and the command prints them.
+     */
+    public function test_the_command_prints_the_names_behind_the_counts(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 697,
+                'authorization_headers' => 2,
+                'non_jwt_authorization' => 2,
+                'storage_keys' => 15,
+                'cookies' => 9,
+                'hosts' => ['stockbit.com'],
+                'storage_key_names' => ['sb_session', 'theme', '_ga'],
+                'cookie_names' => ['SESSIONID', '_gid'],
+                'indexeddb_names' => ['sb-offline'],
+                'landed_url' => 'https://portal.example.test/verify-device',
+                'title' => 'Verify your device',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('sb_session')
+            ->expectsOutputToContain('SESSIONID')
+            ->expectsOutputToContain('sb-offline')
+            // The landing page is the other half: a device-verification screen
+            // explains an absent session far better than any count can.
+            ->expectsOutputToContain('verify-device')
+            ->assertFailed();
+    }
+
     public function test_the_password_never_appears_in_the_diagnosis(): void
     {
         $exception = $this->failureFor((string) json_encode([
