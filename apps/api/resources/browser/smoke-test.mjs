@@ -171,6 +171,27 @@ async function scenario(name, mode, credentials, assert) {
   }
 }
 
+/**
+ * Drive a real login with selectors the probe proposed, on a running portal.
+ */
+async function scenarioWithSelectors(name, port, selectors) {
+  try {
+    const result = await extractBearerToken({
+      loginUrl: `http://127.0.0.1:${port}/login`,
+      username: VALID_USER,
+      password: VALID_PASSWORD,
+      selectors,
+      timeoutMs: 15_000,
+    })
+
+    expect(result.token === FAKE_JWT, 'the proposed selectors did not produce a token')
+    console.log(`  ok   ${name}`)
+  } catch (failure) {
+    console.error(`  FAIL ${name}: ${failure.message}`)
+    process.exitCode = 1
+  }
+}
+
 function expect(condition, message) {
   if (!condition) throw new Error(message)
 }
@@ -333,5 +354,66 @@ await cliScenario(
     expect(JSON.parse(stdout).code === 'BAD_JOB', `expected BAD_JOB, got ${stdout}`)
   },
 )
+
+/**
+ * The form probe, against the same fixture.
+ *
+ * SELECTOR_NOT_FOUND is a configuration failure whose answer lives on the
+ * portal, so the probe that proposes the selectors is worth proving too: a
+ * suggestion that does not actually drive the form is worse than none.
+ */
+async function runFormProbe(loginUrl) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [join(HERE, 'form-probe.mjs')], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, BROWSER_AUTH_LOGIN_URL: loginUrl },
+    })
+
+    let stdout = ''
+    let stderr = ''
+    child.stdout.on('data', (chunk) => (stdout += chunk))
+    child.stderr.on('data', (chunk) => (stderr += chunk))
+    child.on('close', (code) => resolve({ code, stdout, stderr }))
+  })
+}
+
+console.log('the form probe, against the same fixture:')
+
+{
+  const { server, port } = await startPortal('body-only')
+
+  try {
+    const { code, stdout, stderr } = await runFormProbe(`http://127.0.0.1:${port}/login`)
+
+    await cliScenario('it proposes selectors that match the fixture form', {}, () => {
+      expect(code === 0, `expected exit 0, got ${code}: ${stderr.slice(0, 300)}`)
+
+      const report = JSON.parse(stdout)
+
+      expect(
+        report.suggestion.username === 'input[name="email"]',
+        `username selector was ${report.suggestion.username}`,
+      )
+      expect(
+        report.suggestion.password === 'input[name="password"]',
+        `password selector was ${report.suggestion.password}`,
+      )
+      expect(
+        report.suggestion.submit === 'button[type="submit"]',
+        `submit selector was ${report.suggestion.submit}`,
+      )
+    })
+
+    // A proposal is only worth printing if it drives the form, so the
+    // suggested selectors are handed straight back to the extractor.
+    await scenarioWithSelectors(
+      'and a login driven by those selectors succeeds',
+      port,
+      JSON.parse(stdout).suggestion,
+    )
+  } finally {
+    server.close()
+  }
+}
 
 console.log(process.exitCode === 1 ? 'FAILED' : 'all scenarios passed')

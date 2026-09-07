@@ -195,6 +195,49 @@ class BrowserTokenExtractor
     }
 
     /**
+     * Run one of the sibling diagnostic scripts, as a real extraction would.
+     *
+     * The point of a probe is that it answers for *this* server -- same node,
+     * same browser, same user -- so it has to be started the same way a login
+     * is. Building the process separately in each command is how the two drift
+     * apart, and a probe that passes while the login fails is worse than no
+     * probe at all.
+     *
+     * The filename is always a literal from this codebase; basename() is there
+     * so it stays that way if a future caller is careless.
+     */
+    public function runProbe(string $filename, int $timeoutSeconds = 90): Process
+    {
+        $environment = $this->childEnvironment() ?? [];
+
+        foreach ([
+            'BROWSER_AUTH_CHROMIUM_PATH' => config('browser_auth.chromium_path'),
+            'BROWSER_AUTH_LOGIN_URL' => config('browser_auth.login_url'),
+        ] as $name => $value) {
+            if (is_string($value) && trim($value) !== '') {
+                $environment[$name] = trim($value);
+            }
+        }
+
+        $process = new Process(
+            [(string) config('browser_auth.node_binary', 'node'), $this->probePath($filename)],
+            dirname($this->scriptPath()),
+            $environment === [] ? null : $environment,
+            null,
+            $timeoutSeconds,
+        );
+
+        $process->run();
+
+        return $process;
+    }
+
+    public function probePath(string $filename): string
+    {
+        return dirname($this->scriptPath()).'/'.basename($filename);
+    }
+
+    /**
      * Additions to the inherited environment, or null to inherit unchanged.
      *
      * @return array<string, string>|null

@@ -193,50 +193,72 @@ class BrowserAuthCheckCommand extends Command
      */
     private function checkChromium(BrowserTokenExtractor $extractor): array
     {
-        $directory = dirname($extractor->scriptPath());
-        $probe = $directory.'/launch-probe.mjs';
+        $probe = $extractor->probePath('launch-probe.mjs');
 
         if (! is_file($probe)) {
             return ['ok' => false, 'detail' => sprintf('missing at %s', $probe)];
         }
 
-        $environment = [];
-        $browsers = config('browser_auth.browsers_path');
-        $chromium = config('browser_auth.chromium_path');
-
-        if (is_string($browsers) && trim($browsers) !== '') {
-            $environment['PLAYWRIGHT_BROWSERS_PATH'] = trim($browsers);
-        }
-
-        if (is_string($chromium) && trim($chromium) !== '') {
-            $environment['BROWSER_AUTH_CHROMIUM_PATH'] = trim($chromium);
-        }
-
-        $process = new Process(
-            [(string) config('browser_auth.node_binary', 'node'), $probe],
-            $directory,
-            $environment === [] ? null : $environment,
-            null,
-            60,
-        );
-
         try {
-            $process->run();
+            $process = $extractor->runProbe('launch-probe.mjs', 60);
         } catch (\Throwable $exception) {
             return ['ok' => false, 'detail' => $exception->getMessage()];
         }
 
         if (! $process->isSuccessful()) {
-            $stderr = trim($process->getErrorOutput());
+            $stderr = (string) preg_replace('/\s+/', ' ', trim($process->getErrorOutput()));
 
-            return [
-                'ok' => false,
-                'detail' => $stderr === ''
-                    ? sprintf('the probe exited with code %s', (string) $process->getExitCode())
-                    : mb_substr((string) preg_replace('/\s+/', ' ', $stderr), 0, 300),
-            ];
+            if ($stderr === '') {
+                return [
+                    'ok' => false,
+                    'detail' => sprintf('the probe exited with code %s', (string) $process->getExitCode()),
+                ];
+            }
+
+            return ['ok' => false, 'detail' => $this->diagnoseLaunch($stderr)];
         }
 
         return ['ok' => true, 'detail' => trim($process->getOutput()) ?: 'launched'];
+    }
+
+    /**
+     * Say what to do about it, not just what Playwright printed.
+     *
+     * Playwright's own answer to a missing browser is a bordered banner that
+     * gets cut off long before the instruction in it, and its instruction is
+     * the wrong one here anyway: re-running the install as whoever is reading
+     * the message puts the browser in *their* home, which is how the browser
+     * came to be unreachable in the first place.
+     */
+    private function diagnoseLaunch(string $stderr): string
+    {
+        if (! str_contains($stderr, "Executable doesn't exist")) {
+            return mb_substr($stderr, 0, 300);
+        }
+
+        $path = $this->executablePathIn($stderr);
+
+        return sprintf(
+            'no browser at %s. Playwright installs into the home of whoever runs '
+            .'the install, so a browser installed by the deploy user is unreadable '
+            .'here. Install it somewhere shared -- PLAYWRIGHT_BROWSERS_PATH='
+            .'/opt/ms-playwright ./node_modules/.bin/playwright install chromium, '
+            .'then chmod -R a+rX /opt/ms-playwright -- and set '
+            .'BROWSER_AUTH_BROWSERS_PATH to the same directory. Or point '
+            .'BROWSER_AUTH_CHROMIUM_PATH at a Chromium already on this server.',
+            $path ?? 'the expected path',
+        );
+    }
+
+    /**
+     * The path Playwright looked in, which names the user it belongs to.
+     */
+    private function executablePathIn(string $stderr): ?string
+    {
+        if (preg_match('/Executable doesn\'t exist at (\S+)/', $stderr, $matches) !== 1) {
+            return null;
+        }
+
+        return $matches[1];
     }
 }

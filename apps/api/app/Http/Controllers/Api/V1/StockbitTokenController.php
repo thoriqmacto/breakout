@@ -162,7 +162,7 @@ class StockbitTokenController extends ApiController
         } catch (BrowserTokenExtractionException $exception) {
             return ApiResponse::error(
                 $exception->getMessage(),
-                $exception->failureCode === BrowserTokenExtractor::INVALID_CREDENTIALS ? 422 : 502,
+                $this->statusFor($exception->failureCode),
                 ['code' => [$exception->failureCode]],
             );
         } finally {
@@ -194,6 +194,30 @@ class StockbitTokenController extends ApiController
             $status + ['captured_from' => $result['source'], 'elapsed_ms' => $result['elapsed_ms']],
             'Signed in and stored the token.',
         );
+    }
+
+    /**
+     * Say whose problem it is, in the status code.
+     *
+     * 502 means the upstream gave us a bad answer. Returning it for every
+     * failure said the portal was at fault even when the portal was never
+     * reached -- a selector that matches nothing, or a browser that will not
+     * start, is this server's configuration and reads as 500. That mattered in
+     * practice: a 502 sent the operator looking at nginx and the portal for a
+     * problem that was three lines of .env, twice.
+     */
+    private function statusFor(string $failureCode): int
+    {
+        return match ($failureCode) {
+            BrowserTokenExtractor::INVALID_CREDENTIALS => 422,
+            BrowserTokenExtractor::TIMEOUT => 504,
+            // Ours: nothing here depends on what the portal answered.
+            BrowserTokenExtractor::BROWSER_LAUNCH_FAILED,
+            'SELECTOR_NOT_FOUND',
+            'BAD_JOB' => 500,
+            // Theirs: unreachable, or answered with something unusable.
+            default => 502,
+        };
     }
 
     private function browserLockSeconds(): int
