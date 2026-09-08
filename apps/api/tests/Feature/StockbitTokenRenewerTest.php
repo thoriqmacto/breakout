@@ -33,6 +33,18 @@ class StockbitTokenRenewerTest extends TestCase
         app(StockbitCredentialStore::class)->forget();
 
         config(['browser_auth.enabled' => true, 'browser_auth.login_url' => 'https://portal.test/login']);
+
+        // Verification has its own tests; these are about renewal. Without a
+        // stub the verifier makes a live call, and the suite then reports
+        // whether the machine running it happens to reach the portal -- it
+        // stored the token on a sandbox with no route out and refused it on a
+        // CI runner with one, from identical code.
+        $this->mock(StockbitTokenVerifier::class, function ($mock) {
+            $mock->shouldReceive('verify')->andReturn([
+                'status' => StockbitTokenVerifier::OK,
+                'message' => null,
+            ])->byDefault();
+        });
     }
 
     protected function tearDown(): void
