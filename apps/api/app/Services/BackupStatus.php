@@ -72,11 +72,16 @@ class BackupStatus
 
         $historicalRemote = $this->diskFiles($remote, $historicalDirectory, ['csv']);
 
+        // The local disk answers an unreadable directory with an empty list
+        // and no error, so ask the filesystem directly before trusting it.
+        $historicalLocal = $this->localDirectoryFiles((string) config('csv.seed_dir'), ['csv']);
+        $brokerLocal = $this->localDiskFiles($brokerDirectory, ['csv', 'json']);
+
         $collections = [
             $this->collection(
                 'historical',
                 'Historical prices',
-                $this->localDirectoryFiles((string) config('csv.seed_dir'), ['csv']),
+                $historicalLocal,
                 $historicalRemote,
                 $remote,
                 // Historical CSVs are the only collection with a mirror
@@ -88,7 +93,7 @@ class BackupStatus
             $this->collection(
                 'broker_summary',
                 'Broker summary',
-                $this->diskFiles($this->disk('local'), $brokerDirectory, ['csv', 'json']),
+                $brokerLocal,
                 $this->diskFiles($remote, $brokerDirectory, ['csv', 'json']),
                 $remote,
                 pushable: false,
@@ -100,7 +105,16 @@ class BackupStatus
             'generated_at' => Carbon::now()->toIso8601String(),
             'google_drive' => $health,
             'locations' => [
-                ['key' => 'local', 'label' => 'Local', 'available' => true, 'scan_status' => 'ok'],
+                // Derived, not asserted. This said available/ok unconditionally,
+                // so the card stayed green while both scans were returning
+                // nothing -- the one place an operator would look to find out
+                // whether the machine could read its own backups.
+                [
+                    'key' => 'local',
+                    'label' => 'Local',
+                    'available' => $historicalLocal['status'] === 'ok' && $brokerLocal['status'] === 'ok',
+                    'scan_status' => $this->worstStatus([$historicalLocal['status'], $brokerLocal['status']]),
+                ],
                 [
                     'key' => 'gdrive',
                     'label' => 'Google Drive',
@@ -138,13 +152,26 @@ class BackupStatus
      * Local files in an absolute directory, keyed by filename.
      *
      * @param  array<int, string>  $extensions
-     * @return array{status:string, files:array<string, array<string, mixed>>}
+     * @return array{status:string, path:string, files:array<string, array<string, mixed>>}
      */
     private function localDirectoryFiles(string $directory, array $extensions): array
     {
+        $directory = rtrim($directory, '/'.DIRECTORY_SEPARATOR);
+        $status = $this->localDirectoryStatus($directory);
+
+        if ($status !== 'ok') {
+            return ['status' => $status, 'path' => $directory, 'files' => []];
+        }
+
+        $entries = glob($directory.'/*');
+
+        if ($entries === false) {
+            return ['status' => 'failed', 'path' => $directory, 'files' => []];
+        }
+
         $files = [];
 
-        foreach (glob(rtrim($directory, '/'.DIRECTORY_SEPARATOR).'/*') ?: [] as $path) {
+        foreach ($entries as $path) {
             if (! is_file($path) || ! in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $extensions, true)) {
                 continue;
             }
@@ -161,7 +188,83 @@ class BackupStatus
             ];
         }
 
-        return ['status' => 'ok', 'files' => $files];
+        return ['status' => 'ok', 'path' => $directory, 'files' => $files];
+    }
+
+    /**
+     * A local-disk directory, checked for readability before it is listed.
+     *
+     * @param  array<int, string>  $extensions
+     * @return array{status:string, path:string, files:array<string, array<string, mixed>>}
+     */
+    private function localDiskFiles(string $directory, array $extensions): array
+    {
+        $disk = $this->disk('local');
+
+        if ($disk === null) {
+            return ['status' => 'unavailable', 'path' => null, 'files' => []];
+        }
+
+        // Asked of the disk rather than rebuilt from storage_path(), so a
+        // reconfigured root -- or a faked one under test -- is still the
+        // directory that gets checked.
+        $absolute = method_exists($disk, 'path')
+            ? rtrim($disk->path($directory), '/'.DIRECTORY_SEPARATOR)
+            : null;
+
+        $status = $absolute === null ? 'ok' : $this->localDirectoryStatus($absolute);
+
+        if ($status !== 'ok') {
+            return ['status' => $status, 'path' => $absolute, 'files' => []];
+        }
+
+        return $this->diskFiles($disk, $directory, $extensions) + ['path' => $absolute];
+    }
+
+    /**
+     * The status a reader should act on when several scans disagree.
+     *
+     * Anything other than ok wins: a page reporting "ok" beside a collection
+     * it could not read is the failure this whole change is about.
+     *
+     * @param  array<int, string>  $statuses
+     */
+    private function worstStatus(array $statuses): string
+    {
+        foreach ($statuses as $status) {
+            if ($status !== 'ok') {
+                return $status;
+            }
+        }
+
+        return 'ok';
+    }
+
+    /**
+     * Whether this process can actually read a local directory, and if not, why.
+     *
+     * The reason is the point. Every local scan used to return a hardcoded
+     * 'ok', so a directory that was missing, unreadable by the web server user,
+     * or genuinely empty produced identical output: an empty list under a green
+     * light. An operator who fixed the permissions saw exactly what they saw
+     * before, and had no way to tell whether the fix had worked or whether they
+     * had fixed the wrong directory -- which, with the historical CSVs living
+     * outside the application tree under CSV_SEED_DIR, is easy to do.
+     */
+    private function localDirectoryStatus(string $directory): string
+    {
+        if (trim($directory) === '') {
+            return 'unconfigured';
+        }
+
+        if (! is_dir($directory)) {
+            return 'missing';
+        }
+
+        // Readable needs the read bit on the directory and the execute bit on
+        // it and every parent, which is exactly the pair a partial chmod
+        // misses.
+        return is_readable($directory) ? 'ok' : 'unreadable';
     }
 
     /**
@@ -223,7 +326,7 @@ class BackupStatus
     }
 
     /**
-     * @param  array{status:string, files:array<string, array<string, mixed>>}  $local
+     * @param  array{status:string, path?:string, files:array<string, array<string, mixed>>}  $local
      * @param  array{status:string, files:array<string, array<string, mixed>>}  $remote
      * @return array<string, mixed>
      */
@@ -268,7 +371,13 @@ class BackupStatus
             'key' => $key,
             'label' => $label,
             'pushable' => $pushable,
-            'scan' => ['local' => $local['status'], 'gdrive' => $remote['status']],
+            // The path is part of the diagnosis: a chmod applied to the wrong
+            // directory looks exactly like one that did not work.
+            'scan' => [
+                'local' => $local['status'],
+                'local_path' => $local['path'] ?? null,
+                'gdrive' => $remote['status'],
+            ],
             'counts' => $this->counts($files, $localFiles, $remoteFiles),
             'files' => $files,
         ];

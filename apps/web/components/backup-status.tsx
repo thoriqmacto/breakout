@@ -213,7 +213,29 @@ export function DriveHealthCard({ health }: { health: DriveHealth }) {
   )
 }
 
-export function LocalLocationCard({ available }: { available: boolean }) {
+/**
+ * Why a local scan came back with nothing, in the operator's terms.
+ *
+ * "Unavailable" was the only alternative to "scanned", and the card was hard
+ * coded to the latter anyway. These distinguish the three cases that need
+ * three different fixes.
+ */
+const LOCAL_SCAN_LABELS: Record<string, string> = {
+  ok: "Working copy, scanned",
+  missing: "Directory does not exist",
+  unreadable: "Directory exists but this server cannot read it",
+  unconfigured: "No directory configured",
+  failed: "The directory could not be listed",
+  unavailable: "The local disk is not configured",
+}
+
+export function LocalLocationCard({
+  available,
+  scanStatus = "ok",
+}: {
+  available: boolean
+  scanStatus?: string
+}) {
   return (
     <Card>
       <CardContent className="flex items-center gap-4 py-5">
@@ -221,7 +243,7 @@ export function LocalLocationCard({ available }: { available: boolean }) {
         <div className="flex-1">
           <p className="font-semibold">Local</p>
           <p className="text-sm text-muted-foreground">
-            {available ? "Working copy, scanned" : "Unavailable"}
+            {LOCAL_SCAN_LABELS[scanStatus] ?? (available ? "Working copy, scanned" : "Unavailable")}
           </p>
         </div>
         <span
@@ -419,6 +441,22 @@ export function CollectionCard({
         </div>
       </CardHeader>
       <CardContent>
+        {collection.scan.local !== "ok" ? (
+          <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
+            <p className="font-medium text-amber-800 dark:text-amber-300">
+              Local files were not read — {LOCAL_SCAN_LABELS[collection.scan.local] ?? collection.scan.local}
+            </p>
+            {collection.scan.local_path ? (
+              <p className="mt-1 font-mono text-xs break-all text-muted-foreground">
+                {collection.scan.local_path}
+              </p>
+            ) : null}
+            <p className="mt-2 text-xs text-muted-foreground">
+              Nothing below is evidence that a local copy is missing — this server could not look.
+            </p>
+          </div>
+        ) : null}
+
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full min-w-[760px] text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">

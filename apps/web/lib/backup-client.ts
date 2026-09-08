@@ -59,7 +59,7 @@ export type Collection = {
   key: string
   label: string
   pushable: boolean
-  scan: { local: string; gdrive: string }
+  scan: { local: string; gdrive: string; local_path: string | null }
   counts: BackupCounts
   files: BackupFile[]
 }

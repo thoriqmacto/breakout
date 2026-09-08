@@ -275,6 +275,7 @@ export default function BackupStatusPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <LocalLocationCard
                 available={audit.locations.find((l) => l.key === "local")?.available ?? true}
+                scanStatus={audit.locations.find((l) => l.key === "local")?.scan_status ?? "ok"}
               />
               <DriveHealthCard health={audit.google_drive} />
             </div>

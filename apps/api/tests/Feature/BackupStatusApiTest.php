@@ -290,6 +290,89 @@ class BackupStatusApiTest extends TestCase
             ->assertJsonPath('data.collections.1.files.1.state', BackupStatus::GDRIVE_ONLY);
     }
 
+    /**
+     * A directory this process cannot read is not an empty directory.
+     *
+     * Every local scan returned a hardcoded 'ok', so a missing directory, one
+     * the web server user could not read, and one that was genuinely empty all
+     * produced the same output: no files, under a green light. An operator who
+     * ran a chmod to fix it saw exactly what they saw before, with nothing to
+     * say whether it had worked -- or whether, with the historical CSVs living
+     * outside the application tree under CSV_SEED_DIR, they had chmod'ed a
+     * directory this page never reads.
+     */
+    public function test_an_unreadable_local_directory_is_not_reported_as_empty(): void
+    {
+        $this->localCsv('BBCA.csv', "Date,Close\n2026-01-01,100");
+
+        // 0000: present, holding a file, and closed to everyone. Skipped as
+        // root, for whom the mode is advisory.
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            $this->markTestSkipped('root ignores directory permissions.');
+        }
+
+        chmod($this->seedDir, 0000);
+
+        try {
+            $historical = $this->historical();
+        } finally {
+            // Restored before any assertion can leave it unreadable for teardown.
+            chmod($this->seedDir, 0755);
+        }
+
+        $this->assertSame('unreadable', $historical['scan']['local']);
+
+        // And it names the directory it could not read, because a chmod on the
+        // wrong path looks identical to one that did not take.
+        $this->assertSame($this->seedDir, $historical['scan']['local_path']);
+    }
+
+    public function test_a_missing_local_directory_says_so(): void
+    {
+        config(['csv.seed_dir' => $this->seedDir.'/not-here']);
+
+        $historical = $this->historical();
+
+        $this->assertSame('missing', $historical['scan']['local']);
+        $this->assertSame([], $historical['files']);
+    }
+
+    /**
+     * The Local card is derived from the scans, not asserted.
+     */
+    public function test_the_local_location_reports_a_failed_scan(): void
+    {
+        config(['csv.seed_dir' => $this->seedDir.'/not-here']);
+
+        $response = $this->getJson('/api/v1/backup-status/audit');
+
+        if ($response->status() === 401) {
+            $response = $this->withoutMiddleware()->getJson('/api/v1/backup-status/audit');
+        }
+
+        $local = null;
+
+        foreach ($response->assertOk()->json('data.locations') as $location) {
+            if ($location['key'] === 'local') {
+                $local = $location;
+            }
+        }
+
+        $this->assertNotNull($local, 'the report has no local location');
+        $this->assertFalse($local['available']);
+        $this->assertSame('missing', $local['scan_status']);
+    }
+
+    public function test_a_readable_but_empty_directory_is_still_ok(): void
+    {
+        // The other half of the distinction: empty is a real answer, and must
+        // not be dressed up as a failure now that failures are reportable.
+        $historical = $this->historical();
+
+        $this->assertSame('ok', $historical['scan']['local']);
+        $this->assertSame([], $historical['files']);
+    }
+
     public function test_it_requires_authentication(): void
     {
         $this->getJson('/api/v1/backup-status')->assertUnauthorized();
