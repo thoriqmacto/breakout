@@ -3,6 +3,7 @@
 namespace Tests\Feature\Execution;
 
 use App\Models\Asset;
+use App\Models\BrokerSummaryWindow;
 use App\Models\Price;
 use App\Models\User;
 use App\Models\WatchlistScore;
@@ -108,6 +109,24 @@ class ExecutionCandidateTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ], $overrides));
+    }
+
+    /**
+     * Broker coverage for the signal session.
+     *
+     * Without this every row is STALE_DATA at the lifecycle level, whatever
+     * its setup -- freshness gates everything actionable. These tests ran for
+     * a long time without it, asserting only the v1 status, which is how the
+     * lifecycle filter stayed broken while the suite stayed green.
+     */
+    private function seedBrokerWindow(string $symbol, string $date): void
+    {
+        BrokerSummaryWindow::create([
+            'asset_id' => $this->assets[$symbol]->id,
+            'from_date' => $date,
+            'to_date' => $date,
+            'transaction_type' => (string) config('stockbit.defaults.transaction_type'),
+        ]);
     }
 
     private function seedScore(string $symbol, string $date, array $overrides = []): WatchlistScore
@@ -283,6 +302,7 @@ class ExecutionCandidateTest extends TestCase
 
         $this->seedFeature('AAA', $signal);
         $this->seedScore('AAA', $signal);
+        $this->seedBrokerWindow('AAA', $signal);
 
         Sanctum::actingAs(User::factory()->create());
 
@@ -290,7 +310,12 @@ class ExecutionCandidateTest extends TestCase
 
         $this->assertSame('2026-02-27', $payload['signal_date']);
         $this->assertSame('2026-03-02', $payload['next_trading_date']);
-        $this->assertSame(1, $payload['counts']['READY']);
+        // Counted on the status the interface shows. This asserted
+        // counts['READY'] -- the v1 status -- while the table rendered the
+        // lifecycle one, so the card could read 1 above a row labelled
+        // something else entirely.
+        $this->assertSame('TRIGGERED', $payload['rows'][0]['lifecycle_status']);
+        $this->assertSame(1, $payload['counts']['TRIGGERED']);
         $this->assertNotEmpty($payload['disclaimer']);
         $this->assertArrayHasKey('latest_price_date', $payload['freshness']);
         $this->assertSame('AAA', $payload['rows'][0]['symbol']);
@@ -298,7 +323,16 @@ class ExecutionCandidateTest extends TestCase
         $this->assertArrayHasKey('execution_rank', $payload['rows'][0]);
     }
 
-    public function test_status_and_score_filters_narrow_the_list(): void
+    /**
+     * Filtering by a status returns rows that show that status.
+     *
+     * Obvious enough to have gone unasserted, and it was false: the filter
+     * matched the v1 `execution_status` while the interface displayed
+     * `lifecycle_status`. Selecting READY returned a row labelled AVOID --
+     * both fields correct, describing different things -- and the seven
+     * lifecycle-only statuses could never match anything at all.
+     */
+    public function test_the_status_filter_selects_the_status_the_rows_display(): void
     {
         $dates = $this->seedSessions('AAA');
         $this->seedSessions('BBB', 500.0, 4.0);
@@ -308,16 +342,79 @@ class ExecutionCandidateTest extends TestCase
         $this->seedFeature('BBB', $signal, ['bandar_dist_hard' => true, 'valid_long_setup' => false]);
         $this->seedScore('AAA', $signal);
         $this->seedScore('BBB', $signal);
+        $this->seedBrokerWindow('AAA', $signal);
+        $this->seedBrokerWindow('BBB', $signal);
 
         $all = $this->candidates();
         $this->assertSame(2, $all['counts']['TOTAL']);
 
-        $ready = $this->candidates(['statuses' => [ExecutionStatus::READY]]);
-        $this->assertCount(1, $ready['rows']);
-        $this->assertSame('AAA', $ready['rows'][0]['symbol']);
+        // Grouped from the data rather than hardcoded, so the assertion is
+        // about the relationship between filter, counts and rows -- not about
+        // which status this fixture happens to produce.
+        $bySt = [];
 
-        // Counts describe the whole evaluated list, not the filtered view.
-        $this->assertSame(2, $ready['counts']['TOTAL']);
+        foreach ($all['rows'] as $row) {
+            $bySt[$row['lifecycle_status']][] = $row['symbol'];
+        }
+
+        $this->assertNotEmpty($bySt);
+
+        foreach ($bySt as $status => $symbols) {
+            $filtered = $this->candidates(['statuses' => [$status]]);
+
+            $this->assertCount(count($symbols), $filtered['rows'], sprintf('filtering %s returned the wrong number of rows', $status));
+
+            // Nothing comes back wearing a label the caller did not ask for.
+            foreach ($filtered['rows'] as $row) {
+                $this->assertSame($status, $row['lifecycle_status']);
+            }
+
+            // The card and the list agree about how many there are.
+            $this->assertSame(count($symbols), $filtered['counts'][$status]);
+
+            // Counts describe the whole evaluated list, not the filtered view.
+            $this->assertSame(2, $filtered['counts']['TOTAL']);
+        }
+
+        // At least one of those was a lifecycle-only status -- one the v1
+        // field can never hold, so the old filter returned an empty list for
+        // it however many rows were sitting in that state.
+        $this->assertNotEmpty(
+            array_intersect(array_keys($bySt), [
+                ExecutionStatus::ARMED,
+                ExecutionStatus::TRIGGERED,
+                ExecutionStatus::NO_CHASE,
+                ExecutionStatus::HOLD,
+                ExecutionStatus::TRAILING,
+                ExecutionStatus::EXIT,
+                ExecutionStatus::STALE_DATA,
+            ]),
+            'the fixture no longer exercises a lifecycle-only status',
+        );
+    }
+
+    /**
+     * The score filter reads the score the interface prints, not its v1 twin.
+     */
+    public function test_the_score_filter_uses_the_displayed_v2_score(): void
+    {
+        $dates = $this->seedSessions('AAA');
+        $signal = end($dates);
+
+        $this->seedFeature('AAA', $signal);
+        $this->seedScore('AAA', $signal);
+        $this->seedBrokerWindow('AAA', $signal);
+
+        $row = $this->candidates()['rows'][0];
+
+        $v2 = (float) $row['execution_score_v2'];
+        $v1 = (float) $row['execution_score'];
+
+        $this->assertNotEqualsWithDelta($v1, $v2, 0.0001, 'fixture cannot tell the two scores apart');
+
+        // A floor just under the v2 score keeps the row; just over drops it.
+        $this->assertCount(1, $this->candidates(['min_score' => $v2 - 0.5])['rows']);
+        $this->assertCount(0, $this->candidates(['min_score' => $v2 + 0.5])['rows']);
     }
 
     public function test_an_empty_universe_answers_honestly(): void

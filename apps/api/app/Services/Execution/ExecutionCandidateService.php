@@ -964,6 +964,15 @@ class ExecutionCandidateService
     }
 
     /**
+     * Counted on the lifecycle status, which is the one the interface shows.
+     *
+     * These counted `execution_status` -- the v1 status, which only ever takes
+     * WATCH, READY, AVOID or STALE -- while the table rendered
+     * `lifecycle_status`. So the READY card could read 1 above a row plainly
+     * labelled AVOID, both correct and describing different fields, and the
+     * seven lifecycle-only chips (ARMED, TRIGGERED, NO_CHASE, HOLD, TRAILING,
+     * EXIT, STALE_DATA) counted zero forever.
+     *
      * @param  array<int, array<string, mixed>>  $rows
      * @return array<string, int>
      */
@@ -973,7 +982,7 @@ class ExecutionCandidateService
         $counts['TOTAL'] = count($rows);
 
         foreach ($rows as $row) {
-            $counts[$row['execution_status']] = ($counts[$row['execution_status']] ?? 0) + 1;
+            $counts[$row['lifecycle_status']] = ($counts[$row['lifecycle_status']] ?? 0) + 1;
         }
 
         return $counts;
@@ -986,16 +995,21 @@ class ExecutionCandidateService
      */
     private function applyFilters(array $rows, array $options, float $minScore, float $minRr): array
     {
+        // Filtered on what the interface displays and sorts by: the lifecycle
+        // status and the v2 score. Filtering v1 fields while showing v2 ones
+        // made the controls look broken -- selecting a status returned rows
+        // labelled something else, and the four statuses selected by default
+        // matched nothing at all, so the workspace opened empty.
         $statuses = $options['statuses'] ?? null;
         $filterScore = $options['min_score'] ?? null;
         $filterRr = $options['min_rr'] ?? null;
 
         return array_values(array_filter($rows, static function (array $row) use ($statuses, $filterScore, $filterRr): bool {
-            if ($statuses !== null && $statuses !== [] && ! in_array($row['execution_status'], $statuses, true)) {
+            if ($statuses !== null && $statuses !== [] && ! in_array($row['lifecycle_status'], $statuses, true)) {
                 return false;
             }
 
-            if ($filterScore !== null && $row['execution_score'] < (float) $filterScore) {
+            if ($filterScore !== null && $row['execution_score_v2'] < (float) $filterScore) {
                 return false;
             }
 
