@@ -14,20 +14,26 @@ export type ExecutionStatus =
   | "STALE_DATA"
 
 /**
- * In lifecycle order, not alphabetical: a list grouped by status should read
- * as the pipeline a candidate moves through.
+ * The statuses a row can actually be shown as, in lifecycle order rather than
+ * alphabetical: a list grouped by status should read as the pipeline a
+ * candidate moves through.
+ *
+ * READY and STALE are absent deliberately. They belong to the v1
+ * `execution_status`, which the workspace neither displays nor filters on --
+ * offering them as filters would repeat the fault this list used to have,
+ * where seven of eleven chips could not match anything and quietly returned
+ * an empty table. They remain in the API type because stored history and the
+ * v1 field still use them.
  */
 export const EXECUTION_STATUSES: ExecutionStatus[] = [
   "WATCH",
   "ARMED",
   "TRIGGERED",
-  "READY",
   "NO_CHASE",
   "HOLD",
   "TRAILING",
   "EXIT",
   "AVOID",
-  "STALE",
   "STALE_DATA",
 ]
 
