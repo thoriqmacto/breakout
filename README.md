@@ -1936,6 +1936,16 @@ healthy one. An API that cannot be *reached* is not evidence against a token, an
 before: refusing on a failed check would throw away a working bearer over a bad minute on the
 network.
 
+**A session that has ended still looks signed in.** The portal ends the session server-side; the
+app goes on rendering because nothing has told it, and keeps sending the bearer it holds. From the
+page there is no difference — no login form appears — so the login is skipped and the same refused
+token is captured. `browser:token` therefore *forces* a login when you choose to sign in again
+with a password: it clears the session so the form comes back, and refuses to accept any token
+seen before that login is submitted, because the stale one is on the wire within milliseconds of
+page load and would otherwise win the race. The scheduled renewal never forces a login — it passes
+stored credentials too, and signing in nightly would trip the device check the saved profile
+exists to avoid.
+
 **The clock is not the authority.** `automation:token-check` reads the JWT's `exp` and reports
 health from it, which is the token's opinion of itself. A bearer with ten hours left on the claim
 can already be revoked. When the two disagree, the API is right.
