@@ -209,7 +209,9 @@ class StockbitTokenController extends ApiController
     private function statusFor(string $failureCode): int
     {
         return match ($failureCode) {
-            BrowserTokenExtractor::INVALID_CREDENTIALS => 422,
+            BrowserTokenExtractor::INVALID_CREDENTIALS,
+            // Also 422: the caller fixes it by signing in once with a password.
+            BrowserTokenExtractor::PROFILE_SIGNED_OUT => 422,
             BrowserTokenExtractor::TIMEOUT => 504,
             // Ours: nothing here depends on what the portal answered.
             BrowserTokenExtractor::BROWSER_LAUNCH_FAILED,

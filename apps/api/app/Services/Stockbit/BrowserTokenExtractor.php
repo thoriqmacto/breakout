@@ -28,6 +28,16 @@ class BrowserTokenExtractor
     /** Failure kinds the Node side reports, mirrored so callers can branch. */
     public const INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
 
+    /**
+     * The saved profile carries no session, and no password was offered.
+     *
+     * Distinct from INVALID_CREDENTIALS because nothing was submitted and no
+     * credential was judged. Collapsing the two told an operator whose
+     * password was never in question to go and check it -- and hid the real
+     * cause, which is that the profile this user opened was empty.
+     */
+    public const PROFILE_SIGNED_OUT = 'PROFILE_SIGNED_OUT';
+
     public const TIMEOUT = 'TIMEOUT';
 
     public const TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND';
@@ -48,6 +58,9 @@ class BrowserTokenExtractor
      */
     private const EXPLANATIONS = [
         self::INVALID_CREDENTIALS => 'The portal rejected those credentials, or asked for a second factor this cannot answer.',
+        self::PROFILE_SIGNED_OUT => 'The saved browser profile is signed out, and no password was supplied. '
+            .'Sign in once interactively to re-establish it. If another user can sign in with the same '
+            .'profile, this user cannot read it -- see "Being a device the portal recognises".',
         self::TIMEOUT => 'The login did not finish in time. The portal may be slow or unreachable from this server.',
         self::TOKEN_NOT_FOUND => 'Signed in, but no bearer token was seen. The portal may name its token differently; check BROWSER_AUTH_TOKEN_KEYS.',
         self::BROWSER_LAUNCH_FAILED => 'Chromium could not start on this server. Install it, or point BROWSER_AUTH_CHROMIUM_PATH at an existing one.',
