@@ -262,7 +262,18 @@ class ScheduledTaskRunner
                 'trigger' => $run->trigger,
             ]);
 
-            $exitCode = Artisan::call((string) $task->command, $parameters, $buffer);
+            // Artisan::call() builds an ArrayInput, which reports itself as
+            // interactive because nothing has told it otherwise -- there is no
+            // TTY detection on this path the way there is for a real console
+            // run. A command that asks a question then blocks on a stream that
+            // will never answer, which is how a nightly scrape came to sit at
+            // "Enter new Stockbit bearer token" with nobody at the keyboard.
+            // Nothing running on a schedule may prompt, so say so explicitly.
+            $exitCode = Artisan::call(
+                (string) $task->command,
+                $parameters + ['--no-interaction' => true],
+                $buffer,
+            );
         } catch (Throwable $exception) {
             $exitCode = 1;
             $error = $exception->getMessage();

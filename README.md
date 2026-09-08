@@ -1917,6 +1917,22 @@ at every previous step:
 `automation:token-refresh` renews the bearer on a schedule, so a token that expires overnight
 does not take the morning's scrape with it.
 
+**A scrape also renews for itself when the portal says no.** The scheduled renewal decides on the
+clock — missing, expired, or inside the renewal window — and a token can stop working long before
+its `exp` says it should: revoked, rotated, or bound to a session the portal ended. Then the
+refresh job looks at the expiry, calls the token healthy, and goes back to sleep, and the first
+thing to learn otherwise is whichever scrape gets the 401, hours later, part-way through the
+universe. So a 401 mid-scrape triggers one headless renewal and the run carries on. Once per run,
+not once per rejected request: a portal that refuses a freshly issued token will refuse the next
+one, and a browser launch per ticker is both slow and conspicuous.
+
+**Nothing running on a schedule may prompt.** `Artisan::call()` builds an input that reports
+itself as interactive — there is no TTY detection on that path — so a command guarding a prompt
+with `$this->input->isInteractive()` prompts anyway under the scheduler, and then blocks on a
+stream that will never answer. That is how a nightly scrape came to sit at `Enter new Stockbit
+bearer token` with nobody at the keyboard, and be recorded as failed. The dispatcher now passes
+`--no-interaction` explicitly, and a test asserts it.
+
 **With a saved profile, no password is stored at all.** The renewal opens the app through the
 existing session and takes the token the app is already using; it never touches the login form.
 That is strictly better than stored credentials — what a stolen disk gives up is then a session
