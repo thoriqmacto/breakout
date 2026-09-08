@@ -210,6 +210,40 @@ class BrowserTokenEvidenceTest extends TestCase
         );
     }
 
+    /**
+     * A timeout is the failure that most needs the evidence, and had none.
+     *
+     * TIMEOUT and NAVIGATION_FAILED were raised without any of what had been
+     * gathered, so the one message that means "I cannot tell you what
+     * happened" was also the one that arrived with nothing attached -- no
+     * landing page, no screenshot, nothing to look at. The operator was left
+     * re-running it and hoping for a different code.
+     */
+    public function test_a_timeout_carries_its_evidence_and_its_screenshot(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TIMEOUT',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 88,
+                'hosts' => ['stockbit.com'],
+                'landed_url' => 'https://portal.example.test/captcha',
+                'title' => 'Confirm you are human',
+                'screenshot' => '/tmp/browser-token-20260907-101500.png',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('TIMEOUT')
+            // The three that turn "it timed out" into something answerable.
+            ->expectsOutputToContain('/captcha')
+            ->expectsOutputToContain('Confirm you are human')
+            ->expectsOutputToContain('browser-token-20260907-101500.png')
+            ->assertFailed();
+    }
+
     public function test_the_password_never_appears_in_the_diagnosis(): void
     {
         $exception = $this->failureFor((string) json_encode([

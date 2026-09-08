@@ -115,8 +115,14 @@ return [
     | side allows a little more so the child reports its own failure rather
     | than being killed mid-sentence -- a killed child produces no JSON, and
     | "no output" is a much worse diagnostic than "TIMEOUT".
+    |
+    | Generous by default because a portal with a device check spends real time
+    | between accepting a password and showing the app, and the run has to
+    | outlast that: page load, the wait for the form to go, a redirect, and
+    | then the search for the token. Too short does not fail faster in any
+    | useful sense -- it fails as a timeout, which says nothing about why.
     */
-    'timeout_seconds' => (int) env('BROWSER_AUTH_TIMEOUT_SECONDS', 60),
+    'timeout_seconds' => (int) env('BROWSER_AUTH_TIMEOUT_SECONDS', 150),
 
     /*
     | Where the token may be found in a response body, and which paths are

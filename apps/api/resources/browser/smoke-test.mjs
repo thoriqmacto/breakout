@@ -13,6 +13,7 @@
 
 import { createServer } from 'node:http'
 import { mkdtemp, rm } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -869,6 +870,135 @@ console.log('a login that takes its time:')
     })
   } finally {
     server.close()
+  }
+}
+
+/**
+ * The run must finish inside its own budget, and photograph the page on its
+ * way out.
+ *
+ * The waits in this module were written as fixed intervals and then added up:
+ * a 25-second form poll, two 8-second settles and a 10-second redirect wait,
+ * on top of a 30-second navigation. Against a 55-second budget the parent
+ * process killed the child mid-run, which reads as a portal timeout and takes
+ * the diagnostic screenshot -- the one thing that would have explained it --
+ * with it. So the budget is asserted here, not assumed.
+ *
+ * A post-login page is configured deliberately: without one the redirect wait
+ * and the second settle never run, and a version of this scenario that omits
+ * it passes against the very code it is meant to catch.
+ */
+console.log('a run that will not find a token, against its own budget:')
+
+{
+  const { server, port } = await startPortal('quiet')
+  const shotDir = await mkdtemp(join(tmpdir(), 'browser-shot-'))
+  const shot = join(shotDir, 'page.png')
+
+  try {
+    await check('it gives up within its budget and leaves a picture behind', async () => {
+      const budgetMs = 12_000
+      const startedAt = Date.now()
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/slow-login`,
+          postLoginUrl: `http://127.0.0.1:${port}/app`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: {
+            username: 'input[name="username"]',
+            password: 'input[name="password"]',
+            submit: 'button[type="submit"]',
+          },
+          timeoutMs: budgetMs,
+          screenshotPath: shot,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      const elapsed = Date.now() - startedAt
+
+      expect(error !== null, 'this fixture yields no token, so it must fail')
+
+      // Launching a browser is not free, so this is not a tight bound -- it
+      // is the bound that separates waits measured against the budget from
+      // waits that ignore it and run to roughly three times its length.
+      expect(
+        elapsed < budgetMs + 10_000,
+        `the run took ${elapsed}ms against a ${budgetMs}ms budget`,
+      )
+
+      expect(existsSync(shot), 'no screenshot was written')
+      expect(
+        error.evidence?.screenshot === shot,
+        `the evidence did not name the screenshot: ${error.evidence?.screenshot}`,
+      )
+    })
+  } finally {
+    server.close()
+    await rm(shotDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * The picture matters most on the path least likely to produce one.
+ *
+ * A screenshot taken at the ordinary "found nothing" exit is not reached when
+ * the run unwinds through an exception, which is exactly what a portal that
+ * never answers does -- so the failure that most needs a photograph was the
+ * one failure that never had one.
+ */
+console.log('a run that falls over rather than finishing:')
+
+{
+  const shotDir = await mkdtemp(join(tmpdir(), 'browser-shot-'))
+  const shot = join(shotDir, 'page.png')
+
+  // A port that was listening a moment ago and is not now: the connection is
+  // refused, which is what an unreachable portal actually looks like. A
+  // reserved low port would be refused by the browser before it ever tried.
+  const { server: closed, port: deadPort } = await startPortal('quiet')
+  closed.close()
+
+  try {
+    await check('a navigation failure still leaves a picture and its evidence', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${deadPort}/login`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: {
+            username: 'input[name="username"]',
+            password: 'input[name="password"]',
+            submit: 'button[type="submit"]',
+          },
+          timeoutMs: 15_000,
+          navigationTimeoutMs: 5_000,
+          screenshotPath: shot,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'an unreachable portal must fail')
+      expect(
+        error.code === ExtractionError.NAVIGATION_FAILED || error.code === ExtractionError.TIMEOUT,
+        `expected a navigation failure or a timeout, got ${error.code}`,
+      )
+
+      expect(existsSync(shot), 'the failing path wrote no screenshot')
+      expect(
+        error.evidence !== undefined,
+        'the failing path carried no evidence at all',
+      )
+    })
+  } finally {
+    await rm(shotDir, { recursive: true, force: true })
   }
 }
 
