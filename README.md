@@ -1865,34 +1865,48 @@ twice**. Each run launched a fresh browser and threw it away: new cookies, new s
 identity. Every run was a different device, forever.
 
 ```dotenv
-# Written by both the CLI user and the web server user, so it lives outside
-# either home directory.
+# Outside either user's home directory -- see the ownership note below.
 BROWSER_AUTH_PROFILE_DIR=/var/lib/breakout/browser-profile
 ```
 
+> **One profile, one Unix user.** Do not try to share it between the deploy user and `www-data`.
+> Chromium writes its profile files mode `0600`; `chgrp` and `chmod -R g+rwXs` fix what is there
+> now, but every subsequent run creates new files the *other* user cannot read — setgid propagates
+> the group, never the mode. The result is not an error: the second user silently gets an **empty
+> profile**, and the run reports `PROFILE_SIGNED_OUT` with `0 cookie(s), 0 web storage key(s)`.
+>
+> Pick the user that will actually run the renewals — `www-data` if the dashboard endpoint or a
+> `www-data` scheduler is doing it — and establish the profile **as that user**:
+>
+> ```bash
+> sudo mkdir -p /var/lib/breakout/browser-profile
+> sudo chown -R www-data:www-data /var/lib/breakout/browser-profile
+> sudo chmod 700 /var/lib/breakout/browser-profile
+> ```
+
+Then sign in **once** as that user, approve the device through the portal's own notification, and
+check that the session persisted:
+
 ```bash
-sudo mkdir -p /var/lib/breakout/browser-profile
-sudo chgrp -R www-data /var/lib/breakout/browser-profile
-sudo chmod -R g+rwXs /var/lib/breakout/browser-profile
+# signs in; approve the device when the portal asks
+sudo -u www-data php artisan browser:token --dry-run
+
+# no password at all: proves the profile carried the session
+sudo -u www-data php artisan browser:token --session --dry-run
 ```
 
-Then sign in **once**, approve the device through the portal's own notification, and check that
-the session persisted:
-
-```bash
-php artisan browser:token --dry-run     # signs in; approve the device when the portal asks
-php artisan browser:token --session     # no password: proves the profile carried the session
-```
-
-The second command is the one that matters. It supplies no credentials at all — if it captures a
-token, the profile is trusted and every later run can do the same.
+The second command is the one that matters. It supplies no credentials — if it captures a token,
+the profile is trusted and every later run as that user can do the same. Run it as the *wrong*
+user and it fails with `PROFILE_SIGNED_OUT`, which names the profile rather than blaming a
+password that was never supplied.
 
 This is the front door, not a way around it: the device becomes trusted through the portal's
 approval flow rather than by pretending to be a browser it is not. Whether a portal's terms permit
 automated access at all is a question for its terms, not for this README.
 
-`browser:check` reports the profile and whether the user running it can write there — the two
-users differing is the failure this feature has produced at every previous step:
+`browser:check` reports the profile and whether the user running it can write there. Run it as
+the user that owns the profile — the two users differing is the failure this feature has produced
+at every previous step:
 
 ```
  ok  profile        /var/lib/breakout/browser-profile (writable by www-data)

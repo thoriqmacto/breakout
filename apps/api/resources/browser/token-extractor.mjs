@@ -27,6 +27,11 @@ export const ExtractionError = {
   NAVIGATION_FAILED: 'NAVIGATION_FAILED',
   SELECTOR_NOT_FOUND: 'SELECTOR_NOT_FOUND',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  // The saved profile has no session and no password was offered. Its own
+  // code because the fix is not the one INVALID_CREDENTIALS implies: nothing
+  // was submitted and no credential was judged, so sending the operator to
+  // check a password wastes the round.
+  PROFILE_SIGNED_OUT: 'PROFILE_SIGNED_OUT',
   TIMEOUT: 'TIMEOUT',
   TOKEN_NOT_FOUND: 'TOKEN_NOT_FOUND',
 }
@@ -733,7 +738,7 @@ export async function extractBearerToken(options) {
     if (loginFormPresent) {
       if (typeof username !== 'string' || username === '' || typeof password !== 'string' || password === '') {
         throw new TokenExtractionError(
-          ExtractionError.INVALID_CREDENTIALS,
+          ExtractionError.PROFILE_SIGNED_OUT,
           'The portal is asking for a login and no credentials were supplied. The saved '
             + 'profile is signed out: run this once with credentials to sign in again.',
           { evidence: summariseEvidence(evidence) },

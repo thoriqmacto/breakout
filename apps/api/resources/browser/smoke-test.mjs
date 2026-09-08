@@ -818,6 +818,36 @@ console.log('a portal that recognises a device it has seen before:')
 
       expect(result.token === FAKE_JWT, 'the saved profile did not carry the session')
     })
+
+    await check('an empty profile with no password says so, not "wrong credentials"', async () => {
+      // A different directory: the same run this feature makes when the
+      // profile it opens is not the one that was signed in. On the server
+      // that is the web server user opening a profile written by the deploy
+      // user and finding nothing it can read -- and the answer it got was
+      // that the portal had rejected credentials, when none were supplied
+      // and nothing was ever submitted.
+      const emptyProfile = await mkdtemp(join(tmpdir(), 'browser-auth-empty-'))
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/trusted-login`,
+          selectors: SELECTORS_TRUSTED,
+          profileDir: emptyProfile,
+          timeoutMs: 15_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      } finally {
+        await rm(emptyProfile, { recursive: true, force: true })
+      }
+
+      expect(error !== null, 'an empty profile with no password must fail')
+      expect(
+        error.code === ExtractionError.PROFILE_SIGNED_OUT,
+        `expected PROFILE_SIGNED_OUT, got ${error.code}: ${error.message}`,
+      )
+    })
   } finally {
     server.close()
     await rm(profileDir, { recursive: true, force: true })

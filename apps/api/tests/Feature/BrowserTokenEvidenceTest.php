@@ -244,6 +244,44 @@ class BrowserTokenEvidenceTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * "Wrong password" is the wrong answer when no password was offered.
+     *
+     * `--session` supplies no credentials by design. When the profile it opens
+     * carries no session, nothing is submitted and nothing is judged -- but
+     * both outcomes were coded INVALID_CREDENTIALS, so the canned explanation
+     * for that code replaced the child's accurate message and sent the
+     * operator to check a password that was never in question. The real cause
+     * is the profile: on a server, usually one user reading a profile another
+     * user wrote.
+     */
+    public function test_an_empty_profile_is_not_reported_as_a_bad_password(): void
+    {
+        $exception = $this->failureFor((string) json_encode([
+            'ok' => false,
+            'code' => 'PROFILE_SIGNED_OUT',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 172,
+                'authorization_headers' => 0,
+                'storage_keys' => 0,
+                'cookies' => 0,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => false,
+            ],
+        ]));
+
+        $this->assertSame(BrowserTokenExtractor::PROFILE_SIGNED_OUT, $exception->failureCode);
+
+        $message = $exception->getMessage();
+
+        $this->assertStringContainsString('signed out', $message);
+        // The distinction the whole code exists to draw.
+        $this->assertStringNotContainsString('rejected those credentials', $message);
+        // And the server-shaped cause, which is what it actually was.
+        $this->assertStringContainsString('cannot read it', $message);
+    }
+
     public function test_the_password_never_appears_in_the_diagnosis(): void
     {
         $exception = $this->failureFor((string) json_encode([
