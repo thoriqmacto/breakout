@@ -7,6 +7,7 @@ use App\Services\AssetProfileUpdater;
 use App\Services\CsvBars;
 use App\Services\CsvUtilities;
 use App\Services\DbBars;
+use App\Services\Stockbit\StockbitTokenRenewer;
 use App\Services\Stockbit\StockbitTokenResolver;
 use App\Services\StockbitExodusClient;
 use App\Support\AssetList;
@@ -46,6 +47,14 @@ class ScrapeStockbit extends Command
     private array $assetIds = [];
 
     private bool $abortDueToUnauthorized = false;
+
+    /**
+     * Renewal is tried once per run, not once per rejected request.
+     *
+     * A portal that refuses a freshly issued token will refuse the next one,
+     * and a browser launch per ticker is both slow and conspicuous.
+     */
+    private bool $attemptedAutomaticRenewal = false;
 
     /**
      * Symbols whose seed CSV this run rewrote, mirrored once at the end.
@@ -1196,6 +1205,22 @@ class ScrapeStockbit extends Command
         return null;
     }
 
+    /**
+     * Recover from a 401 in the middle of a scrape.
+     *
+     * A rejected token is not the same thing as an expired one, and that
+     * distinction is the whole reason this exists. `automation:token-refresh`
+     * renews on the clock -- missing, expired, or inside the renewal window --
+     * so a token the portal has revoked, rotated, or unbound from its session
+     * still reads as healthy and is left alone. The scrape is the first thing
+     * to learn otherwise, hours later, in the middle of 55 tickers.
+     *
+     * So it renews here and carries on. Before this, the two outcomes were an
+     * abort telling the operator to go and paste a token, or -- when the input
+     * looked interactive, which it does under Artisan::call() -- a password
+     * prompt in a scheduled job that nobody was there to answer, which is how
+     * a nightly run came to sit waiting for a keystroke until it failed.
+     */
     private function refreshBearerIfUnauthorized(
         array $response,
         StockbitExodusClient $api,
@@ -1207,8 +1232,44 @@ class ScrapeStockbit extends Command
 
         $this->warn('Stockbit bearer token rejected (401).');
 
+        // Once per run. A portal that rejects a freshly issued token rejects
+        // the next one too, and a browser launch per ticker across 55 tickers
+        // is a way to be noticed.
+        if (! $this->attemptedAutomaticRenewal) {
+            $this->attemptedAutomaticRenewal = true;
+
+            /** @var StockbitTokenRenewer $renewer */
+            $renewer = app(StockbitTokenRenewer::class);
+
+            if ($renewer->available()) {
+                $this->line('Renewing it with a headless login…');
+
+                $renewal = $renewer->renew();
+
+                if ($renewal['renewed'] === true) {
+                    $api->setBearer((string) $renewal['token']);
+
+                    $expiry = StockbitExodusClient::jwtExpiresAt((string) $renewal['token']);
+
+                    $this->info(sprintf(
+                        'Renewed from %s in %.1fs%s. Continuing.',
+                        $renewal['source'],
+                        ($renewal['elapsed_ms'] ?? 0) / 1000,
+                        $expiry ? ', valid to '.$expiry->format('Y-m-d H:i:s T') : '',
+                    ));
+
+                    return true;
+                }
+
+                // Said once, with the extractor's own already-redacted reason,
+                // then the run falls through to the paths below.
+                $this->warn((string) $renewal['message']);
+            }
+        }
+
         if (! $this->input->isInteractive()) {
-            $this->error('STOCKBIT_BEARER is invalid. Refresh via "php artisan stockbit:token:set" or run interactively.');
+            $this->error('STOCKBIT_BEARER is invalid and could not be renewed automatically. '
+                .'Run "php artisan browser:token --session" or "php artisan stockbit:token:set".');
             $this->abortDueToUnauthorized = true;
 
             return false;

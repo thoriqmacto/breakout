@@ -6,9 +6,7 @@ use App\Models\AutomationAlert;
 use App\Services\Automation\AutomationAlerts;
 use App\Services\Automation\RunMetadata;
 use App\Services\Automation\StockbitTokenHealth;
-use App\Services\Stockbit\BrowserTokenExtractionException;
-use App\Services\Stockbit\BrowserTokenExtractor;
-use App\Services\Stockbit\StockbitTokenResolver;
+use App\Services\Stockbit\StockbitTokenRenewer;
 use App\Support\StockbitCredentialStore;
 use Illuminate\Console\Command;
 
@@ -45,8 +43,7 @@ class TokenRefreshCommand extends Command
     public function handle(
         StockbitTokenHealth $health,
         StockbitCredentialStore $credentials,
-        BrowserTokenExtractor $extractor,
-        StockbitTokenResolver $resolver,
+        StockbitTokenRenewer $renewer,
         AutomationAlerts $alerts,
         RunMetadata $metadata,
     ): int {
@@ -71,53 +68,22 @@ class TokenRefreshCommand extends Command
             return self::SUCCESS;
         }
 
-        if (! $extractor->enabled()) {
+        // One implementation of "sign in and store the bearer", shared with
+        // the 401 recovery inside a scrape. The scheduled renewal runs on the
+        // clock and cannot know a token died early; the scrape finds that out
+        // and needs the same machinery.
+        $result = $renewer->renew();
+
+        $metadata->merge(['profile' => $result['used_profile']]);
+
+        if (! $result['renewed']) {
             return $this->standDown(
                 $alerts,
                 $metadata,
-                'not_configured',
-                'Headless login is switched off, so the token cannot be renewed automatically. '
-                .'Set BROWSER_AUTH_ENABLED and BROWSER_AUTH_LOGIN_URL, or renew by hand.',
+                (string) $result['reason'],
+                (string) $result['message'],
             );
         }
-
-        // A saved profile that is still signed in needs no password at all,
-        // which is the better arrangement by some distance: the thing a
-        // stolen disk gives up is then a session that can be revoked, not a
-        // password that cannot.
-        $hasProfile = $this->hasProfile($extractor);
-
-        if ($stored === null && ! $hasProfile) {
-            return $this->standDown(
-                $alerts,
-                $metadata,
-                'no_credentials',
-                $credentials->exists()
-                    ? 'Stored credentials could not be decrypted with this APP_KEY. Run '
-                        .'`php artisan stockbit:credentials` to replace them.'
-                    : 'No saved browser profile and no stored credentials, so the token cannot be '
-                        .'renewed automatically. Set BROWSER_AUTH_PROFILE_DIR and sign in once, or '
-                        .'run `php artisan stockbit:credentials`.',
-            );
-        }
-
-        $metadata->merge(['profile' => $hasProfile]);
-
-        try {
-            $result = $extractor->extract($stored['username'] ?? null, $stored['password'] ?? null);
-        } catch (BrowserTokenExtractionException $exception) {
-            // The extractor's message is already redacted and already says
-            // what to do about each failure kind, so it is carried through
-            // rather than replaced with something vaguer.
-            return $this->standDown(
-                $alerts,
-                $metadata,
-                $exception->failureCode,
-                'Automatic renewal failed: '.$exception->getMessage(),
-            );
-        }
-
-        $resolver->persist($result['token']);
 
         $after = $health->status($window);
 
@@ -143,22 +109,6 @@ class TokenRefreshCommand extends Command
         ));
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Is there a saved profile to sign in through?
-     *
-     * A misconfigured directory throws rather than answering, and that is not
-     * this method's business to report -- the extraction will raise it with
-     * the path and the user in the message.
-     */
-    private function hasProfile(BrowserTokenExtractor $extractor): bool
-    {
-        try {
-            return $extractor->profileDir() !== null;
-        } catch (BrowserTokenExtractionException) {
-            return false;
-        }
     }
 
     /**

@@ -74,6 +74,41 @@ class SchedulerDispatchTest extends TestCase
         return Carbon::parse($date.' 09:00:00', 'UTC');
     }
 
+    /**
+     * A scheduled run must never be able to ask a question.
+     *
+     * Artisan::call() builds an ArrayInput, which reports itself as
+     * interactive because nothing on that path detects a TTY. So a command
+     * guarding its prompt with `$this->input->isInteractive()` prompts anyway
+     * under the scheduler, and then blocks on a stream that will never answer
+     * -- which is how a nightly scrape came to sit at "Enter new Stockbit
+     * bearer token" with nobody at the keyboard, and be recorded as failed.
+     */
+    public function test_a_scheduled_run_is_never_interactive(): void
+    {
+        $seen = null;
+
+        Artisan::command('automation:test-interactivity', function () use (&$seen) {
+            $seen = $this->input->isInteractive();
+
+            return 0;
+        })->purpose('Test-only interactivity probe.');
+
+        config(['automation.commands.automation:test-interactivity' => [
+            'label' => 'Interactivity probe',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [],
+        ]]);
+
+        $this->task(['command' => 'automation:test-interactivity']);
+
+        app(SchedulerDispatcher::class)->dispatch($this->sixteenHundredWib());
+
+        $this->assertNotNull($seen, 'the probe command never ran');
+        $this->assertFalse($seen, 'a scheduled run was interactive, so a command could prompt');
+    }
+
     public function test_an_enabled_due_task_runs(): void
     {
         $task = $this->task();
