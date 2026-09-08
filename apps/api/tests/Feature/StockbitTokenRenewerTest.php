@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Services\Stockbit\BrowserTokenExtractionException;
 use App\Services\Stockbit\BrowserTokenExtractor;
 use App\Services\Stockbit\StockbitTokenRenewer;
+use App\Services\Stockbit\StockbitTokenVerifier;
 use App\Support\StockbitCredentialStore;
 use App\Support\StockbitTokenStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,6 +33,18 @@ class StockbitTokenRenewerTest extends TestCase
         app(StockbitCredentialStore::class)->forget();
 
         config(['browser_auth.enabled' => true, 'browser_auth.login_url' => 'https://portal.test/login']);
+
+        // Verification has its own tests; these are about renewal. Without a
+        // stub the verifier makes a live call, and the suite then reports
+        // whether the machine running it happens to reach the portal -- it
+        // stored the token on a sandbox with no route out and refused it on a
+        // CI runner with one, from identical code.
+        $this->mock(StockbitTokenVerifier::class, function ($mock) {
+            $mock->shouldReceive('verify')->andReturn([
+                'status' => StockbitTokenVerifier::OK,
+                'message' => null,
+            ])->byDefault();
+        });
     }
 
     protected function tearDown(): void
@@ -81,6 +94,76 @@ class StockbitTokenRenewerTest extends TestCase
         $this->assertSame($token, $result['token']);
 
         // Persisted, not merely returned: the next command reads the store.
+        $this->assertSame($token, app(StockbitTokenStore::class)->get());
+    }
+
+    /**
+     * A captured token the API refuses is not stored, and not called renewed.
+     *
+     * This is the loop that made the outage self-sustaining. The extractor
+     * reads the bearer off a request header -- before any response exists to
+     * say the request was rejected -- so a profile whose session had ended
+     * kept handing back the same dead token, which was stored, used, refused,
+     * and "renewed" into itself again. Same fingerprint every time, with every
+     * layer reporting success.
+     */
+    public function test_a_token_the_api_refuses_is_not_stored(): void
+    {
+        $dead = $this->jwt(time() + 36000);
+
+        // Still hours from expiry: the clock says healthy, the server does not.
+        $this->mock(BrowserTokenExtractor::class, function ($mock) use ($dead) {
+            $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andReturn('/var/lib/breakout/browser-profile');
+            $mock->shouldReceive('extract')
+                ->andReturn(['token' => $dead, 'source' => 'request-header', 'elapsed_ms' => 4900]);
+        });
+
+        $this->mock(StockbitTokenVerifier::class, function ($mock) {
+            $mock->shouldReceive('verify')->andReturn([
+                'status' => StockbitTokenVerifier::REJECTED,
+                'message' => 'The portal refused this token.',
+            ]);
+        });
+
+        $result = app(StockbitTokenRenewer::class)->renew();
+
+        $this->assertFalse($result['renewed']);
+        $this->assertSame(StockbitTokenRenewer::REJECTED_BY_API, $result['reason']);
+
+        // The point of the whole check: nothing known-broken reaches the store,
+        // where it would overwrite whatever was there and be used all night.
+        $this->assertNull(app(StockbitTokenStore::class)->get());
+    }
+
+    /**
+     * An unreachable API is not evidence against a token.
+     *
+     * Refusing to store on a failed check would discard a working bearer every
+     * time the network had a bad minute -- a worse failure than the one the
+     * check exists to prevent, and a harder one to diagnose.
+     */
+    public function test_a_verification_that_could_not_run_still_stores(): void
+    {
+        $token = $this->jwt(time() + 36000);
+
+        $this->mock(BrowserTokenExtractor::class, function ($mock) use ($token) {
+            $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andReturn('/var/lib/breakout/browser-profile');
+            $mock->shouldReceive('extract')
+                ->andReturn(['token' => $token, 'source' => 'request-header', 'elapsed_ms' => 4900]);
+        });
+
+        $this->mock(StockbitTokenVerifier::class, function ($mock) {
+            $mock->shouldReceive('verify')->andReturn([
+                'status' => StockbitTokenVerifier::UNKNOWN,
+                'message' => 'Could not verify the token (network_error).',
+            ]);
+        });
+
+        $result = app(StockbitTokenRenewer::class)->renew();
+
+        $this->assertTrue($result['renewed']);
         $this->assertSame($token, app(StockbitTokenStore::class)->get());
     }
 

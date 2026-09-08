@@ -1926,6 +1926,20 @@ universe. So a 401 mid-scrape triggers one headless renewal and the run carries 
 not once per rejected request: a portal that refuses a freshly issued token will refuse the next
 one, and a browser launch per ticker is both slow and conspicuous.
 
+**A captured token is proven before it is trusted.** The extractor reads the bearer off a request
+header, and that happens *before* any response exists to say the request was refused. So a profile
+whose session has ended keeps handing back the same dead token: captured, stored, used, rejected,
+"renewed" into itself again — the same fingerprint every time, with every layer reporting success.
+One cheap authenticated call settles it. A token the API refuses is never stored and never counted
+as a renewal, and `browser:token` prints an `accepted` line so a dead capture cannot look like a
+healthy one. An API that cannot be *reached* is not evidence against a token, and is stored as
+before: refusing on a failed check would throw away a working bearer over a bad minute on the
+network.
+
+**The clock is not the authority.** `automation:token-check` reads the JWT's `exp` and reports
+health from it, which is the token's opinion of itself. A bearer with ten hours left on the claim
+can already be revoked. When the two disagree, the API is right.
+
 **Nothing running on a schedule may prompt.** `Artisan::call()` builds an input that reports
 itself as interactive — there is no TTY detection on that path — so a command guarding a prompt
 with `$this->input->isInteractive()` prompts anyway under the scheduler, and then blocks on a

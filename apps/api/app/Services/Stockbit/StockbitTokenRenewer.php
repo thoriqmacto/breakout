@@ -32,10 +32,23 @@ class StockbitTokenRenewer
     /** The browser ran and did not come back with a token. */
     public const EXTRACTION_FAILED = 'extraction_failed';
 
+    /**
+     * A token was captured and the API refused it.
+     *
+     * The important case, and the one that used to be invisible. The extractor
+     * reads the bearer off a request header, which happens before any response
+     * exists to say the request was rejected -- so a profile whose session has
+     * ended keeps handing over the same dead token, and every layer above
+     * reports a successful renewal. Storing it overwrites whatever was there
+     * with something known not to work.
+     */
+    public const REJECTED_BY_API = 'rejected_by_api';
+
     public function __construct(
         private readonly BrowserTokenExtractor $extractor,
         private readonly StockbitCredentialStore $credentials,
         private readonly StockbitTokenResolver $resolver,
+        private readonly StockbitTokenVerifier $verifier,
     ) {}
 
     /**
@@ -111,6 +124,22 @@ class StockbitTokenRenewer
             );
         }
 
+        // Proven before it is trusted. A captured token is a token the app was
+        // sending, not necessarily one the API still accepts, and the two stop
+        // being the same thing the moment a session ends.
+        $verification = $this->verifier->verify($result['token']);
+
+        if ($verification['status'] === StockbitTokenVerifier::REJECTED) {
+            return $this->refused(
+                self::REJECTED_BY_API,
+                (string) $verification['message'],
+                $usedProfile,
+            );
+        }
+
+        // An unreachable API is not evidence against the token: storing it is
+        // the same decision as before this check existed, and refusing it
+        // would throw away a working bearer over a bad minute on the network.
         $this->resolver->persist($result['token']);
 
         return [
