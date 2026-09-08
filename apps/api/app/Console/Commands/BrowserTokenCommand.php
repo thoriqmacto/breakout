@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\Stockbit\BrowserTokenExtractionException;
 use App\Services\Stockbit\BrowserTokenExtractor;
 use App\Services\Stockbit\StockbitTokenResolver;
+use App\Services\Stockbit\StockbitTokenVerifier;
 use App\Support\StockbitCredentialStore;
 use Illuminate\Console\Command;
 
@@ -38,6 +39,7 @@ class BrowserTokenCommand extends Command
         BrowserTokenExtractor $extractor,
         StockbitCredentialStore $credentials,
         StockbitTokenResolver $resolver,
+        StockbitTokenVerifier $verifier,
     ): int {
         if (! $extractor->enabled()) {
             $this->error('Headless login is switched off. Set BROWSER_AUTH_ENABLED=true and BROWSER_AUTH_LOGIN_URL.');
@@ -93,6 +95,25 @@ class BrowserTokenCommand extends Command
         if ($sessionOnly) {
             $this->line('  signed in    from the saved profile, with no password');
         }
+
+        // Captured is not the same as accepted. The extractor reads the bearer
+        // off a request header, which happens before any response exists to
+        // say the request was refused -- so a profile whose session has ended
+        // hands back the same dead token every time, and this command reported
+        // it as a successful capture on each of them.
+        $verification = $verifier->verify($result['token']);
+
+        if ($verification['status'] === StockbitTokenVerifier::REJECTED) {
+            $this->line('  accepted     <fg=red>no -- the portal refused it</>');
+            $this->newLine();
+            $this->error((string) $verification['message']);
+
+            return self::FAILURE;
+        }
+
+        $this->line($verification['status'] === StockbitTokenVerifier::OK
+            ? '  accepted     yes, checked against the API'
+            : '  accepted     unknown -- '.$verification['message']);
 
         if ($this->option('dry-run')) {
             $this->newLine();

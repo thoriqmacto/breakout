@@ -32,6 +32,13 @@ return [
         'max_window_staleness_days' => env('SB_MAX_WINDOW_STALENESS_DAYS', 7),
     ],
 
+    /*
+     * The symbol one cheap authenticated call asks about, to find out whether
+     * a token actually works. A JWT's own expiry is its opinion of itself; the
+     * only authority on whether a bearer is accepted is the API.
+     */
+    'verify_symbol' => env('SB_VERIFY_SYMBOL', 'BBCA'),
+
     'watchlist' => [
         'id' => env('SB_WATCHLIST_ID', 808507),
         'query' => [
