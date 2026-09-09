@@ -81,8 +81,9 @@ export function StockbitTokenCard({
           <KeyRound className="size-4" aria-hidden /> Stockbit token
         </CardTitle>
         <CardDescription>
-          Scheduled scraping stops when this expires. Stockbit tokens cannot be renewed
-          automatically, so paste a fresh one here when the reminder asks.
+          Scheduled scraping stops when this expires. The hourly renewal signs in with the
+          saved browser profile and replaces it before that happens, so paste one here only
+          when the reminder says the renewal could not.
         </CardDescription>
       </CardHeader>
 
