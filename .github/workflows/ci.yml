@@ -97,10 +97,15 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Fails only on a new critical advisory. The repository currently carries
-      # 3 high advisories that cannot clear without the semver-major next@16
-      # upgrade, so gating on "high" here would be permanently red and would
-      # teach everyone to ignore this job.
+      # Fails only on a new critical advisory. What remains below that line is
+      # postcss, reachable only through next's own copy of it, and it cannot
+      # clear without the semver-major next@16 upgrade -- so gating on "high"
+      # here would be permanently red and would teach everyone to ignore this
+      # job.
+      #
+      # This step reads the live advisory database, so it can turn red on a
+      # commit that has not changed: a critical published against next did
+      # exactly that, hours after the same tree passed. That is the job working.
       - name: Audit dependencies
         run: npm audit --audit-level=critical
 
