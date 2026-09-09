@@ -84,6 +84,10 @@ class DataReconcileStatusCommand extends Command
         $this->line('  <fg=gray>absolute</>    '.($this->absolutePath($store, $path) ?? '—'));
         $this->line('  <fg=gray>ownership</>   '.$this->ownership($store, $path));
         $this->components->twoColumnDetail('  size', $this->bytes($store->size($path)));
+        // line(), not twoColumnDetail: this message is a sentence, and the
+        // column formatter truncates to the terminal width -- which silently
+        // ate the half that names the user who cannot write.
+        $this->line('  <fg=gray>directory</>   '.$this->directoryState($store));
         $this->components->twoColumnDetail('  generated at', (string) ($reconciliation['generated_at'] ?? '—'));
         $this->components->twoColumnDetail('  market date', (string) ($reconciliation['market_date'] ?? '—'));
 
@@ -152,6 +156,37 @@ class DataReconcileStatusCommand extends Command
         }
 
         return $status === 'not_ready' ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * Whether a rebuild could even write here.
+     *
+     * Reporting only on the manifest answers half the question. A missing
+     * manifest and a manifest that cannot be created look identical from the
+     * dashboard and from the first half of this readout, and they need
+     * opposite responses: one is "run the rebuild", the other is "the rebuild
+     * will fail until this directory is writable". The rebuild failing is how
+     * that was found the slow way.
+     */
+    private function directoryState(ReconciliationStore $store): string
+    {
+        $absolute = $this->absolutePath($store, $store->root());
+
+        if ($absolute === null) {
+            return '—';
+        }
+
+        if (! is_dir($absolute)) {
+            $parent = dirname($absolute);
+
+            return is_writable($parent)
+                ? '<fg=yellow>does not exist yet</> (creatable)'
+                : sprintf('<fg=red>does not exist and %s is not writable by %s</>', $parent, $this->currentUser());
+        }
+
+        return is_writable($absolute)
+            ? '<fg=green>writable</>'
+            : sprintf('<fg=red>NOT writable by %s</> — a rebuild cannot write here', $this->currentUser());
     }
 
     private function absolutePath(ReconciliationStore $store, string $path): ?string

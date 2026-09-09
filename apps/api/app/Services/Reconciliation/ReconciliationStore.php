@@ -247,6 +247,55 @@ class ReconciliationStore
     }
 
     /**
+     * Say why a write failed, and where.
+     *
+     * The disk is configured with `throw => false`, so Flysystem returns
+     * false and discards the underlying reason -- and the reason is almost
+     * always the only thing worth knowing. "Could not write
+     * reconciliation/manifest.json.a1b2c3.tmp" names a path relative to a root
+     * the reader cannot see, from a user the message does not identify,
+     * for a cause it does not state.
+     *
+     * All three are recoverable here without changing the disk's behaviour,
+     * and together they turn this from a hunt into a sentence: a directory
+     * owned by the deploy user and merely group-readable is not writable by
+     * www-data, which is exactly the shape this failure takes in production.
+     */
+    private function writeFailure(string $temporary): string
+    {
+        $disk = $this->disk();
+        $absolute = method_exists($disk, 'path') ? $disk->path($temporary) : $temporary;
+        $directory = dirname((string) $absolute);
+
+        $reason = match (true) {
+            ! is_dir($directory) => sprintf('the directory %s does not exist', $directory),
+            ! is_writable($directory) => sprintf('the directory %s is not writable', $directory),
+            default => 'the filesystem rejected the write',
+        };
+
+        return sprintf(
+            'Could not write %s: %s by the user running this process (%s). '
+            .'Check the ownership and mode of that directory.',
+            $absolute,
+            $reason,
+            $this->processUser(),
+        );
+    }
+
+    private function processUser(): string
+    {
+        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+            $user = posix_getpwuid(posix_geteuid());
+
+            if (is_array($user) && isset($user['name'])) {
+                return (string) $user['name'];
+            }
+        }
+
+        return (string) (getenv('USER') ?: 'unknown');
+    }
+
+    /**
      * Write through a temporary neighbour so readers never see a partial file.
      *
      * The temporary lives in the same directory on purpose: a rename across
@@ -268,7 +317,7 @@ class ReconciliationStore
         $temporary = $path.'.'.bin2hex(random_bytes(6)).'.tmp';
 
         if ($disk->put($temporary, $contents) === false) {
-            throw new RuntimeException(sprintf('Could not write the reconciliation temporary file %s.', $temporary));
+            throw new RuntimeException($this->writeFailure($temporary));
         }
 
         try {
