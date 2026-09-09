@@ -444,6 +444,14 @@ class AssetReconciler
             'duplicate_broker_windows' => array_slice($duplicateWindows, 0, $cap),
             'missing_source_files' => array_slice($missingSources, 0, $cap),
             'broker_lag_sessions' => $lag,
+
+            // Whether the raw archive was actually consulted. Not checking is
+            // a third outcome, distinct from finding everything and from
+            // finding things absent, and it has to travel with the document:
+            // without it "healthy" means either "every raw file is there" or
+            // "the archive could not be read", and those need opposite
+            // responses from whoever is looking at the dashboard.
+            'raw_archive_checked' => $this->archiveIndex() !== null,
         ];
     }
 

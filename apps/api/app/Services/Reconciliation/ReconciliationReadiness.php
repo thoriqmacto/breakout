@@ -60,6 +60,7 @@ class ReconciliationReadiness
                 'warning' => $summary['warning'] ?? 0,
                 'error' => $summary['error'] ?? 0,
                 'with_gaps' => $summary['with_gaps'] ?? 0,
+                'raw_archive_unchecked' => $summary['raw_archive_unchecked'] ?? 0,
                 'ohlcv_current' => $summary['ohlcv_current'] ?? 0,
                 'broker_current' => $summary['broker_current'] ?? 0,
                 'latest_ohlcv_date' => $summary['latest_ohlcv_date'] ?? null,
@@ -108,6 +109,18 @@ class ReconciliationReadiness
 
         if (($summary['error'] ?? 0) > 0) {
             $blockers[] = sprintf('%d asset(s) have reconciliation errors.', (int) $summary['error']);
+        }
+
+        // Said once here rather than as a warning on every asset: it is one
+        // fact about the archive, not 55 facts about the data. Reporting it
+        // per asset is how a single unreadable disk came to look like a fleet
+        // of corrupted assets.
+        if (($summary['raw_archive_unchecked'] ?? 0) > 0) {
+            $warnings[] = sprintf(
+                'The raw archive could not be read when %d asset(s) were reconciled, so their raw-file '
+                .'coverage is unverified rather than confirmed.',
+                (int) $summary['raw_archive_unchecked'],
+            );
         }
 
         if (($summary['warning'] ?? 0) > 0) {

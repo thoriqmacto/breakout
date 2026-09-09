@@ -131,6 +131,8 @@ export type ManifestSummary = {
   warning: number
   error: number
   with_gaps: number
+  /** Assets whose raw-file coverage could not be verified, not assets found wanting. */
+  raw_archive_unchecked: number
   ohlcv_current: number
   broker_current: number
   latest_ohlcv_date: string | null
