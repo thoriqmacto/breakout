@@ -6,6 +6,7 @@ use App\Http\Resources\ApiResponse;
 use App\Jobs\RunStrategyJob;
 use App\Models\Strategy;
 use App\Models\StrategyRun;
+use App\Services\Strategies\StrategyCatalogue;
 use App\Services\Strategy\Rules\FieldRegistry;
 use App\Services\Strategy\Rules\RuleOperators;
 use App\Services\Strategy\Rules\RuleValidator;
@@ -33,6 +34,34 @@ class StrategyController extends ApiController
                 'max_depth' => RuleValidator::MAX_DEPTH,
                 'max_conditions' => RuleValidator::MAX_CONDITIONS,
             ],
+        ]);
+    }
+
+    /**
+     * The strategies that ship as code, and the count of the ones that do not.
+     *
+     * Served together because the question people ask is "how many strategies
+     * are there", and answering it from two places is how the dashboard came
+     * to print a hardcoded 6. Read-only: these are classes with constructor
+     * parameters, not the rules JSON the runner executes.
+     */
+    public function builtIn(Request $request, StrategyCatalogue $catalogue)
+    {
+        $builtIn = $catalogue->all();
+
+        // The class name is deliberately not exposed. It is an internal
+        // detail, it is of no use to the page, and it invites a caller to
+        // start addressing strategies by it.
+        $entries = array_map(static function (array $entry): array {
+            unset($entry['class']);
+
+            return $entry + ['emits_daily_signal' => true, 'aliases' => []];
+        }, $builtIn);
+
+        return ApiResponse::success([
+            'built_in' => $entries,
+            'built_in_count' => count($entries),
+            'user_count' => Strategy::query()->where('user_id', $request->user()->id)->count(),
         ]);
     }
 

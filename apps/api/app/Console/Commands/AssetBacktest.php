@@ -6,12 +6,7 @@ use App\Models\Asset;
 use App\Services\AssetMetrics;
 use App\Services\Backtest\GenericBacktester;
 use App\Services\Backtest\HLSLBreakoutBacktestService;
-use App\Services\Strategies\BreakoutAtr;
-use App\Services\Strategies\DonchianBreakout;
-use App\Services\Strategies\MovingAverageCrossover;
-use App\Services\Strategies\RocMomentum;
-use App\Services\Strategies\RsiReversal;
-use App\Services\Strategies\SupportResistanceBreakout;
+use App\Services\Strategies\StrategyCatalogue;
 use App\Services\Strategies\TrailingStop;
 use Illuminate\Console\Command;
 
@@ -50,14 +45,12 @@ class AssetBacktest extends Command
      */
     public function handle(): int
     {
-        $map = [
-            'DonchBO' => DonchianBreakout::class,
-            'AtrBO' => BreakoutAtr::class,
-            'RocMomentum' => RocMomentum::class,
-            'MACross' => MovingAverageCrossover::class,
-            'RsiReversal' => RsiReversal::class,
-            'SR_BO' => SupportResistanceBreakout::class,
-        ];
+        // From the catalogue rather than a copy kept here. This list used to
+        // live inline, which made the command the only place that knew how
+        // many strategies exist -- so the dashboard printed the number as a
+        // string literal, correct until it wasn't.
+        $catalogue = app(StrategyCatalogue::class);
+        $map = $catalogue->classMap();
 
         $tickers = $this->resolveTickers();
         if ($tickers === []) {
@@ -66,9 +59,13 @@ class AssetBacktest extends Command
             return Command::FAILURE;
         }
 
+        // Resolved through the catalogue so the aliases and the casing the
+        // command has always accepted stay accepted, from one definition.
         $strategyOption = (string) $this->option('strategy');
-        if (strcasecmp($strategyOption, 'HLSL') === 0) {
-            $strategyOption = 'HLSLBreakout';
+        $entry = $catalogue->find($strategyOption);
+
+        if ($entry !== null) {
+            $strategyOption = (string) $entry['key'];
         }
 
         if ($strategyOption === 'HLSLBreakout') {
@@ -83,6 +80,7 @@ class AssetBacktest extends Command
 
         if (! array_key_exists($strategyOption, $map)) {
             $this->error("Unknown strategy: {$strategyOption}");
+            $this->line('Available: '.implode(', ', $catalogue->keys()));
 
             return Command::FAILURE;
         }
