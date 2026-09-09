@@ -33,6 +33,14 @@ const FAKE_JWT = [
   'ZmFrZS1zaWduYXR1cmUtZm9yLWEtbG9jYWwtc21va2UtdGVzdA',
 ].join('.')
 
+// A second structurally valid JWT, so a test can assert that a login produced
+// a *different* token rather than handing back the one already in storage.
+const SECOND_JWT = [
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+  'eyJzdWIiOiJzbW9rZS10ZXN0LTIiLCJleHAiOjQxMDI0NDQ4MDB9',
+  'c2Vjb25kLWZha2Utc2lnbmF0dXJlLWZvci1hLXNtb2tlLXRlc3Q',
+].join('.')
+
 /**
  * @param {'body-only'|'header-only'|'both'|'none'} mode How the portal reveals its token.
  */
@@ -139,8 +147,62 @@ function appPage() {
 }
 
 function startPortal(mode) {
+  // How many times the stale-session fixture has been logged into. The first
+  // login issues a token that later goes stale; the second issues a new one,
+  // which is what makes "the login actually happened" assertable.
+  let logins = 0
+
   const server = createServer((request, response) => {
     const url = request.url ?? '/'
+
+    // A portal whose session has been ended server-side while its app carries
+    // on rendering. No form appears, and the bearer it still holds is the one
+    // the API refuses -- the exact shape of the outage this fixture exists for.
+    if (url === '/stale-login') {
+      const known = (request.headers.cookie ?? '').includes('deviceTrusted=1')
+      const issued = logins === 0 ? FAKE_JWT : SECOND_JWT
+
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(known
+        ? `<!doctype html>
+<html><body><div id="app">signed in</div>
+  <script>
+    const session = JSON.parse(localStorage.getItem('sb_session') || '{}');
+    fetch('/api/me', { headers: { Authorization: 'Bearer ' + session.access_token } });
+  </script>
+</body></html>`
+        : `<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+        }),
+      });
+      if (!response.ok) return;
+      document.cookie = 'deviceTrusted=1; Path=/; Max-Age=86400';
+      localStorage.setItem('sb_session', JSON.stringify({
+        access_token: ${JSON.stringify('__ISSUED__')},
+      }));
+      document.getElementById('f').remove();
+    });
+  </script>
+</body></html>`.replace('__ISSUED__', issued))
+
+      if (! known) logins += 1
+
+      return
+    }
 
     if (url === '/login') {
       response.writeHead(200, { 'content-type': 'text/html' })
@@ -846,6 +908,85 @@ console.log('a portal that recognises a device it has seen before:')
       expect(
         error.code === ExtractionError.PROFILE_SIGNED_OUT,
         `expected PROFILE_SIGNED_OUT, got ${error.code}: ${error.message}`,
+      )
+    })
+  } finally {
+    server.close()
+    await rm(profileDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * A session the portal has ended, while its app carries on rendering.
+ *
+ * The outage this whole feature spent a night on. Stockbit stopped accepting
+ * the bearer; the app went on drawing a signed-in page because nothing had
+ * told it otherwise, and kept sending that bearer on every request. The
+ * extractor reads the bearer off a request header, so it captured the dead one
+ * -- and because no login form was on the page, it skipped the login entirely.
+ * Supplying a password did nothing: same token, same fingerprint, every time.
+ */
+console.log('a portal whose session has quietly ended:')
+
+{
+  const { server, port } = await startPortal('quiet')
+  const profileDir = await mkdtemp(join(tmpdir(), 'browser-auth-stale-'))
+
+  const SELECTORS = {
+    username: 'input[name="username"]',
+    password: 'input[name="password"]',
+    submit: 'button[type="submit"]',
+  }
+
+  try {
+    await check('a first login establishes the session', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/stale-login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: SELECTORS,
+        profileDir,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, `the first login gave ${result.token?.slice(-6)}`)
+    })
+
+    await check('without credentials it reuses whatever the app is holding', async () => {
+      // Correct and desirable when the session is alive -- and indistinguishable,
+      // from the page, from when it is not. This is why the token has to be
+      // verified rather than trusted.
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/stale-login`,
+        selectors: SELECTORS,
+        profileDir,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the saved session was not reused')
+    })
+
+    await check('credentials force a real login, and a different token comes back', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/stale-login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        // Explicit, because credentials alone must not mean this: the
+        // scheduled renewal passes stored credentials too, and forcing a
+        // login on every run would trip the device check nightly.
+        forceLogin: true,
+        selectors: SELECTORS,
+        profileDir,
+        timeoutMs: 15_000,
+      })
+
+      // The assertion the outage turned on. Before this, the app looked
+      // signed in, no form appeared, the login was skipped, and the same
+      // token came back -- so there was no way to replace a dead session
+      // short of deleting the profile directory by hand.
+      expect(
+        result.token === SECOND_JWT,
+        `expected a freshly issued token, got ${result.token === FAKE_JWT ? 'the old one' : 'something else'}`,
       )
     })
   } finally {

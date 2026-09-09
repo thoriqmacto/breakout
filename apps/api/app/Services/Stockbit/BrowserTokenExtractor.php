@@ -105,7 +105,7 @@ class BrowserTokenExtractor
      * @param  string|null  $username  Omitted when a saved profile is expected
      *                                 to be signed in already.
      */
-    public function extract(?string $username = null, ?string $password = null): array
+    public function extract(?string $username = null, ?string $password = null, bool $forceLogin = false): array
     {
         if (! $this->enabled()) {
             throw new BrowserTokenExtractionException(
@@ -163,6 +163,12 @@ class BrowserTokenExtractor
             'login_url' => (string) config('browser_auth.login_url'),
             'post_login_url' => config('browser_auth.post_login_url'),
             'profile_dir' => $profile,
+            // Asked for explicitly, never inferred from the presence of
+            // credentials: the scheduled renewal passes stored credentials
+            // too, and forcing a login on every run would trip the device
+            // check nightly -- the exact thing a saved profile exists to
+            // avoid. Only an operator saying "sign in again" sets this.
+            'force_login' => $forceLogin,
             'screenshot_path' => $this->screenshotPath,
             'username' => $username,
             'password' => $password,

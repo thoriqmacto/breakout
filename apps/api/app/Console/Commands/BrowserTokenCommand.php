@@ -72,7 +72,10 @@ class BrowserTokenCommand extends Command
         $this->line(sprintf('Signing in to %s…', (string) config('browser_auth.login_url')));
 
         try {
-            $result = $extractor->extract($username, $password);
+            // Not session-only means the operator chose to sign in again
+            // with a password, and expects that to actually happen even when
+            // the app still renders as signed in.
+            $result = $extractor->extract($username, $password, forceLogin: ! $sessionOnly);
         } catch (BrowserTokenExtractionException $exception) {
             $this->newLine();
             $this->error(sprintf('[%s] %s', $exception->failureCode, $exception->getMessage()));

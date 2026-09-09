@@ -80,6 +80,7 @@ async function main() {
       loginUrl: job.login_url,
       postLoginUrl: job.post_login_url,
       profileDir: job.profile_dir,
+      forceLogin: job.force_login === true,
       screenshotPath: job.screenshot_path,
       username: job.username,
       password: job.password,

@@ -73,6 +73,10 @@ const DEFAULTS = {
   // A page of the app to open after logging in, to provoke the authenticated
   // call that carries the bearer. Empty means "do not navigate".
   postLoginUrl: undefined,
+  // Sign in again even when the app looks signed in already. See the block
+  // that uses it: an app rendering from a session the API has stopped
+  // accepting is indistinguishable, from the page, from a working one.
+  forceLogin: false,
   // A directory the browser keeps between runs. Without one, every run is a
   // brand-new device: cookies, storage and whatever identity the portal
   // assigned are all discarded on close, so a device-trust prompt can never be
@@ -148,6 +152,7 @@ export function summariseEvidence(evidence) {
     url_after_submit: evidence.urlAfterSubmit,
     screenshot: evidence.screenshot,
     used_existing_session: evidence.usedExistingSession,
+    cleared_session: evidence.clearedSession,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -524,12 +529,25 @@ export async function extractBearerToken(options) {
   let resolveToken
   let settled = false
 
+  /**
+   * Whether a token seen right now is one this run should accept.
+   *
+   * Closed only when a login has been demanded. An app whose session the
+   * portal has ended goes on rendering, and fires its authenticated calls on
+   * page load carrying the bearer it still holds -- which the request listener
+   * captures and settles on within milliseconds, long before there is any
+   * chance to clear the session and sign in again. Forcing the login was not
+   * enough on its own: the stale token had already won the race. Nothing is
+   * accepted until the login this run asked for has actually been submitted.
+   */
+  let accepting = true
+
   // Resolved by whichever listener sees a token first. Created before
   // anything navigates, so no response can arrive before someone is
   // listening for it.
   const tokenSeen = new Promise((resolve) => {
     resolveToken = (result) => {
-      if (!settled) {
+      if (!settled && accepting) {
         settled = true
         resolve(result)
       }
@@ -578,6 +596,8 @@ export async function extractBearerToken(options) {
     screenshot: null,
     // True when the saved profile was already signed in and no login ran.
     usedExistingSession: false,
+    // True when a stale session was cleared to force the login form back.
+    clearedSession: false,
   }
 
   try {
@@ -611,6 +631,10 @@ export async function extractBearerToken(options) {
     }
 
     const page = context.pages()[0] ?? (await context.newPage())
+
+    // Shut before the first navigation, so the stale token the app sends on
+    // page load cannot settle the run ahead of the login being forced.
+    accepting = !config.forceLogin
 
     /**
      * Photograph the page, once, on whichever path ends the run badly.
@@ -723,15 +747,62 @@ export async function extractBearerToken(options) {
       )
     }
 
+    const deadline = startedAt + config.timeoutMs
+
+    // Every wait from here is measured against the run's own budget, not
+    // against a constant. Waits written as fixed intervals add up: this
+    // function grew a 25-second form poll, two 8-second settles and a
+    // 10-second redirect wait on top of a 30-second navigation, against a
+    // 55-second budget, and the parent killed the child mid-run -- which
+    // reports as a portal timeout and takes the diagnostic screenshot with it.
+    //
+    // Declared here rather than further down because the forced-login reload
+    // below is now the first wait that needs it, and a const used above its
+    // declaration is a runtime error no syntax check will catch.
+    const remaining = (want) => Math.max(0, Math.min(want, deadline - Date.now()))
+
     // A portal that already knows this profile sends /login straight to the
     // app, so there is no form to fill. Logging in again anyway would trip the
     // device check on every scheduled run -- the exact thing the profile
     // exists to stop.
-    const loginFormPresent = await page
+    let loginFormPresent = await page
       .locator(selectors.password)
       .first()
       .isVisible({ timeout: 5_000 })
       .catch(() => false)
+
+    // Unless the caller asked for a real login, which is the only way out of
+    // the following trap: the portal ends the session server-side, the app
+    // goes on rendering because it has not yet been told, and the bearer it
+    // still holds is refused by the API. From the page there is no difference
+    // between that and a healthy session -- no form appears, so the login is
+    // skipped, the same dead token is captured, and supplying a password
+    // achieves nothing at all. Clearing the session is what makes the form
+    // come back.
+    if (config.forceLogin && !loginFormPresent) {
+      evidence.clearedSession = true
+
+      await context.clearCookies().catch(() => {})
+
+      await page
+        .evaluate(() => {
+          try {
+            localStorage.clear()
+            sessionStorage.clear()
+          } catch {
+            // A page that denies storage access has nothing here to clear.
+          }
+        })
+        .catch(() => {})
+
+      await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
+
+      loginFormPresent = await page
+        .locator(selectors.password)
+        .first()
+        .isVisible({ timeout: remaining(10_000) })
+        .catch(() => false)
+    }
 
     evidence.usedExistingSession = !loginFormPresent
 
@@ -766,17 +837,19 @@ export async function extractBearerToken(options) {
           { cause: error },
         )
       }
+
+      // The login this run asked for has now happened, so whatever the app
+      // sends next is a token from this session rather than the one it was
+      // holding when the run started.
+      accepting = true
     }
 
-    const deadline = startedAt + config.timeoutMs
-
-    // Every wait from here is measured against the run's own budget, not
-    // against a constant. Waits written as fixed intervals add up: this
-    // function grew a 25-second form poll, two 8-second settles and a
-    // 10-second redirect wait on top of a 30-second navigation, against a
-    // 55-second budget, and the parent killed the child mid-run -- which
-    // reports as a portal timeout and takes the diagnostic screenshot with it.
-    const remaining = (want) => Math.max(0, Math.min(want, deadline - Date.now()))
+    // No form even after clearing, so there was no login to wait for and
+    // nothing to distinguish a new token from an old one. Reopening is the
+    // same behaviour as a run that never asked to force a login: better a
+    // token that may be stale, which the verifier will now catch, than a run
+    // that reports finding none at all.
+    accepting = true
 
     // Whether the form is still there, asked *now*, before this function
     // navigates anywhere of its own accord.
