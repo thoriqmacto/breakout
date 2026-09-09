@@ -5,6 +5,7 @@ namespace App\Console\Commands\Automation;
 use App\Models\AutomationAlert;
 use App\Services\Automation\AutomationAlerts;
 use App\Services\Automation\RunMetadata;
+use App\Services\GoogleDriveGrantLog;
 use App\Services\GoogleDriveHealth;
 use App\Services\GoogleDriveOAuthClassifier as Code;
 use Illuminate\Console\Command;
@@ -43,6 +44,18 @@ class GoogleDriveCheckCommand extends Command
 
     private const ALERT_KEY = 'authorisation-required';
 
+    /**
+     * Kept apart from the failure alert on purpose: "it stopped working" and
+     * "it will stop working on Friday" need different responses, and one
+     * resolving must not clear the other.
+     */
+    private const AGE_ALERT_KEY = 'expiring-soon';
+
+    public function __construct(private readonly GoogleDriveGrantLog $grants)
+    {
+        parent::__construct();
+    }
+
     public function handle(
         GoogleDriveHealth $health,
         AutomationAlerts $alerts,
@@ -72,7 +85,12 @@ class GoogleDriveCheckCommand extends Command
 
             $this->info($status['message']);
 
-            return self::SUCCESS;
+            // A working grant is not necessarily a grant that will still be
+            // working on Friday. On a consent screen still in Testing, Google
+            // expires refresh tokens seven days after issue, so "healthy
+            // today" and "healthy for the rest of the week" are different
+            // claims and only the first one has been tested.
+            return $this->reportAge($alerts, $metadata);
         }
 
         $alerts->raise(
@@ -96,6 +114,83 @@ class GoogleDriveCheckCommand extends Command
         // collectors have not run yet, and a non-zero exit is what marks the
         // run red on the dashboard so it is noticed before they do.
         return self::FAILURE;
+    }
+
+    /**
+     * Warn while the grant still works, if it is living on a timer.
+     *
+     * Only when an operator has said there is one. A refresh token has no
+     * expiry to read, so the lifetime comes from configuration -- it is the
+     * consent screen's mode expressed as a number of days -- and with none
+     * set this does nothing at all rather than inventing a deadline for a
+     * published app and warning weekly about nothing.
+     *
+     * The age is a lower bound: it counts from the first time a probe saw
+     * this token working, which may be after it was issued. That errs early,
+     * which is the safe direction.
+     */
+    private function reportAge(AutomationAlerts $alerts, RunMetadata $metadata): int
+    {
+        $lifetime = config('google_drive.grant_lifetime_days');
+        $refreshToken = (string) config('filesystems.disks.gdrive.refreshToken', '');
+
+        if ($refreshToken === '') {
+            return self::SUCCESS;
+        }
+
+        $firstSeen = $this->grants->observe($refreshToken);
+        $age = (int) $firstSeen->diffInDays(now());
+
+        $metadata->merge([
+            'grant_fingerprint' => $this->grants->fingerprint($refreshToken),
+            'grant_first_seen_at' => $firstSeen->toIso8601String(),
+            'grant_age_days' => $age,
+            'grant_lifetime_days' => $lifetime,
+        ]);
+
+        if (! is_int($lifetime) || $lifetime <= 0) {
+            $alerts->resolve(AutomationAlert::TYPE_GOOGLE_DRIVE, self::AGE_ALERT_KEY);
+
+            return self::SUCCESS;
+        }
+
+        $remaining = $lifetime - $age;
+        $warnBefore = max(1, (int) config('google_drive.grant_warn_before_days', 2));
+
+        $this->line(sprintf(
+            '  Grant seen working for %d of its %d day(s); %d remaining.',
+            $age,
+            $lifetime,
+            max(0, $remaining),
+        ));
+
+        if ($remaining > $warnBefore) {
+            $alerts->resolve(AutomationAlert::TYPE_GOOGLE_DRIVE, self::AGE_ALERT_KEY);
+
+            return self::SUCCESS;
+        }
+
+        $alerts->raise(
+            AutomationAlert::TYPE_GOOGLE_DRIVE,
+            self::AGE_ALERT_KEY,
+            $remaining <= 0 ? AutomationAlert::SEVERITY_CRITICAL : AutomationAlert::SEVERITY_WARNING,
+            'Google Drive authorisation is about to expire',
+            sprintf(
+                'The Drive grant has been working for %d of the %d days it is configured to last, so it expires in '
+                .'about %d. Re-authorise before then, or publish the OAuth consent screen: Google expires refresh '
+                .'tokens after 7 days only while the app is in Testing.',
+                $age,
+                $lifetime,
+                max(0, $remaining),
+            ),
+            ['age_days' => $age, 'lifetime_days' => $lifetime, 'remaining_days' => max(0, $remaining)],
+        );
+
+        $metadata->set('alert', 'raised');
+
+        // Still a success: the grant works, and the collectors that follow
+        // will not be blocked by a warning about next week.
+        return self::SUCCESS;
     }
 
     /**
