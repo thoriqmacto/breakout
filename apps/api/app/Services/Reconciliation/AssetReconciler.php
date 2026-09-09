@@ -37,6 +37,20 @@ use Illuminate\Support\Facades\Storage;
  */
 class AssetReconciler
 {
+    /**
+     * The archive listing, memoised for the lifetime of a run.
+     *
+     * One instance serves the whole pass -- ReconciliationService takes it
+     * through the constructor -- so listing once here is listing once per
+     * reconciliation, which is the point.
+     *
+     * @var array<string, true>|null
+     */
+    private ?array $archivePaths = null;
+
+    /** Whether the listing has been attempted, since null is a real result. */
+    private bool $archiveListed = false;
+
     public function __construct(
         private readonly TradingWeekResolver $calendar,
         private readonly ReconciliationStore $store,
@@ -613,7 +627,62 @@ class AssetReconciler
 
     private function rawExists(string $path): bool
     {
-        return Storage::disk('local')->exists($path);
+        $index = $this->archiveIndex();
+
+        // An archive that could not be listed is not evidence that anything
+        // is missing from it. Reporting unknown as absent is how every window
+        // of every asset came to be flagged at once.
+        if ($index === null) {
+            return true;
+        }
+
+        return isset($index[$path]);
+    }
+
+    /**
+     * The raw archive's contents, listed once for the whole run.
+     *
+     * `Storage::disk('local')` was hardcoded here while every other consumer
+     * of this archive -- the importer, the archive mirror, the scrape, the
+     * rebuild command -- reads `stockbit.save_disk`. With SB_SAVE_DISK=gdrive
+     * the files sit on Drive and the local directory is empty by design, so
+     * the lookup found nothing and reconciliation reported that every window
+     * of every asset referenced a lost file. 55 assets, 55 warnings, none of
+     * them true.
+     *
+     * Listed rather than probed per window because the configured disk can be
+     * remote: one directory listing replaces a network round trip for every
+     * window of every asset, which for this dataset is several hundred calls
+     * a night to answer a question one call already answers.
+     *
+     * @return array<string, true>|null null when the archive cannot be read
+     */
+    private function archiveIndex(): ?array
+    {
+        if ($this->archiveListed) {
+            return $this->archivePaths;
+        }
+
+        $this->archiveListed = true;
+
+        $disk = (string) config('stockbit.save_disk', 'local');
+        $directory = trim((string) config('stockbit.save_dir', 'broker_summary'), '/');
+
+        try {
+            $paths = Storage::disk($disk)->files($directory);
+        } catch (\Throwable) {
+            // Distinguished from an empty archive on purpose: an empty one is
+            // a true finding, an unreachable one is no finding at all.
+            return $this->archivePaths = null;
+        }
+
+        $index = [];
+
+        foreach ($paths as $path) {
+            $index[(string) $path] = true;
+        }
+
+        return $this->archivePaths = $index;
     }
 
     private function dateString(mixed $value): ?string
