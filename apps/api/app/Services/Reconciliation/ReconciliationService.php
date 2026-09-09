@@ -280,6 +280,7 @@ class ReconciliationService
             'warning_count' => count($integrity['warnings']),
             'error_count' => count($integrity['errors']),
             'broker_lag_sessions' => $integrity['broker_lag_sessions'],
+            'raw_archive_checked' => $integrity['raw_archive_checked'] ?? true,
 
             'latest_accdist' => $insight['latest_accdist'],
             'latest_accdist_score' => $insight['latest_accdist_score'],
@@ -308,8 +309,13 @@ class ReconciliationService
         $latestOhlcv = null;
         $latestBrokerDaily = null;
         $gapped = 0;
+        $archiveUnchecked = 0;
 
         foreach ($entries as $entry) {
+            if (($entry['raw_archive_checked'] ?? true) === false) {
+                $archiveUnchecked++;
+            }
+
             match ($entry['integrity_status'] ?? 'healthy') {
                 'error' => $error++,
                 'warning' => $warning++,
@@ -359,6 +365,7 @@ class ReconciliationService
                 'warning' => $warning,
                 'error' => $error,
                 'with_gaps' => $gapped,
+                'raw_archive_unchecked' => $archiveUnchecked,
                 'ohlcv_current' => $ohlcvCurrent,
                 'broker_current' => $brokerCurrent,
                 'latest_ohlcv_date' => $latestOhlcv,

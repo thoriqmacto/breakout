@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\BrokerSummaryWindow;
 use App\Models\Price;
 use App\Services\Reconciliation\AssetReconciler;
+use App\Services\Reconciliation\ReconciliationReadiness;
+use App\Services\Reconciliation\ReconciliationStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -137,9 +139,72 @@ class RawArchiveDiskTest extends TestCase
     }
 
     /**
+     * "Could not check" is recorded, not quietly rendered as "healthy".
+     *
+     * Suppressing the false accusation was only half the job. An asset whose
+     * raw coverage was never verified still reads healthy from its status
+     * alone, so the fact that the archive was unreadable has to travel with
+     * the document -- otherwise a Drive outage silently turns the check off
+     * and the dashboard reports the recovery layer as sound.
+     */
+    public function test_an_unreadable_archive_is_recorded_as_unchecked(): void
+    {
+        $asset = $this->assetWithWindow();
+
+        config(['stockbit.save_disk' => 'a-disk-that-does-not-exist']);
+
+        $integrity = app(AssetReconciler::class)->build($asset, 'fingerprint')['integrity'];
+
+        $this->assertFalse($integrity['raw_archive_checked']);
+    }
+
+    public function test_a_readable_archive_is_recorded_as_checked(): void
+    {
+        $asset = $this->assetWithWindow();
+
+        Storage::disk('archive')->put(self::FILE, '{}');
+
+        $integrity = app(AssetReconciler::class)->build($asset, 'fingerprint')['integrity'];
+
+        $this->assertTrue($integrity['raw_archive_checked']);
+    }
+
+    /**
      * A file sitting on the local disk does not count when the archive is
      * configured elsewhere -- otherwise the check passes for the wrong reason.
      */
+    /**
+     * The readiness report says it once, for the whole fleet.
+     *
+     * One unreadable disk is one fact about the archive, not one fact per
+     * asset. Reporting it per asset is exactly how it looked like 55
+     * corrupted assets the first time.
+     */
+    public function test_readiness_warns_once_that_coverage_is_unverified(): void
+    {
+        app(ReconciliationStore::class)->writeManifest([
+            'schema_version' => 1,
+            'summary' => [
+                'asset_count' => 55,
+                'healthy' => 55,
+                'warning' => 0,
+                'error' => 0,
+                'raw_archive_unchecked' => 55,
+            ],
+            'assets' => [],
+        ]);
+
+        $warnings = app(ReconciliationReadiness::class)->report()['readiness']['warnings'];
+
+        $unverified = array_values(array_filter(
+            $warnings,
+            static fn (string $warning): bool => str_contains($warning, 'unverified rather than confirmed'),
+        ));
+
+        $this->assertCount(1, $unverified);
+        $this->assertStringContainsString('55 asset(s)', $unverified[0]);
+    }
+
     public function test_the_local_disk_is_not_consulted_when_the_archive_is_elsewhere(): void
     {
         $asset = $this->assetWithWindow();
