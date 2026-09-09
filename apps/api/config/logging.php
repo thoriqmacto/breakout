@@ -58,10 +58,24 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        /*
+        | The explicit permission is not decoration. Two users write this log
+        | -- artisan as the deploy user, PHP-FPM as www-data -- and Monolog
+        | creates the file with the umask applied, which is 0644 on a default
+        | host. Whichever user writes first therefore owns a file the other
+        | can never append to, and the second one dies with "could not be
+        | opened in append mode: Permission denied".
+        |
+        | Worse than losing the log: the failure happens while reporting some
+        | other error, so it replaces that error's message with its own. A
+        | permission fault in storage/ then surfaces as a logging fault, and
+        | the original cause is never printed anywhere at all.
+        */
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'permission' => 0664,
             'replace_placeholders' => true,
         ],
 
@@ -70,6 +84,7 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
+            'permission' => 0664,
             'replace_placeholders' => true,
         ],
 
