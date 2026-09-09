@@ -185,6 +185,16 @@ return [
             ],
         ],
 
+        'automation:gdrive-check' => [
+            'label' => 'Google Drive check',
+            'description' => 'Spend the Google Drive refresh token and raise a dashboard reminder when the grant no longer works. A refresh token carries no readable expiry, so probing it is the only way to know before a collector needs it.',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [
+                'disk' => ['type' => 'enum', 'values' => ['gdrive', 'local'], 'label' => 'Check this disk instead'],
+            ],
+        ],
+
         'automation:token-check' => [
             'label' => 'Stockbit token reminder',
             'description' => 'Inspect the stored Stockbit JWT and raise a dashboard reminder when it needs renewing.',
@@ -412,6 +422,18 @@ return [
             'condition' => 'none',
             'priority' => 5,
             'enabled' => false,
+            'sync_gdrive_after_success' => false,
+        ],
+        [
+            'name' => 'Google Drive Check',
+            'slug' => 'google-drive-check',
+            'description' => 'Every day at 17:45 WIB, after the trading calendar refresh and before the 18:00 collectors, spend the Google Drive refresh token to confirm the grant still works. A Google refresh token is not a JWT: it has no readable expiry, so there is nothing to inspect and no clock to compare against -- the only way to know is to use it. Finding out at 18:00 instead means a scrape that dies after the first ticker with "invalid_grant", and a day of missing bars; finding out at 17:45 means a dashboard reminder with time to re-authorise.',
+            'command' => 'automation:gdrive-check',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '45 17 * * *',
+            'condition' => 'none',
+            'priority' => 1,
+            'enabled' => true,
             'sync_gdrive_after_success' => false,
         ],
         [

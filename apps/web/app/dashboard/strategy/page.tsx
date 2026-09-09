@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/card"
 import {
   copyStrategy,
+  fetchBuiltInStrategies,
   fetchStrategies,
   runStrategy,
+  type BuiltInStrategy,
   type StrategyRecord,
 } from "@/lib/strategy-builder-client"
+import { BuiltInStrategies } from "@/components/built-in-strategies"
 
 type Scope = "mine" | "public" | "all"
 
@@ -33,6 +36,7 @@ export default function StrategiesPage() {
   const { accessToken } = useAuth()
   const [scope, setScope] = useState<Scope>("mine")
   const [strategies, setStrategies] = useState<StrategyRecord[]>([])
+  const [builtIn, setBuiltIn] = useState<BuiltInStrategy[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
@@ -56,6 +60,26 @@ export default function StrategiesPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  // Fetched once and not on every scope change: the catalogue is the same
+  // list whichever scope the editable strategies are filtered by. A failure
+  // here leaves the section hidden rather than replacing the page's error,
+  // which belongs to the strategies the user came to see.
+  useEffect(() => {
+    if (!accessToken) return
+
+    let cancelled = false
+
+    fetchBuiltInStrategies(accessToken)
+      .then((payload) => {
+        if (!cancelled) setBuiltIn(payload.built_in)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [accessToken])
 
   const handleRun = async (strategy: StrategyRecord) => {
     if (!accessToken) return
@@ -153,6 +177,8 @@ export default function StrategiesPage() {
       ) : (
         <>
           <StrategyCards strategies={strategies} emptyMessage={activeScope?.empty} />
+
+          <BuiltInStrategies strategies={builtIn} />
 
           {strategies.length > 0 ? (
             <Card>

@@ -131,6 +131,40 @@ export function fetchRuleSchema(accessToken: string): Promise<RuleSchema> {
   return request<RuleSchema>("/v1/strategies/schema", accessToken, {}, "Unable to load the rule schema.")
 }
 
+/**
+ * A strategy that ships as code rather than as a row someone edits.
+ *
+ * Read-only by nature: these are classes with constructor parameters and a
+ * signal() method, not the rules the runner executes. The defaults are shown
+ * so a reader can see what a run actually uses, not so they can change it
+ * here.
+ */
+export type BuiltInStrategy = {
+  key: string
+  name: string
+  summary: string
+  parameters: { name: string; default: number; unit: string }[]
+  supports_trailing_stop: boolean
+  backtester: string
+  emits_daily_signal: boolean
+  aliases: string[]
+}
+
+export type BuiltInStrategies = {
+  built_in: BuiltInStrategy[]
+  built_in_count: number
+  user_count: number
+}
+
+export async function fetchBuiltInStrategies(accessToken: string): Promise<BuiltInStrategies> {
+  return request<BuiltInStrategies>(
+    "/v1/strategies/built-in",
+    accessToken,
+    {},
+    "Unable to load built-in strategies",
+  )
+}
+
 export async function fetchStrategies(
   accessToken: string,
   scope: "mine" | "public" | "all" = "all",

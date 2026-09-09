@@ -14,6 +14,16 @@ class AutomationAlert extends Model
 {
     public const TYPE_STOCKBIT_TOKEN = 'stockbit_token';
 
+    /**
+     * The Google Drive grant.
+     *
+     * Separate from the Stockbit token because they fail independently and
+     * are fixed by different people doing different things -- and because a
+     * refresh token has no readable expiry, so this one can only ever be
+     * raised by a probe that actually spent it.
+     */
+    public const TYPE_GOOGLE_DRIVE = 'google_drive';
+
     public const SEVERITY_INFO = 'info';
 
     public const SEVERITY_WARNING = 'warning';

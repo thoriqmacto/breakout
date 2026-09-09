@@ -173,6 +173,11 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('strategies/schema', [StrategyController::class, 'schema'])
         ->name('strategies.schema');
 
+    // Declared before the apiResource for the same reason as schema above:
+    // "strategies/built-in" would otherwise be read as "strategies/{id}".
+    Route::get('strategies/built-in', [StrategyController::class, 'builtIn'])
+        ->name('strategies.built-in');
+
     Route::post('strategies/{strategy}/copy', [StrategyController::class, 'copy'])
         ->whereNumber('strategy')
         ->name('strategies.copy');

@@ -17,7 +17,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { fetchPortfolios, type PositionRecord } from "@/lib/portfolio-client"
-import { fetchStrategies, type StrategyRecord } from "@/lib/strategy-builder-client"
+import {
+  fetchBuiltInStrategies,
+  fetchStrategies,
+  type StrategyRecord,
+} from "@/lib/strategy-builder-client"
+import { fetchAutomationAlerts, type AutomationAlert } from "@/lib/automation-client"
 import { formatIdr } from "@/lib/currency"
 
 const parseNumericInput = (value: string) => {
@@ -115,6 +120,10 @@ export default function DashboardPage() {
   const { user, accessToken } = useAuth()
   const [strategies, setStrategies] = useState<StrategyRecord[]>([])
   const [strategiesError, setStrategiesError] = useState<string | null>(null)
+  const [strategyCounts, setStrategyCounts] = useState<{ user: number; builtIn: number } | null>(
+    null,
+  )
+  const [openAlerts, setOpenAlerts] = useState<AutomationAlert[] | null>(null)
   const [symbol, setSymbol] = useState("")
   const [closePriceInput, setClosePriceInput] = useState("")
   const [percentInput, setPercentInput] = useState("")
@@ -198,6 +207,32 @@ export default function DashboardPage() {
           )
         }
       })
+
+    // The counts come from the API rather than from the list above: that list
+    // is scoped "all" and includes public strategies belonging to other
+    // people, so counting it would answer a different question from the one
+    // the card asks.
+    fetchBuiltInStrategies(accessToken)
+      .then((payload) => {
+        if (!cancelled) {
+          setStrategyCounts({ user: payload.user_count, builtIn: payload.built_in_count })
+        }
+      })
+      .catch((cause) => {
+        if (!cancelled) {
+          setStrategiesError(
+            cause instanceof Error ? cause.message : "Unable to count strategies.",
+          )
+        }
+      })
+
+    // An alert that cannot be loaded is not zero alerts, so the card keeps
+    // showing "…" rather than reporting all clear on a failed request.
+    fetchAutomationAlerts(accessToken)
+      .then((rows) => {
+        if (!cancelled) setOpenAlerts(rows)
+      })
+      .catch(() => {})
 
     return () => {
       cancelled = true
@@ -284,13 +319,28 @@ export default function DashboardPage() {
     () => [
       {
         title: "Total Strategies",
-        value: "6",
-        description: "Configured breakout strategies currently monitored.",
+        // Counted, not asserted. This read "6" as a string literal, which was
+        // the number of entries in a map inlined in the backtest command --
+        // right when it was written, and with nothing to keep it right.
+        value: strategyCounts
+          ? `${strategyCounts.user + strategyCounts.builtIn}`
+          : strategiesError ?? "…",
+        description: strategyCounts
+          ? `${strategyCounts.user} of your own · ${strategyCounts.builtIn} built in`
+          : "Counting your strategies and the built-in ones.",
       },
       {
         title: "Open Alerts",
-        value: "12",
-        description: "Signals awaiting analyst review across all assets.",
+        // Unresolved automation alerts: the Stockbit token and Google Drive
+        // reminders. A number that means something needs you, rather than one
+        // that moves with the market.
+        value: openAlerts === null ? "…" : `${openAlerts.length}`,
+        description:
+          openAlerts === null
+            ? "Checking automation alerts."
+            : openAlerts.length === 0
+              ? "Nothing needs attention."
+              : openAlerts.map((alert) => alert.title).join(" · "),
       },
       {
         title: "Portfolio Status",
@@ -302,7 +352,7 @@ export default function DashboardPage() {
           : portfolioSummaryError ?? "Loading portfolio activity...",
       },
     ],
-    [portfolioSummary, portfolioSummaryError],
+    [portfolioSummary, portfolioSummaryError, strategyCounts, strategiesError, openAlerts],
   )
 
   useEffect(() => {
