@@ -3,9 +3,11 @@
 namespace Tests\Feature\Automation;
 
 use App\Models\AutomationAlert;
+use App\Services\GoogleDriveGrantLog;
 use App\Services\GoogleDriveHealth;
 use App\Services\GoogleDriveOAuthClassifier as Code;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -24,6 +26,13 @@ use Tests\TestCase;
 class GoogleDriveCheckCommandTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Storage::fake('local');
+    }
 
     private function health(string $code, string $message = 'Drive says so.'): void
     {
@@ -102,6 +111,93 @@ class GoogleDriveCheckCommandTest extends TestCase
         // is worth keeping, and raising is keyed on (type, key) so the next
         // failure updates this row rather than accumulating another.
         $this->assertTrue($alert === null || $alert->resolved_at !== null);
+    }
+
+    /**
+     * A working grant on a seven-day timer still needs notice.
+     *
+     * The consent screen is in Testing, where Google expires refresh tokens
+     * seven days after issue. "Healthy today" and "healthy on Friday" are
+     * different claims, and the probe only tests the first.
+     */
+    public function test_a_grant_close_to_its_configured_lifetime_warns_while_still_working(): void
+    {
+        $this->health(Code::HEALTHY, 'Google Drive OAuth is healthy.');
+
+        config([
+            'filesystems.disks.gdrive.refreshToken' => 'a-refresh-token',
+            'google_drive.grant_lifetime_days' => 7,
+            'google_drive.grant_warn_before_days' => 2,
+        ]);
+
+        // Seen working six days ago, so one day left of the seven.
+        $this->travelTo(now()->subDays(6));
+        app(GoogleDriveGrantLog::class)->observe('a-refresh-token');
+        $this->travelBack();
+
+        // Success, not failure: the grant works, and the collectors that
+        // follow must not be blocked by a warning about next week.
+        $this->artisan('automation:gdrive-check')->assertExitCode(0);
+
+        $alert = AutomationAlert::where('type', AutomationAlert::TYPE_GOOGLE_DRIVE)
+            ->where('key', 'expiring-soon')
+            ->first();
+
+        $this->assertNotNull($alert);
+        $this->assertSame(AutomationAlert::SEVERITY_WARNING, $alert->severity);
+        $this->assertStringContainsString('publish the OAuth consent screen', $alert->message);
+    }
+
+    /**
+     * With no lifetime configured there is no deadline to warn about.
+     *
+     * A published app's refresh token does not expire on a timer, and
+     * inventing one would produce a weekly warning about nothing.
+     */
+    public function test_no_configured_lifetime_raises_nothing(): void
+    {
+        $this->health(Code::HEALTHY, 'Google Drive OAuth is healthy.');
+
+        config([
+            'filesystems.disks.gdrive.refreshToken' => 'a-refresh-token',
+            'google_drive.grant_lifetime_days' => null,
+        ]);
+
+        $this->travelTo(now()->subDays(300));
+        app(GoogleDriveGrantLog::class)->observe('a-refresh-token');
+        $this->travelBack();
+
+        $this->artisan('automation:gdrive-check')->assertExitCode(0);
+
+        $this->assertNull(
+            AutomationAlert::where('key', 'expiring-soon')->first(),
+            'A grant with no configured lifetime has no deadline to warn about.',
+        );
+    }
+
+    /**
+     * Re-authorising resets the clock, and the record never holds the token.
+     */
+    public function test_a_new_token_restarts_the_clock_and_is_stored_only_as_a_fingerprint(): void
+    {
+        $log = app(GoogleDriveGrantLog::class);
+
+        $this->travelTo(now()->subDays(6));
+        $log->observe('the-old-token');
+        $this->travelBack();
+
+        $this->assertSame(6, $log->ageInDays('the-old-token'));
+
+        // A different token has no history: not zero days old, unknown.
+        $this->assertNull($log->ageInDays('the-new-token'));
+
+        $log->observe('the-new-token');
+        $this->assertSame(0, $log->ageInDays('the-new-token'));
+
+        $stored = Storage::disk('local')->get('google-drive/grant.json');
+
+        $this->assertStringNotContainsString('the-new-token', $stored);
+        $this->assertStringContainsString($log->fingerprint('the-new-token'), $stored);
     }
 
     /**
