@@ -234,6 +234,40 @@ class StockbitTokenRenewerTest extends TestCase
      * than escaping from a availability check called to decide whether a retry
      * is worth promising.
      */
+    /**
+     * A profile that exists and cannot be used says so.
+     *
+     * The scheduler dispatches through the queue, so a renewal runs as the
+     * queue worker's user -- not necessarily the user who signed in at a
+     * terminal. When that user cannot use the profile directory, the old
+     * message told the operator to "set BROWSER_AUTH_PROFILE_DIR and sign in
+     * once": advice for a variable already set and a profile already signed
+     * in, which reads as a missing feature rather than a permissions fault.
+     */
+    public function test_an_unusable_profile_is_not_reported_as_a_missing_one(): void
+    {
+        $this->mock(BrowserTokenExtractor::class, function ($mock) {
+            $mock->shouldReceive('enabled')->andReturn(true);
+            $mock->shouldReceive('profileDir')->andThrow(
+                new BrowserTokenExtractionException(
+                    'NOT_CONFIGURED',
+                    'The browser profile directory /var/lib/breakout/browser-profile belongs to '
+                    .'www-data, and this command is running as deploy.',
+                ),
+            );
+            $mock->shouldReceive('extract')->never();
+        });
+
+        $result = app(StockbitTokenRenewer::class)->renew();
+
+        $this->assertFalse($result['renewed']);
+        $this->assertSame(StockbitTokenRenewer::PROFILE_UNUSABLE, $result['reason']);
+
+        // The real cause, not a suggestion to configure what is configured.
+        $this->assertStringContainsString('belongs to www-data', (string) $result['message']);
+        $this->assertStringNotContainsString('BROWSER_AUTH_PROFILE_DIR', (string) $result['message']);
+    }
+
     public function test_a_broken_profile_directory_does_not_escape_the_check(): void
     {
         $this->mock(BrowserTokenExtractor::class, function ($mock) {

@@ -29,6 +29,21 @@ class StockbitTokenRenewer
     /** No saved profile and no stored credentials: nothing to sign in with. */
     public const NO_CREDENTIALS = 'no_credentials';
 
+    /**
+     * A profile directory is configured, and this process cannot use it.
+     *
+     * Distinct from NO_CREDENTIALS because the remedies are opposite. That one
+     * says "set BROWSER_AUTH_PROFILE_DIR and sign in once", which is useless
+     * advice when the variable is already set and the profile already exists
+     * -- the fault is that the process running the renewal is not the user the
+     * profile belongs to.
+     *
+     * It is easy to reach without noticing. The scheduler dispatches through
+     * the queue, so the renewal runs as the queue worker's user, which is not
+     * necessarily the user who signed in at a terminal.
+     */
+    public const PROFILE_UNUSABLE = 'profile_unusable';
+
     /** The browser ran and did not come back with a token. */
     public const EXTRACTION_FAILED = 'extraction_failed';
 
@@ -43,6 +58,14 @@ class StockbitTokenRenewer
      * with something known not to work.
      */
     public const REJECTED_BY_API = 'rejected_by_api';
+
+    /**
+     * Why the profile directory could not be used, when it could not.
+     *
+     * Set by hasProfile(), which both available() and renew() call before
+     * anything decides there is nothing to sign in with.
+     */
+    private ?string $profileFault = null;
 
     public function __construct(
         private readonly BrowserTokenExtractor $extractor,
@@ -102,6 +125,13 @@ class StockbitTokenRenewer
         $stored = $this->credentials->get();
 
         if ($stored === null && ! $usedProfile) {
+            // A configured-but-unusable profile is not an absent one, and
+            // telling someone to set a variable they have already set is how
+            // a permissions fault reads as a missing feature.
+            if ($this->profileFault !== null) {
+                return $this->refused(self::PROFILE_UNUSABLE, $this->profileFault);
+            }
+
             return $this->refused(
                 self::NO_CREDENTIALS,
                 $this->credentials->exists()
@@ -176,9 +206,17 @@ class StockbitTokenRenewer
      */
     private function hasProfile(): bool
     {
+        $this->profileFault = null;
+
         try {
             return $this->extractor->profileDir() !== null;
-        } catch (BrowserTokenExtractionException) {
+        } catch (BrowserTokenExtractionException $exception) {
+            // Kept rather than discarded. The extractor's message names the
+            // directory, its owner and the user that is running -- everything
+            // needed to act -- and swallowing it left the caller reporting
+            // "no profile configured" for a profile that plainly exists.
+            $this->profileFault = $exception->getMessage();
+
             return false;
         }
     }
