@@ -364,16 +364,87 @@ class BrowserTokenExtractor
         if (! is_writable($path)) {
             throw new BrowserTokenExtractionException(
                 self::NOT_CONFIGURED,
-                sprintf(
-                    'The browser profile directory %s is not writable by this user. Both the CLI '
-                    .'user and the web server user write to it: chgrp it to a shared group and '
-                    .'chmod g+rwxs.',
-                    $path,
-                ),
+                $this->profileOwnershipMessage($path),
             );
         }
 
         return $path;
+    }
+
+    /**
+     * Say who owns the profile, and to run as them.
+     *
+     * This used to advise a shared group and `chmod g+rwxs`, which does not
+     * work and quietly makes things worse. setgid propagates the group to new
+     * files; it never propagates the mode. Chromium writes its cookies and
+     * session state owner-only, so a second user in the shared group can
+     * create files in the directory and still not read the ones that matter --
+     * and a second user writing into a live profile risks corrupting it rather
+     * than sharing it.
+     *
+     * A profile belongs to one Unix user. The useful instruction is therefore
+     * which user that is, which this can answer by looking, rather than a
+     * chmod recipe that appears to work until the login silently reuses
+     * nothing.
+     */
+    private function profileOwnershipMessage(string $path): string
+    {
+        $owner = $this->ownerOf($path);
+        $current = $this->currentUser();
+
+        if ($owner === null || $owner === $current) {
+            return sprintf(
+                'The browser profile directory %s is not writable by %s. A Chromium profile belongs '
+                .'to one Unix user: make that directory writable by the user that runs the '
+                .'scheduler, and run this command as that user.',
+                $path,
+                $current,
+            );
+        }
+
+        return sprintf(
+            'The browser profile directory %s belongs to %s, and this command is running as %s. '
+            .'A Chromium profile belongs to one Unix user -- its cookies and session state are '
+            .'written owner-only, so a shared group does not make it readable. Run this as the '
+            .'owner instead: sudo -u %s php artisan %s',
+            $path,
+            $owner,
+            $current,
+            $owner,
+            'browser:token',
+        );
+    }
+
+    private function ownerOf(string $path): ?string
+    {
+        $uid = @fileowner($path);
+
+        if ($uid === false) {
+            return null;
+        }
+
+        if (function_exists('posix_getpwuid')) {
+            $entry = posix_getpwuid($uid);
+
+            if (is_array($entry) && isset($entry['name'])) {
+                return (string) $entry['name'];
+            }
+        }
+
+        return (string) $uid;
+    }
+
+    private function currentUser(): string
+    {
+        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+            $entry = posix_getpwuid(posix_geteuid());
+
+            if (is_array($entry) && isset($entry['name'])) {
+                return (string) $entry['name'];
+            }
+        }
+
+        return (string) (getenv('USER') ?: 'this user');
     }
 
     public function probePath(string $filename): string
