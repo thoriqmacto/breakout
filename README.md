@@ -1310,11 +1310,21 @@ actually traded.
 
 ### Required production setup
 
-Cron must invoke Laravel's scheduler every minute. Add this to the deploy user's crontab:
+Cron must invoke Laravel's scheduler every minute, **as the user that owns the browser profile**:
 
 ```cron
+# sudo -u www-data crontab -e
+HOME=/var/www
 * * * * * cd /var/www/breakout/apps/api && php artisan schedule:run >> /dev/null 2>&1
 ```
+
+The user matters because scheduled tasks run *in the cron process*. `automation:token-refresh`
+launches Chromium against `BROWSER_AUTH_PROFILE_DIR`, and that profile is owned by one Unix user
+and readable by no other (see *One profile, one Unix user* above). Put this crontab on the deploy
+user while the profile belongs to `www-data` and the renewal fails every night with
+`profile_unusable`, naming the owner it could not read as — the scrapes that depend on the token
+then fail behind it. `HOME` is set because Chromium wants a writable home even when the profile
+lives elsewhere, and cron gives `www-data` none.
 
 `scheduler:dispatch` runs due tasks in-process, in priority order, so a bulk scrape holds the
 tick until it finishes. It is registered `withoutOverlapping()->runInBackground()`, so the next
@@ -1339,6 +1349,21 @@ stdout_logfile=/var/log/breakout-worker.log
 `--tries=1` is intentional: the runner records the outcome on the run row, so a retry would
 re-execute an hour of API calls that already reported how they went.
 
+**A worker belongs to one application.** `queue:work` reads the queue of the app whose `artisan`
+it was started with, so a worker running another project's `artisan` — even on the same box, as
+the same user, against the same MySQL server — never sees this one's jobs. Breakout needs a
+worker of its own, and `user=www-data` matches the profile owner so a queued renewal can use the
+same profile the scheduled one does. Confirm which apps actually have a worker before concluding
+one is running:
+
+```bash
+pgrep -af 'artisan queue:work'    # every worker, with the artisan path that identifies its app
+```
+
+Without a breakout worker, "Run now" leaves the run sitting in `queued` — it does not fail, and
+nothing on the page says why. A run that fails in milliseconds came from cron, not from the
+button.
+
 ### Default seeded automations
 
 Installed by the migrations that create the tables, and restorable with
@@ -1347,7 +1372,7 @@ Installed by the migrations that create the tables, and restorable with
 | Name | Schedule | Condition | Priority | Command |
 | --- | --- | --- | --- | --- |
 | Trading Calendar Refresh | 17:30 `Asia/Jakarta`, daily | `none` | 1 | `automation:trading-calendar-refresh` |
-| Stockbit Token Renewal | `:15` hourly | `none` | 5 | `automation:token-refresh` (seeded **disabled**; needs stored credentials) |
+| Stockbit Token Renewal | `:15` hourly | `none` | 5 | `automation:token-refresh` (seeded **disabled**; needs a browser profile owned by the cron user, or stored credentials) |
 | Stockbit Token Reminder | 09:00 `Asia/Jakarta`, daily | `none` | 5 | `automation:token-check` |
 | Daily OHLCV Sync | 18:00 `Asia/Jakarta`, daily | `trading_day` | 10 | `automation:ohlcv-daily` |
 | Daily Broker Summary | 18:00 `Asia/Jakarta`, daily | `trading_day` | 20 | `automation:broker-summary-daily` |
@@ -2070,6 +2095,15 @@ Diagnosing a missed run:
    the run detail names the tickers that produced no bar, or the uploads that failed.
 5. **Run history is empty and the task shows "Never run"** → confirm the task is enabled and its
    cron expression is valid (`scheduler:status` prints `invalid cron` when it is not).
+6. **A run sits at `queued` and never starts** → it came from the *Run now* button, and no queue
+   worker is consuming this application's queue. `pgrep -af 'artisan queue:work'` lists every
+   worker on the box with the `artisan` path that says which app it belongs to; another
+   project's worker never picks these jobs up. Scheduled runs are unaffected — they execute
+   inside the cron process.
+7. **`Stockbit Token Renewal` fails in milliseconds with `profile_unusable`** → the process that
+   ran it is not the user that owns `BROWSER_AUTH_PROFILE_DIR`. The message names the owner and
+   the user it ran as; move the crontab to the owner (`sudo -u www-data crontab -e`) rather than
+   loosening the profile's permissions, which cannot work — see *One profile, one Unix user*.
 
 Structured logs are written under `automation.task.started`, `automation.task.finished`,
 `automation.dispatch.*`. Captured Artisan output is redacted of anything credential-shaped and
