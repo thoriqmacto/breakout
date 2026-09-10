@@ -38,9 +38,11 @@ class StockbitTokenRenewer
      * -- the fault is that the process running the renewal is not the user the
      * profile belongs to.
      *
-     * It is easy to reach without noticing. The scheduler dispatches through
-     * the queue, so the renewal runs as the queue worker's user, which is not
-     * necessarily the user who signed in at a terminal.
+     * It is easy to reach without noticing, because nothing says which Unix
+     * user the renewal runs as. A scheduled run executes inside the cron
+     * process, so it is the crontab's user; a "run now" from the dashboard is
+     * queued, so it is the queue worker's. Neither is necessarily the user who
+     * signed in at a terminal, and a Chromium profile belongs to one user.
      */
     public const PROFILE_UNUSABLE = 'profile_unusable';
 
