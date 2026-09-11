@@ -1937,6 +1937,45 @@ at every previous step:
  ok  profile        /var/lib/breakout/browser-profile (writable by www-data)
 ```
 
+### Re-establishing the session, in order
+
+The order matters, because step 2 is destructive. Run these as the profile's owner.
+
+```bash
+# 1. Is the saved session still good? No password, nothing changed.
+sudo -u www-data php artisan browser:token --session --dry-run
+
+# 2. Only if step 1 failed: sign in again. This CLEARS the profile first.
+sudo -u www-data php artisan browser:token --username='<account email>' --screenshot=/tmp/sb
+
+# 3. Prove step 2 persisted, again with no password.
+sudo -u www-data php artisan browser:token --session --dry-run
+```
+
+**Step 2 clears the profile's cookies and storage before showing the form.** That is deliberate —
+it is the only way out of the dead-session trap described below — but it means running it on a
+*healthy* profile signs that profile out for nothing. The interactive prompt (*"A saved browser
+profile exists. Sign in again with a password?"*) defaults to **no** for exactly this reason;
+passing `--username` skips the prompt and forces the login.
+
+**The username is the account's email address.** A portal that greets you by a display name still
+authenticates on the email, and the display name produces a genuine 401 — which reads in the
+evidence exactly like a wrong password. Two symptoms identify it:
+
+| Evidence | Meaning |
+| --- | --- |
+| `form gone: no` | still on the login form — a captcha, a second factor, or a rejected submit |
+| `form gone: yes` **and** `INVALID_CREDENTIALS` | the form submitted and the portal answered 401/403 — wrong username or password |
+
+**No device-approval notification arrives for a failed login.** Device trust is only requested
+*after* the credentials pass, so a missing notification is a symptom of the 401 rather than a
+separate problem to chase. Waiting for one, or wiping the profile to provoke one, changes nothing.
+
+If the credentials work in an ordinary browser but the headless login still gets 401, the portal
+is refusing the automated client specifically. Paste a bearer instead — `stockbit:token:set` reads
+it from stdin so it never reaches your shell history — and sort the headless path out without a
+collection deadline hanging over it.
+
 ### Unattended renewal
 
 `automation:token-refresh` renews the bearer on a schedule, so a token that expires overnight
@@ -2100,6 +2139,9 @@ Diagnosing a missed run:
    worker on the box with the `artisan` path that says which app it belongs to; another
    project's worker never picks these jobs up. Scheduled runs are unaffected — they execute
    inside the cron process.
+   A failed renewal also carries its own remedy: open the run on the Automation page and the
+   detail shows a **What to do** block keyed on the failure's reason code, with the steps in the
+   order they must be run.
 7. **`Stockbit Token Renewal` fails in milliseconds with `profile_unusable`** → the process that
    ran it is not the user that owns `BROWSER_AUTH_PROFILE_DIR`. The message names the owner and
    the user it ran as; move the crontab to the owner (`sudo -u www-data crontab -e`) rather than

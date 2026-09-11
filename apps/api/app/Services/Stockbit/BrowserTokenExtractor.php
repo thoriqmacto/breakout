@@ -57,7 +57,9 @@ class BrowserTokenExtractor
      * whoever is looking at the dashboard.
      */
     private const EXPLANATIONS = [
-        self::INVALID_CREDENTIALS => 'The portal rejected those credentials, or asked for a second factor this cannot answer.',
+        self::INVALID_CREDENTIALS => 'The portal rejected those credentials, or asked for a second factor this cannot answer. '
+            .'A portal that greets you by a display name usually still wants the account email address as the username. '
+            .'No device-approval notification is sent for a login that never got past this step.',
         self::PROFILE_SIGNED_OUT => 'The saved browser profile is signed out, and no password was supplied. '
             .'Sign in once interactively to re-establish it. If another user can sign in with the same '
             .'profile, this user cannot read it -- see "Being a device the portal recognises".',
