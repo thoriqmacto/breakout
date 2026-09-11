@@ -23,8 +23,24 @@ import {
   type StrategyRecord,
 } from "@/lib/strategy-builder-client"
 import { BuiltInStrategies } from "@/components/built-in-strategies"
+import { BacktestPanel } from "@/components/backtest-panel"
+import { StrategyComparison } from "@/components/strategy-comparison"
 
 type Scope = "mine" | "public" | "all"
+
+/**
+ * Three things sit on this page now: the rule-builder strategies, backtesting
+ * a built-in over one symbol, and comparing every built-in on one symbol. They
+ * are tabs rather than stacked cards because only one of them is ever the
+ * question being asked, and stacking pushed the comparison below the fold.
+ */
+type Tab = "strategies" | "backtest" | "comparison"
+
+const TABS: { value: Tab; label: string }[] = [
+  { value: "strategies", label: "Strategies" },
+  { value: "backtest", label: "Backtest" },
+  { value: "comparison", label: "Compare" },
+]
 
 const SCOPES: { value: Scope; label: string; empty: string }[] = [
   { value: "mine", label: "My strategies", empty: "You have not created a strategy yet." },
@@ -41,6 +57,7 @@ export default function StrategiesPage() {
   const [error, setError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [tab, setTab] = useState<Tab>("strategies")
 
   const load = useCallback(async () => {
     if (!accessToken) return
@@ -143,6 +160,29 @@ export default function StrategiesPage() {
         </div>
       </div>
 
+      <div className="flex gap-1 border-b" role="tablist" aria-label="Strategies view">
+        {TABS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            role="tab"
+            aria-selected={tab === option.value}
+            onClick={() => setTab(option.value)}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+              tab === option.value
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "backtest" ? <BacktestPanel strategies={builtIn} /> : null}
+      {tab === "comparison" ? <StrategyComparison /> : null}
+
+      {tab === "strategies" ? (
       <div className="flex flex-wrap gap-2">
         {SCOPES.map((option) => (
           <Button
@@ -155,6 +195,7 @@ export default function StrategiesPage() {
           </Button>
         ))}
       </div>
+      ) : null}
 
       {notice ? (
         <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
@@ -168,7 +209,7 @@ export default function StrategiesPage() {
         </div>
       ) : null}
 
-      {loading ? (
+      {tab !== "strategies" ? null : loading ? (
         <Card>
           <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading strategies…

@@ -10,6 +10,7 @@ use App\Models\Asset;
 use App\Models\Metric;
 use App\Services\Analysis\AssetMetricProjector;
 use App\Services\AssetMetrics;
+use App\Services\Assets\AssetCoverage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -46,8 +47,13 @@ class AssetController extends ApiController
      * opened. PBAS is a broker-accumulation signal and is scored in the
      * execution pipeline; it has no place in a structural ordering.
      */
-    public function metricsIndex()
+    public function metricsIndex(AssetCoverage $coverage)
     {
+        // Read once for the whole table rather than per row: the page shows
+        // every asset, and a query each would be one round trip per symbol for
+        // a column nobody would wait for.
+        $coverageByAsset = $coverage->all();
+
         $metrics = Metric::orderByDesc('sort_uptrend')
             ->orderByDesc('sort_roc13')
             ->orderByDesc('sort_close_vs_high55')
@@ -82,6 +88,10 @@ class AssetController extends ApiController
                 'bars' => $metric->bars,
                 'pbas' => $metric->pbas,
                 'bavg' => $metric->bavg,
+                // Null rather than zeroes when the asset holds no bars at all:
+                // "nothing collected yet" and "collected with holes" are
+                // different states and the page says so differently.
+                'coverage' => $coverageByAsset[$metric->asset_id] ?? null,
             ];
         }
 
@@ -90,7 +100,7 @@ class AssetController extends ApiController
         ]);
     }
 
-    public function metricForAsset(Asset $asset)
+    public function metricForAsset(Asset $asset, AssetCoverage $coverage)
     {
         $metric = Metric::where('asset_id', $asset->id)->first();
 
@@ -119,6 +129,7 @@ class AssetController extends ApiController
                 'bars' => $metric->bars,
                 'pbas' => $metric->pbas,
                 'bavg' => $metric->bavg,
+                'coverage' => $coverage->forAsset($asset->id),
             ],
         ]);
     }

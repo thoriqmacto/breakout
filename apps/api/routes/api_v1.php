@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\AutomationController;
 use App\Http\Controllers\Api\V1\BacktestController;
+use App\Http\Controllers\Api\V1\BacktestRunController;
 use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Api\V1\ReconciliationController;
 use App\Http\Controllers\Api\V1\ScheduledTaskController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\StockbitTokenController;
+use App\Http\Controllers\Api\V1\StrategyAlertController;
 use App\Http\Controllers\Api\V1\StrategyController;
 use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
@@ -94,7 +96,28 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('broker-summary.entries.index');
 
     // Backtest
+    // The original endpoint: stateless, takes the bars in the request body,
+    // stores nothing. Kept because the HLSL breakout flow still posts to it.
     Route::get('backtest', [BacktestController::class, 'run']);
+
+    // Stored backtests: same runner the CLI uses, same rows, so a run started
+    // from the dashboard and one started from a terminal are the same thing
+    // afterwards.
+    Route::post('backtests', [BacktestRunController::class, 'store'])
+        ->name('backtests.store');
+    Route::get('backtests', [BacktestRunController::class, 'index'])
+        ->name('backtests.index');
+    Route::get('backtests/comparison', [BacktestRunController::class, 'comparison'])
+        ->name('backtests.comparison');
+    // Declared last: "comparison" would otherwise be captured as a run id.
+    Route::get('backtests/{run}', [BacktestRunController::class, 'show'])
+        ->name('backtests.show');
+
+    // Standing requests to be told when a strategy fires on an asset.
+    Route::get('strategy-alerts', [StrategyAlertController::class, 'index']);
+    Route::post('strategy-alerts', [StrategyAlertController::class, 'store']);
+    Route::patch('strategy-alerts/{strategyAlert}', [StrategyAlertController::class, 'update']);
+    Route::delete('strategy-alerts/{strategyAlert}', [StrategyAlertController::class, 'destroy']);
 
     // Scraper requests history
     Route::get('scraper-requests', [ScraperRequestController::class, 'index']);

@@ -6,7 +6,6 @@ import { useEffect, useState, type ReactNode } from "react"
 import {
   Bot,
   Boxes,
-  CalendarDays,
   HandCoins,
   LayoutDashboard,
   LineChart,
@@ -47,11 +46,6 @@ const navigation: NavigationItem[] = [
     label: "Portfolio",
     href: "/dashboard/portfolio",
     icon: Briefcase,
-  },
-  {
-    label: "Trading Days",
-    href: "/dashboard/trading-days",
-    icon: CalendarDays,
   },
   {
     label: "Broker Summary",

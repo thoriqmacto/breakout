@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 
 import { useAuth } from "@/components/auth-provider"
@@ -13,6 +14,7 @@ import {
   type AssetMetricRow,
 } from "@/lib/asset-metrics"
 import { AddAssetButton } from "@/components/add-asset-button"
+import { TradingCalendar } from "@/components/trading-calendar"
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
@@ -75,7 +77,12 @@ const formatBandarAverage = (bavg: number | null, close: number | null) => {
   return `${formattedPrice}(${sign}${percentFormatter.format(diffPercent)}%)`
 }
 
-type ColumnKey = keyof AssetMetricRow
+/**
+ * Most columns are a field on the row. Coverage is one object supplying three
+ * of them -- last bar, gaps, staleness -- so the key type is widened rather
+ * than the row flattened: the three read together and are stored together.
+ */
+type ColumnKey = keyof AssetMetricRow | "lastBar" | "sessionsMissing" | "sessionsBehind"
 
 type SortDirection = "asc" | "desc"
 
@@ -289,7 +296,60 @@ const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
     getCopyValue: (row) => formatNumber(row.bars, integerFormatter),
     render: (row) => formatNumber(row.bars, integerFormatter),
   },
+  {
+    key: "lastBar",
+    label: "Last bar",
+    align: "left",
+    cellClassName: "tabular-nums text-muted-foreground",
+    getSortValue: (row) => row.coverage?.lastBarDate ?? null,
+    getCopyValue: (row) => row.coverage?.lastBarDate ?? "—",
+    render: (row) => row.coverage?.lastBarDate ?? "—",
+  },
+  {
+    key: "sessionsMissing",
+    // "Gaps", not "Missing bars": the number is sessions the market held
+    // inside this asset's own span that it has no bar for. An asset listed
+    // last month is not missing the years before it existed.
+    label: "Gaps",
+    align: "right",
+    cellClassName: "tabular-nums",
+    getSortValue: (row) => row.coverage?.sessionsMissing ?? null,
+    getCopyValue: (row) =>
+      row.coverage ? String(row.coverage.sessionsMissing) : "—",
+    render: (row) => <CoverageCount value={row.coverage?.sessionsMissing ?? null} />,
+  },
+  {
+    key: "sessionsBehind",
+    // Deliberately separate from Gaps. A hole in the middle of a history and a
+    // symbol that stopped updating a week ago are different failures with
+    // different fixes, and one column covering both would name neither.
+    label: "Behind",
+    align: "right",
+    cellClassName: "tabular-nums",
+    getSortValue: (row) => row.coverage?.sessionsBehind ?? null,
+    getCopyValue: (row) =>
+      row.coverage ? String(row.coverage.sessionsBehind) : "—",
+    render: (row) => <CoverageCount value={row.coverage?.sessionsBehind ?? null} />,
+  },
 ]
+
+/**
+ * Zero is the answer worth seeing quietly; anything else is worth seeing.
+ *
+ * An em dash rather than a zero when there is no coverage at all, because
+ * "no bars collected yet" is not "collected, nothing missing".
+ */
+function CoverageCount({ value }: { value: number | null }) {
+  if (value === null) return <span className="text-muted-foreground">—</span>
+
+  if (value === 0) return <span className="text-muted-foreground">0</span>
+
+  return (
+    <span className="rounded-full bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+      {integerFormatter.format(value)}
+    </span>
+  )
+}
 
 const COLUMN_MAP = ASSET_METRIC_COLUMNS.reduce(
   (accumulator, column) => {
@@ -304,8 +364,16 @@ const DEFAULT_VISIBLE_COLUMN_KEYS = ASSET_METRIC_COLUMNS.filter(
   (column) => column.defaultVisible !== false,
 ).map((column) => column.key)
 
+type AssetsView = "metrics" | "calendar"
+
 export default function AssetsMetricsPage() {
   const { accessToken } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  // In the URL rather than in component state: the retired
+  // /dashboard/trading-days route redirects straight to ?view=calendar, and a
+  // tab nobody can link to is a tab nobody can bookmark.
+  const view: AssetsView = searchParams.get("view") === "calendar" ? "calendar" : "metrics"
   const [rows, setRows] = useState<AssetMetricRow[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -848,8 +916,53 @@ export default function AssetsMetricsPage() {
             <Link href="/dashboard/assets/settings">Asset Setting</Link>
           </Button>
         </div>
+        <div className="flex gap-1 border-b pt-2" role="tablist" aria-label="Assets view">
+          <ViewTab
+            label="Assets"
+            active={view === "metrics"}
+            onSelect={() => router.replace("/dashboard/assets")}
+          />
+          <ViewTab
+            label="Trading calendar"
+            active={view === "calendar"}
+            onSelect={() => router.replace("/dashboard/assets?view=calendar")}
+          />
+        </div>
       </div>
-      {content}
+      {view === "calendar" ? <TradingCalendar /> : content}
     </div>
+  )
+}
+
+/**
+ * The calendar is market-wide and the metrics table is per asset, so they are
+ * two views of one page rather than two columns of one table. Everything that
+ * *is* per asset -- how many bars, how many gaps, how stale -- folded into the
+ * table itself, which is where the question was being asked.
+ */
+function ViewTab({
+  label,
+  active,
+  onSelect,
+}: {
+  label: string
+  active: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onSelect}
+      className={classNames(
+        "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+        active
+          ? "border-primary text-foreground"
+          : "border-transparent text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {label}
+    </button>
   )
 }
