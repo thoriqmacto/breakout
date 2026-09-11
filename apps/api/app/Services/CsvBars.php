@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Support\PathOwnership;
 use DateTime;
+use RuntimeException;
 
 class CsvBars
 {
@@ -61,11 +63,23 @@ class CsvBars
     public static function write(string $path, array $rows): void
     {
         $dir = dirname($path);
-        if (! is_dir($dir)) {
-            mkdir($dir, 0777, true);
+
+        if (! is_dir($dir) && ! @mkdir($dir, 0775, true) && ! is_dir($dir)) {
+            throw new RuntimeException(self::writeFailure($dir));
         }
+
         $tmp = $path.'.tmp';
-        $h = fopen($tmp, 'w');
+        $h = @fopen($tmp, 'w');
+
+        // Unchecked, this handed `false` to fputcsv() and the run died on a
+        // type error three lines later -- or, before that, on PHP's own
+        // "Failed to open stream: Permission denied", which names the file and
+        // neither the user that could not write it nor the user that owns the
+        // directory. Those two names are the whole diagnosis.
+        if ($h === false) {
+            throw new RuntimeException(self::writeFailure($dir));
+        }
+
         fputcsv($h, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'], ',', '"', '\\');
         ksort($rows);
         foreach ($rows as $d => $r) {
@@ -74,7 +88,56 @@ class CsvBars
             fputcsv($h, [$outDate, $r['open'], $r['high'], $r['low'], $r['close'], $r['volume']], ',', '"', '\\');
         }
         fclose($h);
-        rename($tmp, $path);
+
+        // A failed rename used to be silent, which is the worst of the three
+        // outcomes: the caller counts a bar as saved, the destination still
+        // holds yesterday's file, and a scratch file is left behind to be
+        // mistaken for data later.
+        if (! @rename($tmp, $path)) {
+            @unlink($tmp);
+
+            throw new RuntimeException(self::writeFailure($dir));
+        }
+    }
+
+    /**
+     * Name the directory, its owner, and the user that could not write there.
+     *
+     * This has now cost three separate investigations in one week -- the
+     * storage logs, the browser profile, and this -- each of which began with
+     * a message that said permission was denied without saying to whom. The
+     * cause is always the same shape: a directory established by one user and
+     * written by another after the scheduler moved.
+     */
+    private static function writeFailure(string $directory): string
+    {
+        $reason = PathOwnership::writeReason($directory);
+        $current = PathOwnership::currentUser();
+        $owner = PathOwnership::owner($directory);
+
+        if ($owner === null || $owner === $current) {
+            return sprintf(
+                'Could not write to %s: the directory %s for %s. Check its ownership and mode.',
+                $directory,
+                $reason,
+                $current,
+            );
+        }
+
+        return sprintf(
+            'Could not write to %s: the directory %s for %s, and it belongs to %s. '
+            .'Either run as %s, or give %s ownership of the data directory '
+            .'(chown -R %s %s). A data directory differs from a browser profile here: '
+            .'sharing it is the intended arrangement.',
+            $directory,
+            $reason,
+            $current,
+            $owner,
+            $owner,
+            $current,
+            $current,
+            $directory,
+        );
     }
 
     /**

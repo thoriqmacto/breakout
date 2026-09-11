@@ -2,6 +2,7 @@
 
 namespace App\Services\Stockbit;
 
+use App\Support\PathOwnership;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -419,34 +420,16 @@ class BrowserTokenExtractor
 
     private function ownerOf(string $path): ?string
     {
-        $uid = @fileowner($path);
-
-        if ($uid === false) {
-            return null;
-        }
-
-        if (function_exists('posix_getpwuid')) {
-            $entry = posix_getpwuid($uid);
-
-            if (is_array($entry) && isset($entry['name'])) {
-                return (string) $entry['name'];
-            }
-        }
-
-        return (string) $uid;
+        return PathOwnership::owner($path);
     }
 
     private function currentUser(): string
     {
-        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
-            $entry = posix_getpwuid(posix_geteuid());
+        $user = PathOwnership::currentUser();
 
-            if (is_array($entry) && isset($entry['name'])) {
-                return (string) $entry['name'];
-            }
-        }
-
-        return (string) (getenv('USER') ?: 'this user');
+        // These messages read "not writable by <this>", where an unresolvable
+        // user is better named "this user" than "unknown".
+        return $user === 'unknown' ? 'this user' : $user;
     }
 
     public function probePath(string $filename): string
