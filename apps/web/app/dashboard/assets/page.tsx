@@ -14,6 +14,7 @@ import {
   type AssetMetricRow,
 } from "@/lib/asset-metrics"
 import { AddAssetButton } from "@/components/add-asset-button"
+import { InfoTip } from "@/components/ui/info-tip"
 import { TradingCalendar } from "@/components/trading-calendar"
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
@@ -816,6 +817,7 @@ export default function AssetsMetricsPage() {
                         column.headerClassName,
                       )}
                     >
+                      <span className={classNames("flex items-center gap-1", buttonAlignment)}>
                       <button
                         type="button"
                         onClick={(event) => handleSortToggle(column.key, event.shiftKey)}
@@ -841,6 +843,11 @@ export default function AssetsMetricsPage() {
                           )}
                         </span>
                       </button>
+                      <InfoTip
+                        term={column.key === "rank" ? "structuralRank" : column.key}
+                        align={column.align === "right" ? "right" : "left"}
+                      />
+                      </span>
                     </th>
                   )
                 })}

@@ -25,6 +25,7 @@ import {
 import { BuiltInStrategies } from "@/components/built-in-strategies"
 import { BacktestPanel } from "@/components/backtest-panel"
 import { StrategyComparison } from "@/components/strategy-comparison"
+import { ArmedAlerts } from "@/components/armed-alerts"
 
 type Scope = "mine" | "public" | "all"
 
@@ -34,12 +35,13 @@ type Scope = "mine" | "public" | "all"
  * are tabs rather than stacked cards because only one of them is ever the
  * question being asked, and stacking pushed the comparison below the fold.
  */
-type Tab = "strategies" | "backtest" | "comparison"
+type Tab = "strategies" | "backtest" | "comparison" | "alerts"
 
 const TABS: { value: Tab; label: string }[] = [
   { value: "strategies", label: "Strategies" },
   { value: "backtest", label: "Backtest" },
   { value: "comparison", label: "Compare" },
+  { value: "alerts", label: "Alerts" },
 ]
 
 const SCOPES: { value: Scope; label: string; empty: string }[] = [
@@ -181,6 +183,7 @@ export default function StrategiesPage() {
 
       {tab === "backtest" ? <BacktestPanel strategies={builtIn} /> : null}
       {tab === "comparison" ? <StrategyComparison /> : null}
+      {tab === "alerts" ? <ArmedAlerts /> : null}
 
       {tab === "strategies" ? (
       <div className="flex flex-wrap gap-2">

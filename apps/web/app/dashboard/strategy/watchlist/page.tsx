@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Loader2, RefreshCcw } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
+import { InfoTip } from "@/components/ui/info-tip"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -235,6 +236,21 @@ export default function StrategyWatchlistPage() {
             </p>
           ) : null}
 
+          <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-sm">
+            <p className="font-medium">This score ranks setups. It does not say what to execute.</p>
+            <p className="mt-1 text-muted-foreground">
+              A high score means the setup is high quality relative to the others on this date —
+              broker accumulation, price structure and the risk filters. It is <strong>not</strong> a
+              gate on whether the setup is actionable: a symbol can score in the 80s here and be a
+              WATCH on Execution, because arming a setup takes two different things — price within
+              one ATR of its 20-session high, and brokers actually accumulating. Open{" "}
+              <Link href="/dashboard/execution" className="font-medium underline">
+                Execution
+              </Link>{" "}
+              for that question, and its <em>How a status is decided</em> panel for the full ladder.
+            </p>
+          </div>
+
           <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-muted-foreground">
             <p>
               Scan date:{" "}
@@ -259,19 +275,19 @@ export default function StrategyWatchlistPage() {
               <table className="min-w-full text-sm">
                 <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
                   <tr>
-                    <th className="px-3 py-2 text-left">Symbol</th>
-                    <th className="px-3 py-2 text-right">Score</th>
-                    <th className="px-3 py-2 text-right">BAS</th>
-                    <th className="px-3 py-2 text-right">BCS</th>
-                    <th className="px-3 py-2 text-center">LF</th>
-                    <th className="px-3 py-2 text-center">RRF</th>
-                    <th className="px-3 py-2 text-right">Close</th>
-                    <th className="px-3 py-2 text-right">Stop</th>
-                    <th className="px-3 py-2 text-right">Target</th>
-                    <th className="px-3 py-2 text-right">R/R</th>
-                    <th className="px-3 py-2 text-right">VolR</th>
-                    <th className="px-3 py-2 text-center">Brk20</th>
-                    <th className="px-3 py-2 text-right">Why</th>
+                    <th className="px-3 py-2 text-left"><InfoTip term="symbol" align="left">Symbol</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="watchlistScore" align="right">Score</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="bas" align="right">BAS</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="bcs" align="right">BCS</InfoTip></th>
+                    <th className="px-3 py-2 text-center"><InfoTip term="liquidityFilter" align="left">LF</InfoTip></th>
+                    <th className="px-3 py-2 text-center"><InfoTip term="riskRewardFilter" align="left">RRF</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="close" align="right">Close</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="stop" align="right">Stop</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="target" align="right">Target</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="riskReward" align="right">R/R</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="volumeRatio" align="right">VolR</InfoTip></th>
+                    <th className="px-3 py-2 text-center"><InfoTip term="breakout20" align="left">Brk20</InfoTip></th>
+                    <th className="px-3 py-2 text-right"><InfoTip term="why" align="right">Why</InfoTip></th>
                   </tr>
                 </thead>
                 <tbody>
