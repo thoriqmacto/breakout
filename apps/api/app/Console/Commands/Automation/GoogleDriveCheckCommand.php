@@ -63,7 +63,14 @@ class GoogleDriveCheckCommand extends Command
     ): int {
         $disk = $this->diskName();
         $status = $health->check($disk);
-        $code = (string) ($status['code'] ?? Code::UNKNOWN_ERROR);
+
+        // `code` is null when the grant is healthy -- the health check reserves
+        // it for something to act on -- so falling back to UNKNOWN_ERROR on a
+        // null read every working grant as a broken one: the probe raised
+        // "Google Drive is not usable" carrying the message "Google Drive OAuth
+        // is healthy", exited non-zero, and never cleared its own alert.
+        // `status` always carries the verdict, so it is the one to read.
+        $code = (string) ($status['code'] ?? $status['status'] ?? Code::UNKNOWN_ERROR);
 
         // Never Google's raw response: it describes a request carrying the
         // client secret and the refresh token. The health check has already

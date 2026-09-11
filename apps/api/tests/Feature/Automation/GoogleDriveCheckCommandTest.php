@@ -34,16 +34,26 @@ class GoogleDriveCheckCommandTest extends TestCase
         Storage::fake('local');
     }
 
+    /**
+     * Exactly the shape GoogleDriveHealth::result() returns.
+     *
+     * It used to differ in the two fields that mattered: `status` was the
+     * literal 'error' rather than the verdict, and `code` was set even when
+     * healthy. The real check leaves `code` NULL for a healthy grant -- it is
+     * reserved for something to act on -- so every test here exercised a
+     * response production never produces, and the healthy path was green in
+     * CI while failing on the server.
+     */
     private function health(string $code, string $message = 'Drive says so.'): void
     {
         $this->mock(GoogleDriveHealth::class, function ($mock) use ($code, $message) {
             $mock->shouldReceive('check')->andReturn([
-                'status' => $code === Code::HEALTHY ? 'healthy' : 'error',
+                'status' => $code,
                 'configured' => $code !== Code::NOT_CONFIGURED,
                 'connected' => $code === Code::HEALTHY,
                 'refresh_token_status' => $code,
                 'can_read' => $code === Code::HEALTHY,
-                'code' => $code,
+                'code' => $code === Code::HEALTHY ? null : $code,
                 'message' => $message,
                 'guidance' => ['Re-authorise from the Backups page.'],
                 'checked_at' => now()->toIso8601String(),

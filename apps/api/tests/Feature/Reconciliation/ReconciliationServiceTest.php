@@ -165,9 +165,24 @@ class ReconciliationServiceTest extends TestCase
 
     /**
      * The property the nightly job depends on.
+     *
+     * Time is frozen because the manifest carries `generated_at`, and it is
+     * inside the hashed content. Two runs a second apart therefore produce
+     * two manifest hashes no matter what the data did, which made this
+     * assertion a race against the clock: green while both runs landed in
+     * the same second, red on a slower machine. It failed in CI exactly that
+     * way, and `$this->travel(1)->second()` between the runs reproduces it
+     * every time.
+     *
+     * Freezing is the right fix rather than dropping `generated_at` from the
+     * hash: the stored timestamp is what the readiness check reads to say how
+     * fresh the recovery layer is, so it has to keep moving in production.
+     * What this test is about is the documents, not the clock.
      */
     public function test_a_second_run_with_no_new_data_rewrites_nothing(): void
     {
+        $this->freezeTime();
+
         $asset = $this->asset();
         $this->bar($asset, '2026-09-01', 1000);
         $this->window($asset, '2026-09-01', '2026-09-01');
