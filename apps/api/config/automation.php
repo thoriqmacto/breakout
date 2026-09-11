@@ -185,6 +185,14 @@ return [
             ],
         ],
 
+        'automation:strategy-alerts' => [
+            'label' => 'Strategy alerts',
+            'description' => 'Evaluate every enabled strategy alert against its asset\'s newest bar and raise a dashboard reminder when one fires. Uses the same strategy classes the backtester walks history with, so an alert cannot disagree with the backtest that justified it.',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [],
+        ],
+
         'automation:gdrive-check' => [
             'label' => 'Google Drive check',
             'description' => 'Spend the Google Drive refresh token and raise a dashboard reminder when the grant no longer works. A refresh token carries no readable expiry, so probing it is the only way to know before a collector needs it.',
@@ -409,6 +417,18 @@ return [
             'cron_expression' => '0 18 * * *',
             'condition' => 'none',
             'priority' => 30,
+            'enabled' => true,
+            'sync_gdrive_after_success' => false,
+        ],
+        [
+            'name' => 'Strategy Alerts',
+            'slug' => 'strategy-alerts',
+            'description' => 'Every day at 18:30 WIB, after the analysis refresh has landed, ask each watched strategy whether it fires on its asset\'s newest bar. A signal found here is for the next session -- the bar it fired on has already closed. Condition "none" because it reads only stored bars: on a day the market did not trade there is no new bar, the last evaluated session is unchanged, and nothing fires twice.',
+            'command' => 'automation:strategy-alerts',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '30 18 * * *',
+            'condition' => 'none',
+            'priority' => 40,
             'enabled' => true,
             'sync_gdrive_after_success' => false,
         ],

@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { AssetAlertsCard } from "@/components/asset-alerts-card"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import {
   normalizeMetrics,
@@ -396,6 +397,23 @@ export default function AssetDetailPage() {
           </CardHeader>
           <CardContent>
             <CoveragePanel coverage={metric?.coverage ?? null} loading={metricLoading} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Strategy alerts</CardTitle>
+            <CardDescription>
+              Be told when a strategy fires on this asset. Evaluated after the evening collection,
+              so a signal is for the next session.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {asset ? (
+              <AssetAlertsCard assetId={asset.id} symbol={asset.symbol} />
+            ) : (
+              <p className="text-sm text-muted-foreground">Loading asset…</p>
+            )}
           </CardContent>
         </Card>
 

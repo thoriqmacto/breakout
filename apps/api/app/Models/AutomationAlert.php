@@ -24,6 +24,16 @@ class AutomationAlert extends Model
      */
     public const TYPE_GOOGLE_DRIVE = 'google_drive';
 
+    /**
+     * A strategy a user asked to be told about fired on an asset.
+     *
+     * Its own type because it is the only alert that is not about the system
+     * being broken: the others say something needs fixing, this one says
+     * something needs deciding, and mixing them would make "no alerts" stop
+     * meaning "nothing is wrong".
+     */
+    public const TYPE_STRATEGY_SIGNAL = 'strategy_signal';
+
     public const SEVERITY_INFO = 'info';
 
     public const SEVERITY_WARNING = 'warning';

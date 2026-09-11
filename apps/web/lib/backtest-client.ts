@@ -70,6 +70,8 @@ export type StrategyComparisonRow = {
  */
 export type BuiltInStrategyOption = {
   key: string
+  /** The catalogue calls it `name`; `label` is accepted for callers that map. */
+  name?: string | null
   label?: string | null
 }
 

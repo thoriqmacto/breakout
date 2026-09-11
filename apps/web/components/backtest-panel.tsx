@@ -143,7 +143,7 @@ export function BacktestPanel({
               >
                 {strategies.map((option) => (
                   <option key={option.key} value={option.key}>
-                    {option.label ?? option.key}
+                    {option.name ?? option.label ?? option.key}
                   </option>
                 ))}
               </select>

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\ReconciliationController;
 use App\Http\Controllers\Api\V1\ScheduledTaskController;
 use App\Http\Controllers\Api\V1\ScraperRequestController;
 use App\Http\Controllers\Api\V1\StockbitTokenController;
+use App\Http\Controllers\Api\V1\StrategyAlertController;
 use App\Http\Controllers\Api\V1\StrategyController;
 use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
@@ -111,6 +112,12 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     // Declared last: "comparison" would otherwise be captured as a run id.
     Route::get('backtests/{run}', [BacktestRunController::class, 'show'])
         ->name('backtests.show');
+
+    // Standing requests to be told when a strategy fires on an asset.
+    Route::get('strategy-alerts', [StrategyAlertController::class, 'index']);
+    Route::post('strategy-alerts', [StrategyAlertController::class, 'store']);
+    Route::patch('strategy-alerts/{strategyAlert}', [StrategyAlertController::class, 'update']);
+    Route::delete('strategy-alerts/{strategyAlert}', [StrategyAlertController::class, 'destroy']);
 
     // Scraper requests history
     Route::get('scraper-requests', [ScraperRequestController::class, 'index']);
