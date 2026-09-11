@@ -282,6 +282,35 @@ class BrowserTokenEvidenceTest extends TestCase
         $this->assertStringContainsString('cannot read it', $message);
     }
 
+    /**
+     * The trap this cost an evening to find: the account's display name is not
+     * its username. The portal answers 401, which is a real rejection, so the
+     * evidence reads exactly like a wrong password -- and because the login
+     * never passed that step, no device-approval notification arrives either,
+     * which invites the operator to go looking at the device instead.
+     */
+    public function test_rejected_credentials_name_the_email_trap_and_the_missing_notification(): void
+    {
+        $exception = $this->failureFor((string) json_encode([
+            'ok' => false,
+            'code' => 'INVALID_CREDENTIALS',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 566,
+                'authorization_headers' => 1,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+            ],
+        ]));
+
+        $this->assertSame(BrowserTokenExtractor::INVALID_CREDENTIALS, $exception->failureCode);
+
+        $message = $exception->getMessage();
+
+        $this->assertStringContainsString('email address', $message);
+        $this->assertStringContainsString('notification', $message);
+    }
+
     public function test_the_password_never_appears_in_the_diagnosis(): void
     {
         $exception = $this->failureFor((string) json_encode([

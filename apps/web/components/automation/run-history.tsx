@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge, RunStatusBadge } from "@/components/automation/badges"
+import { RunRemedy } from "@/components/automation/run-remedy"
 import {
   formatDuration,
   formatJakarta,
@@ -104,6 +105,8 @@ function RunRow({ run, command }: { run: TaskRun; command: string }) {
           </p>
         </div>
       ) : null}
+
+      <RunRemedy run={run} />
 
       {run.output ? (
         <div className="mt-3">
