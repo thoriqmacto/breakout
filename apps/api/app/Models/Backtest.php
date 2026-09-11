@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Backtest extends Model
@@ -20,6 +21,10 @@ class Backtest extends Model
     protected $fillable = [
         'run_id',
         'created_at',
+        'asset_id',
+        'symbol',
+        'strategy',
+        'source',
         'params_json',
         'stats_json',
         'notes',
@@ -37,5 +42,13 @@ class Backtest extends Model
     public function trades(): HasMany
     {
         return $this->hasMany(BacktestTrade::class, 'run_id', 'run_id');
+    }
+
+    /**
+     * @return BelongsTo<Asset, Backtest>
+     */
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class);
     }
 }

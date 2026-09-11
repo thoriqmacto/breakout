@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\AutomationController;
 use App\Http\Controllers\Api\V1\BacktestController;
+use App\Http\Controllers\Api\V1\BacktestRunController;
 use App\Http\Controllers\Api\V1\BackupStatusController;
 use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
@@ -94,7 +95,22 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('broker-summary.entries.index');
 
     // Backtest
+    // The original endpoint: stateless, takes the bars in the request body,
+    // stores nothing. Kept because the HLSL breakout flow still posts to it.
     Route::get('backtest', [BacktestController::class, 'run']);
+
+    // Stored backtests: same runner the CLI uses, same rows, so a run started
+    // from the dashboard and one started from a terminal are the same thing
+    // afterwards.
+    Route::post('backtests', [BacktestRunController::class, 'store'])
+        ->name('backtests.store');
+    Route::get('backtests', [BacktestRunController::class, 'index'])
+        ->name('backtests.index');
+    Route::get('backtests/comparison', [BacktestRunController::class, 'comparison'])
+        ->name('backtests.comparison');
+    // Declared last: "comparison" would otherwise be captured as a run id.
+    Route::get('backtests/{run}', [BacktestRunController::class, 'show'])
+        ->name('backtests.show');
 
     // Scraper requests history
     Route::get('scraper-requests', [ScraperRequestController::class, 'index']);

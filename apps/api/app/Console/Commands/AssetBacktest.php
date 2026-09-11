@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
-use App\Services\AssetMetrics;
-use App\Services\Backtest\GenericBacktester;
+use App\Services\Backtest\BacktestRunner;
 use App\Services\Backtest\HLSLBreakoutBacktestService;
 use App\Services\Strategies\StrategyCatalogue;
 use App\Services\Strategies\TrailingStop;
@@ -35,8 +34,10 @@ class AssetBacktest extends Command
      */
     protected $description = 'Run a backtest for a given asset symbol and strategy';
 
-    public function __construct(private readonly HLSLBreakoutBacktestService $hlslBacktest)
-    {
+    public function __construct(
+        private readonly HLSLBreakoutBacktestService $hlslBacktest,
+        private readonly BacktestRunner $runner,
+    ) {
         parent::__construct();
     }
 
@@ -87,17 +88,22 @@ class AssetBacktest extends Command
 
         $capital = (float) $this->option('capital');
 
+        // Parsed into a spec rather than a TrailingStop: the runner builds the
+        // object, so the CLI and the API describe a trailing stop the same way
+        // and only one place knows how to construct one.
         $trailingOpt = (string) $this->option('trailing');
-        $trailingStop = null;
+        $trailingSpec = null;
         if ($trailingOpt !== '') {
             [$type, $params] = explode(':', $trailingOpt, 2) + [null, null];
             if ($type === 'percent' && $params !== null) {
-                $trailingStop = TrailingStop::percent((float) $params);
+                $trailingSpec = ['type' => 'percent', 'percent' => (float) $params];
             } elseif ($type === 'atr' && $params !== null) {
                 $parts = array_map('trim', explode(',', $params));
-                $multiple = (float) ($parts[0] ?? 0);
-                $period = isset($parts[1]) ? (int) $parts[1] : 14;
-                $trailingStop = TrailingStop::atr($multiple, $period);
+                $trailingSpec = [
+                    'type' => 'atr',
+                    'multiple' => (float) ($parts[0] ?? 0),
+                    'period' => isset($parts[1]) ? (int) $parts[1] : 14,
+                ];
             } else {
                 $this->error('Invalid trailing stop format.');
 
@@ -159,15 +165,15 @@ class AssetBacktest extends Command
 
                 $metricsByName = [];
                 foreach ($names as $name) {
-                    $class = $map[$name];
-                    $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
-                    $strategy = $useTrailing
-                        ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
-                        : new $class(new AssetMetrics([$bars[0]]));
-                    $backtester = new GenericBacktester($strategy);
-                    $result = $backtester->run($bars, $capital);
-                    $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
-                    $metricsByName[$name] = $this->formatMetrics($metrics);
+                    $useTrailing = $trailingSpec && ($applyTrailingToAll || in_array($name, $trailingStrategies, true));
+
+                    $run = $this->runner->run($symbol, $name, [
+                        'capital' => $capital,
+                        'trailing' => $useTrailing ? $trailingSpec : null,
+                        'source' => 'cli',
+                    ]);
+
+                    $metricsByName[$name] = $this->formatMetrics($run->stats_json);
                 }
 
                 $metricLabels = [
@@ -218,16 +224,20 @@ class AssetBacktest extends Command
             $this->info("Ticker: {$symbol}");
             $this->info('Bars: '.count($bars));
 
-            $useTrailing = $trailingStop && ($applyTrailingToAll || in_array($strategyOption, $trailingStrategies, true));
-            $strategy = $useTrailing
-                ? new $class(new AssetMetrics([$bars[0]]), trailingStop: $trailingStop)
-                : new $class(new AssetMetrics([$bars[0]]));
-            $backtester = new GenericBacktester($strategy);
+            $useTrailing = $trailingSpec && ($applyTrailingToAll || in_array($strategyOption, $trailingStrategies, true));
 
-            $result = $backtester->run($bars, $capital);
+            $run = $this->runner->run($symbol, $strategyOption, [
+                'capital' => $capital,
+                'trailing' => $useTrailing ? $trailingSpec : null,
+                'source' => 'cli',
+            ]);
 
-            $metrics = $backtester->calculateMetrics($bars, $result['equity_curve'], $result['trades'], $capital, $result['final_equity']);
-            $metrics = $this->formatMetrics($metrics);
+            // Printed so a terminal run is linkable afterwards: the dashboard
+            // shows this same row, and without the id there is no way back to
+            // it from here.
+            $this->line("Run: {$run->run_id}");
+
+            $metrics = $this->formatMetrics($run->stats_json);
 
             $rows = [
                 ['CAGR', $metrics['cagr']],
@@ -244,15 +254,15 @@ class AssetBacktest extends Command
                 $this->info("Strategy: {$strategyOption}");
 
                 $tradeRows = [];
-                foreach ($result['trades'] as $i => $t) {
+                foreach ($run->trades()->orderBy('entry_date')->get() as $i => $trade) {
                     $tradeRows[] = [
                         $i + 1,
-                        $t['entry_date'],
-                        $t['exit_date'],
-                        sprintf('%.2f', $t['entry_price']),
-                        sprintf('%.2f', $t['exit_price']),
-                        (string) $t['shares'],
-                        sprintf('%.2f', $t['pnl']),
+                        (string) $trade->entry_date?->format('Y-m-d'),
+                        (string) $trade->exit_date?->format('Y-m-d'),
+                        sprintf('%.2f', (float) $trade->entry_px),
+                        sprintf('%.2f', (float) $trade->exit_px),
+                        (string) (int) $trade->units,
+                        sprintf('%.2f', (float) $trade->pnl),
                     ];
                 }
 
