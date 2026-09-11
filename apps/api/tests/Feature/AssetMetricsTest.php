@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\Price;
+use App\Models\TradingDay;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,5 +60,59 @@ class AssetMetricsTest extends TestCase
         $this->assertSame('AAA', $metrics[0]['symbol']);
         $this->assertArrayHasKey('roc13', $metrics[0]);
         $this->assertSame(0, $metrics[0]['roc13']);
+    }
+
+    /**
+     * The page shows how complete a history is, not only how long it is.
+     *
+     * A count of bars cannot say whether any are missing; that needs the
+     * trading calendar, which used to live on a separate page.
+     */
+    public function test_the_metrics_row_carries_coverage_against_the_calendar(): void
+    {
+        Sanctum::actingAs(User::factory()->create(), ['*']);
+
+        $asset = Asset::create(['symbol' => 'BBB', 'name' => 'Asset BBB']);
+
+        $start = CarbonImmutable::parse('2024-01-01');
+
+        for ($i = 0; $i < 70; $i++) {
+            $date = $start->addDays($i);
+
+            // The market held this session...
+            TradingDay::create(['date' => $date->toDateString(), 'close' => 7000 + $i]);
+
+            // ...but the asset has no bar for one of them.
+            if ($i === 40) {
+                continue;
+            }
+
+            Price::create([
+                'asset_id' => $asset->id,
+                'date' => $date->toDateString(),
+                'open' => 100 + $i,
+                'high' => 105 + $i,
+                'low' => 95 + $i,
+                'close' => 100 + $i,
+                'volume' => 1000 + $i,
+            ]);
+        }
+
+        $this->postJson('/api/v1/assets/metrics/update')->assertOk();
+
+        $coverage = $this->getJson('/api/v1/assets/metrics')
+            ->assertOk()
+            ->json('data.metrics.0.coverage');
+
+        $this->assertNotNull($coverage, 'An asset with bars must carry coverage.');
+        $this->assertSame(69, $coverage['bars']);
+        $this->assertSame(70, $coverage['sessions_expected']);
+        $this->assertSame(1, $coverage['sessions_missing']);
+        $this->assertFalse($coverage['complete']);
+
+        // And the same figures for the single-asset view behind the row.
+        $this->getJson("/api/v1/assets/{$asset->id}/metrics")
+            ->assertOk()
+            ->assertJsonPath('data.metric.coverage.sessions_missing', 1);
     }
 }

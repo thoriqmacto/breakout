@@ -18,6 +18,36 @@ export type AssetMetricApiRow = {
   bars: number | string | null
   pbas: number | string | null
   bavg: number | string | null
+  coverage?: AssetCoverageApi | null
+}
+
+/**
+ * How complete the asset's history is, measured against the trading calendar.
+ *
+ * Absent (rather than zeroed) when the asset has no bars at all: "nothing
+ * collected yet" and "collected with holes" are different states and the table
+ * shows them differently.
+ */
+export type AssetCoverageApi = {
+  bars: number | string | null
+  first_bar_date: string | null
+  last_bar_date: string | null
+  sessions_expected: number | string | null
+  sessions_missing: number | string | null
+  sessions_behind: number | string | null
+  complete: boolean | string | number | null
+}
+
+export type AssetCoverage = {
+  bars: number
+  firstBarDate: string | null
+  lastBarDate: string | null
+  sessionsExpected: number
+  /** Sessions the market held inside this asset's own span that it has no bar for. */
+  sessionsMissing: number
+  /** Sessions held since its last bar -- staleness, which is a different fault. */
+  sessionsBehind: number
+  complete: boolean
 }
 
 export type AssetMetricRow = {
@@ -40,6 +70,21 @@ export type AssetMetricRow = {
   bars: number | null
   pbas: number | null
   bavg: number | null
+  coverage: AssetCoverage | null
+}
+
+const normalizeCoverage = (row: AssetCoverageApi | null | undefined): AssetCoverage | null => {
+  if (!row) return null
+
+  return {
+    bars: parseIntegerValue(row.bars),
+    firstBarDate: row.first_bar_date,
+    lastBarDate: row.last_bar_date,
+    sessionsExpected: parseIntegerValue(row.sessions_expected),
+    sessionsMissing: parseIntegerValue(row.sessions_missing),
+    sessionsBehind: parseIntegerValue(row.sessions_behind),
+    complete: parseBooleanValue(row.complete) ?? false,
+  }
 }
 
 export const parseNumericValue = (value: unknown): number | null => {
@@ -109,4 +154,5 @@ export const normalizeMetrics = (rows: AssetMetricApiRow[]): AssetMetricRow[] =>
     bars: parseNumericValue(row.bars),
     pbas: parseNumericValue(row.pbas),
     bavg: parseNumericValue(row.bavg),
+    coverage: normalizeCoverage(row.coverage),
   }))

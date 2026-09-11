@@ -389,6 +389,18 @@ export default function AssetDetailPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle>History coverage</CardTitle>
+            <CardDescription>
+              Bars held against the sessions the market actually traded.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CoveragePanel coverage={metric?.coverage ?? null} loading={metricLoading} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Broker summary</CardTitle>
             <CardDescription>
               Overview of recent broker activity for this symbol.
@@ -457,6 +469,67 @@ export default function AssetDetailPage() {
           ) : null}
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+/**
+ * What the Trading Days page used to be asked for, one symbol at a time.
+ *
+ * A bar count alone cannot say whether any are missing -- that needs the
+ * calendar -- and the two numbers below are kept apart on purpose: a hole
+ * inside the asset's own span and a feed that stopped updating are different
+ * failures with different fixes.
+ */
+function CoveragePanel({
+  coverage,
+  loading,
+}: {
+  coverage: AssetMetricRow["coverage"]
+  loading: boolean
+}) {
+  if (loading) {
+    return <p className="text-sm text-muted-foreground">Loading coverage…</p>
+  }
+
+  if (!coverage) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No price bars have been collected for this asset yet.
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MetricItem label="Bars" value={integerFormatter.format(coverage.bars)} />
+        <MetricItem
+          label="Sessions expected"
+          value={integerFormatter.format(coverage.sessionsExpected)}
+        />
+        <MetricItem label="Gaps" value={integerFormatter.format(coverage.sessionsMissing)} />
+        <MetricItem label="Behind" value={integerFormatter.format(coverage.sessionsBehind)} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <MetricItem label="First bar" value={coverage.firstBarDate ?? "—"} />
+        <MetricItem label="Last bar" value={coverage.lastBarDate ?? "—"} />
+      </div>
+
+      {coverage.sessionsMissing > 0 ? (
+        <p className="rounded-md bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-400">
+          {integerFormatter.format(coverage.sessionsMissing)} session(s) inside this asset&apos;s own
+          span have no bar. Backfill the range rather than re-running today.
+        </p>
+      ) : null}
+
+      {coverage.sessionsBehind > 0 ? (
+        <p className="rounded-md bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-400">
+          The market has traded {integerFormatter.format(coverage.sessionsBehind)} session(s) since
+          the last bar. This symbol has stopped updating rather than lost a day in the middle.
+        </p>
+      ) : null}
     </div>
   )
 }
