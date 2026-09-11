@@ -2,6 +2,7 @@
 
 namespace App\Services\Reconciliation;
 
+use App\Support\PathOwnership;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use JsonException;
@@ -284,15 +285,7 @@ class ReconciliationStore
 
     private function processUser(): string
     {
-        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
-            $user = posix_getpwuid(posix_geteuid());
-
-            if (is_array($user) && isset($user['name'])) {
-                return (string) $user['name'];
-            }
-        }
-
-        return (string) (getenv('USER') ?: 'unknown');
+        return PathOwnership::currentUser();
     }
 
     /**
