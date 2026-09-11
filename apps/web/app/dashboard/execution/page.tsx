@@ -5,6 +5,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight, Loader2, RefreshCcw } from "lucide-react"
 
 import { useAuth } from "@/components/auth-provider"
+import { InfoTip } from "@/components/ui/info-tip"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -159,6 +160,79 @@ function ProbabilityCell({ outcome }: { outcome: ExecutionCandidate["historical_
   )
 }
 
+/**
+ * The ladder that decides a status, in the order it is actually applied.
+ *
+ * Written down because the page had a real contradiction in it: a symbol can
+ * score 82 on the Watchlist and appear in no actionable bucket here, and
+ * nothing on either page said why. The score is not a gate on ARMED or
+ * TRIGGERED -- it ranks candidates and it blocks READY on the v1 rules -- so
+ * "strong score, nothing to do" is the ordinary case rather than a fault.
+ */
+function HowStatusIsDecided({ armedDistanceAtr }: { armedDistanceAtr: number | null }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <CardTitle className="text-base">How a status is decided</CardTitle>
+            <CardDescription>
+              Rules applied in order on the last completed session. The first one that matches wins.
+            </CardDescription>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => setOpen((current) => !current)}>
+            {open ? "Hide" : "Show"}
+          </Button>
+        </div>
+      </CardHeader>
+
+      {open ? (
+        <CardContent className="space-y-3 text-sm">
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>Already held in the selected portfolio → <strong>HOLD</strong>, <strong>TRAILING</strong> or <strong>EXIT</strong>.</li>
+            <li>Broker regime is distributive, the setup is not a valid long, or no stop can be measured → <strong>AVOID</strong>.</li>
+            <li>Price or broker inputs are not from the latest session → <strong>STALE</strong> / <strong>STALE_DATA</strong>.</li>
+            <li>
+              Closed above the 20-session high → <strong>TRIGGERED</strong>, unless price has already
+              run past the entry zone, which is <strong>NO_CHASE</strong>.
+            </li>
+            <li>
+              Not broken out, but within{" "}
+              <strong>{armedDistanceAtr === null ? "the configured" : armedDistanceAtr} ATR</strong>{" "}
+              of that high <em>and</em> brokers are accumulating → <strong>ARMED</strong>.
+            </li>
+            <li>Anything else → <strong>WATCH</strong>.</li>
+          </ol>
+
+          <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+            <p className="font-medium">Score does not appear in that ladder.</p>
+            <p className="mt-1 text-muted-foreground">
+              Score ranks candidates against each other and is listed among a row&apos;s blockers
+              when it falls below the threshold, but it cannot make a setup ARMED or TRIGGERED. Only
+              two things do that: where price sits against its 20-session high, and what the brokers
+              are doing. A symbol scoring in the 80s with no breakout and no accumulation is
+              correctly a WATCH — the score is saying the setup is high quality, not that it is
+              happening yet.
+            </p>
+          </div>
+
+          <p className="text-muted-foreground">
+            These are the built-in execution rules, not one of the strategies on the Strategies page.
+            Those are backtested and alerted on separately; this workspace always applies the rules
+            above, under the{" "}
+            <Link href="/dashboard/strategy" className="font-medium underline">
+              strategy profile
+            </Link>{" "}
+            shown at the top.
+          </p>
+        </CardContent>
+      ) : null}
+    </Card>
+  )
+}
+
 function StatusBadge({ status }: { status: ExecutionStatus }) {
   return (
     <span className={`inline-flex rounded px-2 py-0.5 text-xs font-semibold ${STATUS_STYLES[status]}`}>
@@ -198,7 +272,68 @@ function DetailList({ title, items }: { title: string; items: string[] }) {
   )
 }
 
-function CandidateDetail({ row }: { row: ExecutionCandidate }) {
+/**
+ * For a candidate that is not actionable, the two things standing in the way.
+ *
+ * The row already lists reasons, but in the passive voice -- "0.32 ATR below
+ * the 20-session high" leaves the reader to remember the threshold and do the
+ * comparison. This states the gap as a condition still to be met, which is the
+ * question actually being asked of a WATCH row: what would have to change.
+ */
+function WhatItNeeds({
+  row,
+  armedDistanceAtr,
+}: {
+  row: ExecutionCandidate
+  armedDistanceAtr: number | null
+}) {
+  if (row.lifecycle_status !== "WATCH") return null
+
+  const distance = row.price_setup.distance_to_breakout_atr
+  const accumulating =
+    row.broker.regime === "ACCUMULATION" || row.broker.regime === "STRONG_ACCUMULATION"
+  const threshold = armedDistanceAtr ?? 1
+
+  const missing: string[] = []
+
+  if (distance === null) {
+    missing.push("a measurable 20-session high to break out from")
+  } else if (distance > threshold) {
+    missing.push(
+      `price within ${threshold} ATR of the 20-session high — it is ${distance.toFixed(2)} ATR away`,
+    )
+  }
+
+  if (!accumulating) {
+    missing.push(`brokers accumulating — the regime reads ${row.broker.regime}`)
+  }
+
+  // Both conditions met and still WATCH means the ladder was decided earlier,
+  // and inventing a reason here would contradict the row's own reasons.
+  if (missing.length === 0) return null
+
+  return (
+    <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-2">
+      <p className="font-semibold">To become ARMED this needs</p>
+      <ul className="mt-0.5 list-disc space-y-0.5 pl-4">
+        {missing.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <p className="mt-1 text-muted-foreground">
+        Its score is not what is holding it back — score ranks setups, it does not arm them.
+      </p>
+    </div>
+  )
+}
+
+function CandidateDetail({
+  row,
+  armedDistanceAtr,
+}: {
+  row: ExecutionCandidate
+  armedDistanceAtr: number | null
+}) {
   const plan = row.execution_plan
   const profit = row.profit_management
   const position = profit.position
@@ -215,6 +350,7 @@ function CandidateDetail({ row }: { row: ExecutionCandidate }) {
               <li key={`action-${index}`}>{reason}</li>
             ))}
           </ul>
+          <WhatItNeeds row={row} armedDistanceAtr={armedDistanceAtr} />
           <DetailList title="Broker" items={row.reasons_v2.broker} />
         </div>
 
@@ -553,6 +689,8 @@ export default function ExecutionWorkspacePage() {
         </CardContent>
       </Card>
 
+      <HowStatusIsDecided armedDistanceAtr={payload?.strategy_profile.armed_distance_atr ?? null} />
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {EXECUTION_STATUSES.map((status) => (
           <Card key={status}>
@@ -682,49 +820,28 @@ export default function ExecutionWorkspacePage() {
               <thead className="text-muted-foreground border-b text-xs">
                 <tr>
                   <th className="w-8" />
-                  <th className="px-3 py-2 text-left">Exec</th>
-                  <th className="px-3 py-2 text-left">Symbol</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Action</th>
-                  <th className="px-3 py-2 text-right">Score</th>
-                  <th className="px-3 py-2 text-left" title="Broker regime from the 5/10/20-day windows">
-                    Regime
+                  <th className="px-3 py-2 text-left"><InfoTip term="executionRank">Exec</InfoTip></th>
+                  <th className="px-3 py-2 text-left"><InfoTip term="symbol">Symbol</InfoTip></th>
+                  <th className="px-3 py-2 text-left"><InfoTip term="executionStatus">Status</InfoTip></th>
+                  <th className="px-3 py-2 text-left"><InfoTip term="executionAction">Action</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="executionScore" align="right">Score</InfoTip></th>
+                  <th className="px-3 py-2 text-left"><InfoTip term="brokerRegime" align="left">Regime</InfoTip></th>
+                  <th className="px-3 py-2 text-center"><InfoTip term="brokerFlow" align="left">Flow</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="brokerAgreement" align="right">Persist</InfoTip></th>
+                  <th className="px-3 py-2 text-center"><InfoTip term="breakout20" align="left">B/O</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="volVsAvg20" align="right">Vol×</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="close" align="right">Close</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="trigger" align="right">Trigger</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="entryZone" align="right">Zone</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="stop" align="right">Stop</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="riskPct" align="right">Risk%</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="trailActivation" align="right">+5%</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="profitFloor" align="right">Floor</InfoTip></th>
+                  <th className="px-3 py-2 text-right">
+                    <InfoTip term="probability" align="right">P(+5%)</InfoTip>
                   </th>
-                  <th className="px-3 py-2 text-center" title="3D / 5D / 10D / 20D broker flow direction">
-                    Flow
-                  </th>
-                  <th className="px-3 py-2 text-right" title="Fraction of broker windows accumulating">
-                    Persist
-                  </th>
-                  <th className="px-3 py-2 text-center" title="20-session breakout confirmed">
-                    B/O
-                  </th>
-                  <th className="px-3 py-2 text-right">Vol×</th>
-                  <th className="px-3 py-2 text-right">Close</th>
-                  <th className="px-3 py-2 text-right">Trigger</th>
-                  <th className="px-3 py-2 text-right" title="Entry zone: trigger to trigger + ATR extension">
-                    Zone
-                  </th>
-                  <th className="px-3 py-2 text-right">Stop</th>
-                  <th className="px-3 py-2 text-right" title="Initial risk as a percentage of the trigger">
-                    Risk%
-                  </th>
-                  <th className="px-3 py-2 text-right" title="Trailing activation price (+5%)">
-                    +5%
-                  </th>
-                  <th className="px-3 py-2 text-right" title="Minimum locked-profit floor (+3%)">
-                    Floor
-                  </th>
-                  <th
-                    className="px-3 py-2 text-right"
-                    title="Share of comparable historical setups that reached +5% before their initial stop"
-                  >
-                    P(+5%)
-                  </th>
-                  <th className="px-3 py-2 text-right" title="Comparable sample size">
-                    n
-                  </th>
-                  <th className="px-3 py-2 text-right">Held</th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="sampleSize" align="right">n</InfoTip></th>
+                  <th className="px-3 py-2 text-right"><InfoTip term="held" align="right">Held</InfoTip></th>
                 </tr>
               </thead>
               <tbody>
@@ -854,7 +971,10 @@ export default function ExecutionWorkspacePage() {
                     {expanded === row.asset_id ? (
                       <tr>
                         <td colSpan={21} className="p-0">
-                          <CandidateDetail row={row} />
+                          <CandidateDetail
+                            row={row}
+                            armedDistanceAtr={payload?.strategy_profile.armed_distance_atr ?? null}
+                          />
                         </td>
                       </tr>
                     ) : null}

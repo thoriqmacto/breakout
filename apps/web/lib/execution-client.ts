@@ -328,6 +328,8 @@ export type ExecutionPayload = {
   strategy_profile: {
     version: string
     broker_windows: number[]
+    /** How close to the 20-session high a setup must sit to count as ARMED. */
+    armed_distance_atr: number
     trail_activation_gain_pct: number
     trailing_distance_pct: number
     minimum_locked_profit_pct: number
