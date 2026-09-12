@@ -29,11 +29,15 @@ class IndexCatalogReader
     }
 
     /**
+     * @param  array{diagnose?: bool, dump_html?: string|null}  $options
+     *                                                                    diagnose gathers samples of the page for a person to read;
+     *                                                                    dump_html writes the rendered HTML to that path. Both are
+     *                                                                    operator tools, off unless asked for.
      * @return array{symbols: array<int, string>, evidence: array<string, mixed>}
      *
      * @throws IndexCatalogReadException
      */
-    public function read(string $url): array
+    public function read(string $url, array $options = []): array
     {
         $script = $this->scriptPath();
 
@@ -52,6 +56,8 @@ class IndexCatalogReader
             // rather than being killed mid-sentence.
             'timeout_ms' => ($timeout - 5) * 1000,
             'chromium_path' => config('market_indexes.browser.chromium_path'),
+            'diagnose' => (bool) ($options['diagnose'] ?? false),
+            'dump_html' => $options['dump_html'] ?? null,
         ];
 
         $process = new Process(

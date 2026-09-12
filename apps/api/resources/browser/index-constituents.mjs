@@ -27,6 +27,8 @@
  * PHP side, where it is testable.
  */
 
+import { writeFile } from 'node:fs/promises'
+
 import { chromium } from 'playwright'
 
 const STDIN_LIMIT_BYTES = 16 * 1024
@@ -201,6 +203,61 @@ function collectSymbols() {
   }
 }
 
+
+/**
+ * What the page looks like when nothing ticker-shaped came out of it.
+ *
+ * Deliberately separate from collectSymbols: this is for a person deciding
+ * why a read failed, not for the sync, and it returns samples of the page
+ * rather than counts. Only ever gathered when an operator asks for it with
+ * --diagnose, and printed to their terminal rather than written to a run
+ * record -- a catalogue page is public, but a run record is not the place to
+ * accumulate somebody else's markup.
+ */
+function diagnosePage() {
+  const shape = /^[A-Z][A-Z0-9]{2,5}$/
+
+  const hrefs = new Set()
+  for (const anchor of document.querySelectorAll('a[href]')) {
+    try {
+      hrefs.add(new URL(anchor.getAttribute('href'), document.baseURI).pathname)
+    } catch {
+      hrefs.add(anchor.getAttribute('href'))
+    }
+  }
+
+  const text = (document.body?.innerText || '').replace(/\s+/g, ' ').trim()
+
+  // The decisive signal: are ticker-shaped words in the rendered text at all?
+  // If they are, the selectors are wrong. If they are not, the list never
+  // rendered -- a login wall, a redirect, a bot check.
+  const words = new Set()
+  for (const word of text.split(/[^A-Za-z0-9]+/)) {
+    if (shape.test(word)) words.add(word)
+  }
+
+  const jsonScripts = [...document.querySelectorAll('script[type="application/json"], script#__NEXT_DATA__')]
+
+  return {
+    title: document.title || null,
+    url: location.href,
+    text_head: text.slice(0, 400),
+    text_length: text.length,
+    href_samples: [...hrefs].slice(0, 30),
+    ticker_shaped_words: [...words].slice(0, 40),
+    tag_counts: {
+      a: document.querySelectorAll('a[href]').length,
+      table: document.querySelectorAll('table').length,
+      tr: document.querySelectorAll('tr').length,
+      td: document.querySelectorAll('td').length,
+      role_row: document.querySelectorAll('[role="row"]').length,
+      role_cell: document.querySelectorAll('[role="cell"], [role="gridcell"]').length,
+      json_scripts: jsonScripts.length,
+    },
+    json_script_ids: jsonScripts.map((script) => script.id || script.getAttribute('data-name') || '(anonymous)'),
+  }
+}
+
 /**
  * @returns {Promise<{symbols: string[], evidence: object}>}
  */
@@ -210,6 +267,8 @@ export async function readIndexConstituents({
   executablePath,
   userAgent,
   headless = true,
+  diagnose = false,
+  dumpHtml = null,
 } = {}) {
   if (typeof url !== 'string' || url.trim() === '') {
     throw new CatalogReadError(CatalogError.NAVIGATION_FAILED, 'No catalogue URL was supplied.')
@@ -255,17 +314,38 @@ export async function readIndexConstituents({
     // read rather than failing the run.
     await page.waitForLoadState('networkidle', { timeout: timeoutMs }).catch(() => {})
 
-    let previousCount = -1
-    for (let pass = 0; pass < 12; pass++) {
-      const count = await page.evaluate(() => document.querySelectorAll('tr, [role="row"]').length)
+    // Growth is measured on the page height and on how many ticker-shaped
+    // words the text holds, not on a row count: a virtualised list that uses
+    // neither <tr> nor role="row" would have registered no growth at all and
+    // the loop would have stopped after two passes without scrolling.
+    let previous = '-1'
+    for (let pass = 0; pass < 20; pass++) {
+      const measure = await page.evaluate(() => {
+        const shape = /^[A-Z][A-Z0-9]{2,5}$/
+        const words = new Set()
 
-      if (count === previousCount && pass > 1) break
+        for (const word of (document.body?.innerText || '').split(/[^A-Za-z0-9]+/)) {
+          if (shape.test(word)) words.add(word)
+        }
 
-      previousCount = count
+        return [document.body?.scrollHeight ?? 0, words.size, document.querySelectorAll('a[href]').length].join(':')
+      })
+
+      if (measure === previous && pass > 1) break
+
+      previous = measure
 
       await page.evaluate(() => window.scrollBy(0, window.innerHeight * 0.9))
       await page.waitForTimeout(400)
     }
+
+    if (typeof dumpHtml === 'string' && dumpHtml !== '') {
+      // Written before the verdict, so a failed read still leaves something
+      // to look at.
+      await writeFile(dumpHtml, await page.content(), 'utf8')
+    }
+
+    const report = diagnose ? await page.evaluate(diagnosePage) : null
 
     const found = await page.evaluate(collectSymbols)
 
@@ -285,6 +365,8 @@ export async function readIndexConstituents({
       anchors_total: found.anchors_total,
       container: found.container,
       elapsed_ms: Date.now() - startedAt,
+      ...(dumpHtml ? { dump_html: dumpHtml } : {}),
+      ...(report ? { diagnosis: report } : {}),
     }
 
     if (symbols.length === 0) {
@@ -323,6 +405,8 @@ async function main() {
       executablePath: job.chromium_path || process.env.BROWSER_AUTH_CHROMIUM_PATH || undefined,
       userAgent: job.user_agent,
       headless: job.headless !== false,
+      diagnose: job.diagnose === true,
+      dumpHtml: typeof job.dump_html === 'string' && job.dump_html !== '' ? job.dump_html : null,
     })
 
     finish({ ok: true, symbols, evidence }, 0)
