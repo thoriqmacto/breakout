@@ -40,7 +40,9 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   },
   symbol: {
     term: "Symbol",
-    definition: "The IDX ticker. Click it for everything stored about that asset.",
+    definition:
+      "The IDX ticker. Click it for everything stored about that asset. A chip beside it — JII70 — means the stock is currently in that published index; click the chip for the whole constituent list and what has joined or left.",
+    range: "Four letters, as the exchange lists them.",
   },
   name: { term: "Name", definition: "The listed company name." },
   close: {

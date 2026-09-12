@@ -185,6 +185,18 @@ return [
             ],
         ],
 
+        'automation:index-sync' => [
+            'label' => 'Index membership sync',
+            'description' => 'Read a published index\'s catalogue page and record which symbols belong to it, dating every arrival and departure. Refuses a list that looks like a partially loaded page rather than un-badging half the index. Reads a public page, so it needs no Stockbit token.',
+            'stockbit_bulk' => false,
+            'arguments' => [],
+            'options' => [
+                'index' => ['type' => 'string', 'label' => 'Index code (default: the configured default)'],
+                'force' => ['type' => 'boolean', 'label' => 'Apply a list the safety guards would refuse'],
+                'dry-run' => ['type' => 'boolean', 'label' => 'Report the change without writing it'],
+            ],
+        ],
+
         'automation:strategy-alerts' => [
             'label' => 'Strategy alerts',
             'description' => 'Evaluate every enabled strategy alert against its asset\'s newest bar and raise a dashboard reminder when one fires. Uses the same strategy classes the backtester walks history with, so an alert cannot disagree with the backtest that justified it.',
@@ -417,6 +429,18 @@ return [
             'cron_expression' => '0 18 * * *',
             'condition' => 'none',
             'priority' => 30,
+            'enabled' => true,
+            'sync_gdrive_after_success' => false,
+        ],
+        [
+            'name' => 'Index Membership Sync',
+            'slug' => 'index-membership-sync',
+            'description' => 'Every day at 07:30 WIB, well clear of the evening collectors, re-read the configured index catalogue page and record what joined or left. An index is reviewed twice a year, so most runs change nothing -- the daily cadence is about noticing that the page is still readable, because a reader that has quietly broken looks exactly like an index that has not changed. Condition "none" because it reads a public page and spends no market data quota.',
+            'command' => 'automation:index-sync',
+            'parameters' => ['arguments' => [], 'options' => []],
+            'cron_expression' => '30 7 * * *',
+            'condition' => 'none',
+            'priority' => 15,
             'enabled' => true,
             'sync_gdrive_after_success' => false,
         ],

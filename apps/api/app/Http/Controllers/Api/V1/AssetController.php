@@ -11,6 +11,7 @@ use App\Models\Metric;
 use App\Services\Analysis\AssetMetricProjector;
 use App\Services\AssetMetrics;
 use App\Services\Assets\AssetCoverage;
+use App\Services\Indexes\IndexMembershipSync;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -47,12 +48,16 @@ class AssetController extends ApiController
      * opened. PBAS is a broker-accumulation signal and is scored in the
      * execution pipeline; it has no place in a structural ordering.
      */
-    public function metricsIndex(AssetCoverage $coverage)
+    public function metricsIndex(AssetCoverage $coverage, IndexMembershipSync $indexes)
     {
         // Read once for the whole table rather than per row: the page shows
         // every asset, and a query each would be one round trip per symbol for
         // a column nobody would wait for.
         $coverageByAsset = $coverage->all();
+
+        // Same reasoning for the index badges: one query for the whole
+        // membership table, not one per rendered chip.
+        $indexesBySymbol = $indexes->currentBySymbol();
 
         $metrics = Metric::orderByDesc('sort_uptrend')
             ->orderByDesc('sort_roc13')
@@ -92,6 +97,11 @@ class AssetController extends ApiController
                 // "nothing collected yet" and "collected with holes" are
                 // different states and the page says so differently.
                 'coverage' => $coverageByAsset[$metric->asset_id] ?? null,
+                // Published indexes this symbol currently belongs to. An empty
+                // list means "in none of the indexes we track", which is not
+                // the same as "we have never looked" -- the index panel says
+                // when the membership was last read.
+                'indexes' => $indexesBySymbol[strtoupper((string) $metric->symbol)] ?? [],
             ];
         }
 
@@ -100,7 +110,7 @@ class AssetController extends ApiController
         ]);
     }
 
-    public function metricForAsset(Asset $asset, AssetCoverage $coverage)
+    public function metricForAsset(Asset $asset, AssetCoverage $coverage, IndexMembershipSync $indexes)
     {
         $metric = Metric::where('asset_id', $asset->id)->first();
 
@@ -130,6 +140,7 @@ class AssetController extends ApiController
                 'pbas' => $metric->pbas,
                 'bavg' => $metric->bavg,
                 'coverage' => $coverage->forAsset($asset->id),
+                'indexes' => $indexes->currentBySymbol([(string) $metric->symbol])[strtoupper((string) $metric->symbol)] ?? [],
             ],
         ]);
     }

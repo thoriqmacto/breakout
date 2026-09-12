@@ -2272,6 +2272,114 @@ file-by-file one.
 `GET /v1/automation/stockbit-token` returns status only — configured, source, fingerprint
 (`****abcd`), expiry, remaining duration. There is no endpoint that returns the bearer.
 
+## Published index membership
+
+The Assets table shows what this installation collects. It could not show which of those
+stocks the exchange considers part of an index, and it could not show the other half of
+the question at all: the index members that are *not* being collected, which is where new
+candidates come from.
+
+`JII70` is configured out of the box in `config/market_indexes.php`. Adding another index
+is an entry in that file — a code, a name, its catalogue URL, and the floor below which a
+fetched list is treated as a broken read rather than as a shrunken index.
+
+### What is stored
+
+Two tables. `market_indexes` dates the membership — when it was last read and from where.
+`index_memberships` holds one row per symbol per index, with `joined_on`, `last_seen_on`
+and a nullable `removed_on`.
+
+A departure is a date, never a delete. A stock that leaves JII70 keeps its row, keeps its
+bars and keeps its place in every table; only the badge goes. That matters because the
+question six months later is "was this in the index when I bought it?", and a deleted row
+cannot answer it.
+
+### Where the list comes from
+
+```bash
+# Read the catalogue page with a headless browser (what the scheduled task does).
+php artisan automation:index-sync
+
+# Or hand it the list, when the page cannot be read.
+php artisan automation:index-sync --symbols='BBCA,BBRI,TLKM,…'
+php artisan automation:index-sync --file=/tmp/jii70.txt
+
+# See what would change without writing it.
+php artisan automation:index-sync --dry-run
+```
+
+Both sources end in the same service, so a pasted list is dated and guarded exactly like a
+scraped one. The dashboard offers the same two entrances: Assets → **Index**, where the
+membership can be pasted in any shape (a whole table copied off the page works — anything
+ticker-shaped is picked out).
+
+The browser read is deliberately not the Stockbit API client. The catalogue page is public,
+so this path involves no bearer, no saved profile and no credentials: an expired token
+cannot stop the index from syncing, and nothing here can reach the token store.
+
+### Why a list can be refused
+
+A page that renders thirty of its seventy rows before the read gives up produces a
+perfectly well-formed list of thirty symbols. Writing it would strip the badge from forty
+stocks, record forty departures that never happened, and record the matching forty joins
+the next morning — silently, because every row involved looks normal.
+
+So a list has to clear two bars before anything is written:
+
+| Guard | Default | Overridable |
+| --- | --- | --- |
+| Not empty | — | never |
+| At least `min_members` symbols | 40 for JII70 | `--force` |
+| Drops no more than `max_shrink_ratio` of current members | 25% | `--force` |
+
+A refusal writes nothing, fails the run, and raises a dashboard alert naming the reason.
+`--force` exists for the day the exchange really does rebuild the index — which a person
+looking at the real page can tell apart from a half-loaded one, and a scheduled job cannot.
+
+### Reading the page is itself the thing being checked
+
+The scheduled task runs daily at 07:30 WIB even though an index is reviewed twice a year.
+The cadence is not about catching a review on the day. It is that a reader which has
+quietly stopped working looks exactly like an index that has not changed, and the only
+difference between them is how long it takes to notice. A failed read raises an
+`index_membership` alert on the Automation page with the paste command in it.
+
+### Starting to collect a member
+
+Selecting untracked members in the index panel and adding them creates their `assets` rows
+with `sync_price` and `sync_broker_summary` set, which is the whole mechanism: the 18:00
+OHLCV job reads every price-synced asset and the broker-summary job every broker-synced
+one, so a symbol added here joins that evening's run with nothing else to wire.
+
+What it does not do is backfill history. Tonight's run fetches tonight's bar, so a new
+symbol starts with one bar and the structural columns stay empty until it has enough —
+ROC 13w needs 66 bars, the 55-week high needs 275. Fill it in with:
+
+```bash
+php artisan stockbit:scrape BBCA --historical    # from the IPO date if known
+```
+
+The API refuses to create an asset for a symbol that is not a current member of the named
+index. The browser sends a list of tickers; the server checks each one against the
+membership it stored itself rather than trusting the payload.
+
+| Method | Endpoint | |
+| --- | --- | --- |
+| `GET` | `/v1/indexes` | configured indexes, member and tracked counts |
+| `GET` | `/v1/indexes/{code}` | members, what left recently, per-symbol collection state |
+| `POST` | `/v1/indexes/{code}/members` | replace the membership from a pasted list |
+| `POST` | `/v1/indexes/{code}/track` | create asset rows for members, collection on |
+
+### Proving the reader without the real page
+
+`apps/api/resources/browser/catalog-smoke-test.mjs` runs the reader against a throwaway
+page on localhost: a table written after load, a list that exists only in the
+`__NEXT_DATA__` island, rows that only appear on scroll, a page with nothing on it, and a
+related-stocks rail whose tickers must *not* be collected. Run it with
+`npm run smoke:catalog` in `apps/api/resources/browser`. A failure there means this code is
+wrong; it says nothing about whether a third party changed their markup, which is what the
+daily run and its alert are for.
+
 ## CI / CD
 
 Two workflows in `.github/workflows/`.
