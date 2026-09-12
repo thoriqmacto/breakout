@@ -2428,10 +2428,36 @@ That last line is the one that decides it:
 | some listed | the list rendered; the selectors missed it | fix the selectors against the dumped HTML |
 | `(none)` | the list never rendered — a login wall, a redirect, a bot check | check the profile is configured and its session is alive |
 
-A redirect to a sign-in page is reported as `LOGIN_REQUIRED` rather than as a markup
-problem, because the two need opposite responses: nothing about the constituent selectors
-is wrong, and no change to them would help. If it appears, the saved profile's session has
-lapsed — re-establish it the way the token renewal's is re-established.
+`LOGIN_REQUIRED` rather than a markup problem covers both ways the session can fail, which
+look nothing alike:
+
+- **a redirect** to a sign-in page, judged on the path;
+- **no redirect at all** — the catalogue URL stays put and the app replaces its own content
+  with "Sesi Kamu Sudah Habis". Nothing distinguishes that from changed markup except the
+  words on the page, so the reader checks for them when it has collected nothing.
+
+Either way the remedy is the same and the opposite of a selector fix: the saved profile's
+session has lapsed. Check it with `php artisan browser:token --session --dry-run` and sign
+it in again — it is the same profile, and the same session, the token renewal uses.
+
+### Four sources, one of them a fallback
+
+The reader unions three sources it can scope to the constituent list — ticker links, the
+JSON island, table cells — and keeps a fourth in reserve: **the server-rendered HTML of the
+navigation response itself**, captured before anything else runs.
+
+That fourth one exists because the page is server-rendered and then hydrated. A client-side
+session check that decides to show an expired-session screen removes the constituents from
+the DOM, so by the time the page settles they are gone — but they were in the response. It
+is a fallback rather than a fourth member of the union because raw markup cannot be scoped:
+there is no DOM to ask which block is the list, so a "related stocks" rail in the same
+markup is indistinguishable from a constituent. The live DOM can be scoped and wins whenever
+it has anything at all.
+
+Two smaller rules fall out of the same problem. Only a *bare* `/symbol/XXXX` link counts in
+raw markup — `/symbol/AALI/financials` is the site's own navigation using a sample ticker —
+and the DOM link source needs at least five matching anchors before it believes it has found
+a list, because two or three are a menu.
 
 `--dump-html` writes the rendered DOM for reading. Both are operator tools: the diagnosis
 goes to the terminal of whoever asked for it and never into a run record, which keeps

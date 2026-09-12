@@ -223,11 +223,13 @@ class IndexSyncCommand extends Command
         $this->reportDiagnosis($evidence);
 
         $this->line(sprintf(
-            '  Read %d ticker-shaped entries (%s links, %s data, %s cells).',
+            '  Read %d ticker-shaped entries from the %s (%s links, %s data, %s cells, %s in the server markup).',
             count($symbols),
+            ($evidence['source'] ?? 'dom') === 'server_html' ? 'server HTML' : 'live page',
             $evidence['from_links'] ?? '?',
             $evidence['from_json'] ?? '?',
             $evidence['from_cells'] ?? '?',
+            $evidence['from_server_html'] ?? '?',
         ));
 
         return $symbols;
@@ -371,7 +373,8 @@ class IndexSyncCommand extends Command
     private function remedy(string $reason): string
     {
         return match ($reason) {
-            IndexCatalogReadException::LOGIN_REQUIRED => 'The catalogue is behind a sign-in. Point MARKET_INDEX_PROFILE_DIR at the signed-in browser profile, or re-establish that profile\'s session.',
+            IndexCatalogReadException::LOGIN_REQUIRED => 'The catalogue needs a signed-in session. Check the saved profile with '
+                .'"php artisan browser:token --session --dry-run" and sign it in again if it has lapsed; it is the same profile the token renewal uses.',
             IndexCatalogReadException::PROFILE_BUSY => 'The saved browser profile was busy; the next scheduled read will have it.',
             IndexCatalogReadException::NO_SYMBOLS_FOUND => 'Run the command again with --diagnose to see what the page held.',
             IndexCatalogReadException::NOT_INSTALLED => 'The headless browser could not start; the scheduled read will keep failing until it can.',
