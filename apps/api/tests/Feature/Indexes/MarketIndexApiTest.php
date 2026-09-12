@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\Indexes;
 
+use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\Metric;
 use App\Models\User;
 use App\Services\Indexes\IndexMembershipSync;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -162,6 +164,7 @@ class MarketIndexApiTest extends TestCase
     public function test_tracking_creates_assets_that_the_daily_collectors_will_pick_up(): void
     {
         $this->signIn();
+        Queue::fake();
 
         app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
 
@@ -179,14 +182,43 @@ class MarketIndexApiTest extends TestCase
             $this->assertTrue((bool) $asset->sync_broker_summary);
         }
 
-        // The message has to say what was not done, or a symbol with one bar
-        // reads as a symbol that is ready.
-        $this->assertStringContainsString('history is not backfilled', (string) $response->json('message'));
+        $this->assertStringContainsString('backfill', (string) $response->json('message'));
+    }
+
+    public function test_tracking_queues_a_history_backfill_for_each_new_symbol(): void
+    {
+        $this->signIn();
+        Queue::fake();
+
+        app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
+
+        // One already tracked, so the request covers both branches at once.
+        Asset::create(['symbol' => 'AA01', 'name' => 'Beta', 'sync_price' => false, 'sync_broker_summary' => false]);
+
+        $this->postJson('/api/v1/indexes/TEST70/track', [
+            'symbols' => ['AA00', 'AA01', 'GOTO'],
+        ])->assertOk();
+
+        // The daily job asks for one session, so without this a new symbol
+        // gains one bar an evening and takes a year to become usable.
+        Queue::assertPushed(BackfillAssetHistoryJob::class, 1);
+        Queue::assertPushed(
+            BackfillAssetHistoryJob::class,
+            static fn (BackfillAssetHistoryJob $job): bool => $job->symbol === 'AA00',
+        );
+
+        // An asset that already existed is not re-scraped from its IPO date,
+        // and a symbol that was refused was never created to scrape.
+        Queue::assertNotPushed(
+            BackfillAssetHistoryJob::class,
+            static fn (BackfillAssetHistoryJob $job): bool => in_array($job->symbol, ['AA01', 'GOTO'], true),
+        );
     }
 
     public function test_tracking_refuses_a_symbol_that_is_not_a_member(): void
     {
         $this->signIn();
+        Queue::fake();
 
         app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
 
@@ -202,6 +234,7 @@ class MarketIndexApiTest extends TestCase
     public function test_tracking_switches_collection_back_on_for_an_existing_asset(): void
     {
         $this->signIn();
+        Queue::fake();
 
         app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
 

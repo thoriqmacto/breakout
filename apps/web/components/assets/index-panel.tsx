@@ -136,7 +136,8 @@ export function IndexPanel({ code }: { code?: string }) {
       if (outcome.created.length > 0) {
         parts.push(
           `${outcome.created.length} symbol${outcome.created.length === 1 ? "" : "s"} added — ` +
-            "collection starts at tonight's run, and history is not backfilled.",
+            "a full history backfill from each IPO date is queued, and daily collection starts at " +
+            "the next scheduled run.",
         )
       }
 
@@ -223,8 +224,10 @@ export function IndexPanel({ code }: { code?: string }) {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Constituents</CardTitle>
           <CardDescription>
-            Tick the ones you want collected. Adding a symbol creates its asset row with daily OHLCV
-            and broker summary switched on, so it joins tonight&apos;s scheduled run.
+            Tick the ones you want collected. Adding a symbol switches on daily OHLCV and broker
+            summary, and queues a backfill that walks its whole price history from the IPO date —
+            the same history the assets already here hold. The backfill runs in the background and
+            waits for the evening collectors if they are working.
           </CardDescription>
         </CardHeader>
 

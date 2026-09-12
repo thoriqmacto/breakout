@@ -2347,17 +2347,42 @@ difference between them is how long it takes to notice. A failed read raises an
 ### Starting to collect a member
 
 Selecting untracked members in the index panel and adding them creates their `assets` rows
-with `sync_price` and `sync_broker_summary` set, which is the whole mechanism: the 18:00
-OHLCV job reads every price-synced asset and the broker-summary job every broker-synced
-one, so a symbol added here joins that evening's run with nothing else to wire.
+with `sync_price` and `sync_broker_summary` set, which is the whole mechanism for the daily
+collection: the 18:00 OHLCV job reads every price-synced asset and the broker-summary job
+every broker-synced one, so a symbol added here joins that evening's run with nothing else
+to wire.
 
-What it does not do is backfill history. Tonight's run fetches tonight's bar, so a new
-symbol starts with one bar and the structural columns stay empty until it has enough —
-ROC 13w needs 66 bars, the 55-week high needs 275. Fill it in with:
+History is a separate problem, because the daily job asks for exactly one session — it
+passes `--from` and `--to` both pinned to the market date. Left at that, a symbol added
+today would gain one bar an evening and take a year to become usable: ROC 13w needs 66
+bars and the 55-week high needs 275.
+
+So each newly created asset also gets a queued `BackfillAssetHistoryJob`, which runs
 
 ```bash
-php artisan stockbit:scrape BBCA --historical    # from the IPO date if known
+php artisan stockbit:scrape SYMBOL --historical    # no --from, on purpose
 ```
+
+Omitting `--from` is the whole trick: the scraper syncs the ticker profile, reads the IPO
+date off it, and walks from there a year at a time (`ScrapeStockbit::synchronize`). That is
+the same path that built the assets this installation already holds, so a symbol added
+through the index panel ends up with the same history rather than a shorter one of its own
+kind. The same command is still there to run by hand.
+
+The job is deliberately patient rather than eager:
+
+- it takes `automation:stockbit-bulk`, the lock the scheduled bulk scrapes take, so a
+  backfill cannot run alongside the evening collectors and halve everyone's throughput;
+- a Stockbit token that fails preflight defers it by 15 minutes rather than failing it —
+  the hourly renewal exists for exactly that;
+- it is unique per symbol and carries `WithoutOverlapping`, so adding the same symbol twice
+  does not queue two scrapes.
+
+**One setting to check:** the database queue re-delivers a job once `retry_after` elapses,
+whether or not the first attempt is still running, and a full backfill takes minutes.
+`DB_QUEUE_RETRY_AFTER` defaults to 90 seconds; set it above the job's 7200-second timeout
+(or well above the longest backfill) on any box running these. The overlap middleware
+blocks the duplicate either way, but the right value keeps it from being needed.
 
 The API refuses to create an asset for a symbol that is not a current member of the named
 index. The browser sends a list of tickers; the server checks each one against the

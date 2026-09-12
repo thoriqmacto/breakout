@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\ApiResponse;
+use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\IndexMembership;
 use App\Models\MarketIndex;
@@ -197,15 +198,17 @@ class MarketIndexController extends ApiController
     /**
      * Start collecting data for index members this installation does not hold.
      *
-     * Creating the asset row is the whole mechanism: the daily OHLCV job reads
-     * every asset with sync_price set and the broker-summary job every asset
-     * with sync_broker_summary set, so an asset created here joins tonight's
-     * collection with no further wiring.
+     * Creating the asset row is the whole mechanism for the daily collection:
+     * the OHLCV job reads every asset with sync_price set and the
+     * broker-summary job every asset with sync_broker_summary set, so an asset
+     * created here joins tonight's run with no further wiring.
      *
-     * What it does not do is backfill history. Tonight's run fetches tonight's
-     * bar, so a new symbol starts with one bar and the structural columns stay
-     * empty until it has enough -- which is why the response says so rather
-     * than leaving the page to imply the symbol is ready.
+     * History is a separate problem, because the daily job asks for exactly
+     * one session. Left at that a new symbol would gain one bar an evening and
+     * take a year to become usable -- ROC 13w needs 66 bars, the 55-week high
+     * needs 275 -- so each newly created asset also gets a queued backfill
+     * that walks its whole history from the IPO date, the same path that built
+     * the assets this installation already holds.
      */
     public function track(Request $request, string $code)
     {
@@ -260,12 +263,18 @@ class MarketIndexController extends ApiController
 
             Asset::query()->create([
                 'symbol' => $symbol,
-                // The nightly profile sync replaces this with the listed name.
+                // The backfill syncs the profile on its way to the IPO date
+                // and replaces this with the listed name.
                 'name' => $symbol,
                 'sync_price' => true,
                 'sync_profile' => true,
                 'sync_broker_summary' => true,
             ]);
+
+            // Queued, not awaited: a full history is minutes of API calls per
+            // symbol, and it takes the shared Stockbit lock so it waits its
+            // turn behind the evening collectors rather than competing.
+            BackfillAssetHistoryJob::dispatch($symbol);
 
             $created[] = $symbol;
         }
@@ -273,10 +282,10 @@ class MarketIndexController extends ApiController
         $message = $created === []
             ? 'Nothing new to add.'
             : sprintf(
-                '%s added. Collection starts at the next scheduled run; history is not backfilled, so run '
-                .'"php artisan stockbit:scrape %s --historical" to fill it in.',
+                '%s added. Daily collection starts at the next scheduled run, and a full history backfill from '
+                .'each symbol\'s IPO date is queued now -- it runs in the background and waits for the evening '
+                .'collectors if they are working.',
                 implode(', ', $created),
-                implode(' ', $created),
             );
 
         return ApiResponse::success([
