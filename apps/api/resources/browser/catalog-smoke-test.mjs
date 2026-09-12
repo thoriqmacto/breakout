@@ -108,6 +108,72 @@ function virtualisedPage(symbols) {
 }
 
 /**
+ * The real catalogue's table, as far as a fixture can go.
+ *
+ * An Ant Design table with a scroll body of its own: `overflow-y: scroll` on a
+ * fixed max-height, a spacer table sized to the whole list, and a window of
+ * rows that is re-rendered as the box scrolls. Rows carry `data-row-key`, the
+ * measure row carries none, and the price column holds numbers that a
+ * ticker-shaped test must not take.
+ *
+ * Three properties matter and none was covered before. The window is the only
+ * part of the list in the DOM, so a single read after scrolling finishes sees
+ * the last twenty-eight rows and nothing else; the box is not the window, so
+ * `window.scrollBy` never moves it at all; and with `blanks` the list renders
+ * an empty window once scrolled past its own data, which is how a pass finds
+ * no list at all and the page's furniture becomes the best thing on it.
+ */
+function antTablePage(symbols, rail, { blanks = false } = {}) {
+  return `<!doctype html>
+<html><head><title>Indeks JII70 | Test</title></head>
+<body>
+  <nav><a href="/stream">Stream</a><a href="/symbol/AALI/financials">Financials</a></nav>
+  <table id="rail"><tbody>
+    ${rail.map((symbol) => `<tr data-row-key="${symbol}"><td>${symbol}</td></tr>`).join('')}
+  </tbody></table>
+  <div class="ant-table-body" style="overflow-y: scroll; max-height: 725px">
+    <table style="table-layout: fixed"><tbody class="ant-table-tbody"></tbody></table>
+  </div>
+  <script>
+    const symbols = ${JSON.stringify(symbols)}
+    const ROW = 44
+    const WINDOW = 28
+    const box = document.querySelector('.ant-table-body')
+    const spacer = box.querySelector('table')
+    const body = box.querySelector('tbody')
+
+    spacer.style.height = (symbols.length * ROW) + 'px'
+
+    const render = () => {
+      const raw = Math.floor(box.scrollTop / ROW) - 2
+      // A real virtual list clamps to its own data. ${blanks} is the one that
+      // does not, and renders an empty window once scrolled past the end.
+      const first = ${blanks} ? Math.max(0, raw) : Math.max(0, Math.min(raw, symbols.length - WINDOW))
+      const last = Math.min(symbols.length, first + WINDOW)
+
+      body.innerHTML = '<tr aria-hidden="true" class="ant-table-measure-row"><td></td><td></td></tr>'
+
+      for (let index = first; index < last; index++) {
+        const row = document.createElement('tr')
+        row.className = 'ant-table-row catalog-table-body-row'
+        row.setAttribute('data-row-key', symbols[index])
+        row.style.transform = 'translateY(' + (first * ROW) + 'px)'
+        row.innerHTML =
+          '<td class="ant-table-cell catalog-table-cell-symbol"><p><a href="/symbol/' + symbols[index] + '">' +
+          symbols[index] + '</a></p></td>' +
+          '<td class="ant-table-cell catalog-table-cell-price"> 1,340</td>' +
+          '<td class="ant-table-cell catalog-table-cell-change">-30 (-2.19%)</td>'
+        body.appendChild(row)
+      }
+    }
+
+    render()
+    box.addEventListener('scroll', render)
+  </script>
+</body></html>`
+}
+
+/**
  * The second real failure: the catalogue renders, then the app decides the
  * session is stale and replaces the list with its own screen. The server HTML
  * carried the constituents; the settled DOM does not.
@@ -158,6 +224,8 @@ function startServer() {
     '/hydrated': hydratedPage(UNIQUE_MEMBERS),
     '/data-island': dataIslandPage(UNIQUE_MEMBERS),
     '/virtualised': virtualisedPage(UNIQUE_MEMBERS),
+    '/ant-table': antTablePage(UNIQUE_MEMBERS, RAIL),
+    '/ant-table-blanks': antTablePage(UNIQUE_MEMBERS, RAIL, { blanks: true }),
     '/empty': emptyPage(),
     '/login': signInPage(),
     '/lapsed': lapsedSessionPage(UNIQUE_MEMBERS),
@@ -231,6 +299,42 @@ async function main() {
       'rows that only arrive on scroll are reached',
       UNIQUE_MEMBERS.every((symbol) => virtualised.symbols.includes(symbol)),
       `${virtualised.symbols.length} of ${UNIQUE_MEMBERS.length}`,
+    )
+
+    const antTable = await readIndexConstituents({ url: `${base}/ant-table`, timeoutMs: 60000, executablePath })
+    check(
+      'a table that recycles its rows inside its own scroll box is read in full',
+      UNIQUE_MEMBERS.every((symbol) => antTable.symbols.includes(symbol)),
+      `${antTable.symbols.length} of ${UNIQUE_MEMBERS.length} over ${antTable.evidence.passes} passes, ` +
+        `${antTable.evidence.scrollers} scrollers`,
+    )
+    check(
+      'the row key is what carries the symbol, not the price beside it',
+      antTable.evidence.from_row_keys === UNIQUE_MEMBERS.length &&
+        antTable.symbols.length === UNIQUE_MEMBERS.length,
+      `${antTable.evidence.from_row_keys} row keys, ${antTable.symbols.length} symbols kept`,
+    )
+    check(
+      'a second keyed table on the page does not merge into the index',
+      RAIL.every((symbol) => !antTable.symbols.includes(symbol)),
+      'the longest group of row keys is the list',
+    )
+    check(
+      'a complete read is not reported as truncated',
+      antTable.evidence.truncated === false,
+      `truncated ${antTable.evidence.truncated}`,
+    )
+
+    const blanked = await readIndexConstituents({ url: `${base}/ant-table-blanks`, timeoutMs: 60000, executablePath })
+    check(
+      'a pass that finds the list empty does not adopt the furniture instead',
+      RAIL.every((symbol) => !blanked.symbols.includes(symbol)),
+      `${blanked.symbols.length} symbols over ${blanked.evidence.passes} passes, rail kept out`,
+    )
+    check(
+      'and the list is still read in full through the empty passes',
+      UNIQUE_MEMBERS.every((symbol) => blanked.symbols.includes(symbol)),
+      `${blanked.symbols.length} of ${UNIQUE_MEMBERS.length}`,
     )
 
     // The real deployment reads through the profile the token renewal keeps

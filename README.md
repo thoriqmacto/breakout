@@ -2440,11 +2440,16 @@ Either way the remedy is the same and the opposite of a selector fix: the saved 
 session has lapsed. Check it with `php artisan browser:token --session --dry-run` and sign
 it in again — it is the same profile, and the same session, the token renewal uses.
 
-### Four sources, one of them a fallback
+### Five sources, one of them a fallback
 
-The reader unions three sources it can scope to the constituent list — ticker links, the
-JSON island, table cells — and keeps a fourth in reserve: **the server-rendered HTML of the
-navigation response itself**, captured before anything else runs.
+The reader unions four sources it can scope to the constituent list — row keys, ticker
+links, the JSON island, table cells — and keeps a fifth in reserve: **the server-rendered
+HTML of the navigation response itself**, captured before anything else runs.
+
+Row keys are the strongest of them and were added after reading the real table: its rows
+are `<tr data-row-key="MAPA">`, and a row key is the list's own identifier for a row rather
+than text that happens to look like a ticker. A price cell, a nav label and Ant Design's
+hidden measure row are all excluded by that one fact, with no rule about any of them.
 
 That fourth one exists because the page is server-rendered and then hydrated. A client-side
 session check that decides to show an expired-session screen removes the constituents from
@@ -2459,6 +2464,33 @@ raw markup — `/symbol/AALI/financials` is the site's own navigation using a sa
 and the DOM link source needs at least five matching anchors before it believes it has found
 a list, because two or three are a menu.
 
+### The list is virtualised, and it scrolls inside itself
+
+The real table is an Ant Design body with `overflow-y: scroll` and a fixed max height, so
+**the window does not scroll at all** and `window.scrollBy` reached nothing. Inside it, only
+a window of rows exists in the DOM — twenty-eight of seventy — and they are recycled as the
+box moves. Two consequences, both of which the reader now handles:
+
+- every element that overflows vertically and says it scrolls is pushed, the document
+  included, so this does not depend on recognising any particular component;
+- the page is collected on **every pass and unioned**, rather than read once after the
+  scrolling finishes, which would see the last window and nothing before it.
+
+A virtualised list can also be momentarily empty — mid re-render, or scrolled past its own
+data. On such a pass the best thing on the page is whatever furniture is left, and because
+passes are unioned that furniture would join the index permanently (it did, in a fixture: an
+empty window handed the reader a five-row related-stocks rail as "the list"). So the list is
+**pinned** the first time it is recognised, with an attribute on the page's own DOM, and
+every later pass reads that element or nothing.
+
+If the reader is still finding new symbols when it runs out of passes, what it has is a
+prefix of the list rather than the list. That is reported as `truncated` and the sync
+refuses it: a list that is 80% read looks like an ordinary index review to the shrink guard,
+which is exactly the silent corruption the guards exist to prevent. `--force` accepts it.
+
+`--diagnose` also prints the page's scroll boxes and their visible/total heights, which is
+the half that was invisible until the real page was read.
+
 `--dump-html` writes the rendered DOM for reading. Both are operator tools: the diagnosis
 goes to the terminal of whoever asked for it and never into a run record, which keeps
 counts rather than somebody else's markup.
@@ -2470,8 +2502,9 @@ having two entrances.
 
 `apps/api/resources/browser/catalog-smoke-test.mjs` runs the reader against a throwaway
 page on localhost: a table written after load, a list that exists only in the
-`__NEXT_DATA__` island, rows that only appear on scroll, a page with nothing on it, and a
-related-stocks rail whose tickers must *not* be collected. Run it with
+`__NEXT_DATA__` island, rows that only appear on scroll, an Ant Design table that recycles
+its rows inside its own scroll box, the same table blanking itself mid-scroll, a page with
+nothing on it, and a related-stocks rail whose tickers must *not* be collected. Run it with
 `npm run smoke:catalog` in `apps/api/resources/browser`. A failure there means this code is
 wrong; it says nothing about whether a third party changed their markup, which is what the
 daily run and its alert are for.

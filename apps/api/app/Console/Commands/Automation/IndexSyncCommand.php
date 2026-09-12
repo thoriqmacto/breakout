@@ -223,14 +223,49 @@ class IndexSyncCommand extends Command
         $this->reportDiagnosis($evidence);
 
         $this->line(sprintf(
-            '  Read %d ticker-shaped entries from the %s (%s links, %s data, %s cells, %s in the server markup).',
+            '  Read %d ticker-shaped entries from the %s (%s row keys, %s links, %s data, %s cells, %s in the server markup) '
+            .'over %s passes of %s scroll boxes.',
             count($symbols),
             ($evidence['source'] ?? 'dom') === 'server_html' ? 'server HTML' : 'live page',
+            $evidence['from_row_keys'] ?? '?',
             $evidence['from_links'] ?? '?',
             $evidence['from_json'] ?? '?',
             $evidence['from_cells'] ?? '?',
             $evidence['from_server_html'] ?? '?',
+            $evidence['passes'] ?? '?',
+            $evidence['scrollers'] ?? '?',
         ));
+
+        // A read that was still finding new symbols when it ran out of passes
+        // returned a prefix of the list. Writing it would date a departure for
+        // every member past the cut, and the shrink guard would not always
+        // catch it -- a list that is 80% read looks like an ordinary review.
+        if (($evidence['truncated'] ?? false) === true && ! $this->option('force')) {
+            $metadata->merge(['read_failed' => true, 'read_reason' => 'truncated']);
+
+            $alerts->raise(
+                self::ALERT_TYPE,
+                $code,
+                AutomationAlert::SEVERITY_WARNING,
+                sprintf('%s membership could not be refreshed', $code),
+                sprintf(
+                    'The catalogue was still producing new symbols when the reader ran out of passes, so the %d it '
+                    .'returned are the start of the list rather than the list. Membership is unchanged. Re-run with '
+                    .'--force to accept the partial list anyway, or paste the membership into the index panel.',
+                    count($symbols),
+                ),
+                ['reason' => 'truncated', 'received' => count($symbols)],
+            );
+
+            $this->error(sprintf(
+                'The read was cut short after %s passes with %d symbols and still counting, so it is a partial list. '
+                .'Nothing was written.',
+                $evidence['passes'] ?? '?',
+                count($symbols),
+            ));
+
+            return null;
+        }
 
         return $symbols;
     }
@@ -338,6 +373,14 @@ class IndexSyncCommand extends Command
             foreach (array_slice($hrefs, 0, 30) as $href) {
                 $this->line('    '.$href);
             }
+        }
+
+        $boxes = is_array($diagnosis['scroll_boxes'] ?? null) ? $diagnosis['scroll_boxes'] : [];
+
+        if ($boxes !== []) {
+            // The half that was invisible until the real page was read: a list
+            // inside one of these is untouched by scrolling the window.
+            $this->line('  Scroll boxes (visible/total): '.implode(', ', $boxes));
         }
 
         if (($diagnosis['text_head'] ?? '') !== '') {
