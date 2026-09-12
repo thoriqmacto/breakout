@@ -19,6 +19,8 @@ export type AssetMetricApiRow = {
   pbas: number | string | null
   bavg: number | string | null
   coverage?: AssetCoverageApi | null
+  /** Published index codes this symbol currently belongs to, e.g. ["JII70"]. */
+  indexes?: string[] | null
 }
 
 /**
@@ -71,6 +73,14 @@ export type AssetMetricRow = {
   pbas: number | null
   bavg: number | null
   coverage: AssetCoverage | null
+  /**
+   * Published indexes this symbol is currently in.
+   *
+   * Empty means "in none of the indexes this dashboard follows", which is not
+   * the same as "never checked" -- the index panel is where the date of the
+   * last membership read lives.
+   */
+  indexes: string[]
 }
 
 const normalizeCoverage = (row: AssetCoverageApi | null | undefined): AssetCoverage | null => {
@@ -155,4 +165,7 @@ export const normalizeMetrics = (rows: AssetMetricApiRow[]): AssetMetricRow[] =>
     pbas: parseNumericValue(row.pbas),
     bavg: parseNumericValue(row.bavg),
     coverage: normalizeCoverage(row.coverage),
+    indexes: Array.isArray(row.indexes)
+      ? row.indexes.filter((code): code is string => typeof code === "string" && code !== "")
+      : [],
   }))

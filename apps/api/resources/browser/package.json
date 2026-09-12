@@ -2,10 +2,11 @@
   "name": "breakout-browser-auth",
   "private": true,
   "type": "module",
-  "description": "Headless-browser bearer token extraction, invoked by the Laravel API.",
+  "description": "Headless-browser helpers invoked by the Laravel API: bearer token extraction and index catalogue reads.",
   "scripts": {
     "install:chromium": "playwright install --with-deps chromium",
-    "smoke": "node smoke-test.mjs"
+    "smoke": "node smoke-test.mjs",
+    "smoke:catalog": "node catalog-smoke-test.mjs"
   },
   "dependencies": {
     "playwright": "^1.49.0"

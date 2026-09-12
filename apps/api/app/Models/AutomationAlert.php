@@ -34,6 +34,16 @@ class AutomationAlert extends Model
      */
     public const TYPE_STRATEGY_SIGNAL = 'strategy_signal';
 
+    /**
+     * A published index's membership could not be refreshed.
+     *
+     * Its own type because the consequence is quiet: nothing breaks, the
+     * badges simply go on describing whatever was last read. Without a row
+     * saying so, "the index has not changed in three weeks" and "the reader
+     * has been broken for three weeks" look exactly alike.
+     */
+    public const TYPE_INDEX_MEMBERSHIP = 'index_membership';
+
     public const SEVERITY_INFO = 'info';
 
     public const SEVERITY_WARNING = 'warning';

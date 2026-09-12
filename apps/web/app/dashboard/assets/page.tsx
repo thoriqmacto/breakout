@@ -14,6 +14,8 @@ import {
   type AssetMetricRow,
 } from "@/lib/asset-metrics"
 import { AddAssetButton } from "@/components/add-asset-button"
+import { IndexBadge } from "@/components/assets/index-badge"
+import { IndexPanel } from "@/components/assets/index-panel"
 import { InfoTip } from "@/components/ui/info-tip"
 import { TradingCalendar } from "@/components/trading-calendar"
 
@@ -131,14 +133,17 @@ const ASSET_METRIC_COLUMNS: ColumnDefinition[] = [
     align: "left",
     cellClassName: "font-medium text-foreground",
     getSortValue: (row) => row.symbol,
-    getCopyValue: (row) => row.symbol,
+    getCopyValue: (row) => (row.indexes.length > 0 ? `${row.symbol} (${row.indexes.join(", ")})` : row.symbol),
     render: (row) => (
-      <Link
-        href={`/dashboard/assets/${row.assetId}`}
-        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
-      >
-        {row.symbol}
-      </Link>
+      <span className="inline-flex items-center gap-1.5">
+        <Link
+          href={`/dashboard/assets/${row.assetId}`}
+          className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          {row.symbol}
+        </Link>
+        <IndexBadge codes={row.indexes} />
+      </span>
     ),
   },
   {
@@ -365,7 +370,7 @@ const DEFAULT_VISIBLE_COLUMN_KEYS = ASSET_METRIC_COLUMNS.filter(
   (column) => column.defaultVisible !== false,
 ).map((column) => column.key)
 
-type AssetsView = "metrics" | "calendar"
+type AssetsView = "metrics" | "calendar" | "index"
 
 export default function AssetsMetricsPage() {
   const { accessToken } = useAuth()
@@ -374,7 +379,11 @@ export default function AssetsMetricsPage() {
   // In the URL rather than in component state: the retired
   // /dashboard/trading-days route redirects straight to ?view=calendar, and a
   // tab nobody can link to is a tab nobody can bookmark.
-  const view: AssetsView = searchParams.get("view") === "calendar" ? "calendar" : "metrics"
+  const requestedView = searchParams.get("view")
+  const view: AssetsView =
+    requestedView === "calendar" ? "calendar" : requestedView === "index" ? "index" : "metrics"
+  // Which index the panel opens on, so a badge can link straight to its own.
+  const requestedIndex = searchParams.get("index") ?? undefined
   const [rows, setRows] = useState<AssetMetricRow[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -934,9 +943,20 @@ export default function AssetsMetricsPage() {
             active={view === "calendar"}
             onSelect={() => router.replace("/dashboard/assets?view=calendar")}
           />
+          <ViewTab
+            label="Index"
+            active={view === "index"}
+            onSelect={() => router.replace("/dashboard/assets?view=index")}
+          />
         </div>
       </div>
-      {view === "calendar" ? <TradingCalendar /> : content}
+      {view === "calendar" ? (
+        <TradingCalendar />
+      ) : view === "index" ? (
+        <IndexPanel code={requestedIndex} />
+      ) : (
+        content
+      )}
     </div>
   )
 }

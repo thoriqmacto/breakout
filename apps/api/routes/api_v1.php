@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\ExecutionCandidateController;
+use App\Http\Controllers\Api\V1\MarketIndexController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PortfolioImportController;
 use App\Http\Controllers\Api\V1\PositionController;
@@ -74,6 +75,26 @@ Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
         ->name('assets.sync-settings');
 
     Route::apiResource('assets', AssetController::class);
+
+    // Published indexes
+    //
+    // The code is taken from the URL and checked against the configured list
+    // before it reaches a query: it names a configured index or it is a 404,
+    // never a filter on arbitrary text.
+    Route::get('indexes', [MarketIndexController::class, 'index'])
+        ->name('indexes.index');
+
+    Route::get('indexes/{code}', [MarketIndexController::class, 'show'])
+        ->whereAlphaNumeric('code')
+        ->name('indexes.show');
+
+    Route::post('indexes/{code}/members', [MarketIndexController::class, 'storeMembers'])
+        ->whereAlphaNumeric('code')
+        ->name('indexes.members.store');
+
+    Route::post('indexes/{code}/track', [MarketIndexController::class, 'track'])
+        ->whereAlphaNumeric('code')
+        ->name('indexes.track');
 
     // Broker summary
     //
