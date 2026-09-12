@@ -58,7 +58,7 @@ class IndexSyncCommandTest extends TestCase
         $this->app->bind(IndexCatalogReader::class, function () {
             return new class extends IndexCatalogReader
             {
-                public function read(string $url): array
+                public function read(string $url, array $options = []): array
                 {
                     throw new \RuntimeException('the browser must not be used for a supplied list');
                 }
@@ -112,7 +112,7 @@ class IndexSyncCommandTest extends TestCase
         $this->app->bind(IndexCatalogReader::class, function () {
             return new class extends IndexCatalogReader
             {
-                public function read(string $url): array
+                public function read(string $url, array $options = []): array
                 {
                     throw new IndexCatalogReadException(
                         IndexCatalogReadException::NO_SYMBOLS_FOUND,

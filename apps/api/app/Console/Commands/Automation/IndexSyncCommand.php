@@ -35,7 +35,9 @@ class IndexSyncCommand extends Command
         {--symbols= : Use this list instead of reading the page (comma or space separated)}
         {--file= : Read the list from a file instead of reading the page}
         {--force : Apply a list the safety guards would otherwise refuse}
-        {--dry-run : Report what would change without writing it}';
+        {--dry-run : Report what would change without writing it}
+        {--diagnose : Print what the catalogue page actually contained, for when a read finds nothing}
+        {--dump-html= : Write the rendered page to this path, for when the markup needs reading}';
 
     protected $description = 'Refresh a published index\'s membership from its catalogue page, or from a supplied list.';
 
@@ -173,8 +175,15 @@ class IndexSyncCommand extends Command
 
         $metadata->merge(['source' => 'browser', 'source_url' => $url]);
 
+        $options = [
+            'diagnose' => (bool) $this->option('diagnose'),
+            'dump_html' => is_string($this->option('dump-html')) && trim((string) $this->option('dump-html')) !== ''
+                ? trim((string) $this->option('dump-html'))
+                : null,
+        ];
+
         try {
-            ['symbols' => $symbols, 'evidence' => $evidence] = $reader->read($url);
+            ['symbols' => $symbols, 'evidence' => $evidence] = $reader->read($url, $options);
         } catch (IndexCatalogReadException $exception) {
             // The evidence is counts and a page title, never page content: a
             // catalogue page is public, but a run record is not the place to
@@ -183,7 +192,7 @@ class IndexSyncCommand extends Command
                 'read_failed' => true,
                 'read_reason' => $exception->reason,
                 'error_summary' => $exception->getMessage(),
-                'evidence' => $exception->evidence,
+                'evidence' => $this->countsOnly($exception->evidence),
             ]);
 
             $alerts->raise(
@@ -203,11 +212,14 @@ class IndexSyncCommand extends Command
             );
 
             $this->error($exception->getMessage());
+            $this->reportDiagnosis($exception->evidence);
 
             return null;
         }
 
-        $metadata->merge(['evidence' => $evidence, 'received' => count($symbols)]);
+        $metadata->merge(['evidence' => $this->countsOnly($evidence), 'received' => count($symbols)]);
+
+        $this->reportDiagnosis($evidence);
 
         $this->line(sprintf(
             '  Read %d ticker-shaped entries (%s links, %s data, %s cells).',
@@ -270,5 +282,80 @@ class IndexSyncCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Show an operator what the page actually held.
+     *
+     * Only when --diagnose asked for it, and only to the terminal. A read that
+     * finds nothing is a question about somebody else's markup, and the one
+     * fact that settles it is whether ticker-shaped words are in the rendered
+     * text at all: if they are, the selectors are wrong; if they are not, the
+     * list never rendered and no selector would have helped.
+     *
+     * @param  array<string, mixed>  $evidence
+     */
+    private function reportDiagnosis(array $evidence): void
+    {
+        if (isset($evidence['dump_html'])) {
+            $this->line('  Rendered page written to '.$evidence['dump_html']);
+        }
+
+        $diagnosis = $evidence['diagnosis'] ?? null;
+
+        if (! is_array($diagnosis)) {
+            return;
+        }
+
+        $this->newLine();
+        $this->line('<comment>What the page contained</comment>');
+        $this->line('  Landed on : '.($diagnosis['url'] ?? '?'));
+        $this->line('  Title     : '.($diagnosis['title'] ?? '(none)'));
+        $this->line('  Text      : '.($diagnosis['text_length'] ?? 0).' chars');
+
+        $counts = is_array($diagnosis['tag_counts'] ?? null) ? $diagnosis['tag_counts'] : [];
+
+        $this->line('  Elements  : '.implode(', ', array_map(
+            static fn (string $tag, $count): string => $tag.'='.$count,
+            array_keys($counts),
+            array_values($counts),
+        )));
+
+        $words = is_array($diagnosis['ticker_shaped_words'] ?? null) ? $diagnosis['ticker_shaped_words'] : [];
+
+        $this->line('  Ticker-shaped words in the text: '.(
+            $words === [] ? '(none -- the list never rendered)' : implode(' ', array_slice($words, 0, 40))
+        ));
+
+        $hrefs = is_array($diagnosis['href_samples'] ?? null) ? $diagnosis['href_samples'] : [];
+
+        if ($hrefs !== []) {
+            $this->line('  Link paths:');
+
+            foreach (array_slice($hrefs, 0, 30) as $href) {
+                $this->line('    '.$href);
+            }
+        }
+
+        if (($diagnosis['text_head'] ?? '') !== '') {
+            $this->line('  First words: '.$diagnosis['text_head']);
+        }
+    }
+
+    /**
+     * Counts and identifiers only, for the run record.
+     *
+     * The diagnosis is samples of a third party's page. It belongs on the
+     * terminal of whoever asked for it, not accumulating in a table the
+     * dashboard reads.
+     *
+     * @param  array<string, mixed>  $evidence
+     * @return array<string, mixed>
+     */
+    private function countsOnly(array $evidence): array
+    {
+        unset($evidence['diagnosis']);
+
+        return $evidence;
     }
 }

@@ -2395,6 +2395,31 @@ membership it stored itself rather than trusting the payload.
 | `POST` | `/v1/indexes/{code}/members` | replace the membership from a pasted list |
 | `POST` | `/v1/indexes/{code}/track` | create asset rows for members, collection on |
 
+### When the read finds nothing
+
+`NO_SYMBOLS_FOUND` means the page loaded and carried nothing ticker-shaped. That is one
+message covering two very different faults, so ask the page which it is:
+
+```bash
+php artisan automation:index-sync --dry-run --diagnose --dump-html=/tmp/jii70.html
+```
+
+`--diagnose` prints what the page held — where it landed, its title, how many links, tables
+and JSON islands, the first words of its text, and the ticker-shaped words in that text.
+That last line is the one that decides it:
+
+| Ticker-shaped words in the text | What it means | What to do |
+| --- | --- | --- |
+| some listed | the list rendered; the selectors missed it | fix the selectors against the dumped HTML |
+| `(none)` | the list never rendered — a login wall, a redirect, a bot check | the page is not readable unauthenticated; use the paste box |
+
+`--dump-html` writes the rendered DOM for reading. Both are operator tools: the diagnosis
+goes to the terminal of whoever asked for it and never into a run record, which keeps
+counts rather than somebody else's markup.
+
+Either way the membership is unchanged and the paste box still works, which is the point of
+having two entrances.
+
 ### Proving the reader without the real page
 
 `apps/api/resources/browser/catalog-smoke-test.mjs` runs the reader against a throwaway

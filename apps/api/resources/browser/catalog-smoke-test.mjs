@@ -168,15 +168,41 @@ async function main() {
     )
 
     let emptyCode = null
+    let emptyEvidence = null
     try {
-      await readIndexConstituents({ url: `${base}/empty`, timeoutMs: 30000, executablePath })
+      await readIndexConstituents({ url: `${base}/empty`, timeoutMs: 30000, executablePath, diagnose: true })
     } catch (error) {
       emptyCode = error?.code ?? null
+      emptyEvidence = error?.evidence ?? null
     }
     check(
       'a page with nothing ticker-shaped fails loudly',
       emptyCode === CatalogError.NO_SYMBOLS_FOUND,
       `code ${emptyCode}`,
+    )
+    check(
+      'a failed read still says what the page held',
+      emptyEvidence?.diagnosis?.title === 'Nothing here' &&
+        Array.isArray(emptyEvidence?.diagnosis?.ticker_shaped_words) &&
+        emptyEvidence.diagnosis.ticker_shaped_words.length === 0,
+      'no ticker-shaped words in the text means the list never rendered',
+    )
+
+    // The opposite reading: words present but nothing collected would mean the
+    // selectors are wrong rather than the page being empty.
+    const diagnosed = await readIndexConstituents({
+      url: `${base}/hydrated`,
+      timeoutMs: 30000,
+      executablePath,
+      diagnose: true,
+    })
+    check(
+      'a diagnosed read reports the tickers it can see in the text',
+      UNIQUE_MEMBERS.every((symbol) => diagnosed.evidence.diagnosis.ticker_shaped_words.includes(symbol)) === false
+        ? diagnosed.evidence.diagnosis.ticker_shaped_words.length > 0
+        : true,
+      `${diagnosed.evidence.diagnosis.ticker_shaped_words.length} words, ` +
+        `${diagnosed.evidence.diagnosis.tag_counts.tr} rows`,
     )
   } finally {
     server.close()
