@@ -18,7 +18,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { chromium } from 'playwright'
-import { readIndexConstituents, looksLikeSignIn, CatalogError } from './index-constituents.mjs'
+import {
+  readIndexConstituents,
+  looksLikeSignIn,
+  looksLikeLapsedSession,
+  symbolsInMarkup,
+  CatalogError,
+} from './index-constituents.mjs'
 
 /** Seventy distinct tickers, so the fixture is the size of a real index. */
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -101,6 +107,40 @@ function virtualisedPage(symbols) {
 </body></html>`
 }
 
+/**
+ * The second real failure: the catalogue renders, then the app decides the
+ * session is stale and replaces the list with its own screen. The server HTML
+ * carried the constituents; the settled DOM does not.
+ */
+function lapsedSessionPage(symbols) {
+  return `<!doctype html>
+<html><head><title>Stockbit - Investasi Saham</title></head>
+<body>
+  <nav><a href="/stream">Stream</a><a href="/symbol/AALI/financials">Financials</a>
+    <a href="/symbol/IHSG/chartbit">Chartbit</a><a href="/e-ipo">e-IPO</a><a href="/ktur">KTUR</a></nav>
+  <table id="constituents"><tbody>
+    ${symbols.map((symbol) => `<tr><td><a href="/symbol/${symbol}">${symbol}</a></td></tr>`).join('')}
+  </tbody></table>
+  <script>
+    // What a client-side session check does to server-rendered content.
+    setTimeout(() => {
+      document.querySelector('#constituents').remove()
+      const notice = document.createElement('p')
+      notice.textContent = 'Sesi Kamu Sudah Habis Silahkan login kembali untuk melanjutkan'
+      document.body.appendChild(notice)
+    }, 120)
+  </script>
+</body></html>`
+}
+
+/** A lapsed session with nothing server-rendered to fall back on. */
+function lapsedWithoutListPage() {
+  return `<!doctype html>
+<html><head><title>Stockbit - Investasi Saham</title></head>
+<body><nav><a href="/stream">Stream</a><a href="/ktur">KTUR</a></nav>
+<p>Sesi Kamu Sudah Habis Silahkan login kembali untuk melanjutkan</p></body></html>`
+}
+
 /** The real failure: the catalogue answers with a redirect to sign in. */
 function signInPage() {
   return `<!doctype html>
@@ -120,6 +160,8 @@ function startServer() {
     '/virtualised': virtualisedPage(UNIQUE_MEMBERS),
     '/empty': emptyPage(),
     '/login': signInPage(),
+    '/lapsed': lapsedSessionPage(UNIQUE_MEMBERS),
+    '/lapsed-empty': lapsedWithoutListPage(),
   }
 
   const server = createServer((request, response) => {
@@ -229,6 +271,44 @@ async function main() {
     } finally {
       await rm(profileDir, { recursive: true, force: true })
     }
+
+    // The server HTML is read before hydration can replace it, so a list that
+    // only the server sent still arrives.
+    const lapsed = await readIndexConstituents({ url: `${base}/lapsed`, timeoutMs: 30000, executablePath })
+    check(
+      'a list the client wipes is still read from the server HTML',
+      UNIQUE_MEMBERS.every((symbol) => lapsed.symbols.includes(symbol)),
+      `${lapsed.symbols.length} symbols, ${lapsed.evidence.from_server_html} from server markup`,
+    )
+    check(
+      'deep navigation links are not mistaken for constituents',
+      !lapsed.symbols.includes('AALI') && !lapsed.symbols.includes('IHSG'),
+      'only bare /symbol/XXXX links count in raw markup',
+    )
+
+    let lapsedCode = null
+    try {
+      await readIndexConstituents({ url: `${base}/lapsed-empty`, timeoutMs: 30000, executablePath })
+    } catch (error) {
+      lapsedCode = error?.code ?? null
+    }
+    check(
+      'a lapsed session is named as one, even without a redirect',
+      lapsedCode === CatalogError.LOGIN_REQUIRED,
+      `code ${lapsedCode}`,
+    )
+    check(
+      'the lapsed-session phrases are matched in both languages',
+      looksLikeLapsedSession('Sesi Kamu Sudah Habis') &&
+        looksLikeLapsedSession('Your session has expired') &&
+        looksLikeLapsedSession('70 constituents') === false,
+      'and an ordinary page is not mistaken for one',
+    )
+    check(
+      'raw markup yields bare symbol links only',
+      symbolsInMarkup('<a href="/symbol/BBCA">x</a><a href="/symbol/AALI/financials">y</a>').join(',') === 'BBCA',
+      'deep links belong to navigation',
+    )
 
     let gatedCode = null
     let gatedEvidence = null

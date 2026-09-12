@@ -114,6 +114,59 @@ export function looksLikeSignIn(requested, landed) {
   return /(^|\/)(login|signin|sign-in|masuk|auth|sso)(\/|$)/i.test(landedPath)
 }
 
+
+/**
+ * Ticker links in raw markup, before a browser has touched it.
+ *
+ * Deliberately stricter than the DOM reader: it matches only a *bare* symbol
+ * link -- `/symbol/BBCA` and not `/symbol/AALI/financials` -- because there is
+ * no DOM here to scope the search to the constituent table, and the site's own
+ * navigation is full of deep symbol links using a couple of example tickers.
+ * A bare link is what a constituent row carries.
+ *
+ * @param {string|null} html
+ * @returns {string[]}
+ */
+export function symbolsInMarkup(html) {
+  if (typeof html !== 'string' || html === '') return []
+
+  const found = new Set()
+  const pattern = /["'\s](?:https?:\/\/[^"'\s]+)?\/(?:symbol|symbols|companies|saham|stock)\/([A-Za-z][A-Za-z0-9]{2,5})(?=["'\s?#])/g
+
+  let match
+
+  while ((match = pattern.exec(html)) !== null) {
+    found.add(match[1].toUpperCase())
+  }
+
+  return [...found]
+}
+
+/**
+ * Phrases a portal shows when a session has lapsed rather than when a page is
+ * missing. Both languages the site uses.
+ */
+const SESSION_LAPSED = [
+  /sesi\s+(?:kamu|anda)\s+sudah\s+habis/i,
+  /sila[hk]an\s+login\s+kembali/i,
+  /session\s+(?:has\s+)?expired/i,
+  /please\s+log\s*-?\s*in\s+again/i,
+]
+
+/**
+ * Whether an otherwise-empty page is saying the session lapsed.
+ *
+ * Checked only when nothing was collected, so a catalogue that happens to
+ * mention the words somewhere is never mistaken for a lapsed one. This case
+ * does not redirect -- the URL stays on the catalogue -- so nothing else
+ * distinguishes it from markup that changed, and those need opposite fixes.
+ */
+export function looksLikeLapsedSession(text) {
+  if (typeof text !== 'string' || text === '') return false
+
+  return SESSION_LAPSED.some((pattern) => pattern.test(text))
+}
+
 /**
  * Everything ticker-shaped the loaded page can be made to admit to.
  *
@@ -164,6 +217,11 @@ function collectSymbols() {
     return depth
   }
 
+  // A constituent list is made of many links. Two or three are the site's own
+  // navigation -- deep links using a sample ticker -- and treating those as
+  // the list is how a page with its table removed still yields "symbols".
+  const MINIMUM_LINKS = 5
+
   const quorum = Math.max(2, Math.ceil(anchors.length * 0.6))
 
   let container = null
@@ -182,8 +240,11 @@ function collectSymbols() {
   }
 
   const fromLinks = []
-  for (const { anchor, symbol } of anchors) {
-    if (container === null || container.contains(anchor)) fromLinks.push(symbol)
+
+  if (anchors.length >= MINIMUM_LINKS) {
+    for (const { anchor, symbol } of anchors) {
+      if (container === null || container.contains(anchor)) fromLinks.push(symbol)
+    }
   }
 
   const fromJson = []
@@ -357,8 +418,16 @@ export async function readIndexConstituents({
   try {
     const page = context.pages()[0] ?? (await context.newPage())
 
+    let serverHtml = null
+
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs })
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs })
+
+      // The list is server-rendered, so the navigation response already holds
+      // it. Kept before anything else runs: a client-side app that decides the
+      // session is stale replaces that markup with its own screen, and by the
+      // time the DOM settles the constituents are gone from it.
+      serverHtml = await response?.text().catch(() => null)
     } catch (error) {
       throw new CatalogReadError(
         CatalogError.NAVIGATION_FAILED,
@@ -419,7 +488,17 @@ export async function readIndexConstituents({
 
     const found = await page.evaluate(collectSymbols)
 
-    const symbols = [...new Set([...found.links, ...found.json, ...found.cells])]
+    const fromServer = symbolsInMarkup(serverHtml)
+
+    const fromDom = [...new Set([...found.links, ...found.json, ...found.cells])]
+
+    // The server HTML is a fallback rather than another source to merge. It
+    // cannot be scoped -- there is no DOM to ask which block is the list, so a
+    // "related stocks" rail in the same markup is indistinguishable from a
+    // constituent. The live DOM can be scoped and is therefore better whenever
+    // it has anything at all; this rescues the case where it has nothing
+    // because the page replaced its own content after rendering.
+    const symbols = (fromDom.length > 0 ? fromDom : fromServer)
       .filter((symbol) => SYMBOL_SHAPE.test(symbol))
       .sort()
 
@@ -430,6 +509,8 @@ export async function readIndexConstituents({
       from_links: new Set(found.links).size,
       from_json: new Set(found.json).size,
       from_cells: new Set(found.cells).size,
+      from_server_html: fromServer.length,
+      source: fromDom.length > 0 ? 'dom' : 'server_html',
       // Anchors outside the constituent list are counted but not collected;
       // a gap between these two is the page carrying a related-stocks rail.
       anchors_total: found.anchors_total,
@@ -440,6 +521,17 @@ export async function readIndexConstituents({
     }
 
     if (symbols.length === 0) {
+      const text = await page.evaluate(() => document.body?.innerText || '')
+
+      if (looksLikeLapsedSession(text)) {
+        throw new CatalogReadError(
+          CatalogError.LOGIN_REQUIRED,
+          'The page loaded but says the session has expired, so it showed no constituents. '
+            + 'The saved profile needs signing in again.',
+          { evidence },
+        )
+      }
+
       throw new CatalogReadError(
         CatalogError.NO_SYMBOLS_FOUND,
         'The page loaded but carried nothing ticker-shaped. Its markup has probably changed.',
