@@ -13,7 +13,12 @@
  */
 
 import { createServer } from 'node:http'
-import { readIndexConstituents, CatalogError } from './index-constituents.mjs'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
+import { chromium } from 'playwright'
+import { readIndexConstituents, looksLikeSignIn, CatalogError } from './index-constituents.mjs'
 
 /** Seventy distinct tickers, so the fixture is the size of a real index. */
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -96,6 +101,14 @@ function virtualisedPage(symbols) {
 </body></html>`
 }
 
+/** The real failure: the catalogue answers with a redirect to sign in. */
+function signInPage() {
+  return `<!doctype html>
+<html><head><title>Stockbit - Investasi Saham</title></head>
+<body><form><input name="username" placeholder="Email or username"><input type="password">
+<a href="/trouble-login/forgot-password">Trouble Logging In?</a></form></body></html>`
+}
+
 function emptyPage() {
   return '<!doctype html><html><head><title>Nothing here</title></head><body><p>Halaman tidak ditemukan.</p></body></html>'
 }
@@ -106,10 +119,21 @@ function startServer() {
     '/data-island': dataIslandPage(UNIQUE_MEMBERS),
     '/virtualised': virtualisedPage(UNIQUE_MEMBERS),
     '/empty': emptyPage(),
+    '/login': signInPage(),
   }
 
   const server = createServer((request, response) => {
     const path = new URL(request.url, 'http://localhost').pathname
+
+    // What Stockbit actually does: the catalogue bounces to sign-in, carrying
+    // the requested page back as a query parameter.
+    if (path === '/gated') {
+      response.writeHead(302, { location: '/login?next=' + encodeURIComponent(path) })
+      response.end()
+
+      return
+    }
+
     const body = routes[path]
 
     if (body === undefined) {
@@ -165,6 +189,67 @@ async function main() {
       'rows that only arrive on scroll are reached',
       UNIQUE_MEMBERS.every((symbol) => virtualised.symbols.includes(symbol)),
       `${virtualised.symbols.length} of ${UNIQUE_MEMBERS.length}`,
+    )
+
+    // The real deployment reads through the profile the token renewal keeps
+    // signed in, because the catalogue is behind a sign-in.
+    const profileDir = await mkdtemp(join(tmpdir(), 'catalog-profile-'))
+
+    try {
+      const viaProfile = await readIndexConstituents({
+        url: `${base}/hydrated`,
+        timeoutMs: 30000,
+        executablePath,
+        profileDir,
+      })
+      check(
+        'a saved profile is used when one is configured',
+        UNIQUE_MEMBERS.every((symbol) => viaProfile.symbols.includes(symbol)),
+        `${viaProfile.symbols.length} symbols through a persistent context`,
+      )
+
+      // Chromium holds the profile exclusively, so a second reader has to say
+      // "busy" rather than "broken" -- they need opposite responses.
+      const holder = await chromium.launchPersistentContext(profileDir, { headless: true, executablePath })
+      let busyCode = null
+
+      try {
+        await readIndexConstituents({ url: `${base}/hydrated`, timeoutMs: 30000, executablePath, profileDir })
+      } catch (error) {
+        busyCode = error?.code ?? null
+      } finally {
+        await holder.close().catch(() => {})
+      }
+
+      check(
+        'a profile already open reports busy rather than broken',
+        busyCode === CatalogError.PROFILE_BUSY,
+        `code ${busyCode}`,
+      )
+    } finally {
+      await rm(profileDir, { recursive: true, force: true })
+    }
+
+    let gatedCode = null
+    let gatedEvidence = null
+    try {
+      await readIndexConstituents({ url: `${base}/gated`, timeoutMs: 30000, executablePath })
+    } catch (error) {
+      gatedCode = error?.code ?? null
+      gatedEvidence = error?.evidence ?? null
+    }
+    check(
+      'a catalogue that redirects to sign-in says so, rather than blaming the markup',
+      gatedCode === CatalogError.LOGIN_REQUIRED,
+      `code ${gatedCode}, landed ${gatedEvidence?.landed ?? '?'}`,
+    )
+    check(
+      'the redirect is judged on the path, not on the whole URL',
+      // The redirect carries the requested page in ?next=, so a substring test
+      // against the original URL would never fire.
+      looksLikeSignIn('https://x.test/catalog/indeks/jii70', 'https://x.test/login?next=/catalog/indeks/jii70') &&
+        looksLikeSignIn('https://x.test/catalog/indeks/jii70', 'https://x.test/catalog/indeks/jii70') === false,
+      'a page that did not move is not a sign-in page',
     )
 
     let emptyCode = null

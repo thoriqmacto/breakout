@@ -102,6 +102,16 @@ return [
     'profile_dir' => env('BROWSER_AUTH_PROFILE_DIR'),
 
     /*
+    | How long a renewal waits for the profile when another job is in it.
+    |
+    | The index catalogue read borrows the same signed-in profile, and Chromium
+    | will not open one twice. Generous, because a renewal that gives up leaves
+    | the evening collectors without a bearer, while the reader holding the
+    | profile finishes in about a minute.
+    */
+    'profile_wait_seconds' => (int) env('BROWSER_AUTH_PROFILE_WAIT_SECONDS', 180),
+
+    /*
     | How long before expiry the scheduled renewal starts trying.
     |
     | Wide enough that a failed attempt has room for several retries before the

@@ -2,6 +2,7 @@
 
 namespace App\Services\Indexes;
 
+use App\Support\BrowserProfileLock;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -13,9 +14,14 @@ use Symfony\Component\Process\Process;
  * constituents in it. A browser is the only reader that sees what a person
  * sees.
  *
- * Deliberately not the Stockbit API client: this reads a public catalogue page
- * and involves no bearer, no profile and no credentials, so a token that has
- * expired cannot stop the index from syncing and a change here cannot reach
+ * This was built on the assumption that a catalogue page is public, which
+ * turned out to be false for Stockbit: the first run against the real page
+ * landed on https://stockbit.com/login. So the reader reports LOGIN_REQUIRED
+ * as its own outcome rather than blaming the markup, and the paste box carries
+ * the membership in the meantime.
+ *
+ * It still involves no bearer and no saved profile. That is now a limitation
+ * rather than a virtue, but it is also what keeps a change here from reaching
  * the token store.
  *
  * The child is invoked with an argument list and fed JSON on stdin. There is
@@ -58,6 +64,7 @@ class IndexCatalogReader
             'chromium_path' => config('market_indexes.browser.chromium_path'),
             'diagnose' => (bool) ($options['diagnose'] ?? false),
             'dump_html' => $options['dump_html'] ?? null,
+            'profile_dir' => $this->profileDir(),
         ];
 
         $process = new Process(
@@ -67,6 +74,21 @@ class IndexCatalogReader
             json_encode($job, JSON_THROW_ON_ERROR),
             $timeout,
         );
+
+        // Only when a profile is in play: an anonymous read shares nothing and
+        // has no reason to queue behind the token renewal.
+        $lock = null;
+
+        if ($job['profile_dir'] !== null) {
+            $lock = BrowserProfileLock::make($timeout + 60);
+
+            if (! BrowserProfileLock::acquire($lock, BrowserProfileLock::readWait())) {
+                throw new IndexCatalogReadException(
+                    IndexCatalogReadException::PROFILE_BUSY,
+                    'The saved browser profile is in use, most likely by the Stockbit token renewal.',
+                );
+            }
+        }
 
         try {
             $process->run();
@@ -79,6 +101,8 @@ class IndexCatalogReader
             if ($process->isRunning()) {
                 $process->stop(1);
             }
+
+            BrowserProfileLock::release($lock);
         }
 
         return $this->interpret($process, $url);
@@ -111,6 +135,8 @@ class IndexCatalogReader
                     IndexCatalogReadException::BROWSER_LAUNCH_FAILED,
                     IndexCatalogReadException::NAVIGATION_FAILED,
                     IndexCatalogReadException::NO_SYMBOLS_FOUND,
+                    IndexCatalogReadException::LOGIN_REQUIRED,
+                    IndexCatalogReadException::PROFILE_BUSY,
                     IndexCatalogReadException::TIMEOUT,
                 ], true) ? $reason : IndexCatalogReadException::UNEXPECTED,
                 (string) ($decoded['message'] ?? 'The catalogue could not be read.'),
@@ -172,6 +198,16 @@ class IndexCatalogReader
         return $stderr === ''
             ? 'The catalogue reader produced no output at all.'
             : 'The catalogue reader failed before it could report: '.$stderr;
+    }
+
+    /**
+     * The signed-in profile to read through, or null to read anonymously.
+     */
+    private function profileDir(): ?string
+    {
+        $dir = config('market_indexes.browser.profile_dir');
+
+        return is_string($dir) && trim($dir) !== '' ? trim($dir) : null;
     }
 
     private function scriptPath(): string

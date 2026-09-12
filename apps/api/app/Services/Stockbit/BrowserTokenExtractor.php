@@ -2,6 +2,7 @@
 
 namespace App\Services\Stockbit;
 
+use App\Support\BrowserProfileLock;
 use App\Support\PathOwnership;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -47,6 +48,16 @@ class BrowserTokenExtractor
 
     public const NOT_CONFIGURED = 'NOT_CONFIGURED';
 
+    /**
+     * Another job was in the saved profile and would not let go.
+     *
+     * Chromium holds a profile directory exclusively, and since the index
+     * catalogue read borrows the same signed-in profile, the two have to take
+     * turns. This waits minutes before reporting it, because a renewal that
+     * gives up leaves the evening collectors without a bearer.
+     */
+    public const PROFILE_BUSY = 'PROFILE_BUSY';
+
     /** The three selectors the login form is driven by. */
     public const SELECTOR_ROLES = ['username', 'password', 'submit'];
 
@@ -67,6 +78,8 @@ class BrowserTokenExtractor
         self::TIMEOUT => 'The login did not finish in time. The portal may be slow or unreachable from this server.',
         self::TOKEN_NOT_FOUND => 'Signed in, but no bearer token was seen. The portal may name its token differently; check BROWSER_AUTH_TOKEN_KEYS.',
         self::BROWSER_LAUNCH_FAILED => 'Chromium could not start on this server. Install it, or point BROWSER_AUTH_CHROMIUM_PATH at an existing one.',
+        self::PROFILE_BUSY => 'The saved browser profile was in use by another job for the whole wait, most likely the index catalogue read. '
+            .'Nothing is wrong: run it again, or let the next scheduled renewal have it.',
         'SELECTOR_NOT_FOUND' => 'A field on the login form was not found. The portal has probably changed its markup; check the BROWSER_AUTH_*_SELECTOR values.',
         'NAVIGATION_FAILED' => 'The login page could not be opened from this server.',
         'BAD_JOB' => 'The extraction job was malformed. This is a bug rather than a configuration problem.',
@@ -200,6 +213,23 @@ class BrowserTokenExtractor
             $timeout,
         );
 
+        // The index catalogue read borrows this same profile, and Chromium
+        // will not open one twice. This waits minutes rather than seconds: a
+        // renewal that gives up leaves the collectors without a bearer, while
+        // the reader that holds the lock is finished in about one.
+        $profileLock = null;
+
+        if ($profile !== null) {
+            $profileLock = BrowserProfileLock::make($timeout + 60);
+
+            if (! BrowserProfileLock::acquire($profileLock, BrowserProfileLock::renewalWait())) {
+                throw new BrowserTokenExtractionException(
+                    self::PROFILE_BUSY,
+                    self::EXPLANATIONS[self::PROFILE_BUSY],
+                );
+            }
+        }
+
         try {
             $process->run();
         } catch (ProcessTimedOutException) {
@@ -213,6 +243,8 @@ class BrowserTokenExtractor
             if ($process->isRunning()) {
                 $process->stop(1);
             }
+
+            BrowserProfileLock::release($profileLock);
         }
 
         // A null password is not a secret to redact, and passing it as one
