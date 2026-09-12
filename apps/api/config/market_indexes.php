@@ -74,18 +74,31 @@ return [
     /*
     | The headless browser that reads the catalogue page.
     |
-    | Defaults are shared with the token extractor where they describe the same
-    | machine -- the node binary, where Playwright keeps its browsers, an
-    | already-installed Chromium -- because they are properties of the server
-    | rather than of the job. The profile is deliberately NOT shared: this
-    | reads a public catalogue page and has no business opening a signed-in
-    | browser profile.
+    | Defaults are shared with the token extractor because they describe the
+    | same machine: the node binary, where Playwright keeps its browsers, an
+    | already-installed Chromium.
+    |
+    | The profile is shared too, which was not the original intention. This was
+    | built assuming a catalogue page is public; the first run against the real
+    | one landed on https://stockbit.com/login. The session the token renewal
+    | keeps alive is the only way past that, so the reader borrows the same
+    | profile -- and, because Chromium holds a profile exclusively, the same
+    | lock. Leave MARKET_INDEX_PROFILE_DIR empty to read anonymously, which is
+    | right for any catalogue that really is public.
     */
     'browser' => [
         'node_binary' => env('MARKET_INDEX_NODE_BINARY', env('BROWSER_AUTH_NODE_BINARY', 'node')),
         'chromium_path' => env('MARKET_INDEX_CHROMIUM_PATH', env('BROWSER_AUTH_CHROMIUM_PATH')),
         'browsers_path' => env('MARKET_INDEX_BROWSERS_PATH', env('BROWSER_AUTH_BROWSERS_PATH', env('PLAYWRIGHT_BROWSERS_PATH'))),
         'timeout_seconds' => (int) env('MARKET_INDEX_TIMEOUT_SECONDS', 90),
+        'profile_dir' => env('MARKET_INDEX_PROFILE_DIR', env('BROWSER_AUTH_PROFILE_DIR')),
+
+        /*
+        | How long a read waits for the profile before giving up. Short on
+        | purpose: the renewal has to win, and a read that loses costs a day
+        | of badge staleness rather than a day of missing bars.
+        */
+        'profile_wait_seconds' => (int) env('MARKET_INDEX_PROFILE_WAIT_SECONDS', 20),
     ],
 
 ];

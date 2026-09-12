@@ -201,10 +201,11 @@ class IndexSyncCommand extends Command
                 $exception->needsAttention() ? AutomationAlert::SEVERITY_WARNING : AutomationAlert::SEVERITY_INFO,
                 sprintf('%s membership could not be refreshed', $code),
                 sprintf(
-                    '%s Membership is unchanged from the last successful read, so the badges on the Assets page are '
+                    '%s %s Membership is unchanged from the last successful read, so the badges on the Assets page are '
                     .'as old as that. Paste the list from %s into the index panel, or run '
                     .'"php artisan automation:index-sync --index=%s --symbols=..." to update it by hand.',
                     $exception->getMessage(),
+                    $this->remedy($exception->reason),
                     $url,
                     $code,
                 ),
@@ -357,5 +358,25 @@ class IndexSyncCommand extends Command
         unset($evidence['diagnosis']);
 
         return $evidence;
+    }
+
+    /**
+     * What the operator is supposed to do about this particular failure.
+     *
+     * Kept apart from the message the reader produced, which describes what
+     * happened rather than what to do. A sign-in redirect is the case that
+     * most needs this: nothing is wrong with the page or the selectors, so
+     * advice about markup would send somebody looking in the wrong place.
+     */
+    private function remedy(string $reason): string
+    {
+        return match ($reason) {
+            IndexCatalogReadException::LOGIN_REQUIRED => 'The catalogue is behind a sign-in. Point MARKET_INDEX_PROFILE_DIR at the signed-in browser profile, or re-establish that profile\'s session.',
+            IndexCatalogReadException::PROFILE_BUSY => 'The saved browser profile was busy; the next scheduled read will have it.',
+            IndexCatalogReadException::NO_SYMBOLS_FOUND => 'Run the command again with --diagnose to see what the page held.',
+            IndexCatalogReadException::NOT_INSTALLED => 'The headless browser could not start; the scheduled read will keep failing until it can.',
+            IndexCatalogReadException::TIMEOUT, IndexCatalogReadException::NAVIGATION_FAILED => 'That is usually transient; tomorrow\'s run may well succeed.',
+            default => '',
+        };
     }
 }

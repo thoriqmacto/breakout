@@ -21,6 +21,22 @@ class IndexCatalogReadException extends RuntimeException
 
     public const NO_SYMBOLS_FOUND = 'NO_SYMBOLS_FOUND';
 
+    /**
+     * The site answered with a sign-in page.
+     *
+     * Its own code because the remedy is the opposite of NO_SYMBOLS_FOUND's:
+     * nothing about the constituent markup is wrong and no selector would
+     * help. The page needs a session, or the list needs pasting.
+     */
+    public const LOGIN_REQUIRED = 'LOGIN_REQUIRED';
+
+    /**
+     * The saved profile was open elsewhere -- the token renewal, most likely.
+     *
+     * Transient, and not worth a warning: the next scheduled read gets it.
+     */
+    public const PROFILE_BUSY = 'PROFILE_BUSY';
+
     public const TIMEOUT = 'TIMEOUT';
 
     public const UNEXPECTED = 'UNEXPECTED';
@@ -41,6 +57,6 @@ class IndexCatalogReadException extends RuntimeException
      */
     public function needsAttention(): bool
     {
-        return in_array($this->reason, [self::NOT_INSTALLED, self::NO_SYMBOLS_FOUND], true);
+        return in_array($this->reason, [self::NOT_INSTALLED, self::NO_SYMBOLS_FOUND, self::LOGIN_REQUIRED], true);
     }
 }

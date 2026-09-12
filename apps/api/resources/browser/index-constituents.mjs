@@ -44,6 +44,13 @@ export const CatalogError = {
   NAVIGATION_FAILED: 'NAVIGATION_FAILED',
   TIMEOUT: 'TIMEOUT',
   NO_SYMBOLS_FOUND: 'NO_SYMBOLS_FOUND',
+  // The site sent the reader to a sign-in page. Its own code because the
+  // remedy is the opposite of NO_SYMBOLS_FOUND's: nothing about the
+  // constituent markup is wrong, and no selector would help.
+  LOGIN_REQUIRED: 'LOGIN_REQUIRED',
+  // The saved profile is open elsewhere -- the token renewal, most likely.
+  // Transient by nature: the next run gets it.
+  PROFILE_BUSY: 'PROFILE_BUSY',
 }
 
 export class CatalogReadError extends Error {
@@ -79,6 +86,32 @@ async function readJob() {
   }
 
   return job
+}
+
+
+/**
+ * Whether the site answered with a sign-in page instead of the catalogue.
+ *
+ * Compared on the path rather than the whole URL, because a redirect usually
+ * carries the original page back as a query parameter -- `/login?next=/catalog
+ * /indeks/jii70` contains the requested URL and would defeat a substring test.
+ */
+export function looksLikeSignIn(requested, landed) {
+  if (typeof landed !== 'string' || landed === '') return false
+
+  let requestedPath = requested
+  let landedPath = landed
+
+  try {
+    requestedPath = new URL(requested).pathname
+    landedPath = new URL(landed).pathname
+  } catch {
+    return false
+  }
+
+  if (requestedPath === landedPath) return false
+
+  return /(^|\/)(login|signin|sign-in|masuk|auth|sso)(\/|$)/i.test(landedPath)
 }
 
 /**
@@ -269,33 +302,60 @@ export async function readIndexConstituents({
   headless = true,
   diagnose = false,
   dumpHtml = null,
+  profileDir = null,
 } = {}) {
   if (typeof url !== 'string' || url.trim() === '') {
     throw new CatalogReadError(CatalogError.NAVIGATION_FAILED, 'No catalogue URL was supplied.')
   }
 
   const startedAt = Date.now()
+
+  const contextOptions = {
+    userAgent:
+      userAgent ||
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+    viewport: { width: 1440, height: 2000 },
+  }
+
+  // A saved profile means a saved session. The catalogue is behind a sign-in,
+  // so a throwaway context lands on the login page every time; the profile the
+  // token renewal keeps signed in is the only reader that sees the list.
+  //
+  // Chromium holds an exclusive lock on a profile directory, so the caller is
+  // responsible for not running two of these at once. The PHP side takes a
+  // lock the token renewal takes too.
+  const persistent = typeof profileDir === 'string' && profileDir !== ''
+
   let browser
+  let context
 
   try {
-    browser = await chromium.launch({ headless, executablePath })
+    if (persistent) {
+      context = await chromium.launchPersistentContext(profileDir, {
+        headless,
+        executablePath,
+        ...contextOptions,
+      })
+    } else {
+      browser = await chromium.launch({ headless, executablePath })
+      context = await browser.newContext(contextOptions)
+    }
   } catch (error) {
+    const message = String(error?.message ?? error)
+
     throw new CatalogReadError(
-      CatalogError.BROWSER_LAUNCH_FAILED,
-      `Chromium could not be launched: ${error?.message ?? error}`,
+      // A profile already open is not a broken installation, and saying so
+      // sends the operator to check the wrong thing.
+      /SingletonLock|ProcessSingleton|already (?:in use|running)/i.test(message)
+        ? CatalogError.PROFILE_BUSY
+        : CatalogError.BROWSER_LAUNCH_FAILED,
+      `Chromium could not be launched: ${message}`,
       { cause: error },
     )
   }
 
   try {
-    const context = await browser.newContext({
-      userAgent:
-        userAgent ||
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
-      viewport: { width: 1440, height: 2000 },
-    })
-
-    const page = await context.newPage()
+    const page = context.pages()[0] ?? (await context.newPage())
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs })
@@ -304,6 +364,16 @@ export async function readIndexConstituents({
         CatalogError.NAVIGATION_FAILED,
         `The catalogue page could not be opened: ${error?.message ?? error}`,
         { cause: error },
+      )
+    }
+
+    const landed = page.url()
+
+    if (looksLikeSignIn(url, landed)) {
+      throw new CatalogReadError(
+        CatalogError.LOGIN_REQUIRED,
+        `The catalogue redirected to a sign-in page (${landed}). It is not readable without a session.`,
+        { evidence: { requested: url, landed } },
       )
     }
 
@@ -379,7 +449,10 @@ export async function readIndexConstituents({
 
     return { symbols, evidence }
   } finally {
-    await browser.close().catch(() => {})
+    // A persistent context owns the browser it launched, so closing it is what
+    // releases the profile directory for the next reader.
+    await context.close().catch(() => {})
+    await browser?.close().catch(() => {})
   }
 }
 
@@ -407,6 +480,7 @@ async function main() {
       headless: job.headless !== false,
       diagnose: job.diagnose === true,
       dumpHtml: typeof job.dump_html === 'string' && job.dump_html !== '' ? job.dump_html : null,
+      profileDir: typeof job.profile_dir === 'string' && job.profile_dir !== '' ? job.profile_dir : null,
     })
 
     finish({ ok: true, symbols, evidence }, 0)

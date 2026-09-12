@@ -101,6 +101,15 @@ const REMEDIES: Record<string, Remedy> = {
       "Meanwhile, paste a bearer so collection is not held up: `php artisan stockbit:token:set`",
     ],
   },
+  profile_busy: {
+    cause:
+      "Another job was using the saved browser profile. Chromium holds a profile exclusively, so the two take turns — " +
+      "the index catalogue read borrows the same signed-in session.",
+    steps: [
+      "Nothing is wrong: run it again, or let the next scheduled renewal have it.",
+      "If it repeats every time, check whether a browser was left running: pgrep -af chrome",
+    ],
+  },
   browser_launch_failed: {
     cause: "Chromium could not start at all, so no login was attempted.",
     steps: [

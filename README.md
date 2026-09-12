@@ -2313,9 +2313,24 @@ scraped one. The dashboard offers the same two entrances: Assets → **Index**, 
 membership can be pasted in any shape (a whole table copied off the page works — anything
 ticker-shaped is picked out).
 
-The browser read is deliberately not the Stockbit API client. The catalogue page is public,
-so this path involves no bearer, no saved profile and no credentials: an expired token
-cannot stop the index from syncing, and nothing here can reach the token store.
+The browser read is not the Stockbit API client and involves no bearer — but it does need a
+session. **The catalogue page is not public:** the first run against the real one landed on
+`https://stockbit.com/login`, which was a wrong assumption in the original design. So the
+reader opens the signed-in Chromium profile the token renewal already keeps alive:
+
+```
+MARKET_INDEX_PROFILE_DIR=/var/www/.browser-profile   # defaults to BROWSER_AUTH_PROFILE_DIR
+```
+
+Leave it empty to read anonymously, which is right for a catalogue that really is public.
+
+Chromium holds a profile directory exclusively, so two jobs now want the same one and take
+turns on a shared lock (`browser:profile`). They wait deliberately different lengths: a
+renewal that gives up leaves the evening collectors without a bearer, so it waits 180
+seconds; a read that gives up costs a day of badge staleness, so it waits 20 and comes back
+tomorrow. Both are tunable (`BROWSER_AUTH_PROFILE_WAIT_SECONDS`,
+`MARKET_INDEX_PROFILE_WAIT_SECONDS`) and both report `PROFILE_BUSY`, which is a state
+rather than a fault.
 
 ### Why a list can be refused
 
@@ -2411,7 +2426,12 @@ That last line is the one that decides it:
 | Ticker-shaped words in the text | What it means | What to do |
 | --- | --- | --- |
 | some listed | the list rendered; the selectors missed it | fix the selectors against the dumped HTML |
-| `(none)` | the list never rendered — a login wall, a redirect, a bot check | the page is not readable unauthenticated; use the paste box |
+| `(none)` | the list never rendered — a login wall, a redirect, a bot check | check the profile is configured and its session is alive |
+
+A redirect to a sign-in page is reported as `LOGIN_REQUIRED` rather than as a markup
+problem, because the two need opposite responses: nothing about the constituent selectors
+is wrong, and no change to them would help. If it appears, the saved profile's session has
+lapsed — re-establish it the way the token renewal's is re-established.
 
 `--dump-html` writes the rendered DOM for reading. Both are operator tools: the diagnosis
 goes to the terminal of whoever asked for it and never into a run record, which keeps
