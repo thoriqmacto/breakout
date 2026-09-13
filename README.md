@@ -1870,7 +1870,8 @@ when proposing the submit control: "Login with Google" matches every hint the re
 usually sits above it, and opens a popup this cannot drive.
 
 Failures are reported by kind rather than as one generic error, because they need different
-fixes: `INVALID_CREDENTIALS` (or a second factor this cannot answer), `TIMEOUT`,
+fixes: `INVALID_CREDENTIALS` (or a second factor this cannot answer),
+`AWAITING_DEVICE_APPROVAL` (the credentials passed, and a device approval is outstanding), `TIMEOUT`,
 `SELECTOR_NOT_FOUND` (the portal changed its markup), `TOKEN_NOT_FOUND` (signed in, but the token
 is named something not in `BROWSER_AUTH_TOKEN_KEYS`), and `BROWSER_LAUNCH_FAILED`.
 
@@ -1910,10 +1911,12 @@ BROWSER_AUTH_PROFILE_DIR=/var/lib/breakout/browser-profile
 > ```
 
 Then sign in **once** as that user, approve the device through the portal's own notification, and
-check that the session persisted:
+check that the session persisted. Watch the terminal while it runs: it prints `approve now` the
+moment the portal asks, and then waits up to `BROWSER_AUTH_APPROVAL_WAIT_SECONDS` for you to tap
+the notification. Have the phone in your hand before you start.
 
 ```bash
-# signs in; approve the device when the portal asks
+# signs in; approve the device when the portal asks -- it says when
 sudo -u www-data php artisan browser:token --dry-run
 
 # no password at all: proves the profile carried the session
@@ -1952,24 +1955,53 @@ sudo -u www-data php artisan browser:token --username='<account email>' --screen
 sudo -u www-data php artisan browser:token --session --dry-run
 ```
 
-**Step 2 clears the profile's cookies and storage before showing the form.** That is deliberate —
-it is the only way out of the dead-session trap described below — but it means running it on a
-*healthy* profile signs that profile out for nothing. The interactive prompt (*"A saved browser
-profile exists. Sign in again with a password?"*) defaults to **no** for exactly this reason;
-passing `--username` skips the prompt and forces the login.
+**Step 2 clears the profile's session before showing the form, but keeps the device.** Clearing is
+deliberate — it is the only way out of the dead-session trap described below — but what it clears
+is now everything *except* the cookies and storage keys that identify this browser as a device the
+portal has already had approved (`trustedDevice` and anything else named after a device or a trust
+decision; `BROWSER_AUTH_DEVICE_TRUST_KEYS`). Wiping those too is what made every forced login ask
+for a fresh approval: you approved, the approval was stored, and the next run with a password
+deleted it before submitting. If keeping them means no login form appears — a portal that keeps its
+session in the same place it keeps its idea of the device — the run clears them as well and says so
+in the evidence, because getting the form back matters more than saving one approval.
+
+Running step 2 on a *healthy* profile still signs it out for nothing, so the interactive prompt
+(*"A saved browser profile exists. Sign in again with a password?"*) defaults to **no**; passing
+`--username` skips the prompt and forces the login.
+
+**A device-approval step is its own outcome, not a rejected password.** A portal that asks another
+device to approve the login refuses the login call while it waits, and its approval poll refuses
+too, until you tap approve. On the wire those refusals are indistinguishable from a wrong password,
+and treating them as one is exactly what reported a login *you had already approved* as
+`INVALID_CREDENTIALS`. The run now recognises the hold, says so while it is still open, and waits:
+
+```
+Signing in to https://stockbit.com/login…
+  submitted    waiting for the portal to answer
+  approve now  the portal wants this login approved on another device — tap the notification within 180s
+  approved     after 34s — collecting the token
+```
+
+`browser:token` waits `BROWSER_AUTH_APPROVAL_WAIT_SECONDS` (180 by default, `--approval-wait=` for
+one run) **on top of** `BROWSER_AUTH_TIMEOUT_SECONDS`, because by the time the notification reaches
+a phone the ordinary budget has already gone on opening the page and waiting for the portal. While
+it waits it stays on the page the portal left it on rather than navigating away, and if that page
+falls silent — its poll finished, its websocket dropped — it reopens the login URL, which is how a
+portal that has granted the session hands it over. `AWAITING_DEVICE_APPROVAL` means the approval
+never arrived; the credentials were fine.
+
+Nothing unattended waits at all: a scheduled renewal has nobody to tap approve, so it reports
+`AWAITING_DEVICE_APPROVAL` immediately and leaves it to one interactive run.
 
 **The username is the account's email address.** A portal that greets you by a display name still
-authenticates on the email, and the display name produces a genuine 401 — which reads in the
-evidence exactly like a wrong password. Two symptoms identify it:
+authenticates on the email, and the display name produces a genuine 401. Three symptoms separate
+the cases:
 
 | Evidence | Meaning |
 | --- | --- |
-| `form gone: no` | still on the login form — a captcha, a second factor, or a rejected submit |
-| `form gone: yes` **and** `INVALID_CREDENTIALS` | the form submitted and the portal answered 401/403 — wrong username or password |
-
-**No device-approval notification arrives for a failed login.** Device trust is only requested
-*after* the credentials pass, so a missing notification is a symptom of the 401 rather than a
-separate problem to chase. Waiting for one, or wiping the profile to provoke one, changes nothing.
+| `form gone: no` | still on the login form — a captcha, or a rejected submit |
+| `form gone: yes` **and** `AWAITING_DEVICE_APPROVAL` | the credentials passed; a device approval is outstanding — approve it while the run is open |
+| `form gone: yes` **and** `INVALID_CREDENTIALS` | the portal answered 401/403 with nothing about a device — wrong username or password |
 
 If the credentials work in an ordinary browser but the headless login still gets 401, the portal
 is refusing the automated client specifically. Paste a bearer instead — `stockbit:token:set` reads

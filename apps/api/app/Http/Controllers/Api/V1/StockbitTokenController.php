@@ -211,7 +211,14 @@ class StockbitTokenController extends ApiController
         return match ($failureCode) {
             BrowserTokenExtractor::INVALID_CREDENTIALS,
             // Also 422: the caller fixes it by signing in once with a password.
-            BrowserTokenExtractor::PROFILE_SIGNED_OUT => 422,
+            BrowserTokenExtractor::PROFILE_SIGNED_OUT,
+            // And so is an outstanding device approval: nothing is broken at
+            // either end, the login is simply unfinished until a person
+            // approves it. 502 would blame the portal for working as designed.
+            // This endpoint never waits for one -- an HTTP request is the wrong
+            // place to hold a browser open for minutes -- so the remedy in the
+            // message is one interactive `browser:token`.
+            BrowserTokenExtractor::AWAITING_DEVICE_APPROVAL => 422,
             BrowserTokenExtractor::TIMEOUT => 504,
             // Ours: nothing here depends on what the portal answered.
             BrowserTokenExtractor::BROWSER_LAUNCH_FAILED,

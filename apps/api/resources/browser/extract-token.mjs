@@ -90,6 +90,18 @@ async function main() {
         submit: job.selectors?.submit,
       },
       timeoutMs: job.timeout_ms,
+      approvalWaitMs: job.approval_wait_ms,
+      approvalUrlHints: job.approval_url_hints,
+      approvalTextHints: job.approval_text_hints,
+      deviceTrustKeys: job.device_trust_keys,
+      // Progress goes to stderr, one JSON object per line, because stdout is
+      // the result and must stay parseable. The parent streams these so an
+      // operator learns that their phone is waiting for them *while* the run
+      // is still open -- which is the only time that information is worth
+      // anything.
+      onProgress: (event) => {
+        process.stderr.write(`progress ${JSON.stringify(event)}\n`)
+      },
       headless: job.headless !== false,
       urlHints: job.url_hints,
       tokenKeys: job.token_keys,

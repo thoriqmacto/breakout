@@ -40,6 +40,19 @@ class BrowserTokenExtractor
      */
     public const PROFILE_SIGNED_OUT = 'PROFILE_SIGNED_OUT';
 
+    /**
+     * The credentials passed, and the portal asked another device to approve.
+     *
+     * Distinct from INVALID_CREDENTIALS because nothing is misconfigured and no
+     * password is in question. The two were collapsed, and not by accident: an
+     * approval poll answers 401 or 403 until the approval lands, which is byte
+     * for byte what a refused credential looks like. So a login the operator
+     * had already approved on their phone was reported as a rejected password,
+     * under a sentence telling them no notification is sent for a login that
+     * gets this far.
+     */
+    public const AWAITING_DEVICE_APPROVAL = 'AWAITING_DEVICE_APPROVAL';
+
     public const TIMEOUT = 'TIMEOUT';
 
     public const TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND';
@@ -75,6 +88,11 @@ class BrowserTokenExtractor
         self::PROFILE_SIGNED_OUT => 'The saved browser profile is signed out, and no password was supplied. '
             .'Sign in once interactively to re-establish it. If another user can sign in with the same '
             .'profile, this user cannot read it -- see "Being a device the portal recognises".',
+        self::AWAITING_DEVICE_APPROVAL => 'The credentials were accepted, and the portal is waiting for this login '
+            .'to be approved on another device. No approval arrived while the run was open. '
+            .'Approve the notification while `php artisan browser:token` is still running -- it says when it '
+            .'starts waiting -- or give it longer with BROWSER_AUTH_APPROVAL_WAIT_SECONDS. Nothing unattended '
+            .'waits for an approval at all, so a scheduled renewal reporting this needs one interactive run.',
         self::TIMEOUT => 'The login did not finish in time. The portal may be slow or unreachable from this server.',
         self::TOKEN_NOT_FOUND => 'Signed in, but no bearer token was seen. The portal may name its token differently; check BROWSER_AUTH_TOKEN_KEYS.',
         self::BROWSER_LAUNCH_FAILED => 'Chromium could not start on this server. Install it, or point BROWSER_AUTH_CHROMIUM_PATH at an existing one.',
@@ -118,11 +136,34 @@ class BrowserTokenExtractor
     public ?string $screenshotPath = null;
 
     /**
+     * Called with each progress event the child reports, if anyone is watching.
+     *
+     * The one piece of information that is worthless after the fact: that the
+     * portal has asked for a device approval, while the run is still open to
+     * receive one. A headless browser shows nothing, so before this the
+     * terminal simply sat silent until the attempt had already failed.
+     *
+     * @var null|callable(array<string, mixed>): void
+     */
+    public $onProgress = null;
+
+    /**
      * @param  string|null  $username  Omitted when a saved profile is expected
      *                                 to be signed in already.
+     * @param  int|null  $approvalWaitSeconds  How long to hold the run open while a
+     *                                         person approves the login on another
+     *                                         device. Null means do not wait, which
+     *                                         is the only safe default: every
+     *                                         unattended caller reaches this method,
+     *                                         and none of them has anyone to tap
+     *                                         approve. An interactive caller opts in.
      */
-    public function extract(?string $username = null, ?string $password = null, bool $forceLogin = false): array
-    {
+    public function extract(
+        ?string $username = null,
+        ?string $password = null,
+        bool $forceLogin = false,
+        ?int $approvalWaitSeconds = null,
+    ): array {
         if (! $this->enabled()) {
             throw new BrowserTokenExtractionException(
                 self::NOT_CONFIGURED,
@@ -165,6 +206,16 @@ class BrowserTokenExtractor
 
         $timeout = max(10, (int) config('browser_auth.timeout_seconds', 60));
 
+        $approvalWait = max(0, $approvalWaitSeconds ?? 0);
+
+        // The child's own ceiling is the run budget plus whatever it may spend
+        // waiting for a person, plus the grace it allows itself to turn a
+        // granted approval into a session (20s on the Node side). PHP's is
+        // five seconds beyond that, so a child that runs long reports its own
+        // failure instead of being killed mid-sentence -- a killed child
+        // produces no JSON, and "no output" explains nothing.
+        $wallClock = $timeout + $approvalWait + ($approvalWait > 0 ? 25 : 0);
+
         $profile = $this->profileDir();
 
         if ($profile === null && ($username === null || $password === null)) {
@@ -192,6 +243,10 @@ class BrowserTokenExtractor
             // The child gets the shorter budget so it can report its own
             // timeout; PHP's is the backstop for a child that wedged.
             'timeout_ms' => ($timeout - 5) * 1000,
+            'approval_wait_ms' => $approvalWait * 1000,
+            'approval_url_hints' => (array) config('browser_auth.approval_url_hints'),
+            'approval_text_hints' => (array) config('browser_auth.approval_text_hints'),
+            'device_trust_keys' => (array) config('browser_auth.device_trust_keys'),
             'token_keys' => (array) config('browser_auth.token_keys'),
             'url_hints' => (array) config('browser_auth.url_hints'),
             'chromium_path' => config('browser_auth.chromium_path'),
@@ -210,7 +265,7 @@ class BrowserTokenExtractor
             dirname($script),
             $this->childEnvironment(),
             json_encode($job, JSON_THROW_ON_ERROR),
-            $timeout,
+            $wallClock,
         );
 
         // The index catalogue read borrows this same profile, and Chromium
@@ -220,7 +275,7 @@ class BrowserTokenExtractor
         $profileLock = null;
 
         if ($profile !== null) {
-            $profileLock = BrowserProfileLock::make($timeout + 60);
+            $profileLock = BrowserProfileLock::make($wallClock + 60);
 
             if (! BrowserProfileLock::acquire($profileLock, BrowserProfileLock::renewalWait())) {
                 throw new BrowserTokenExtractionException(
@@ -231,7 +286,16 @@ class BrowserTokenExtractor
         }
 
         try {
-            $process->run();
+            // With a callback rather than bare: Symfony still buffers stdout
+            // for getOutput() below, and stderr arrives line by line as the
+            // child writes it. Buffering it until the end would deliver "the
+            // portal is waiting for your approval" after the run that needed
+            // the approval had already given up.
+            $process->run(function (string $type, string $buffer): void {
+                if ($type === Process::ERR) {
+                    $this->relayProgress($buffer);
+                }
+            });
         } catch (ProcessTimedOutException) {
             throw new BrowserTokenExtractionException(
                 self::TIMEOUT,
@@ -256,6 +320,35 @@ class BrowserTokenExtractor
                 static fn (?string $value): bool => is_string($value) && $value !== '',
             )),
         );
+    }
+
+    /**
+     * Hand the child's progress lines to whoever is watching.
+     *
+     * The child writes `progress {json}` per line on stderr and anything else
+     * it has to say alongside it, so only the prefixed lines are parsed and
+     * everything else is ignored -- a node warning must not become a progress
+     * event, and a malformed line must never fail the run.
+     */
+    private function relayProgress(string $buffer): void
+    {
+        if (! is_callable($this->onProgress)) {
+            return;
+        }
+
+        foreach (explode("\n", $buffer) as $line) {
+            $line = trim($line);
+
+            if (! str_starts_with($line, 'progress ')) {
+                continue;
+            }
+
+            $event = json_decode(substr($line, 9), true);
+
+            if (is_array($event) && is_string($event['event'] ?? null)) {
+                ($this->onProgress)($event);
+            }
+        }
     }
 
     /**
@@ -488,6 +581,20 @@ class BrowserTokenExtractor
 
         $count = static fn (string $key): int => (int) ($evidence[$key] ?? 0);
 
+        $approval = '';
+
+        if (($evidence['awaiting_approval'] ?? false) === true) {
+            $approval = ($evidence['approval_granted'] ?? false) === true
+                ? sprintf(
+                    ' The device approval arrived after %.0fs.',
+                    $count('approval_waited_ms') / 1000,
+                )
+                : sprintf(
+                    ' The portal asked for this login to be approved on another device and waited %.0fs for it.',
+                    $count('approval_waited_ms') / 1000,
+                );
+        }
+
         $hosts = array_values(array_filter(
             is_array($evidence['hosts'] ?? null) ? $evidence['hosts'] : [],
             static fn ($host): bool => is_string($host) && $host !== '',
@@ -523,7 +630,8 @@ class BrowserTokenExtractor
         }
 
         return sprintf(
-            ' Seen: %s.%s',
+            '%s Seen: %s.%s',
+            $approval,
             implode(', ', $parts),
             $hosts === [] ? '' : ' Hosts: '.implode(', ', array_slice($hosts, 0, 8)).'.',
         );

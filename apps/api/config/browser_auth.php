@@ -135,6 +135,67 @@ return [
     'timeout_seconds' => (int) env('BROWSER_AUTH_TIMEOUT_SECONDS', 150),
 
     /*
+    | How long an interactive run holds open while a person approves the login
+    | on another device.
+    |
+    | Its own budget, deliberately added to `timeout_seconds` rather than taken
+    | out of it. By the time a notification reaches a phone the run has already
+    | spent its budget opening the page, filling the form and waiting for the
+    | portal to answer, so a share of that budget is not a wait for a human --
+    | it is whatever happened to be left, which was about a minute and usually
+    | less than it takes to unlock a phone and find the notification.
+    |
+    | Only `browser:token` waits this long. Nothing unattended does: a cron job
+    | has nobody to tap approve, and a scheduled renewal that blocks for three
+    | minutes is worse than one that reports what it is waiting for.
+    */
+    'approval_wait_seconds' => (int) env('BROWSER_AUTH_APPROVAL_WAIT_SECONDS', 180),
+
+    /*
+    | How a device-approval step is recognised, so the refusals one returns
+    | while it waits are not read as a refused password.
+    |
+    | Paths first: an approval poll answers 401 or 403 until the approval lands,
+    | which on the wire is indistinguishable from a rejected credential. Then
+    | the words a waiting page uses -- English and Indonesian, since the portal
+    | this was built against is Indonesian. Both are comma-separated and
+    | tunable, because a portal that changes its wording must not cost a deploy.
+    */
+    'approval_url_hints' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env(
+            'BROWSER_AUTH_APPROVAL_URL_HINTS',
+            '/device,/approval,/approve,/trusted,/verify,/verification,/challenge,/mfa,/2fa,/otp,/notification',
+        )),
+    ))),
+
+    'approval_text_hints' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env(
+            'BROWSER_AUTH_APPROVAL_TEXT_HINTS',
+            'approve,approval,waiting for you,check your phone,check your device,trusted device,'
+            .'notification,authenticator,setujui,persetujuan,perangkat terpercaya,notifikasi,verifikasi',
+        )),
+    ))),
+
+    /*
+    | Storage and cookie names that make the saved profile a device the portal
+    | recognises, kept across the clear a forced login performs.
+    |
+    | Signing in with a password has to clear the session -- a portal that has
+    | ended one server-side leaves its app rendering as though nothing happened
+    | -- but clearing the device-trust state with it means the portal asks for a
+    | new approval on every forced login. The operator approves, the next run
+    | with a password deletes it, and the approval is asked for again forever.
+    | Anything whose name mentions a device or a trust decision is kept in
+    | addition to these.
+    */
+    'device_trust_keys' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('BROWSER_AUTH_DEVICE_TRUST_KEYS', 'trustedDevice,deviceTrusted,deviceId,device_id')),
+    ))),
+
+    /*
     | Where the token may be found in a response body, and which paths are
     | worth parsing. Comma-separated so they stay tunable without a deploy.
     */

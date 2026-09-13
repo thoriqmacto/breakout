@@ -27,6 +27,14 @@ export const ExtractionError = {
   NAVIGATION_FAILED: 'NAVIGATION_FAILED',
   SELECTOR_NOT_FOUND: 'SELECTOR_NOT_FOUND',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  // The credentials passed and the portal asked another device to approve the
+  // login. Its own code because nothing here is misconfigured and no password
+  // is in question: what is missing is a person tapping "approve" inside the
+  // window this run is willing to wait. Reporting it as INVALID_CREDENTIALS --
+  // which is what a latched 401 from the approval poll used to do -- sends the
+  // operator to re-check a password that was accepted, and tells them no
+  // notification was sent when one is sitting on their phone.
+  AWAITING_DEVICE_APPROVAL: 'AWAITING_DEVICE_APPROVAL',
   // The saved profile has no session and no password was offered. Its own
   // code because the fix is not the one INVALID_CREDENTIALS implies: nothing
   // was submitted and no credential was judged, so sending the operator to
@@ -57,8 +65,78 @@ const DEFAULT_URL_HINTS = ['/api/', '/auth', '/login', '/token', '/session', '/o
 /** Keys whose value is plausibly the token, in descending specificity. */
 const DEFAULT_TOKEN_KEYS = ['access_token', 'accessToken', 'id_token', 'idToken', 'token', 'jwt', 'bearer']
 
+/**
+ * Paths that belong to a second step rather than to the login itself.
+ *
+ * A device-approval round trip happens on its own endpoints: the app asks
+ * whether the approval has landed yet, and gets "not yet" until it has. Those
+ * answers are frequently 401 or 403, which is indistinguishable from a refused
+ * password unless the path is taken into account.
+ */
+const DEFAULT_APPROVAL_URL_HINTS = [
+  '/device',
+  '/approval',
+  '/approve',
+  '/trusted',
+  '/verify',
+  '/verification',
+  '/challenge',
+  '/mfa',
+  '/2fa',
+  '/otp',
+  '/notification',
+]
+
+/**
+ * What a page waiting for an approval says, in English and in Indonesian.
+ *
+ * Phrases rather than bare words: a cookie banner mentions "device", and the
+ * cost of matching one is a run that waits three minutes for an approval that
+ * was never asked for. Only consulted once the login form has gone, so a
+ * rejected password cannot reach this test at all.
+ */
+const DEFAULT_APPROVAL_TEXT_HINTS = [
+  'approve',
+  'approval',
+  'waiting for you',
+  'check your phone',
+  'check your device',
+  'trusted device',
+  'notification',
+  'authenticator',
+  'setujui',
+  'persetujuan',
+  'perangkat terpercaya',
+  'notifikasi',
+  'verifikasi',
+]
+
+/**
+ * Storage and cookie names that make this browser a device the portal knows.
+ *
+ * Kept across the clear that a forced login performs. Without this, signing in
+ * with a password wipes the very state the approval established, so the portal
+ * asks for a new approval on every single forced login -- and the operator
+ * approves one device after another, each of which is thrown away by the next
+ * run that supplies a password.
+ */
+const DEFAULT_DEVICE_TRUST_KEYS = ['trustedDevice', 'deviceTrusted', 'deviceId', 'device_id']
+
+/** Anything else named after a device or a trust decision is kept too. */
+const DEVICE_TRUST_PATTERN = /device|trust/i
+
 /** How deep into a response body to look for one of those keys. */
 const MAX_BODY_DEPTH = 6
+
+/**
+ * How long a granted approval buys to turn itself into a session.
+ *
+ * Added to the run's budget at the moment the approval lands, never taken from
+ * it: by then the original budget has been spent waiting, and a run that gives
+ * up two seconds after the operator tapped approve wasted the one thing that
+ * cannot be automated.
+ */
+const APPROVAL_COMPLETION_MS = 20_000
 
 /** Ceiling on a response body we will parse, so a large download cannot stall the run. */
 const MAX_BODY_BYTES = 2_000_000
@@ -88,6 +166,32 @@ const DEFAULTS = {
   // captcha, a spinner and an error toast are one glance apart while being
   // several rounds apart by inference.
   screenshotPath: undefined,
+  // How long to hold the run open once the portal has asked another device to
+  // approve this login. Zero means "report it and stop", which is the right
+  // answer for anything unattended: nobody is going to tap approve for a cron
+  // job, and a scheduled renewal that blocks for three minutes is worse than
+  // one that says what it is waiting for. An operator at a terminal passes a
+  // real number.
+  //
+  // Deliberately *additional* to timeoutMs rather than carved out of it. The
+  // run has already spent its budget opening the page, filling the form and
+  // waiting for the portal to answer before a person is even notified, so a
+  // share of the original budget is not a wait for a human -- it is whatever
+  // happened to be left.
+  approvalWaitMs: 0,
+  approvalUrlHints: DEFAULT_APPROVAL_URL_HINTS,
+  approvalTextHints: DEFAULT_APPROVAL_TEXT_HINTS,
+  deviceTrustKeys: DEFAULT_DEVICE_TRUST_KEYS,
+  // How long the page may sit silent during an approval wait before the login
+  // URL is opened again. Once the approval lands the portal will send /login
+  // to the app, so reopening it is what turns a granted approval into a
+  // session -- but doing it while the page is still talking would abandon the
+  // portal's own poll, so it only happens when nothing is happening.
+  approvalNudgeMs: 20_000,
+  // Called with {event, ...} as the run progresses. The only way an operator
+  // can know to reach for their phone: a headless run shows nothing, and a
+  // silent terminal for three minutes is indistinguishable from a hang.
+  onProgress: undefined,
   // Point at a Chromium that is already on the box. Playwright otherwise
   // downloads its own (~400MB plus system libraries), which is a lot to put
   // on a small VPS when the distribution already ships one.
@@ -153,6 +257,13 @@ export function summariseEvidence(evidence) {
     screenshot: evidence.screenshot,
     used_existing_session: evidence.usedExistingSession,
     cleared_session: evidence.clearedSession,
+    kept_device_trust: evidence.keptDeviceTrust,
+    dropped_device_trust: evidence.droppedDeviceTrust,
+    awaiting_approval: evidence.awaitingApproval,
+    approval_signal: evidence.approvalSignal,
+    approval_granted: evidence.approvalGranted,
+    approval_waited_ms: evidence.approvalWaitedMs,
+    auth_rejections: evidence.authRejections,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -165,6 +276,11 @@ export function summariseEvidence(evidence) {
 
 export function describeEvidence(evidence) {
   const hosts = [...evidence.hosts].slice(0, 6).join(', ')
+
+  if (evidence.awaitingApproval && !evidence.approvalGranted) {
+    return 'The portal accepted the credentials and asked another device to approve this login. '
+      + 'No approval arrived while this was waiting.'
+  }
 
   if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0 && evidence.cookies === 0) {
     return 'No request carried an Authorization header and web storage was empty, so the app '
@@ -471,6 +587,121 @@ function urlLooksAuthenticated(url, hints) {
 }
 
 /**
+ * Does this URL belong to the approval step rather than to the login?
+ *
+ * Matched on the path only. A hint like "/verify" against a full URL would
+ * match a host called verify.example.com, and a query string can carry
+ * anything at all -- including, on a portal that round-trips its redirect
+ * target, the word "login".
+ */
+export function urlLooksApproval(url, hints = DEFAULT_APPROVAL_URL_HINTS) {
+  let path
+
+  try {
+    path = new URL(url).pathname.toLowerCase()
+  } catch {
+    return false
+  }
+
+  return hints.some((hint) => typeof hint === 'string' && hint !== '' && path.includes(hint.toLowerCase()))
+}
+
+/** Does this text read like a portal waiting on another device? */
+export function mentionsApproval(text, hints = DEFAULT_APPROVAL_TEXT_HINTS) {
+  if (typeof text !== 'string' || text === '') return false
+
+  const lower = text.toLowerCase()
+
+  return hints.some((hint) => typeof hint === 'string' && hint !== '' && lower.includes(hint.toLowerCase()))
+}
+
+/** Is this a name the portal uses to recognise the device, rather than a session? */
+export function namesDeviceTrust(name, keys = DEFAULT_DEVICE_TRUST_KEYS) {
+  if (typeof name !== 'string' || name === '') return false
+
+  return DEVICE_TRUST_PATTERN.test(name)
+    || keys.some((key) => typeof key === 'string' && key.toLowerCase() === name.toLowerCase())
+}
+
+/**
+ * Sign out without forgetting which device this is.
+ *
+ * A forced login has to clear the session, because a portal that has ended one
+ * server-side leaves its app rendering as though nothing happened and no login
+ * form ever appears. But `clearCookies()` plus `localStorage.clear()` also
+ * throws away the device-trust state the last approval established, so the
+ * portal asks for a new approval every time a password is supplied -- the
+ * operator approves, the next forced run wipes it, and the approval is asked
+ * for again. Whatever names itself after a device or a trust decision is put
+ * back.
+ *
+ * @returns {Promise<string[]>} The names that were kept.
+ */
+export async function clearSessionKeepingDeviceTrust(context, page, keys = DEFAULT_DEVICE_TRUST_KEYS) {
+  const kept = []
+
+  const cookies = await context.cookies().catch(() => [])
+  const trustedCookies = cookies.filter((cookie) => namesDeviceTrust(cookie?.name, keys))
+
+  const trustedStorage = await page
+    .evaluate((names) => {
+      const pattern = /device|trust/i
+      const saved = []
+
+      for (const store of ['localStorage', 'sessionStorage']) {
+        try {
+          const storage = window[store]
+
+          for (let index = 0; index < storage.length; index += 1) {
+            const key = storage.key(index)
+
+            if (pattern.test(key) || names.some((name) => name.toLowerCase() === key.toLowerCase())) {
+              saved.push([store, key, storage.getItem(key)])
+            }
+          }
+        } catch {
+          // Storage can be denied outright; there is then nothing to keep.
+        }
+      }
+
+      return saved
+    }, keys)
+    .catch(() => [])
+
+  await context.clearCookies().catch(() => {})
+
+  await page
+    .evaluate((saved) => {
+      try {
+        localStorage.clear()
+        sessionStorage.clear()
+      } catch {
+        // A page that denies storage access has nothing here to clear.
+      }
+
+      for (const [store, key, value] of saved) {
+        try {
+          window[store].setItem(key, value)
+        } catch {
+          // Restoring is best effort: a failure costs an extra approval, not
+          // the run.
+        }
+      }
+    }, trustedStorage)
+    .catch(() => {})
+
+  if (trustedCookies.length > 0) {
+    await context.addCookies(trustedCookies).catch(() => {})
+
+    kept.push(...trustedCookies.map((cookie) => cookie.name))
+  }
+
+  kept.push(...trustedStorage.map(([, key]) => key))
+
+  return [...new Set(kept)]
+}
+
+/**
  * Log in and return the bearer token the portal issues.
  *
  * @param {object} options
@@ -542,6 +773,62 @@ export async function extractBearerToken(options) {
    */
   let accepting = true
 
+  /**
+   * Say what is happening, to whoever is watching.
+   *
+   * A headless run shows nothing, so an operator has no way to know the portal
+   * has asked for an approval -- and the notification on their phone is only
+   * useful if they reach for it while the run is still open. Failures here are
+   * swallowed: a caller's logging must never be able to fail an extraction.
+   */
+  const report = (event, detail = {}) => {
+    if (typeof config.onProgress !== 'function') return
+
+    try {
+      config.onProgress({ event, ...detail })
+    } catch {
+      // Not our problem, and not worth a run over.
+    }
+  }
+
+  /**
+   * The portal has asked another device to approve, and what told us so.
+   *
+   * Held apart from `credentialsRejected` because the two arrive looking the
+   * same: an approval poll answers 401 or 403 until the approval lands, which
+   * is byte for byte what a refused password looks like on the wire.
+   */
+  let approvalSignal = null
+
+  /** Set once the approval has plainly landed: a 2xx, or the page moving on. */
+  let approvalGranted = false
+
+  /**
+   * Whether this run has submitted the login form.
+   *
+   * A portal fingerprints the device on its login page, before anybody types
+   * anything, and those calls sit on exactly the paths an approval uses. Taken
+   * as an approval signal they would put every run into an approval wait.
+   */
+  let submitted = false
+
+  /**
+   * When the page last did anything at all.
+   *
+   * An approval wait is the one place this matters: a page that is polling or
+   * holding a websocket open must not be navigated out from under, and a page
+   * that has gone quiet is the one that needs reopening.
+   */
+  let lastActivityAt = Date.now()
+
+  const noteApproval = (signal) => {
+    if (approvalSignal !== null) return
+
+    approvalSignal = signal
+    evidence.awaitingApproval = true
+    evidence.approvalSignal = signal
+  }
+
   // Resolved by whichever listener sees a token first. Created before
   // anything navigates, so no response can arrive before someone is
   // listening for it.
@@ -598,6 +885,25 @@ export async function extractBearerToken(options) {
     usedExistingSession: false,
     // True when a stale session was cleared to force the login form back.
     clearedSession: false,
+    // Device-trust names carried across that clear, so a forced login does not
+    // cost the operator another approval.
+    keptDeviceTrust: [],
+    // True when keeping them did not bring the login form back and they had to
+    // go after all -- which costs one approval, and says the portal keeps its
+    // session in the same place it keeps its idea of this device.
+    droppedDeviceTrust: false,
+    // The portal asked another device to approve this login, and what said so.
+    // Without this, the 401s an approval poll returns while it waits read
+    // exactly like a refused password.
+    awaitingApproval: false,
+    approvalSignal: null,
+    // The approval arrived and the portal let the run through.
+    approvalGranted: false,
+    approvalWaitedMs: 0,
+    // Rejections seen on an authentication URL. A count rather than a latch:
+    // one of these is a verdict on the password only when nothing afterwards
+    // contradicts it.
+    authRejections: 0,
   }
 
   try {
@@ -670,18 +976,74 @@ export async function extractBearerToken(options) {
 
       const url = response.url()
 
-      if (!urlLooksAuthenticated(url, config.urlHints)) return
+      if (!urlLooksAuthenticated(url, config.urlHints)
+        && !urlLooksApproval(url, config.approvalUrlHints)) {
+        return
+      }
 
       const status = response.status()
 
-      // 401/403 on the login call itself is the portal saying no.
-      if ((status === 401 || status === 403) && /login|auth|token|session/i.test(url)) {
+      // A refusal on an authentication URL. Three different things arrive
+      // here looking identical, and only one of them is a bad password:
+      //
+      //   - the portal refusing the credentials;
+      //   - an approval poll answering "not yet" while it waits for a phone;
+      //   - the login call itself saying "this device needs approving first".
+      //
+      // Latching the first interpretation is what reported a login the
+      // operator had already approved as INVALID_CREDENTIALS, and printed
+      // "no device-approval notification is sent for a login that never got
+      // past this step" underneath a notification they were holding.
+      // And only after something was submitted. A refusal before that is the
+      // app discovering it is signed out -- which a forced login has just
+      // arranged on purpose -- and reading it as a verdict on a password that
+      // has not been typed yet condemns the login that follows it.
+      if (submitted && (status === 401 || status === 403 || status === 428 || status === 409)) {
+        if (!/login|auth|token|session/i.test(url) && !urlLooksApproval(url, config.approvalUrlHints)) {
+          return
+        }
+
+        evidence.authRejections += 1
+
+        // The path says it belongs to the second step, not to the login.
+        if (urlLooksApproval(url, config.approvalUrlHints)) {
+          noteApproval('approval-endpoint')
+
+          return
+        }
+
+        // Otherwise ask the body. A portal that wants a device approved says
+        // so in the message it refuses with, and that message is the most
+        // direct evidence there is. It is classified and discarded -- never
+        // stored, never surfaced, never logged.
+        const approval = await response
+          .text()
+          .then((text) => mentionsApproval(text.slice(0, 4_000), config.approvalTextHints))
+          .catch(() => false)
+
+        if (approval) {
+          noteApproval('refusal-body')
+
+          return
+        }
+
         credentialsRejected = true
 
         return
       }
 
       if (status >= 400) return
+
+      // A success on an authentication URL after an approval was asked for is
+      // the approval having landed. It also clears a refusal seen earlier:
+      // whatever the portal said while it was waiting, it has now said yes.
+      if (submitted && (/login|auth|token|session/i.test(url) || urlLooksApproval(url, config.approvalUrlHints))) {
+        if (approvalSignal !== null) {
+          approvalGranted = true
+        }
+
+        credentialsRejected = false
+      }
 
       try {
         const type = (response.headers()['content-type'] ?? '').toLowerCase()
@@ -709,11 +1071,18 @@ export async function extractBearerToken(options) {
     // using the token it was just given.
     context.on('request', (request) => {
       evidence.requests += 1
+      lastActivityAt = Date.now()
 
       try {
         evidence.hosts.add(new URL(request.url()).host)
       } catch {
         // A request URL that will not parse tells us nothing; skip it.
+      }
+
+      // The app asking about an approval is itself the signal that one was
+      // asked for, and it arrives before any answer does.
+      if (submitted && urlLooksApproval(request.url(), config.approvalUrlHints)) {
+        noteApproval('approval-endpoint')
       }
 
       if (settled) return
@@ -737,6 +1106,20 @@ export async function extractBearerToken(options) {
       evidence.nonJwtAuthorization += 1
     })
 
+    // Websocket frames are activity as much as requests are, and the request
+    // listener never sees them. On a portal that pushes the approval down a
+    // socket they are the only sign the page is still working, and reopening
+    // the page under it would throw the socket away.
+    page.on('websocket', (socket) => {
+      lastActivityAt = Date.now()
+      socket.on('framereceived', () => {
+        lastActivityAt = Date.now()
+      })
+      socket.on('framesent', () => {
+        lastActivityAt = Date.now()
+      })
+    })
+
     try {
       await page.goto(loginUrl, { waitUntil: 'domcontentloaded' })
     } catch (error) {
@@ -747,7 +1130,7 @@ export async function extractBearerToken(options) {
       )
     }
 
-    const deadline = startedAt + config.timeoutMs
+    let deadline = startedAt + config.timeoutMs
 
     // Every wait from here is measured against the run's own budget, not
     // against a constant. Waits written as fixed intervals add up: this
@@ -782,18 +1165,15 @@ export async function extractBearerToken(options) {
     if (config.forceLogin && !loginFormPresent) {
       evidence.clearedSession = true
 
-      await context.clearCookies().catch(() => {})
-
-      await page
-        .evaluate(() => {
-          try {
-            localStorage.clear()
-            sessionStorage.clear()
-          } catch {
-            // A page that denies storage access has nothing here to clear.
-          }
-        })
-        .catch(() => {})
+      // Everything except what makes this browser a device the portal already
+      // trusts. Clearing that too is why a forced login asked for a fresh
+      // approval every single time: the operator approved, the approval was
+      // stored, and the next run with a password deleted it before submitting.
+      evidence.keptDeviceTrust = await clearSessionKeepingDeviceTrust(
+        context,
+        page,
+        config.deviceTrustKeys,
+      )
 
       await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
 
@@ -802,6 +1182,38 @@ export async function extractBearerToken(options) {
         .first()
         .isVisible({ timeout: remaining(10_000) })
         .catch(() => false)
+
+      // Keeping the device was a preference, not a promise. Some portals keep
+      // the session in the very thing that identifies the device, and there a
+      // careful clear leaves the app still rendering as signed in -- no form,
+      // nothing to submit, and the dead session this run exists to replace
+      // still in place. Getting the form back matters more than saving an
+      // approval, so the second attempt keeps nothing.
+      if (!loginFormPresent && evidence.keptDeviceTrust.length > 0) {
+        evidence.droppedDeviceTrust = true
+        evidence.keptDeviceTrust = []
+
+        await context.clearCookies().catch(() => {})
+
+        await page
+          .evaluate(() => {
+            try {
+              localStorage.clear()
+              sessionStorage.clear()
+            } catch {
+              // A page that denies storage access has nothing here to clear.
+            }
+          })
+          .catch(() => {})
+
+        await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
+
+        loginFormPresent = await page
+          .locator(selectors.password)
+          .first()
+          .isVisible({ timeout: remaining(10_000) })
+          .catch(() => false)
+      }
     }
 
     evidence.usedExistingSession = !loginFormPresent
@@ -842,6 +1254,8 @@ export async function extractBearerToken(options) {
       // sends next is a token from this session rather than the one it was
       // holding when the run started.
       accepting = true
+      submitted = true
+      report('submitted_credentials')
     }
 
     // No form even after clearing, so there was no login to wait for and
@@ -850,6 +1264,135 @@ export async function extractBearerToken(options) {
     // token that may be stale, which the verifier will now catch, than a run
     // that reports finding none at all.
     accepting = true
+
+    /**
+     * Wait for a person to approve this login on another device, then finish.
+     *
+     * Two halves, and the second one is the half that was missing. Waiting is
+     * easy; what makes an approval useful is that something happens *after* it.
+     * The portal grants a session at the moment of approval, but the headless
+     * page does not necessarily learn that on its own -- a page whose poll was
+     * abandoned, or whose socket dropped, sits on the login screen forever
+     * while the session it was waiting for exists. Reopening the login URL is
+     * what collects it: a portal that has decided to trust the session sends
+     * /login straight to the app, and the app then puts the bearer on the wire.
+     *
+     * @returns {Promise<{token: string, source: string}|null>}
+     */
+    async function awaitDeviceApproval() {
+      const waitMs = Math.max(0, config.approvalWaitMs)
+      const waitingSince = Date.now()
+      const until = waitingSince + waitMs
+
+      report('awaiting_device_approval', { wait_ms: waitMs, signal: approvalSignal })
+
+      // The page has left the login URL: the portal let it through. Checked by
+      // prefix, so a portal that moves the approval onto /login/verify is not
+      // mistaken for one that has finished.
+      const leftLoginPage = () => !page.url().startsWith(loginUrl)
+
+      let found = null
+      let nudgedAt = 0
+
+      // A zero wait still goes round once, so a token or an approval that has
+      // already landed is not thrown away for the sake of a strict inequality.
+      do {
+        if (settled) break
+
+        if (!approvalGranted && leftLoginPage()) {
+          approvalGranted = true
+        }
+
+        if (approvalGranted) break
+
+        // The session can appear in storage before the page reflects it.
+        const scan = await findTokenInStorage(page, config.tokenKeys)
+
+        evidence.storageKeys = scan.entries
+        evidence.storageKeyNames = scan.names
+        evidence.claimedToken = [...new Set([...evidence.claimedToken, ...scan.claimed])]
+
+        if (scan.found) {
+          found = { token: scan.found.token, source: `storage:${scan.found.key}` }
+
+          break
+        }
+
+        const cookieScan = await findTokenInCookies(context, config.tokenKeys)
+
+        evidence.cookies = cookieScan.entries
+        evidence.cookieNames = cookieScan.names
+        evidence.claimedToken = [...new Set([...evidence.claimedToken, ...cookieScan.claimed])]
+
+        if (cookieScan.found) {
+          found = { token: cookieScan.found.token, source: `cookie:${cookieScan.found.key}` }
+
+          break
+        }
+
+        // Nothing yet, and nothing happening either. A page that has not made
+        // a request or taken a websocket frame for a while is not waiting for
+        // anything any more -- its poll has finished or its socket has gone --
+        // so reopening the login URL is the only way it will ever learn that
+        // the approval landed. The idle test is what keeps this from abandoning
+        // a page that *is* still waiting, which is the mistake the old
+        // post-login navigation made unconditionally.
+        const idleFor = Date.now() - lastActivityAt
+
+        if (idleFor > config.approvalNudgeMs && Date.now() - nudgedAt > config.approvalNudgeMs) {
+          nudgedAt = Date.now()
+          report('reopening_login_page', { idle_ms: idleFor })
+
+          await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
+
+          if (leftLoginPage()) approvalGranted = true
+        }
+
+        found = await Promise.race([
+          tokenSeen,
+          new Promise((resolve) => setTimeout(() => resolve(null), 1_000)),
+        ])
+      } while (!found && !approvalGranted && Date.now() < until)
+
+      evidence.approvalWaitedMs = Date.now() - waitingSince
+
+      if (found || settled) {
+        // A token is proof the approval landed, whatever else was observed.
+        approvalGranted = true
+        evidence.approvalGranted = true
+        report('approval_granted', { waited_ms: evidence.approvalWaitedMs })
+
+        return found
+      }
+
+      if (!approvalGranted) {
+        return null
+      }
+
+      evidence.approvalGranted = true
+      report('approval_granted', { waited_ms: evidence.approvalWaitedMs })
+
+      // The approval cost a person's attention; do not then lose the session
+      // because the clock the run started on has run out. The grace is added
+      // to the budget rather than taken from it, and the PHP side allows for
+      // it when it sizes the child's own timeout.
+      deadline = Math.max(deadline, Date.now() + APPROVAL_COMPLETION_MS)
+
+      // Still on the login screen after the approval: the page never learned.
+      // Reopening it is what turns the granted approval into a session, and
+      // this is the one moment it is unambiguously safe to navigate -- there
+      // is no longer anything to wait for on this page.
+      if (!leftLoginPage()) {
+        await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
+      }
+
+      report('collecting_token')
+
+      return await Promise.race([
+        tokenSeen,
+        new Promise((resolve) => setTimeout(() => resolve(null), remaining(8_000))),
+      ])
+    }
 
     // Whether the form is still there, asked *now*, before this function
     // navigates anywhere of its own accord.
@@ -904,13 +1447,53 @@ export async function extractBearerToken(options) {
       new Promise((resolve) => setTimeout(() => resolve(null), remaining(8_000))),
     ])
 
+    // The page is the last place to ask, and sometimes the only one: a portal
+    // can put the login on hold without a single refusal crossing the wire --
+    // it simply renders "we sent a notification to your phone" and waits.
+    //
+    // Only when the form has gone. A rejected password leaves the form up, and
+    // a page still offering a login is not a page waiting for an approval,
+    // whatever words are on it.
+    if (!outcome && submitted && approvalSignal === null && evidence.loginFormGone) {
+      const text = await page
+        .locator('body')
+        // Never zero: Playwright reads a zero timeout as "wait forever", so a
+        // budget that has already run out would hang the run here rather than
+        // ending it -- the same trap the redirect wait below guards against.
+        .innerText({ timeout: Math.max(1, remaining(3_000)) })
+        .catch(() => '')
+
+      if (mentionsApproval(text.slice(0, 20_000), config.approvalTextHints)) {
+        noteApproval('page-text')
+      }
+    }
+
+    // Hold the run open while a person approves, and then -- the part that was
+    // missing -- finish the login their approval unblocked.
+    //
+    // What used to happen instead: the refusals from the approval poll latched
+    // `credentialsRejected`, the post-login navigation below abandoned the
+    // waiting page about eight seconds after the form went, and the run ended
+    // inside a minute with INVALID_CREDENTIALS. By the time the notification
+    // was tapped there was nothing left listening, nothing still on the page
+    // that had been waiting, and no budget left to notice.
+    if (!outcome && approvalSignal !== null && !approvalGranted) {
+      outcome = await awaitDeviceApproval()
+    }
+
+    // An approval that was asked for and never came is the whole answer. There
+    // is nothing for a post-login page or a storage scan to find -- the portal
+    // has not issued a session -- and navigating now only replaces the picture
+    // of the page that explains it.
+    const approvalOutstanding = () => approvalSignal !== null && !approvalGranted && !settled
+
     // Then provoke the call the app makes when it uses the token.
     //
     // Some portals authenticate and land on a page that makes no further API
     // call, so nothing carries the bearer while this is watching. Opening a
     // page of the app that does -- the same thing a person does when they
     // read the token out of devtools -- puts it on the wire.
-    if (!outcome && typeof config.postLoginUrl === 'string' && config.postLoginUrl !== '') {
+    if (!outcome && !approvalOutstanding() && typeof config.postLoginUrl === 'string' && config.postLoginUrl !== '') {
       // Let the portal finish first. A login that is mid-redirect when this
       // navigates elsewhere never gets to set its session, and the result is
       // indistinguishable from a login that was refused -- this code would
@@ -932,7 +1515,7 @@ export async function extractBearerToken(options) {
     // Finally, look where the app keeps it. Polled rather than awaited
     // because web storage fires no event this side of the browser, and a
     // single look would race the app writing it.
-    while (!outcome && Date.now() < deadline) {
+    while (!outcome && !approvalOutstanding() && Date.now() < deadline) {
       const scan = await findTokenInStorage(page, config.tokenKeys)
 
       evidence.storageKeys = scan.entries
@@ -974,6 +1557,8 @@ export async function extractBearerToken(options) {
     }
 
     if (outcome) {
+      report('token_found', { source: outcome.source })
+
       return { ...outcome, elapsedMs: Date.now() - startedAt }
     }
 
@@ -981,7 +1566,22 @@ export async function extractBearerToken(options) {
 
     evidence.landedUrl = page.url()
 
-    if (credentialsRejected) {
+    // Asked for and not granted. Reported ahead of the credentials, because
+    // the refusals that an approval poll returns while it waits are the very
+    // thing that used to make this look like a bad password -- and because the
+    // fix is a person, not a configuration change.
+    if (approvalSignal !== null && !approvalGranted) {
+      throw new TokenExtractionError(
+        ExtractionError.AWAITING_DEVICE_APPROVAL,
+        `The portal is waiting for this login to be approved on another device, and no approval `
+          + `arrived within ${Math.round(config.approvalWaitMs / 1000)}s.`,
+        { evidence: summariseEvidence(evidence) },
+      )
+    }
+
+    // A refusal only stands as a verdict on the credentials if no approval was
+    // ever asked for. Once one has been, the portal has already accepted them.
+    if (credentialsRejected && approvalSignal === null) {
       throw new TokenExtractionError(
         ExtractionError.INVALID_CREDENTIALS,
         'The portal rejected those credentials.',

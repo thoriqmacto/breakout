@@ -108,7 +108,21 @@ class BrowserAuthCheckCommand extends Command
             ];
         }
 
-        return ['ok' => true, 'detail' => 'enabled, login URL set'];
+        // The budget belongs here: "how long would a login wait for me?" is a
+        // configuration question, and an operator who has to go and find their
+        // phone needs the answer before they start rather than afterwards.
+        $approvalWait = max(0, (int) config('browser_auth.approval_wait_seconds', 0));
+
+        return [
+            'ok' => true,
+            'detail' => sprintf(
+                'enabled, login URL set, %ds budget%s',
+                max(10, (int) config('browser_auth.timeout_seconds', 60)),
+                $approvalWait > 0
+                    ? sprintf(' plus %ds for a device approval', $approvalWait)
+                    : ' and no wait for a device approval',
+            ),
+        ];
     }
 
     /**
