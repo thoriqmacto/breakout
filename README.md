@@ -1942,13 +1942,30 @@ at every previous step:
 
 ### Re-establishing the session, in order
 
-The order matters, because step 2 is destructive. Run these as the profile's owner.
+**Nothing here involves deploying.** `backend-deploy.yml` ships `apps/api` on its own once CI is
+green on `main`, and it runs `config:cache` as part of that — so by the time you open a terminal the
+code and the configuration are already current. Pulling by hand, or clearing the config cache, is
+not part of this procedure. `browser:check` is the one-line confirmation that what you expect is
+what is running:
+
+```
+ ok  configuration  enabled, login URL set, 150s budget plus 180s for a device approval
+```
+
+If that line reads `and no wait for a device approval`, the deploy has not landed yet or
+`BROWSER_AUTH_APPROVAL_WAIT_SECONDS` is set to 0. Changing the wait for **one run** needs no
+configuration at all — pass `--approval-wait=300`. Changing it permanently is an `.env` edit plus
+`php artisan config:cache`, because a cached config does not see a new `.env` value.
+
+The order below matters, because step 2 is destructive. Run these as the profile's owner — the
+deploy runs as the deploy user, which is not who owns the browser profile.
 
 ```bash
 # 1. Is the saved session still good? No password, nothing changed.
 sudo -u www-data php artisan browser:token --session --dry-run
 
 # 2. Only if step 1 failed: sign in again. This CLEARS the profile first.
+#    Have the phone in your hand: it prints "approve now" and then waits.
 sudo -u www-data php artisan browser:token --username='<account email>' --screenshot=/tmp/sb
 
 # 3. Prove step 2 persisted, again with no password.
