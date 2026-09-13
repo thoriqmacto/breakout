@@ -136,6 +136,62 @@ class IndexSyncCommandTest extends TestCase
         $this->assertStringContainsString('automation:index-sync', $alert->message);
     }
 
+    public function test_a_truncated_read_is_refused_rather_than_written(): void
+    {
+        $this->artisan('automation:index-sync', ['--symbols' => implode(',', $this->members(70))]);
+
+        // Fifty-six of seventy: enough to clear the floor, and a small enough
+        // drop to clear the shrink guard too. Nothing but the reader knows
+        // this list was cut short, so the reader has to say so.
+        $partial = $this->members(56);
+
+        $this->app->bind(IndexCatalogReader::class, function () use ($partial) {
+            return new class($partial) extends IndexCatalogReader
+            {
+                /** @param array<int, string> $partial */
+                public function __construct(private readonly array $partial) {}
+
+                public function read(string $url, array $options = []): array
+                {
+                    return ['symbols' => $this->partial, 'evidence' => ['passes' => 30, 'truncated' => true]];
+                }
+            };
+        });
+
+        $this->artisan('automation:index-sync')->assertExitCode(1);
+
+        $this->assertCount(70, app(IndexMembershipSync::class)->currentSymbols('TEST70'));
+
+        $alert = AutomationAlert::where('type', AutomationAlert::TYPE_INDEX_MEMBERSHIP)->first();
+
+        $this->assertNotNull($alert);
+        $this->assertStringContainsString('start of the list', $alert->message);
+    }
+
+    public function test_a_truncated_read_can_still_be_forced(): void
+    {
+        $this->artisan('automation:index-sync', ['--symbols' => implode(',', $this->members(70))]);
+
+        $partial = $this->members(56);
+
+        $this->app->bind(IndexCatalogReader::class, function () use ($partial) {
+            return new class($partial) extends IndexCatalogReader
+            {
+                /** @param array<int, string> $partial */
+                public function __construct(private readonly array $partial) {}
+
+                public function read(string $url, array $options = []): array
+                {
+                    return ['symbols' => $this->partial, 'evidence' => ['passes' => 30, 'truncated' => true]];
+                }
+            };
+        });
+
+        $this->artisan('automation:index-sync', ['--force' => true])->assertExitCode(0);
+
+        $this->assertCount(56, app(IndexMembershipSync::class)->currentSymbols('TEST70'));
+    }
+
     public function test_a_refused_list_fails_the_run_and_says_why(): void
     {
         $this->artisan('automation:index-sync', ['--symbols' => implode(',', $this->members(45))]);

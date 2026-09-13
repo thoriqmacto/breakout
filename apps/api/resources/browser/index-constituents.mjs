@@ -3,22 +3,24 @@
  * Read the ticker symbols out of a published index catalogue page.
  *
  * The job arrives as JSON on stdin and the result leaves as one JSON object on
- * stdout, matching extract-token.mjs. No credentials are involved: this opens
- * a public catalogue page in a throwaway browser context, with no saved
- * profile and nothing to leak.
+ * stdout, matching extract-token.mjs. No password is handled here and no token
+ * is read: the most it touches is the saved browser profile the caller names,
+ * and only to borrow the session already in it.
  *
- * The page is a client-rendered app, so the symbols are collected three ways
+ * The page is a client-rendered app, so the symbols are collected four ways
  * and unioned:
  *
- *   1. links to a ticker page -- `/symbol/BBCA`, `/companies/BBCA` and the
- *      like. This is the strongest signal, because a catalogue exists to link
- *      to its constituents.
- *   2. the server-rendered data island (`__NEXT_DATA__` or any
+ *   1. rows that name their own symbol -- `<tr data-row-key="MAPA">`. The
+ *      strongest signal by some distance: a row key is the list's own
+ *      identifier for a row, not text that happens to look like a ticker.
+ *   2. links to a ticker page -- `/symbol/BBCA`, `/companies/BBCA` and the
+ *      like, because a catalogue exists to link to its constituents.
+ *   3. the server-rendered data island (`__NEXT_DATA__` or any
  *      `application/json` script), scanned for `symbol`-ish keys.
- *   3. table cells that hold nothing but a ticker-shaped word, as the last
- *      resort for a table whose rows are not links.
+ *   4. table cells that hold nothing but a ticker-shaped word, as the last
+ *      resort for a table whose rows are neither keyed nor linked.
  *
- * Three rather than one because the page's markup is not ours and will change.
+ * Four rather than one because the page's markup is not ours and will change.
  * A single selector that stops matching produces an empty list and a sync that
  * refuses to write; a union degrades to "fewer sources agreed" instead.
  *
@@ -239,11 +241,91 @@ function collectSymbols() {
     }
   }
 
+  /**
+   * Rows that name their own symbol.
+   *
+   * `<tr data-row-key="MAPA">` is what the real catalogue renders, and it is
+   * the strongest source here: a row key is the list's own identifier for the
+   * row rather than text that happens to be ticker-shaped, so a price cell, a
+   * nav label and a measure row are all excluded without a rule about any of
+   * them.
+   *
+   * Grouped by the element holding the rows, because a page can carry a second
+   * keyed table -- a related-stocks rail is sometimes one -- and those rows are
+   * not constituents.
+   */
+  const keyedGroups = new Map()
+  for (const row of document.querySelectorAll('[data-row-key]')) {
+    const value = (row.getAttribute('data-row-key') || '').trim().toUpperCase()
+    if (!shape.test(value)) continue
+
+    const group = row.parentElement || document.body
+    const existing = keyedGroups.get(group)
+
+    if (existing) existing.push(value)
+    else keyedGroups.set(group, [value])
+  }
+
+  let keyedElement = null
+  let keyedSymbols = []
+  for (const [group, list] of keyedGroups) {
+    if (list.length > keyedSymbols.length) {
+      keyedElement = group
+      keyedSymbols = list
+    }
+  }
+
+  /**
+   * The list, remembered between passes.
+   *
+   * A virtualised table is read many times as it is scrolled, and between two
+   * of those reads it can be momentarily empty -- mid re-render, or scrolled
+   * past its own data. On such a pass the winner of either election above is
+   * whatever furniture is left on the page, and because the passes are unioned
+   * that furniture would join the index permanently. It did: an empty window
+   * handed the reader a five-row related-stocks rail as "the list".
+   *
+   * So the list is pinned the first time it is recognised, with an attribute
+   * on the page's own DOM, and every later pass reads that element or nothing.
+   * A pass where the list is empty then contributes nothing, which is correct.
+   * The pin is dropped only if the element leaves the document.
+   */
+  const PIN = 'data-catalog-list'
+
+  let pinned = document.querySelector('[' + PIN + ']')
+
+  if (pinned && !pinned.isConnected) {
+    pinned = null
+  }
+
+  if (pinned === null) {
+    // Two candidates, scored by how much of a list each holds. Keys usually
+    // win, but a page whose constituents are links and whose rail is the keyed
+    // table must not hand the rail the pin.
+    const anchorsInContainer = container === null
+      ? 0
+      : anchors.filter(({ anchor }) => container.contains(anchor)).length
+
+    const candidate = keyedSymbols.length >= anchorsInContainer ? keyedElement : container
+    const score = Math.max(keyedSymbols.length, anchorsInContainer)
+
+    if (candidate && score >= MINIMUM_LINKS) {
+      candidate.setAttribute(PIN, '')
+      pinned = candidate
+    }
+  }
+
+  const scope = pinned ?? container
+
+  const fromRowKeys = pinned === null
+    ? keyedSymbols
+    : (keyedGroups.get(pinned) ?? []).slice()
+
   const fromLinks = []
 
   if (anchors.length >= MINIMUM_LINKS) {
     for (const { anchor, symbol } of anchors) {
-      if (container === null || container.contains(anchor)) fromLinks.push(symbol)
+      if (scope === null || scope.contains(anchor)) fromLinks.push(symbol)
     }
   }
 
@@ -280,21 +362,64 @@ function collectSymbols() {
   }
 
   const fromCells = []
-  const cellScope = container && container.querySelector('td, [role="cell"]') ? container : document
+  const cellScope = scope && scope.querySelector('td, [role="cell"]') ? scope : document
   for (const cell of cellScope.querySelectorAll('td, th, [role="cell"], [role="gridcell"]')) {
     const text = (cell.textContent || '').trim().toUpperCase()
     if (shape.test(text)) fromCells.push(text)
   }
 
   return {
+    rowKeys: fromRowKeys,
     links: fromLinks,
     json: fromJson,
     cells: fromCells,
     title: document.title || null,
     rows: document.querySelectorAll('tr, [role="row"]').length,
     anchors_total: anchors.length,
-    container: container ? container.tagName.toLowerCase() : null,
+    container: scope ? scope.tagName.toLowerCase() : null,
   }
+}
+
+/**
+ * Push every scroller on the page down by a screenful, and report what moved.
+ *
+ * `window.scrollBy` was reaching nothing on the real catalogue. Its table is a
+ * scroll container of its own -- an Ant Design body with `overflow-y: scroll`
+ * and a fixed max-height -- so the window has nothing to scroll and the rows
+ * below the fold never get asked for. Twenty-eight of seventy were in the DOM.
+ *
+ * Runs inside the page. Every element that overflows vertically and says it
+ * scrolls is pushed, the document included, so this does not depend on
+ * recognising any particular component.
+ */
+function scrollDeeper() {
+  const targets = new Set()
+  const root = document.scrollingElement || document.documentElement
+
+  if (root) targets.add(root)
+
+  for (const node of document.querySelectorAll('*')) {
+    if (targets.has(node)) continue
+    if (node.scrollHeight - node.clientHeight <= 8) continue
+
+    const overflow = getComputedStyle(node).overflowY
+
+    if (overflow !== 'auto' && overflow !== 'scroll' && overflow !== 'overlay') continue
+
+    targets.add(node)
+  }
+
+  let moved = 0
+
+  for (const target of targets) {
+    const before = target.scrollTop
+
+    target.scrollTop = before + Math.max(160, (target.clientHeight || window.innerHeight || 800) * 0.8)
+
+    if (target.scrollTop > before) moved++
+  }
+
+  return { moved, scrollers: targets.size }
 }
 
 
@@ -346,9 +471,24 @@ function diagnosePage() {
       td: document.querySelectorAll('td').length,
       role_row: document.querySelectorAll('[role="row"]').length,
       role_cell: document.querySelectorAll('[role="cell"], [role="gridcell"]').length,
+      row_key: document.querySelectorAll('[data-row-key]').length,
       json_scripts: jsonScripts.length,
     },
     json_script_ids: jsonScripts.map((script) => script.id || script.getAttribute('data-name') || '(anonymous)'),
+    // Structure, not content: which boxes on the page scroll, and how much of
+    // each is off-screen. A list that lives in one of these is invisible to a
+    // reader that only scrolls the window, and nothing else in this report
+    // would have shown that.
+    scroll_boxes: [...document.querySelectorAll('*')]
+      .filter((node) => node.scrollHeight - node.clientHeight > 8)
+      .slice(0, 8)
+      .map((node) => {
+        const name = typeof node.className === 'string' && node.className.trim() !== ''
+          ? '.' + node.className.trim().split(/\s+/)[0]
+          : ''
+
+        return `${node.tagName.toLowerCase()}${name} ${node.clientHeight}/${node.scrollHeight}`
+      }),
   }
 }
 
@@ -453,29 +593,62 @@ export async function readIndexConstituents({
     // read rather than failing the run.
     await page.waitForLoadState('networkidle', { timeout: timeoutMs }).catch(() => {})
 
-    // Growth is measured on the page height and on how many ticker-shaped
-    // words the text holds, not on a row count: a virtualised list that uses
-    // neither <tr> nor role="row" would have registered no growth at all and
-    // the loop would have stopped after two passes without scrolling.
-    let previous = '-1'
-    for (let pass = 0; pass < 20; pass++) {
-      const measure = await page.evaluate(() => {
-        const shape = /^[A-Z][A-Z0-9]{2,5}$/
-        const words = new Set()
+    // The page is read on every pass and the results unioned, rather than
+    // read once at the end. A virtualised list recycles its rows: only a
+    // window of them exists in the DOM at a time -- twenty-eight of seventy on
+    // the real catalogue -- so a single read after the scrolling finishes sees
+    // the last window and nothing before it.
+    const union = { rowKeys: new Set(), links: new Set(), json: new Set(), cells: new Set() }
+    const size = () => union.rowKeys.size + union.links.size + union.json.size + union.cells.size
 
-        for (const word of (document.body?.innerText || '').split(/[^A-Za-z0-9]+/)) {
-          if (shape.test(word)) words.add(word)
-        }
+    const meta = { title: null, container: null, rows: 0, anchors_total: 0 }
 
-        return [document.body?.scrollHeight ?? 0, words.size, document.querySelectorAll('a[href]').length].join(':')
-      })
+    let scrollers = 0
+    let passes = 0
+    let settled = 0
+    let truncated = false
 
-      if (measure === previous && pass > 1) break
+    const MAX_PASSES = 30
 
-      previous = measure
+    for (let pass = 0; pass < MAX_PASSES; pass++) {
+      passes = pass + 1
 
-      await page.evaluate(() => window.scrollBy(0, window.innerHeight * 0.9))
-      await page.waitForTimeout(400)
+      const seen = await page.evaluate(collectSymbols)
+
+      const before = size()
+
+      for (const symbol of seen.rowKeys) union.rowKeys.add(symbol)
+      for (const symbol of seen.links) union.links.add(symbol)
+      for (const symbol of seen.json) union.json.add(symbol)
+      for (const symbol of seen.cells) union.cells.add(symbol)
+
+      const grew = size() > before
+
+      meta.title = seen.title ?? meta.title
+      meta.container = seen.container ?? meta.container
+      // Maxima, because a virtualised list holds fewer rows at the bottom than
+      // in the middle and the smaller number would misreport the page.
+      meta.rows = Math.max(meta.rows, seen.rows)
+      meta.anchors_total = Math.max(meta.anchors_total, seen.anchors_total)
+
+      const scroll = await page.evaluate(scrollDeeper)
+
+      scrollers = Math.max(scrollers, scroll.scrollers)
+
+      // Nothing new and nowhere left to go. Confirmed over two passes, since a
+      // batch of rows can still be in flight when the scrolling stops.
+      if (!grew && scroll.moved === 0) {
+        if (++settled >= 2) break
+      } else {
+        settled = 0
+      }
+
+      await page.waitForTimeout(350)
+
+      // Still finding symbols when the passes ran out: what came back is a
+      // prefix of the list rather than the list, and the caller needs to know
+      // that before it writes a membership from it.
+      if (pass === MAX_PASSES - 1 && grew) truncated = true
     }
 
     if (typeof dumpHtml === 'string' && dumpHtml !== '') {
@@ -486,11 +659,9 @@ export async function readIndexConstituents({
 
     const report = diagnose ? await page.evaluate(diagnosePage) : null
 
-    const found = await page.evaluate(collectSymbols)
-
     const fromServer = symbolsInMarkup(serverHtml)
 
-    const fromDom = [...new Set([...found.links, ...found.json, ...found.cells])]
+    const fromDom = [...new Set([...union.rowKeys, ...union.links, ...union.json, ...union.cells])]
 
     // The server HTML is a fallback rather than another source to merge. It
     // cannot be scoped -- there is no DOM to ask which block is the list, so a
@@ -504,17 +675,24 @@ export async function readIndexConstituents({
 
     const evidence = {
       url: page.url(),
-      title: found.title,
-      rows: found.rows,
-      from_links: new Set(found.links).size,
-      from_json: new Set(found.json).size,
-      from_cells: new Set(found.cells).size,
+      title: meta.title,
+      rows: meta.rows,
+      from_row_keys: union.rowKeys.size,
+      from_links: union.links.size,
+      from_json: union.json.size,
+      from_cells: union.cells.size,
       from_server_html: fromServer.length,
       source: fromDom.length > 0 ? 'dom' : 'server_html',
       // Anchors outside the constituent list are counted but not collected;
       // a gap between these two is the page carrying a related-stocks rail.
-      anchors_total: found.anchors_total,
-      container: found.container,
+      anchors_total: meta.anchors_total,
+      container: meta.container,
+      passes,
+      scrollers,
+      // True when the reader was still finding new symbols as it ran out of
+      // passes. The list is then incomplete, and writing it would record
+      // departures for everything past the cut.
+      truncated,
       elapsed_ms: Date.now() - startedAt,
       ...(dumpHtml ? { dump_html: dumpHtml } : {}),
       ...(report ? { diagnosis: report } : {}),
