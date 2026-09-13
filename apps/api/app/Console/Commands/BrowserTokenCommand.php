@@ -182,13 +182,23 @@ class BrowserTokenCommand extends Command
 
             match ($name) {
                 'submitted_credentials' => $this->line('  submitted    waiting for the portal to answer'),
-                'awaiting_device_approval' => $this->warn(sprintf(
-                    '  approve now  the portal wants this login approved on another device%s',
-                    $approvalWait > 0
-                        ? sprintf(' — tap the notification within %ds', $approvalWait)
-                        : ' — not waiting for it (--approval-wait=180 to wait)',
-                )),
-                'reopening_login_page' => $this->line('  still waiting reopening the login page to pick the session up'),
+                // Two different things, and saying the wrong one is its own
+                // failure: the portal actually asked, or the login simply did
+                // not finish and an outstanding approval is the likeliest
+                // reason. Claiming the first when only the second is known
+                // sends someone to look for a notification that may not exist.
+                'awaiting_device_approval' => ($event['signal'] ?? null) === null
+                    ? $this->warn(sprintf(
+                        '  unfinished    the login did not complete; holding %ds in case you are approving it',
+                        $approvalWait,
+                    ))
+                    : $this->warn(sprintf(
+                        '  approve now  the portal wants this login approved on another device%s',
+                        $approvalWait > 0
+                            ? sprintf(' — tap the notification within %ds', $approvalWait)
+                            : ' — not waiting for it (--approval-wait=180 to wait)',
+                    )),
+                'checking_session' => $this->line('  still waiting checking whether the approval has landed yet'),
                 'approval_granted' => $this->info(sprintf(
                     '  approved     after %.0fs — collecting the token',
                     ((int) ($event['waited_ms'] ?? 0)) / 1000,
@@ -254,6 +264,11 @@ class BrowserTokenCommand extends Command
                     'granted after %.0fs',
                     ((int) ($evidence['approval_waited_ms'] ?? 0)) / 1000,
                 ),
+                ($evidence['held_open_unconfirmed'] ?? false) === true
+                    && ($evidence['awaiting_approval'] ?? false) !== true => sprintf(
+                        'nothing was said about one; held open %.0fs anyway, in case you were approving',
+                        ((int) ($evidence['approval_waited_ms'] ?? 0)) / 1000,
+                    ),
                 ($evidence['awaiting_approval'] ?? false) === true => sprintf(
                     'asked for on another device (%s), waited %.0fs — approve it while this is running',
                     (string) ($evidence['approval_signal'] ?? 'seen'),

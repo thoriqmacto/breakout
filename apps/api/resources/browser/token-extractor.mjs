@@ -182,12 +182,15 @@ const DEFAULTS = {
   approvalUrlHints: DEFAULT_APPROVAL_URL_HINTS,
   approvalTextHints: DEFAULT_APPROVAL_TEXT_HINTS,
   deviceTrustKeys: DEFAULT_DEVICE_TRUST_KEYS,
-  // How long the page may sit silent during an approval wait before the login
-  // URL is opened again. Once the approval lands the portal will send /login
-  // to the app, so reopening it is what turns a granted approval into a
-  // session -- but doing it while the page is still talking would abandon the
-  // portal's own poll, so it only happens when nothing is happening.
-  approvalNudgeMs: 20_000,
+  // How often, during an approval wait, to open a second tab and ask the
+  // portal whether the session exists yet.
+  //
+  // On a schedule rather than on the page falling silent. Silence was the
+  // wrong trigger: a portal that holds a websocket open sends heartbeats, the
+  // page therefore never looks idle, and an approval granted thirty seconds in
+  // was waited out for the full three minutes and then reported as never
+  // having arrived.
+  approvalProbeMs: 15_000,
   // Called with {event, ...} as the run progresses. The only way an operator
   // can know to reach for their phone: a headless run shows nothing, and a
   // silent terminal for three minutes is indistinguishable from a hang.
@@ -264,6 +267,9 @@ export function summariseEvidence(evidence) {
     approval_granted: evidence.approvalGranted,
     approval_waited_ms: evidence.approvalWaitedMs,
     auth_rejections: evidence.authRejections,
+    websockets: evidence.websockets,
+    websocket_frames: evidence.websocketFrames,
+    held_open_unconfirmed: evidence.heldOpenUnconfirmed,
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
@@ -280,6 +286,12 @@ export function describeEvidence(evidence) {
   if (evidence.awaitingApproval && !evidence.approvalGranted) {
     return 'The portal accepted the credentials and asked another device to approve this login. '
       + 'No approval arrived while this was waiting.'
+  }
+
+  if (evidence.heldOpenUnconfirmed && !evidence.approvalGranted) {
+    return 'The credentials were accepted -- the login form went -- but the portal never issued a '
+      + 'session, and nothing it said explained why. The run waited in case an approval was '
+      + 'outstanding on another device, and none arrived. The screenshot is the thing to look at.'
   }
 
   if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0 && evidence.cookies === 0) {
@@ -812,15 +824,6 @@ export async function extractBearerToken(options) {
    */
   let submitted = false
 
-  /**
-   * When the page last did anything at all.
-   *
-   * An approval wait is the one place this matters: a page that is polling or
-   * holding a websocket open must not be navigated out from under, and a page
-   * that has gone quiet is the one that needs reopening.
-   */
-  let lastActivityAt = Date.now()
-
   const noteApproval = (signal) => {
     if (approvalSignal !== null) return
 
@@ -900,6 +903,16 @@ export async function extractBearerToken(options) {
     // The approval arrived and the portal let the run through.
     approvalGranted: false,
     approvalWaitedMs: 0,
+    // Sockets the page opened, and frames it was sent. A page that is holding
+    // a socket open is waiting for a push, which is why nothing here depends
+    // on the page looking idle.
+    websockets: 0,
+    websocketFrames: 0,
+    // True when the run held itself open on the *shape* of the login rather
+    // than on anything the portal said: submitted, form gone, no token, still
+    // on the login page. An approval is the usual reason; it is not proof of
+    // one, so it is reported as what it is.
+    heldOpenUnconfirmed: false,
     // Rejections seen on an authentication URL. A count rather than a latch:
     // one of these is a verdict on the password only when nothing afterwards
     // contradicts it.
@@ -1071,7 +1084,6 @@ export async function extractBearerToken(options) {
     // using the token it was just given.
     context.on('request', (request) => {
       evidence.requests += 1
-      lastActivityAt = Date.now()
 
       try {
         evidence.hosts.add(new URL(request.url()).host)
@@ -1106,17 +1118,15 @@ export async function extractBearerToken(options) {
       evidence.nonJwtAuthorization += 1
     })
 
-    // Websocket frames are activity as much as requests are, and the request
-    // listener never sees them. On a portal that pushes the approval down a
-    // socket they are the only sign the page is still working, and reopening
-    // the page under it would throw the socket away.
+    // A portal that pushes its approval down a socket rather than answering a
+    // poll leaves no trace in the request listener, so the sockets are counted
+    // here. Counted only: this used to gate whether the login page was
+    // reopened, and since a socket heartbeat is indistinguishable from real
+    // progress, that gate never opened on the one portal it was written for.
     page.on('websocket', (socket) => {
-      lastActivityAt = Date.now()
+      evidence.websockets += 1
       socket.on('framereceived', () => {
-        lastActivityAt = Date.now()
-      })
-      socket.on('framesent', () => {
-        lastActivityAt = Date.now()
+        evidence.websocketFrames += 1
       })
     })
 
@@ -1270,12 +1280,12 @@ export async function extractBearerToken(options) {
      *
      * Two halves, and the second one is the half that was missing. Waiting is
      * easy; what makes an approval useful is that something happens *after* it.
-     * The portal grants a session at the moment of approval, but the headless
-     * page does not necessarily learn that on its own -- a page whose poll was
-     * abandoned, or whose socket dropped, sits on the login screen forever
-     * while the session it was waiting for exists. Reopening the login URL is
-     * what collects it: a portal that has decided to trust the session sends
-     * /login straight to the app, and the app then puts the bearer on the wire.
+     * The portal grants the session on its own servers at the moment of
+     * approval, and the headless page does not necessarily learn that: its
+     * poll may have finished, its socket may have dropped, or it may have been
+     * waiting all along for a push that never comes. Something has to go and
+     * look -- in a second tab, which sees the same cookies without disturbing
+     * whatever the waiting page is waiting on.
      *
      * @returns {Promise<{token: string, source: string}|null>}
      */
@@ -1291,13 +1301,74 @@ export async function extractBearerToken(options) {
       // mistaken for one that has finished.
       const leftLoginPage = () => !page.url().startsWith(loginUrl)
 
+      /**
+       * Ask the portal whether the session exists yet, without touching the
+       * page that is waiting for it.
+       *
+       * This is the whole difficulty of the approval step. The approval is
+       * granted on the portal's servers, and the headless page may never find
+       * out: its poll finished, its socket dropped, or it was only ever going
+       * to be told by a push that does not arrive. Something has to go and
+       * look -- but looking on the waiting page destroys whatever it was
+       * waiting on, and a portal that binds the approval to that page then
+       * never completes at all.
+       *
+       * A second tab has neither problem. It shares the profile's cookies, so
+       * it sees exactly the session the approval created, and the waiting page
+       * carries on untouched beside it. If the app loads, its authenticated
+       * calls run through the same context listeners and the bearer is
+       * captured from the probe as readily as from anywhere else.
+       */
+      const probeForSession = async () => {
+        const target = typeof config.postLoginUrl === 'string' && config.postLoginUrl !== ''
+          ? config.postLoginUrl
+          : loginUrl
+
+        let sheet = null
+
+        try {
+          sheet = await context.newPage()
+
+          // Bounded on its own, so a probe that hangs cannot eat the wait it
+          // is meant to be checking during. A look that takes fifteen seconds
+          // has failed; the next one is only fifteen seconds away.
+          await sheet.goto(target, {
+            waitUntil: 'domcontentloaded',
+            timeout: Math.min(config.navigationTimeoutMs, 15_000),
+          })
+
+          const landed = sheet.url()
+
+          // Let the app make the call that carries the bearer before the tab
+          // is taken away again.
+          await Promise.race([
+            tokenSeen,
+            new Promise((resolve) => setTimeout(resolve, 2_000)),
+          ])
+
+          // Sent to the login page means the portal still does not know this
+          // browser; anywhere else means it does.
+          return !landed.startsWith(loginUrl)
+        } catch {
+          return false
+        } finally {
+          await sheet?.close().catch(() => {})
+        }
+      }
+
       let found = null
-      let nudgedAt = 0
+      let probedAt = Date.now()
 
       // A zero wait still goes round once, so a token or an approval that has
       // already landed is not thrown away for the sake of a strict inequality.
       do {
-        if (settled) break
+        // Settled by a listener: the token exists, so take it rather than
+        // returning null and making the caller find it again.
+        if (settled) {
+          found = found ?? (await tokenSeen)
+
+          break
+        }
 
         if (!approvalGranted && leftLoginPage()) {
           approvalGranted = true
@@ -1330,22 +1401,37 @@ export async function extractBearerToken(options) {
           break
         }
 
-        // Nothing yet, and nothing happening either. A page that has not made
-        // a request or taken a websocket frame for a while is not waiting for
-        // anything any more -- its poll has finished or its socket has gone --
-        // so reopening the login URL is the only way it will ever learn that
-        // the approval landed. The idle test is what keeps this from abandoning
-        // a page that *is* still waiting, which is the mistake the old
-        // post-login navigation made unconditionally.
-        const idleFor = Date.now() - lastActivityAt
+        // Keep asking the page what it says, rather than asking once and
+        // living with the answer. An approval screen that renders a moment
+        // later than expected, or a portal that holds the login with a 200 and
+        // no refusal at all, is invisible to a single look -- and a run that
+        // never notices the hold never waits for it.
+        if (approvalSignal === null) {
+          const text = await page
+            .locator('body')
+            .innerText({ timeout: 2_000 })
+            .catch(() => '')
 
-        if (idleFor > config.approvalNudgeMs && Date.now() - nudgedAt > config.approvalNudgeMs) {
-          nudgedAt = Date.now()
-          report('reopening_login_page', { idle_ms: idleFor })
+          if (mentionsApproval(text.slice(0, 20_000), config.approvalTextHints)) {
+            noteApproval('page-text')
+            report('awaiting_device_approval', { wait_ms: waitMs, signal: approvalSignal })
+          }
+        }
 
-          await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
+        // Then go and look for the session itself, on a schedule rather than
+        // on the page's silence. Silence was the wrong trigger: this portal
+        // holds a websocket open and its heartbeats count as activity, so the
+        // page never looked idle, the check never ran, and an approval that
+        // had already been granted was waited out for the full three minutes.
+        if (Date.now() - probedAt >= config.approvalProbeMs) {
+          probedAt = Date.now()
+          report('checking_session')
 
-          if (leftLoginPage()) approvalGranted = true
+          if (await probeForSession()) {
+            approvalGranted = true
+
+            break
+          }
         }
 
         found = await Promise.race([
@@ -1354,9 +1440,11 @@ export async function extractBearerToken(options) {
         ])
       } while (!found && !approvalGranted && Date.now() < until)
 
+      if (!found && settled) found = await tokenSeen
+
       evidence.approvalWaitedMs = Date.now() - waitingSince
 
-      if (found || settled) {
+      if (found) {
         // A token is proof the approval landed, whatever else was observed.
         approvalGranted = true
         evidence.approvalGranted = true
@@ -1381,7 +1469,7 @@ export async function extractBearerToken(options) {
       // Still on the login screen after the approval: the page never learned.
       // Reopening it is what turns the granted approval into a session, and
       // this is the one moment it is unambiguously safe to navigate -- there
-      // is no longer anything to wait for on this page.
+      // is nothing left on this page to wait for.
       if (!leftLoginPage()) {
         await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }).catch(() => {})
       }
@@ -1390,7 +1478,7 @@ export async function extractBearerToken(options) {
 
       return await Promise.race([
         tokenSeen,
-        new Promise((resolve) => setTimeout(() => resolve(null), remaining(8_000))),
+        new Promise((resolve) => setTimeout(() => resolve(null), Math.max(1, remaining(8_000)))),
       ])
     }
 
@@ -1477,7 +1565,26 @@ export async function extractBearerToken(options) {
     // inside a minute with INVALID_CREDENTIALS. By the time the notification
     // was tapped there was nothing left listening, nothing still on the page
     // that had been waiting, and no budget left to notice.
-    if (!outcome && approvalSignal !== null && !approvalGranted) {
+    // An unfinished login is held open whether or not the portal said why.
+    //
+    // Detection by wording or by URL is a guess about someone else's markup,
+    // and a guess that misses costs the whole run: the approval arrives, and
+    // there is nothing left waiting for it. But the *shape* is not a guess --
+    // credentials submitted, the form gone, no token, and still sitting on the
+    // login page means the login did not finish, and the only thing that
+    // finishes it is something happening elsewhere. That is worth waiting for
+    // even when nothing named it.
+    //
+    // Not when the portal refused, though: a refusal it never qualified is an
+    // answer, and waiting three minutes to report a typo helps nobody.
+    const loginUnfinished = submitted
+      && evidence.loginFormGone
+      && !credentialsRejected
+      && page.url().startsWith(loginUrl)
+
+    if (!outcome && !approvalGranted && (approvalSignal !== null || loginUnfinished)) {
+      if (approvalSignal === null) evidence.heldOpenUnconfirmed = true
+
       outcome = await awaitDeviceApproval()
     }
 

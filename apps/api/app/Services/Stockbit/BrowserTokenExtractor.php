@@ -244,6 +244,7 @@ class BrowserTokenExtractor
             // timeout; PHP's is the backstop for a child that wedged.
             'timeout_ms' => ($timeout - 5) * 1000,
             'approval_wait_ms' => $approvalWait * 1000,
+            'approval_probe_ms' => max(2, (int) config('browser_auth.approval_probe_seconds', 15)) * 1000,
             'approval_url_hints' => (array) config('browser_auth.approval_url_hints'),
             'approval_text_hints' => (array) config('browser_auth.approval_text_hints'),
             'device_trust_keys' => (array) config('browser_auth.device_trust_keys'),

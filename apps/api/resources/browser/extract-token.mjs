@@ -91,6 +91,7 @@ async function main() {
       },
       timeoutMs: job.timeout_ms,
       approvalWaitMs: job.approval_wait_ms,
+      approvalProbeMs: job.approval_probe_ms,
       approvalUrlHints: job.approval_url_hints,
       approvalTextHints: job.approval_text_hints,
       deviceTrustKeys: job.device_trust_keys,
