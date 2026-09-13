@@ -446,6 +446,206 @@ function startPortal(mode) {
   })
 }
 
+
+/**
+ * A portal that holds the login until another device approves it.
+ *
+ * The shape that produced INVALID_CREDENTIALS against a login the operator had
+ * already approved on their phone, and it reproduces for three separate
+ * reasons, each of which this fixture exercises:
+ *
+ *   - the login call refuses with 403 while it waits, and the approval poll
+ *     keeps refusing until the approval lands. On the wire that is exactly a
+ *     rejected password;
+ *   - the run used to navigate to the post-login page about eight seconds after
+ *     the form went, abandoning the page that was waiting;
+ *   - and the whole budget was about a minute, which is less than it takes to
+ *     unlock a phone and find a notification.
+ *
+ * @param {object} options
+ * @param {number} options.grantAfterMs  How long the "person" takes to approve.
+ * @param {boolean} options.poll         Whether the page asks, or waits silently
+ *                                       for a push that never comes -- the case
+ *                                       that needs the login page reopened.
+ */
+function startApprovalPortal({ grantAfterMs = 3_000, poll = true } = {}) {
+  let askedAt = null
+
+  const approved = () => askedAt !== null && Date.now() - askedAt >= grantAfterMs
+
+  const appPageHtml = `<!doctype html>
+<html><body><div id="app">signed in</div>
+  <script>
+    localStorage.setItem('trustedDevice', JSON.stringify({ token: 'not-a-jwt', approved: true }));
+    localStorage.setItem('sb_session', JSON.stringify({ access_token: ${JSON.stringify(FAKE_JWT)} }));
+    fetch('/api/me', { headers: { Authorization: 'Bearer ' + ${JSON.stringify(FAKE_JWT)} } });
+  </script>
+</body></html>`
+
+  const server = createServer((request, response) => {
+    const url = request.url ?? '/'
+    const cookies = request.headers.cookie ?? ''
+
+    if (url === '/login') {
+      // Approved, so the portal lets this browser in -- which is what makes
+      // reopening the login page the way to collect a granted approval.
+      if (cookies.includes('pending=1') && approved()) {
+        response.writeHead(200, {
+          'content-type': 'text/html',
+          'set-cookie': 'session=1; Path=/',
+        })
+        response.end(appPageHtml)
+
+        return
+      }
+
+      if (cookies.includes('session=1')) {
+        response.writeHead(200, { 'content-type': 'text/html' })
+        response.end(appPageHtml)
+
+        return
+      }
+
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(`<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <div id="status"></div>
+  <script>
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('input[name="username"]').value,
+          password: document.querySelector('input[name="password"]').value,
+          // A device this browser has already had approved skips the hold
+          // entirely -- which is what makes "did the forced login keep it?"
+          // an observable question rather than an internal detail.
+          trusted: localStorage.getItem('trustedDevice') !== null,
+        }),
+      });
+
+      if (response.status === 200) {
+        const payload = await response.json();
+        localStorage.setItem('sb_session', JSON.stringify({ access_token: payload.data.access_token }));
+        document.getElementById('f').remove();
+        document.getElementById('status').textContent = 'signed in';
+
+        return;
+      }
+
+      if (response.status !== 403) {
+        document.getElementById('status').textContent = 'rejected';
+
+        return;
+      }
+
+      // The form goes, and the page says what it is waiting for. Both are what
+      // the production page did, and between them they are why "still on the
+      // login form" was false while "the portal said no" was true.
+      document.getElementById('f').remove();
+      document.getElementById('status').textContent =
+        'Approve the notification we sent to your phone to continue.';
+
+      if (!${JSON.stringify(poll)}) return;
+
+      const timer = setInterval(async () => {
+        const poll = await fetch('/api/auth/device/approval', { method: 'POST' });
+
+        if (poll.status !== 200) return;
+
+        clearInterval(timer);
+        const payload = await poll.json();
+        localStorage.setItem('trustedDevice', JSON.stringify({ approved: true }));
+        localStorage.setItem('sb_session', JSON.stringify({ access_token: payload.data.access_token }));
+        document.getElementById('status').textContent = 'signed in';
+      }, 1000);
+    });
+  </script>
+</body></html>`)
+
+      return
+    }
+
+    if (url === '/api/auth/login' && request.method === 'POST') {
+      const chunks = []
+      request.on('data', (chunk) => chunks.push(chunk))
+      request.on('end', () => {
+        const body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}')
+
+        if (body.email !== VALID_USER || body.password !== VALID_PASSWORD) {
+          response.writeHead(401, { 'content-type': 'application/json' })
+          response.end(JSON.stringify({ message: 'Invalid credentials' }))
+
+          return
+        }
+
+        // An already-trusted device is not held at all.
+        if (body.trusted === true) {
+          response.writeHead(200, {
+            'content-type': 'application/json',
+            'set-cookie': 'session=1; Path=/',
+          })
+          response.end(JSON.stringify({ data: { access_token: FAKE_JWT } }))
+
+          return
+        }
+
+        askedAt = Date.now()
+
+        response.writeHead(403, {
+          'content-type': 'application/json',
+          'set-cookie': 'pending=1; Path=/',
+        })
+        response.end(JSON.stringify({
+          message: 'Approve this login from your trusted device to continue.',
+        }))
+      })
+
+      return
+    }
+
+    if (url === '/api/auth/device/approval' && request.method === 'POST') {
+      if (!approved()) {
+        response.writeHead(403, { 'content-type': 'application/json' })
+        response.end(JSON.stringify({ approved: false }))
+
+        return
+      }
+
+      response.writeHead(200, {
+        'content-type': 'application/json',
+        'set-cookie': 'session=1; Path=/',
+      })
+      response.end(JSON.stringify({ data: { access_token: FAKE_JWT } }))
+
+      return
+    }
+
+    if (url === '/api/me') {
+      response.writeHead(200, { 'content-type': 'application/json' })
+      response.end(JSON.stringify({ data: { id: 1 } }))
+
+      return
+    }
+
+    response.writeHead(404)
+    response.end()
+  })
+
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve({ server, port: server.address().port })
+    })
+  })
+}
+
 const SELECTORS = {
   username: 'input[type="email"]',
   password: 'input[type="password"]',
@@ -1260,5 +1460,212 @@ await check(
     )
   },
 )
+
+
+/**
+ * The device-approval flow, end to end.
+ *
+ * Every assertion here failed before: a login held for an approval was reported
+ * as a rejected password, the page that was waiting was navigated away from
+ * before anybody could tap approve, and a forced login wiped the trust the last
+ * approval had established so the next one asked again.
+ */
+console.log('a portal that holds the login until another device approves it:')
+
+const APPROVAL_SELECTORS = {
+  username: 'input[name="username"]',
+  password: 'input[name="password"]',
+  submit: 'button[type="submit"]',
+}
+
+{
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 600_000 })
+
+  try {
+    await check('an approval it is not waiting for is not called a bad password', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/login`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: APPROVAL_SELECTORS,
+          // Zero: an unattended caller, which must report what the portal is
+          // waiting for rather than hold a cron job open for a human.
+          approvalWaitMs: 0,
+          timeoutMs: 20_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'this fixture issues no token without an approval')
+
+      // The assertion the whole change turns on. The login call answers 403 and
+      // the approval poll answers 403 until the phone is tapped, and that used
+      // to latch as "the portal rejected those credentials" -- printed
+      // underneath "no device-approval notification is sent for a login that
+      // never got past this step", next to a phone that was buzzing.
+      expect(
+        error.code === ExtractionError.AWAITING_DEVICE_APPROVAL,
+        `expected AWAITING_DEVICE_APPROVAL, got ${error.code}: ${error.message}`,
+      )
+      expect(error.evidence?.awaiting_approval === true, 'the evidence did not name the approval')
+      expect(error.evidence?.approval_granted === false, 'nothing was approved, so nothing was granted')
+    })
+
+    await check('a wrong password on the same portal is still a wrong password', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/login`,
+          username: VALID_USER,
+          password: 'wrong',
+          selectors: APPROVAL_SELECTORS,
+          approvalWaitMs: 30_000,
+          timeoutMs: 20_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      // The other half of the distinction: a portal that can ask for an
+      // approval must not make every refusal look like one, or a typo costs
+      // whatever the approval wait is set to.
+      expect(error !== null, 'a wrong password must fail')
+      expect(
+        error.code === ExtractionError.INVALID_CREDENTIALS,
+        `expected INVALID_CREDENTIALS, got ${error.code}: ${error.message}`,
+      )
+      expect(
+        error.evidence?.awaiting_approval !== true,
+        'a rejected password was mistaken for a device approval',
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // Approved after twelve seconds: long enough that the run's own budget is
+  // spent first, which is the whole situation. Approved inside the first few
+  // seconds the token simply arrives on the wire and the approval wait is
+  // never needed -- so a fixture that grants quickly passes against the bug.
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 12_000 })
+
+  try {
+    await check('an approval granted while the run waits produces the token', async () => {
+      const events = []
+
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        // Short on purpose: the approval arrives after the run's own budget
+        // would have expired, which is the situation on a real portal and the
+        // reason the approval wait is added to the budget rather than taken
+        // out of it.
+        timeoutMs: 12_000,
+        onProgress: (event) => events.push(event.event),
+      })
+
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+
+      // The operator has to be told, while it is still worth telling them.
+      expect(
+        events.includes('awaiting_device_approval'),
+        `no approval event was reported: ${events.join(', ')}`,
+      )
+      expect(
+        events.includes('approval_granted'),
+        `the granted approval was not reported: ${events.join(', ')}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // The page never asks again: its poll is gone, or the push it was waiting on
+  // never arrives. The portal has granted the session regardless, and nothing
+  // on the page will ever notice.
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 2_000, poll: false })
+
+  try {
+    await check('a granted approval is collected even when the page stopped asking', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        // Short, so a silent page is noticed rather than waited out.
+        approvalNudgeMs: 3_000,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 1_000 })
+  const profileDir = await mkdtemp(join(tmpdir(), 'browser-auth-approval-'))
+
+  try {
+    await check('the first login is approved once and the device is remembered', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        profileDir,
+        approvalWaitMs: 30_000,
+        timeoutMs: 15_000,
+      })
+
+      expect(result.token === FAKE_JWT, 'the first approved login produced no token')
+    })
+
+    await check('signing in again with a password does not ask for another approval', async () => {
+      const events = []
+
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        profileDir,
+        // The forced login that used to undo the approval: it clears the
+        // session so the form comes back, and it used to clear the device
+        // trust with it -- so the portal asked for a new approval every time a
+        // password was supplied, and every approval was thrown away by the
+        // next run.
+        forceLogin: true,
+        approvalWaitMs: 30_000,
+        timeoutMs: 15_000,
+        onProgress: (event) => events.push(event.event),
+      })
+
+      expect(result.token === FAKE_JWT, 'the forced login produced no token')
+      expect(
+        !events.includes('awaiting_device_approval'),
+        'the forced login threw away the device trust and asked for another approval',
+      )
+    })
+  } finally {
+    server.close()
+    await rm(profileDir, { recursive: true, force: true })
+  }
+}
 
 console.log(process.exitCode === 1 ? 'FAILED' : 'all scenarios passed')

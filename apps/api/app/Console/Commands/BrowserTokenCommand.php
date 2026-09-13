@@ -31,6 +31,7 @@ class BrowserTokenCommand extends Command
                             {--stored : Use the credentials saved by stockbit:credentials}
                             {--session : Use the saved browser profile without logging in}
                             {--screenshot= : Write a picture of the page here when no token is found}
+                            {--approval-wait= : Seconds to hold the run open while you approve the login on another device}
                             {--dry-run : Report what was captured without storing it}';
 
     protected $description = 'Sign in to the portal with a headless browser and report what was captured.';
@@ -69,13 +70,24 @@ class BrowserTokenCommand extends Command
             $extractor->screenshotPath = $this->resolveScreenshotPath(trim($screenshot));
         }
 
+        $approvalWait = $this->approvalWait();
+
+        // Someone is watching this one, which is the whole reason it can wait
+        // for a device approval at all. Nothing scheduled sets this.
+        $extractor->onProgress = $this->progressReporter($approvalWait);
+
         $this->line(sprintf('Signing in to %s…', (string) config('browser_auth.login_url')));
 
         try {
             // Not session-only means the operator chose to sign in again
             // with a password, and expects that to actually happen even when
             // the app still renders as signed in.
-            $result = $extractor->extract($username, $password, forceLogin: ! $sessionOnly);
+            $result = $extractor->extract(
+                $username,
+                $password,
+                forceLogin: ! $sessionOnly,
+                approvalWaitSeconds: $approvalWait,
+            );
         } catch (BrowserTokenExtractionException $exception) {
             $this->newLine();
             $this->error(sprintf('[%s] %s', $exception->failureCode, $exception->getMessage()));
@@ -132,6 +144,61 @@ class BrowserTokenCommand extends Command
     }
 
     /**
+     * How long to hold the run open for a device approval.
+     *
+     * A person is at the keyboard here, so the configured wait applies; the
+     * option is for the run where you already know the phone is in the other
+     * room. Zero switches the wait off and still reports the approval request,
+     * which is the difference that matters -- the failure names what the portal
+     * is waiting for either way.
+     */
+    private function approvalWait(): int
+    {
+        $given = $this->option('approval-wait');
+
+        if (is_string($given) && trim($given) !== '') {
+            return max(0, (int) trim($given));
+        }
+
+        return max(0, (int) config('browser_auth.approval_wait_seconds', 0));
+    }
+
+    /**
+     * Narrate the run, because the only useful moment to learn that a portal
+     * wants a device approved is while it is still waiting for one.
+     *
+     * A headless browser shows nothing and this command printed nothing between
+     * "Signing in…" and the verdict, so an approval notification arrived on a
+     * phone with no indication that anything was waiting for it -- and by the
+     * time it was tapped the run had been over for a minute and had reported a
+     * rejected password.
+     *
+     * @return callable(array<string, mixed>): void
+     */
+    private function progressReporter(int $approvalWait): callable
+    {
+        return function (array $event) use ($approvalWait): void {
+            $name = (string) ($event['event'] ?? '');
+
+            match ($name) {
+                'submitted_credentials' => $this->line('  submitted    waiting for the portal to answer'),
+                'awaiting_device_approval' => $this->warn(sprintf(
+                    '  approve now  the portal wants this login approved on another device%s',
+                    $approvalWait > 0
+                        ? sprintf(' — tap the notification within %ds', $approvalWait)
+                        : ' — not waiting for it (--approval-wait=180 to wait)',
+                )),
+                'reopening_login_page' => $this->line('  still waiting reopening the login page to pick the session up'),
+                'approval_granted' => $this->info(sprintf(
+                    '  approved     after %.0fs — collecting the token',
+                    ((int) ($event['waited_ms'] ?? 0)) / 1000,
+                )),
+                default => null,
+            };
+        };
+    }
+
+    /**
      * A directory means "name the file yourself"; anything else is the file.
      */
     private function resolveScreenshotPath(string $given): string
@@ -182,6 +249,18 @@ class BrowserTokenCommand extends Command
             'form gone' => array_key_exists('login_form_gone', $evidence)
                 ? ($evidence['login_form_gone'] ? 'yes' : 'no -- the login was refused')
                 : null,
+            'approval' => match (true) {
+                ($evidence['approval_granted'] ?? false) === true => sprintf(
+                    'granted after %.0fs',
+                    ((int) ($evidence['approval_waited_ms'] ?? 0)) / 1000,
+                ),
+                ($evidence['awaiting_approval'] ?? false) === true => sprintf(
+                    'asked for on another device (%s), waited %.0fs — approve it while this is running',
+                    (string) ($evidence['approval_signal'] ?? 'seen'),
+                    ((int) ($evidence['approval_waited_ms'] ?? 0)) / 1000,
+                ),
+                default => null,
+            },
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
             'screenshot' => $evidence['screenshot'] ?? null,
