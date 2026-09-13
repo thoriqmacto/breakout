@@ -212,6 +212,52 @@ class BrowserTokenApprovalTest extends TestCase
         $this->assertStringContainsString('"approval_wait_ms":0', $this->job());
     }
 
+    /**
+     * A hold nobody announced must not be reported as one the portal asked for.
+     *
+     * The run holds open on the shape of an unfinished login -- submitted, form
+     * gone, no token, still on the login page -- because recognising the hold
+     * by wording or by URL is a guess about someone else's markup, and a miss
+     * costs the whole run. But what it knows and what it is guessing are
+     * different things, and telling someone to go and tap a notification that
+     * may not exist is its own kind of wrong.
+     */
+    public function test_an_unannounced_hold_is_reported_as_unfinished_not_as_an_approval(): void
+    {
+        $this->configureWith(
+            $this->awaitingApprovalResult(),
+            'progress {"event":"awaiting_device_approval","wait_ms":180000,"signal":null}',
+        );
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('the login did not complete; holding 180s in case you are approving it')
+            ->assertFailed();
+    }
+
+    /**
+     * The waiting page is never the thing that is asked.
+     *
+     * The first version looked for the session only once the page had fallen
+     * silent, which never happened: the portal holds a websocket open and its
+     * heartbeats read as activity. So the interval is configuration, and it is
+     * a schedule rather than a condition.
+     */
+    public function test_the_child_is_given_an_interval_to_look_for_the_session_on(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.approval_probe_seconds' => 12]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"approval_probe_ms":12000', $this->job());
+    }
+
     public function test_the_wait_can_be_switched_off_for_one_run(): void
     {
         $this->configureWith(

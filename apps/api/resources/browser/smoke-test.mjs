@@ -466,9 +466,19 @@ function startPortal(mode) {
  * @param {number} options.grantAfterMs  How long the "person" takes to approve.
  * @param {boolean} options.poll         Whether the page asks, or waits silently
  *                                       for a push that never comes -- the case
- *                                       that needs the login page reopened.
+ *                                       where only a look elsewhere can find the
+ *                                       session.
+ * @param {boolean} options.busy         Keep the waiting page making requests it
+ *                                       learns nothing from. A portal holding a
+ *                                       websocket open looks exactly like this,
+ *                                       and it is what made "wait for the page to
+ *                                       fall silent" never fire.
+ * @param {boolean} options.announce     Whether the hold is announced at all. A
+ *                                       portal that answers 200 and renders a
+ *                                       sentence in its own language says nothing
+ *                                       any hint list can match.
  */
-function startApprovalPortal({ grantAfterMs = 3_000, poll = true } = {}) {
+function startApprovalPortal({ grantAfterMs = 3_000, poll = true, busy = false, announce = true } = {}) {
   let askedAt = null
 
   const approved = () => askedAt !== null && Date.now() - askedAt >= grantAfterMs
@@ -540,18 +550,25 @@ function startApprovalPortal({ grantAfterMs = 3_000, poll = true } = {}) {
         return;
       }
 
-      if (response.status !== 403) {
+      if (response.status !== 403 && response.status !== 200) {
         document.getElementById('status').textContent = 'rejected';
 
         return;
       }
 
-      // The form goes, and the page says what it is waiting for. Both are what
-      // the production page did, and between them they are why "still on the
-      // login form" was false while "the portal said no" was true.
+      // The form goes either way. What the page then says is the difference
+      // between a hold anything can recognise and one that has to be inferred
+      // from the login simply not finishing.
       document.getElementById('f').remove();
-      document.getElementById('status').textContent =
-        'Approve the notification we sent to your phone to continue.';
+      document.getElementById('status').textContent = ${JSON.stringify(announce)}
+        ? 'Approve the notification we sent to your phone to continue.'
+        : 'Mohon tunggu sebentar.';
+
+      // Busy, and none the wiser for it. A page in this state never falls
+      // silent, so anything that waits for silence waits forever.
+      if (${JSON.stringify(busy)}) {
+        setInterval(() => { fetch('/api/heartbeat').catch(() => {}) }, 500);
+      }
 
       if (!${JSON.stringify(poll)}) return;
 
@@ -598,6 +615,19 @@ function startApprovalPortal({ grantAfterMs = 3_000, poll = true } = {}) {
         }
 
         askedAt = Date.now()
+
+        if (!announce) {
+          // Accepted, and then nothing: no refusal, no wording, no endpoint
+          // named after an approval. Everything a hint list works from is
+          // absent, and the login is still not finished.
+          response.writeHead(200, {
+            'content-type': 'application/json',
+            'set-cookie': 'pending=1; Path=/',
+          })
+          response.end(JSON.stringify({ data: { status: 'pending' } }))
+
+          return
+        }
 
         response.writeHead(403, {
           'content-type': 'application/json',
@@ -1605,8 +1635,9 @@ const APPROVAL_SELECTORS = {
         password: VALID_PASSWORD,
         selectors: APPROVAL_SELECTORS,
         approvalWaitMs: 30_000,
-        // Short, so a silent page is noticed rather than waited out.
-        approvalNudgeMs: 3_000,
+        // Short, so the scenario does not spend its life waiting for the
+        // first look.
+        approvalProbeMs: 3_000,
         timeoutMs: 15_000,
       })
 
@@ -1665,6 +1696,91 @@ const APPROVAL_SELECTORS = {
   } finally {
     server.close()
     await rm(profileDir, { recursive: true, force: true })
+  }
+}
+
+
+{
+  // The shape that failed in production twice in three attempts: the approval
+  // is granted, and the page that is waiting for it is busy doing something
+  // else entirely and never finds out.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 2_000,
+    poll: false,
+    busy: true,
+  })
+
+  try {
+    await check('a busy page does not stop the granted approval being collected', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        approvalProbeMs: 3_000,
+        timeoutMs: 15_000,
+      })
+
+      // This is the assertion the second version of this feature exists for.
+      // Waiting for the page to fall silent looked reasonable and was useless
+      // against the one portal it was written for: it holds a websocket open,
+      // the heartbeats count as activity, so the page never looked idle, the
+      // session was never looked for, and an approval granted in two seconds
+      // was reported three minutes later as never having arrived.
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // Nothing announces the hold: the login call answers 200, the page says
+  // something in Indonesian that no hint list contains, and no endpoint is
+  // named after an approval.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 3_000,
+    poll: false,
+    announce: false,
+  })
+
+  try {
+    await check('a hold nothing announced is still waited out', async () => {
+      const events = []
+
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        approvalProbeMs: 3_000,
+        timeoutMs: 12_000,
+        onProgress: (event) => events.push(event),
+      })
+
+      // Recognising the hold cannot be a precondition for surviving it.
+      // Detection reads someone else's markup and someone else's wording, and
+      // a miss costs the entire run -- the approval arrives with nothing left
+      // waiting for it. The shape is not a guess: submitted, form gone, no
+      // token, still on the login page.
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+
+      const held = events.find((event) => event.event === 'awaiting_device_approval')
+
+      expect(held !== undefined, `the run never held open: ${events.map((e) => e.event).join(', ')}`)
+
+      // And it says which of the two it knows. Claiming the portal asked for
+      // an approval when nothing said so sends someone hunting a notification
+      // that may not exist.
+      expect(
+        held.signal === null || held.signal === undefined,
+        `an unannounced hold was reported as an announced one: ${held.signal}`,
+      )
+    })
+  } finally {
+    server.close()
   }
 }
 

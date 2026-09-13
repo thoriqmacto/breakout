@@ -152,6 +152,23 @@ return [
     'approval_wait_seconds' => (int) env('BROWSER_AUTH_APPROVAL_WAIT_SECONDS', 180),
 
     /*
+    | How often, while waiting for a device approval, to open a second tab and
+    | ask the portal whether the session exists yet.
+    |
+    | The approval is granted on the portal's servers and the headless page may
+    | never find out -- its poll finished, its socket dropped, or it was only
+    | ever going to be told by a push. Something has to go and look, and a
+    | second tab can look without destroying whatever the waiting page is
+    | waiting on.
+    |
+    | On a schedule, deliberately, rather than when the page falls quiet: this
+    | portal holds a websocket open, its heartbeats made the page look busy
+    | forever, and an approval granted half a minute in was waited out for the
+    | full three minutes and then reported as never having arrived.
+    */
+    'approval_probe_seconds' => (int) env('BROWSER_AUTH_APPROVAL_PROBE_SECONDS', 15),
+
+    /*
     | How a device-approval step is recognised, so the refusals one returns
     | while it waits are not read as a refused password.
     |
