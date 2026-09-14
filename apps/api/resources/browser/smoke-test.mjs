@@ -477,8 +477,19 @@ function startPortal(mode) {
  *                                       portal that answers 200 and renders a
  *                                       sentence in its own language says nothing
  *                                       any hint list can match.
+ * @param {boolean} options.pollAnswers200 Whether the approval poll reports "not
+ *                                       yet" with a 200 and a body, rather than a
+ *                                       refusal. Most do, and reading that 200 as
+ *                                       the approval is what ended a wait before
+ *                                       the phone had been touched.
  */
-function startApprovalPortal({ grantAfterMs = 3_000, poll = true, busy = false, announce = true } = {}) {
+function startApprovalPortal({
+  grantAfterMs = 3_000,
+  poll = true,
+  busy = false,
+  announce = true,
+  pollAnswers200 = false,
+} = {}) {
   let askedAt = null
 
   const approved = () => askedAt !== null && Date.now() - askedAt >= grantAfterMs
@@ -564,6 +575,11 @@ function startApprovalPortal({ grantAfterMs = 3_000, poll = true, busy = false, 
         ? 'Approve the notification we sent to your phone to continue.'
         : 'Mohon tunggu sebentar.';
 
+      // What every signed-out app does next: ask who it is, and be told 401.
+      // On a path with "session" in it, which is the shape that made a run
+      // conclude the password had been refused.
+      fetch('/api/user/session').catch(() => {});
+
       // Busy, and none the wiser for it. A page in this state never falls
       // silent, so anything that waits for silence waits forever.
       if (${JSON.stringify(busy)}) {
@@ -577,8 +593,13 @@ function startApprovalPortal({ grantAfterMs = 3_000, poll = true, busy = false, 
 
         if (poll.status !== 200) return;
 
-        clearInterval(timer);
         const payload = await poll.json();
+
+        // A 200 is not a yes. The answer is in the body, which is exactly the
+        // distinction the run has to make too.
+        if (payload?.data?.approved === false) return;
+
+        clearInterval(timer);
         localStorage.setItem('trustedDevice', JSON.stringify({ approved: true }));
         localStorage.setItem('sb_session', JSON.stringify({ access_token: payload.data.access_token }));
         document.getElementById('status').textContent = 'signed in';
@@ -643,6 +664,16 @@ function startApprovalPortal({ grantAfterMs = 3_000, poll = true, busy = false, 
 
     if (url === '/api/auth/device/approval' && request.method === 'POST') {
       if (!approved()) {
+        // The status is in the body, not in the code. This is the shape that
+        // ended a wait in zero seconds: the run read the 200 as the approval
+        // landing, while the portal was saying "not yet" inside it.
+        if (pollAnswers200) {
+          response.writeHead(200, { 'content-type': 'application/json' })
+          response.end(JSON.stringify({ data: { approved: false } }))
+
+          return
+        }
+
         response.writeHead(403, { 'content-type': 'application/json' })
         response.end(JSON.stringify({ approved: false }))
 
@@ -1777,6 +1808,180 @@ const APPROVAL_SELECTORS = {
       expect(
         held.signal === null || held.signal === undefined,
         `an unannounced hold was reported as an announced one: ${held.signal}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+
+{
+  // Run one of two that failed on the VPS after #350. The approval poll
+  // answers 200 while it means "not yet", and the run took the 200 for the
+  // approval: waited 0s, gave up, and reported TOKEN_NOT_FOUND while the
+  // phone was still buzzing.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 14_000,
+    pollAnswers200: true,
+  })
+
+  try {
+    await check('a poll that says "not yet" with a 200 is not the approval landing', async () => {
+      const events = []
+      const startedAt = Date.now()
+
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        approvalProbeMs: 3_000,
+        // Shorter than the fixture takes to grant, so only the wait can save
+        // this run. Believing the poll's 200 skipped the wait entirely, and
+        // what was left then expired before the phone was ever tapped.
+        timeoutMs: 10_000,
+        onProgress: (event) => events.push(event),
+      })
+
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+
+      const granted = events.find((event) => event.event === 'approval_granted')
+
+      expect(granted !== undefined, 'the approval was never reported as granted')
+
+      // Measured from the start of the run, not from the start of the wait:
+      // the property is that nothing was called approved before the portal
+      // had approved anything.
+      expect(
+        Date.now() - startedAt >= 14_000,
+        `finished in ${Date.now() - startedAt}ms, before the approval was given`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // Run two of the two. Nothing was ever approved here -- the fixture never
+  // grants -- and the probe still reported success, because it was asked
+  // whether the tab had landed somewhere other than the login page. Navigate
+  // anywhere that is not the login page and the answer is yes.
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 600_000 })
+
+  try {
+    await check('a probe that lands on the app proves nothing without a token', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/login`,
+          // The app page, which serves 200 to anyone -- signed in or not, the
+          // way a single-page app does before its own guard has run.
+          postLoginUrl: `http://127.0.0.1:${port}/api/me`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: APPROVAL_SELECTORS,
+          approvalWaitMs: 8_000,
+          approvalProbeMs: 2_000,
+          timeoutMs: 12_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'no approval was ever given, so no token can exist')
+      expect(
+        error.code === ExtractionError.AWAITING_DEVICE_APPROVAL,
+        `expected AWAITING_DEVICE_APPROVAL, got ${error.code}: ${error.message}`,
+      )
+      expect(
+        error.evidence?.approval_granted === false,
+        'an approval that was never given was reported as granted',
+      )
+
+      // And it says how hard it looked, because "no approval arrived" means
+      // something different after several looks than after none.
+      expect(
+        (error.evidence?.approval_probes ?? 0) > 0,
+        'the wait never opened the app to check',
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // The other half of narrowing what counts as a rejection: a signed-out app
+  // fires a great many requests, and the ones that 401 on paths with "session"
+  // or "auth" in them are it discovering it has no session -- not a verdict on
+  // a password. Only the POST that carried the credentials is that.
+  const { server, port } = await startApprovalPortal({ grantAfterMs: 2_000, poll: false })
+
+  try {
+    await check('a signed-out app 401ing on its own calls is not a rejected password', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 30_000,
+        approvalProbeMs: 3_000,
+        timeoutMs: 12_000,
+      })
+
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
+
+{
+  // The second half of the VPS run that reported INVALID_CREDENTIALS: no
+  // notification was sent, and the password was fine. The app, signed out,
+  // asked who it was and was told 401 on a path with "session" in it -- and
+  // that was taken as the portal refusing the credentials.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 600_000,
+    announce: false,
+    poll: false,
+  })
+
+  try {
+    await check('an unfinished login is not blamed on the password', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/login`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: APPROVAL_SELECTORS,
+          approvalWaitMs: 5_000,
+          approvalProbeMs: 2_000,
+          timeoutMs: 12_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'this fixture never grants, so no token can exist')
+
+      // The credentials were accepted -- the form went. Reporting them as
+      // rejected sends someone to re-check a password that is not the problem,
+      // which is exactly the round this cost on the real portal.
+      expect(
+        error.code !== ExtractionError.INVALID_CREDENTIALS,
+        `an accepted password was reported as rejected: ${error.message}`,
+      )
+      expect(
+        error.evidence?.held_open_unconfirmed === true,
+        'the run did not record that it held the login open',
       )
     })
   } finally {
