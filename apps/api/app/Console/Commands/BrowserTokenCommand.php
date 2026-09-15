@@ -245,12 +245,24 @@ class BrowserTokenCommand extends Command
 
     /**
      * A directory means "name the file yourself"; anything else is the file.
+     *
+     * And the file has to end in an image extension, because the browser
+     * chooses the format from it and refuses a path it cannot read one from --
+     * `--screenshot=/tmp/sb` produced `unsupported mime type "null"` and no
+     * file at all. Every run in this feature's history that was asked for a
+     * picture and given a bare path wrote nothing, and said nothing about it,
+     * so the one artefact that would have explained those runs was never
+     * there to look at.
      */
     private function resolveScreenshotPath(string $given): string
     {
-        return is_dir($given)
-            ? rtrim($given, '/').'/browser-token-'.date('Ymd-His').'.png'
-            : $given;
+        if (is_dir($given)) {
+            return rtrim($given, '/').'/browser-token-'.date('Ymd-His').'.png';
+        }
+
+        return preg_match('/\.(png|jpe?g)$/i', $given) === 1
+            ? $given
+            : $given.'.png';
     }
 
     private function hasProfile(BrowserTokenExtractor $extractor): bool
@@ -327,6 +339,11 @@ class BrowserTokenCommand extends Command
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
             'screenshot' => $evidence['screenshot'] ?? null,
+            // A picture that was asked for and not written says so, rather
+            // than leaving an absent line to be read as "none was requested".
+            'no picture' => is_string($evidence['screenshot_error'] ?? null)
+                ? $evidence['screenshot_error']
+                : null,
         ] as $label => $value) {
             if (is_string($value) && $value !== '') {
                 $this->line(sprintf('  %-16s %s', $label, $value));
@@ -338,6 +355,10 @@ class BrowserTokenCommand extends Command
             'cookies' => $evidence['cookie_names'] ?? null,
             'indexeddb' => $evidence['indexeddb_names'] ?? null,
             'claim a token' => $evidence['claimed_token'] ?? null,
+            // The shape of the bearers that were seen and refused. A long
+            // opaque string and the word "undefined" are the same count and
+            // opposite problems.
+            'bearer shape' => $evidence['non_jwt_bearer_shapes'] ?? null,
         ] as $label => $names) {
             if (! is_array($names) || $names === []) {
                 continue;

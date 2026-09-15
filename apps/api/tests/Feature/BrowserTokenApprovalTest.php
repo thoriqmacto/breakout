@@ -300,6 +300,70 @@ class BrowserTokenApprovalTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * A path the browser cannot choose a format from writes nothing.
+     *
+     * `--screenshot=/tmp/sb` was refused with `unsupported mime type "null"`
+     * and the failure was swallowed, so every run asked for a picture that way
+     * produced none and said nothing about it -- through an entire debugging
+     * session in which the picture was repeatedly the thing to look at.
+     */
+    public function test_a_screenshot_path_without_an_extension_gets_one(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        $this->artisan('browser:token', [
+            '--username' => 'someone@example.test',
+            '--screenshot' => '/tmp/sb',
+        ])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->assertFailed();
+
+        $this->assertStringContainsString('"screenshot_path":"\/tmp\/sb.png"', $this->job());
+    }
+
+    public function test_a_screenshot_path_that_already_names_an_image_is_left_alone(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        $this->artisan('browser:token', [
+            '--username' => 'someone@example.test',
+            '--screenshot' => '/tmp/shot.PNG',
+        ])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->assertFailed();
+
+        $this->assertStringContainsString('"screenshot_path":"\/tmp\/shot.PNG"', $this->job());
+    }
+
+    /**
+     * The count said 11 bearers were refused; it could not say whether they
+     * were opaque session tokens or the word "undefined", which are opposite
+     * problems with the same count.
+     */
+    public function test_the_shape_of_a_refused_bearer_is_reported(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 3827,
+                'authorization_headers' => 11,
+                'non_jwt_authorization' => 11,
+                'non_jwt_bearer_shapes' => ['the literal "undefined"'],
+                'hosts' => ['stockbit.com'],
+                'screenshot_error' => 'path: unsupported mime type "null"',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('the literal "undefined"')
+            ->expectsOutputToContain('unsupported mime type')
+            ->assertFailed();
+    }
+
     public function test_the_wait_can_be_switched_off_for_one_run(): void
     {
         $this->configureWith(
