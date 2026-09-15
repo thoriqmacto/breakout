@@ -231,7 +231,7 @@ class BrowserTokenApprovalTest extends TestCase
 
         $this->artisan('browser:token', ['--username' => 'someone@example.test'])
             ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
-            ->expectsOutputToContain('the login did not complete; holding 180s in case you are approving it')
+            ->expectsOutputToContain('the login did not complete; holding up to 180s in case you are approving it')
             ->assertFailed();
     }
 
@@ -256,6 +256,48 @@ class BrowserTokenApprovalTest extends TestCase
         }
 
         $this->assertStringContainsString('"approval_probe_ms":12000', $this->job());
+    }
+
+    /**
+     * The likeliest cause of a refusal, said where it will be read.
+     *
+     * A portal that greets you by a display name still authenticates on the
+     * account email, and typing the display name is refused exactly like a
+     * wrong password -- with no notification sent, which reads as the device
+     * prompt having stopped working. The explanation was already in the failure
+     * message, in the middle of a paragraph, alongside four other candidates.
+     */
+    public function test_a_rejected_username_that_is_not_an_email_says_so(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'INVALID_CREDENTIALS',
+            'message' => 'ignored',
+            'evidence' => ['requests' => 906, 'hosts' => ['stockbit.com'], 'login_form_gone' => true],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'macto'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('which is not an email address')
+            ->assertFailed();
+    }
+
+    /**
+     * And not when the username is one, because then it explains nothing.
+     */
+    public function test_an_email_username_is_not_second_guessed(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'INVALID_CREDENTIALS',
+            'message' => 'ignored',
+            'evidence' => ['requests' => 906, 'hosts' => ['stockbit.com'], 'login_form_gone' => true],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->doesntExpectOutputToContain('not an email address')
+            ->assertFailed();
     }
 
     public function test_the_wait_can_be_switched_off_for_one_run(): void
