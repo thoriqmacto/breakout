@@ -267,6 +267,8 @@ export function summariseEvidence(evidence) {
     requests: evidence.requests,
     authorization_headers: evidence.authorizationHeaders,
     non_jwt_authorization: evidence.nonJwtAuthorization,
+    non_jwt_bearer_shapes: evidence.nonJwtBearerShapes,
+    screenshot_error: evidence.screenshotError,
     json_responses: evidence.jsonResponses,
     storage_keys: evidence.storageKeys,
     cookies: evidence.cookies,
@@ -302,8 +304,10 @@ export function describeEvidence(evidence) {
 
   if (evidence.nonJwtAuthorization > 0) {
     return `${evidence.nonJwtAuthorization} request(s) carried a bearer that is not a JWT, so it `
-      + 'was rejected as the wrong kind of token. That portal issues an opaque token this cannot '
-      + 'check the expiry of.'
+      + `was rejected as the wrong kind of token (${evidence.nonJwtBearerShapes.join(', ') || 'shape unknown'}). `
+      + 'A long opaque string means the portal has stopped issuing JWTs and the shape test is what '
+      + 'is wrong; the literal "undefined" or "null" means the app had no token to send and the '
+      + 'session is what is wrong.'
   }
 
   if (evidence.authorizationHeaders === 0) {
@@ -876,6 +880,10 @@ export async function extractBearerToken(options) {
     requests: 0,
     authorizationHeaders: 0,
     nonJwtAuthorization: 0,
+    // What those bearers looked like, never what they were.
+    nonJwtBearerShapes: [],
+    // Why no picture was written, when one was asked for and none appeared.
+    screenshotError: null,
     jsonResponses: 0,
     hosts: new Set(),
     storageKeys: 0,
@@ -993,7 +1001,14 @@ export async function extractBearerToken(options) {
         .then(() => {
           evidence.screenshot = config.screenshotPath
         })
-        .catch(() => {})
+        .catch((error) => {
+          // Swallowing this is how a run reports no picture and no reason for
+          // it, which is indistinguishable from a run that was never asked for
+          // one. A path the browser will not write to -- no extension, no
+          // directory, no permission -- is a fixable mistake, and only its own
+          // message says which.
+          evidence.screenshotError = redact(error?.message ?? 'unknown', secrets).slice(0, 200)
+        })
     }
     page.setDefaultTimeout(config.navigationTimeoutMs)
 
@@ -1191,6 +1206,22 @@ export async function extractBearerToken(options) {
       // A bearer that is not a JWT: worth counting, because it means the
       // capture is working and the shape test is what rejected it.
       evidence.nonJwtAuthorization += 1
+
+      // And worth describing, because the count alone cannot tell apart the
+      // two situations it covers, which need opposite answers. A portal that
+      // has stopped issuing JWTs sends a long opaque string, and the shape
+      // test is then the thing that is wrong. An app that is signed out sends
+      // the word "undefined", and the session is the thing that is wrong.
+      //
+      // The shape only: a length is not a secret, and the three words that are
+      // reported verbatim are not credentials by definition.
+      const shape = ['null', 'undefined', 'false', ''].includes(token)
+        ? `the literal "${token}"`
+        : `${token.length} characters`
+
+      if (!evidence.nonJwtBearerShapes.includes(shape) && evidence.nonJwtBearerShapes.length < 4) {
+        evidence.nonJwtBearerShapes.push(shape)
+      }
     })
 
     // A portal that pushes its approval down a socket rather than answering a
