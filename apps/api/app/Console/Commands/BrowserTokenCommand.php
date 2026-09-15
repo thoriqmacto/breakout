@@ -92,6 +92,7 @@ class BrowserTokenCommand extends Command
             $this->newLine();
             $this->error(sprintf('[%s] %s', $exception->failureCode, $exception->getMessage()));
             $this->reportEvidence($exception->evidence);
+            $this->questionTheUsername($exception->failureCode, $username);
 
             return self::FAILURE;
         }
@@ -144,6 +145,40 @@ class BrowserTokenCommand extends Command
     }
 
     /**
+     * Say the obvious thing about a rejected username, where it can be seen.
+     *
+     * This portal greets people by a display name, and typing that display
+     * name is the single likeliest way to be refused -- it produces a genuine
+     * 401, no device notification is sent, and the run reports exactly what it
+     * was told. The explanation has always been in the failure message, in the
+     * middle of a paragraph, next to four other possibilities. Whether the
+     * username looks like an email address is a fact about *this* run, so it
+     * belongs on its own line at the end, where the eye lands.
+     *
+     * Only on a rejection, and only as a question: a portal whose usernames are
+     * not email addresses is perfectly ordinary, and this must not nag a person
+     * whose username is correct.
+     */
+    private function questionTheUsername(string $failureCode, ?string $username): void
+    {
+        if ($failureCode !== BrowserTokenExtractor::INVALID_CREDENTIALS) {
+            return;
+        }
+
+        if (! is_string($username) || $username === '' || str_contains($username, '@')) {
+            return;
+        }
+
+        $this->newLine();
+        $this->warn(sprintf(
+            'The username supplied was "%s", which is not an email address. If this portal greets '
+            .'you by a display name, it still authenticates on the account email -- and a display '
+            .'name typed here is refused exactly like a wrong password, with no notification sent.',
+            $username,
+        ));
+    }
+
+    /**
      * How long to hold the run open for a device approval.
      *
      * A person is at the keyboard here, so the configured wait applies; the
@@ -189,7 +224,7 @@ class BrowserTokenCommand extends Command
                 // sends someone to look for a notification that may not exist.
                 'awaiting_device_approval' => ($event['signal'] ?? null) === null
                     ? $this->warn(sprintf(
-                        '  unfinished    the login did not complete; holding %ds in case you are approving it',
+                        '  unfinished    the login did not complete; holding up to %ds in case you are approving it',
                         $approvalWait,
                     ))
                     : $this->warn(sprintf(
@@ -276,6 +311,19 @@ class BrowserTokenCommand extends Command
                 ),
                 default => null,
             },
+            // Which request was refused, and when. Without it, "the portal
+            // rejected those credentials" is a claim with nothing behind it,
+            // and the operator's only move is to re-type a password that was
+            // never the problem.
+            'refused' => is_string($evidence['rejected_by'] ?? null)
+                ? sprintf(
+                    '%s%s',
+                    $evidence['rejected_by'],
+                    isset($evidence['rejected_after_ms'])
+                        ? sprintf(', %.0fs after the submit', ((int) $evidence['rejected_after_ms']) / 1000)
+                        : '',
+                )
+                : null,
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
             'screenshot' => $evidence['screenshot'] ?? null,

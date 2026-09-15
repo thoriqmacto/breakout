@@ -497,6 +497,10 @@ function startApprovalPortal({
   const appPageHtml = `<!doctype html>
 <html><body><div id="app">signed in</div>
   <script>
+    // Every app does this on load, signed in or not, and signed out it is
+    // answered 401 -- on a POST, to a path with "auth" in it. A probe opens
+    // this page deliberately signed out, so a probe provokes one every time.
+    fetch('/api/auth/refresh', { method: 'POST' }).catch(() => {});
     localStorage.setItem('trustedDevice', JSON.stringify({ token: 'not-a-jwt', approved: true }));
     localStorage.setItem('sb_session', JSON.stringify({ access_token: ${JSON.stringify(FAKE_JWT)} }));
     fetch('/api/me', { headers: { Authorization: 'Bearer ' + ${JSON.stringify(FAKE_JWT)} } });
@@ -537,6 +541,12 @@ function startApprovalPortal({
   </form>
   <div id="status"></div>
   <script>
+    // The shell boots and tries to resume a session before it knows it has
+    // none -- a POST, on a path with "auth" in it, answered 401. Real apps do
+    // this on every load, which is why opening one in a probe manufactures the
+    // exact response that used to be read as a refused password.
+    fetch('/api/auth/refresh', { method: 'POST' }).catch(() => {});
+
     document.getElementById('f').addEventListener('submit', async (event) => {
       event.preventDefault();
       const response = await fetch('/api/auth/login', {
@@ -685,6 +695,46 @@ function startApprovalPortal({
         'set-cookie': 'session=1; Path=/',
       })
       response.end(JSON.stringify({ data: { access_token: FAKE_JWT } }))
+
+      return
+    }
+
+    // What a signed-out app asks for on load, and is refused. A POST, on a
+    // path with "auth" in it -- indistinguishable, to a listener, from the
+    // portal refusing a password. A probe opens the app signed out on purpose,
+    // so a probe provokes one of these every single time.
+    if (url === '/api/auth/refresh' && request.method === 'POST') {
+      if (!cookies.includes('session=1')) {
+        response.writeHead(401, { 'content-type': 'application/json' })
+        response.end(JSON.stringify({ message: 'Token expired.' }))
+
+        return
+      }
+
+      response.writeHead(200, { 'content-type': 'application/json' })
+      response.end(JSON.stringify({ data: { access_token: FAKE_JWT } }))
+
+      return
+    }
+
+    // The same discovery by GET, from the waiting page itself.
+    if (url === '/api/user/session') {
+      if (!cookies.includes('session=1')) {
+        response.writeHead(401, { 'content-type': 'application/json' })
+        response.end(JSON.stringify({ message: 'Unauthenticated.' }))
+
+        return
+      }
+
+      response.writeHead(200, { 'content-type': 'application/json' })
+      response.end(JSON.stringify({ data: { id: 1 } }))
+
+      return
+    }
+
+    if (url === '/api/heartbeat') {
+      response.writeHead(200, { 'content-type': 'application/json' })
+      response.end(JSON.stringify({ data: { alive: true } }))
 
       return
     }
@@ -1982,6 +2032,94 @@ const APPROVAL_SELECTORS = {
       expect(
         error.evidence?.held_open_unconfirmed === true,
         'the run did not record that it held the login open',
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+
+{
+  // The run this was reported from, twice, with a correct password: the probe
+  // opens the app signed out, the app posts to its refresh endpoint, the
+  // portal answers 401 -- and that was read as the password being refused. It
+  // ended at 21 seconds every time: fifteen to the first probe, three for it
+  // to settle, one for the race, one to notice.
+  //
+  // The approval lands after the first probe, so a run that believes the probe
+  // cannot survive to collect it.
+  // Unannounced, as the real runs were: the terminal said "unfinished", which
+  // means no approval signal -- and it is exactly then that a refusal ends the
+  // hold. Announced, the hold survives a spurious refusal by accident, and a
+  // scenario written that way passes against the bug it is meant to catch.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 25_000,
+    poll: false,
+    announce: false,
+  })
+
+  try {
+    await check('a 401 the probe provoked is not the portal refusing the password', async () => {
+      const result = await extractBearerToken({
+        loginUrl: `http://127.0.0.1:${port}/login`,
+        // Set, as it is in production: this is what the probe opens, and it is
+        // the page that posts the refresh.
+        postLoginUrl: `http://127.0.0.1:${port}/login`,
+        username: VALID_USER,
+        password: VALID_PASSWORD,
+        selectors: APPROVAL_SELECTORS,
+        approvalWaitMs: 60_000,
+        approvalProbeMs: 5_000,
+        timeoutMs: 12_000,
+      })
+
+      expect(result.token === FAKE_JWT, `the wrong token came back from ${result.source}`)
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  // And when such a run does end without a token, it must not say the password
+  // was wrong -- it must say which request was refused, and when.
+  const { server, port } = await startApprovalPortal({
+    grantAfterMs: 600_000,
+    poll: false,
+    announce: false,
+  })
+
+  try {
+    await check('a refusal seen during the hold is named, not pinned on the password', async () => {
+      let error = null
+
+      try {
+        await extractBearerToken({
+          loginUrl: `http://127.0.0.1:${port}/login`,
+          postLoginUrl: `http://127.0.0.1:${port}/login`,
+          username: VALID_USER,
+          password: VALID_PASSWORD,
+          selectors: APPROVAL_SELECTORS,
+          approvalWaitMs: 8_000,
+          approvalProbeMs: 2_000,
+          timeoutMs: 12_000,
+        })
+      } catch (thrown) {
+        error = thrown
+      }
+
+      expect(error !== null, 'this fixture never grants, so no token can exist')
+      expect(
+        error.code !== ExtractionError.INVALID_CREDENTIALS,
+        `an accepted password was reported as rejected: ${error.message}`,
+      )
+
+      // The probe's refusals are counted and discarded, so they can be seen to
+      // have been discarded rather than merely not mentioned.
+      expect(
+        (error.evidence?.probe_rejections ?? 0) > 0,
+        'the probe provoked no refusal, so this scenario proves nothing',
       )
     })
   } finally {
