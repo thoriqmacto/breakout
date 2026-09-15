@@ -257,6 +257,9 @@ export function summariseEvidence(evidence) {
     approval_granted: evidence.approvalGranted,
     approval_waited_ms: evidence.approvalWaitedMs,
     auth_rejections: evidence.authRejections,
+    rejected_by: evidence.rejectedBy,
+    rejected_after_ms: evidence.rejectedAfterMs,
+    probe_rejections: evidence.probeRejections,
     websockets: evidence.websockets,
     websocket_frames: evidence.websocketFrames,
     held_open_unconfirmed: evidence.heldOpenUnconfirmed,
@@ -284,7 +287,11 @@ export function describeEvidence(evidence) {
   if (evidence.heldOpenUnconfirmed && !evidence.approvalGranted) {
     return 'The credentials were accepted -- the login form went -- but the portal never issued a '
       + 'session, and nothing it said explained why. The run waited in case an approval was '
-      + 'outstanding on another device, and none arrived. The screenshot is the thing to look at.'
+      + 'outstanding on another device, and none arrived.'
+      + (evidence.rejectedBy === null
+        ? ' Nothing was refused while it waited.'
+        : ` One refusal was seen while it waited, ${evidence.rejectedAfterMs === null ? 'at an unknown time' : `${Math.round(evidence.rejectedAfterMs / 1000)}s after the submit`}: ${evidence.rejectedBy}. That is too late to be the login's own answer.`)
+      + ' The screenshot is the thing to look at.'
   }
 
   if (evidence.authorizationHeaders === 0 && evidence.storageKeys === 0 && evidence.cookies === 0) {
@@ -812,6 +819,8 @@ export async function extractBearerToken(options) {
    * says "not yet" with a 200 and the approval in the body, so every weaker
    * test for it has been true of runs where no session existed at all.
    */
+  let probePage = null
+
   let approvalGranted = false
 
   /**
@@ -822,6 +831,9 @@ export async function extractBearerToken(options) {
    * as an approval signal they would put every run into an approval wait.
    */
   let submitted = false
+
+  /** When the form was submitted, so a refusal can be placed in time. */
+  let submittedAt = null
 
   const noteApproval = (signal) => {
     if (approvalSignal !== null) return
@@ -916,6 +928,14 @@ export async function extractBearerToken(options) {
     // on the login page. An approval is the usual reason; it is not proof of
     // one, so it is reported as what it is.
     heldOpenUnconfirmed: false,
+    // The refusal that decided the verdict, and how long after the submit it
+    // arrived. A refusal one second in is the login being answered; one thirty
+    // seconds in is something else entirely, and telling them apart was
+    // impossible from a count.
+    rejectedBy: null,
+    rejectedAfterMs: null,
+    // Refusals the probe's own tab provoked, and which were therefore ignored.
+    probeRejections: 0,
     // Rejections seen on an authentication URL. A count rather than a latch:
     // one of these is a verdict on the password only when nothing afterwards
     // contradicts it.
@@ -1037,6 +1057,45 @@ export async function extractBearerToken(options) {
         // merely waiting came to be reported as a bad password.
         if (response.request().method().toUpperCase() !== 'POST') {
           return
+        }
+
+        // And never the probe's. Narrowing to the POST was not enough: an app
+        // opened signed out posts to its own refresh endpoint and is answered
+        // 401, so every probe manufactured the very response it was sent to
+        // look past. Which tab a response belongs to settles it; when that
+        // cannot be told and a probe is open, the probe is assumed, because
+        // the cost of ignoring a real refusal is a longer wait and the cost of
+        // believing a false one is the whole run.
+        if (probePage !== null) {
+          let owner = null
+
+          try {
+            owner = response.frame()?.page?.() ?? null
+          } catch {
+            // A response whose frame has gone cannot be attributed.
+          }
+
+          if (owner === null || owner === probePage) {
+            evidence.probeRejections += 1
+
+            return
+          }
+        }
+
+        // Which refusal this was, so the next round is a diagnosis rather than
+        // a guess. Host and path only -- both already public, being the site
+        // this is signing in to -- never the query, which can carry a token,
+        // and never the body.
+        if (evidence.rejectedBy === null) {
+          try {
+            const at = new URL(url)
+
+            evidence.rejectedBy = `POST ${at.host}${at.pathname} ${status}`
+          } catch {
+            evidence.rejectedBy = `POST ${status}`
+          }
+
+          evidence.rejectedAfterMs = submittedAt === null ? null : Date.now() - submittedAt
         }
 
         // Otherwise ask the body. A portal that wants a device approved says
@@ -1281,6 +1340,7 @@ export async function extractBearerToken(options) {
       // holding when the run started.
       accepting = true
       submitted = true
+      submittedAt = Date.now()
       report('submitted_credentials')
     }
 
@@ -1341,6 +1401,7 @@ export async function extractBearerToken(options) {
 
         try {
           sheet = await context.newPage()
+          probePage = sheet
 
           // Bounded on its own, so a probe that hangs cannot eat the wait it
           // is meant to be checking during. A look that takes fifteen seconds
@@ -1358,6 +1419,7 @@ export async function extractBearerToken(options) {
         } catch {
           // A probe that will not load says nothing either way.
         } finally {
+          probePage = null
           await sheet?.close().catch(() => {})
         }
       }
@@ -1376,10 +1438,13 @@ export async function extractBearerToken(options) {
           break
         }
 
-        // A genuine refusal of the credentials, arriving late. Nothing is
-        // being waited for any more, and holding the full three minutes to
-        // report a password the portal has already answered helps nobody.
-        if (credentialsRejected && approvalSignal === null) break
+        // A refusal arriving *during* the hold no longer ends it. The login
+        // call is answered within a second or two, and a refusal that fast has
+        // already stopped the hold from starting -- so anything that turns up
+        // later is some other request being told it has no session, which is
+        // the state being waited out rather than a verdict on it. Ending the
+        // wait on one cost two runs their approval while the password was
+        // perfectly good.
 
         // The session can appear in storage before the page reflects it.
         const scan = await findTokenInStorage(page, config.tokenKeys)
@@ -1571,9 +1636,12 @@ export async function extractBearerToken(options) {
       && !credentialsRejected
       && page.url().startsWith(loginUrl)
 
+    let heldOpen = false
+
     if (!outcome && !approvalGranted && (approvalSignal !== null || loginUnfinished)) {
       if (approvalSignal === null) evidence.heldOpenUnconfirmed = true
 
+      heldOpen = true
       outcome = await awaitDeviceApproval()
     }
 
@@ -1676,8 +1744,11 @@ export async function extractBearerToken(options) {
     }
 
     // A refusal only stands as a verdict on the credentials if no approval was
-    // ever asked for. Once one has been, the portal has already accepted them.
-    if (credentialsRejected && approvalSignal === null) {
+    // ever asked for, and if the login was not held open. A hold only begins
+    // when nothing had been refused, so a refusal recorded during one arrived
+    // too late to be the login's own answer -- it is named in the evidence
+    // instead of being pinned on a password that was accepted.
+    if (credentialsRejected && approvalSignal === null && !heldOpen) {
       throw new TokenExtractionError(
         ExtractionError.INVALID_CREDENTIALS,
         'The portal rejected those credentials.',

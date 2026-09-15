@@ -311,6 +311,19 @@ class BrowserTokenCommand extends Command
                 ),
                 default => null,
             },
+            // Which request was refused, and when. Without it, "the portal
+            // rejected those credentials" is a claim with nothing behind it,
+            // and the operator's only move is to re-type a password that was
+            // never the problem.
+            'refused' => is_string($evidence['rejected_by'] ?? null)
+                ? sprintf(
+                    '%s%s',
+                    $evidence['rejected_by'],
+                    isset($evidence['rejected_after_ms'])
+                        ? sprintf(', %.0fs after the submit', ((int) $evidence['rejected_after_ms']) / 1000)
+                        : '',
+                )
+                : null,
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
             'screenshot' => $evidence['screenshot'] ?? null,
