@@ -292,6 +292,8 @@ export function summariseEvidence(evidence) {
     probe_rejections: evidence.probeRejections,
     page_errors: evidence.pageErrors,
     console_errors: evidence.consoleErrors,
+    launch_error: evidence.launchError,
+    headful_ignored: evidence.headfulIgnored,
     captcha_requests: evidence.captchaRequests,
     captcha_challenged: evidence.captchaChallenged,
     websockets: evidence.websockets,
@@ -1051,6 +1053,13 @@ export async function extractBearerToken(options) {
     // line, the first time it happens.
     pageErrors: [],
     consoleErrors: [],
+    // Why the browser would not start, when it would not start. Surfaced
+    // through evidence because that is the channel that survives the trip to
+    // the operator; the child's own message does not.
+    launchError: null,
+    // Whether a request for a window was silently disregarded, which makes the
+    // whole run unusable as evidence about anything a window would change.
+    headfulIgnored: false,
     // Requests to a captcha service, and whether one put up a challenge.
     //
     // The most likely thing an automated browser awaits forever: a scored
@@ -1089,22 +1098,53 @@ export async function extractBearerToken(options) {
         )
       }
     } catch (error) {
-      // A headful run on a server without a display fails here, and the
-      // stock advice -- reinstall Chromium -- sends the operator to reinstall
-      // a browser that is already present and working. The cause is named
-      // instead, with the one command that fixes it.
-      const needsDisplay = !config.headless
-        && /display|x server|xvfb/i.test(String(error.message ?? ''))
+      const said = String(error.message ?? '')
+
+      // Why it would not start, in the operator's terms rather than
+      // Playwright's. Four causes reach this line and only one of them is
+      // "Chromium is not installed", which is the only one the stock advice
+      // addresses -- and following it means reinstalling a browser that is
+      // already there and working headless.
+      let hint = 'Install it with "npx playwright install --with-deps chromium".'
+
+      if (!config.headless && /display|x server|xvfb|DISPLAY/i.test(said)) {
+        hint = 'A headful run needs a display. On a server: "sudo apt-get install -y xvfb", '
+          + 'then run the command under "xvfb-run -a".'
+      } else if (/lib[a-z0-9_.+-]*\.so|shared librar/i.test(said)) {
+        // Headless shell needs far fewer system libraries than a windowed
+        // Chromium, so a box that has run headless for months can still be
+        // missing everything a headful one wants.
+        hint = 'Chromium is present but a system library it needs is not -- a headful run wants '
+          + 'several a headless one does not. Install them with '
+          + '"npx playwright install-deps chromium", or "sudo apt-get install -y libgtk-3-0 '
+          + 'libgbm1 libasound2t64 libnss3 libxss1".'
+      }
+
+      // Carried as evidence, not only in the message: PHP replaces the child's
+      // message with its own explanation for the failure code, so anything
+      // said only here is discarded before an operator sees it. That is how a
+      // launch failure arrived reading "Install it, or point
+      // BROWSER_AUTH_CHROMIUM_PATH at an existing one" under a box where
+      // Chromium was installed and the path was already correct.
+      evidence.launchError = `${redact(said, secrets).replace(/\s+/g, ' ').trim().slice(0, 300)} -- ${hint}`
 
       throw new TokenExtractionError(
         ExtractionError.BROWSER_LAUNCH_FAILED,
-        `Could not launch Chromium: ${redact(error.message, secrets)}. `
-          + (needsDisplay
-            ? 'A headful run needs a display. On a server: "sudo apt-get install -y xvfb", '
-              + 'then run the command under "xvfb-run -a".'
-            : 'Install it with "npx playwright install --with-deps chromium".'),
+        `Could not launch Chromium: ${redact(said, secrets)}. ${hint}`,
         { cause: error },
       )
+    }
+
+    // A headful run that was not one.
+    //
+    // chrome-headless-shell does not refuse `headless: false`. It accepts the
+    // request, ignores it and launches headless anyway, reporting success --
+    // so a run asked to open a window against that binary produces a result
+    // that looks like a headful run and is not one. Every conclusion drawn
+    // from comparing it against a headless run would be drawn from comparing
+    // headless with headless.
+    if (!config.headless && /headless[_-]?shell/i.test(config.executablePath ?? '')) {
+      evidence.headfulIgnored = true
     }
 
     const page = context.pages()[0] ?? (await context.newPage())

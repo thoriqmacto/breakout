@@ -2053,8 +2053,32 @@ half of that and does nothing about the second, so the sharper test is to run wi
 
 ```bash
 sudo apt-get install -y xvfb
-xvfb-run -a php artisan browser:token --headful --username=you@example.com --screenshot=/tmp/sb
+# Ask first whether this box can open a window at all -- it takes no credentials
+# and costs seconds, where finding out during a login costs a whole attempt.
+sudo -u www-data xvfb-run -a php artisan browser:check --headful
+sudo -u www-data xvfb-run -a php artisan browser:token --headful --username=you@example.com --screenshot=/tmp/sb
 ```
+
+**A headless launch passing says nothing about a windowed one**, and `browser:check` asked only the
+first question until it was given `--headful`. A windowed Chromium wants system libraries a headless
+one does not (`libgtk-3-0`, `libgbm1`, `libasound2t64`), and it wants a display; both report as
+"Chromium could not start", and the `launch` line says which.
+
+**`chrome-headless-shell` will not tell you it ignored you.** Playwright ships two binaries, and a
+box provisioned for headless collection frequently has only the shell, with
+`BROWSER_AUTH_CHROMIUM_PATH` pointing straight at it. Asked for a window, the shell does not refuse:
+it accepts the request, launches headless anyway, and reports success — so a `--headful` run against
+it looks like a windowed run, is not one, and any comparison drawn from it compares headless with
+headless. `browser:check --headful` refuses that binary outright, and a login run that hits it prints
+
+```
+  not headful      a window was asked for and silently not given -- BROWSER_AUTH_CHROMIUM_PATH is
+                   Playwright's headless shell, which ignores the request. This ran headless.
+```
+
+The fix is either the full build (`npx playwright install --with-deps chromium`, then point
+`BROWSER_AUTH_CHROMIUM_PATH` at it) or unsetting `BROWSER_AUTH_CHROMIUM_PATH` entirely and letting
+Playwright pick the right binary for each mode.
 
 If a login that sends nothing headless sends it under xvfb, the captcha is established as the cause
 rather than inferred, and `BROWSER_AUTH_HEADLESS=false` makes it the default — at the price of an
