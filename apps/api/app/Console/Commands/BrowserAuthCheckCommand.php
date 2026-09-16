@@ -22,7 +22,9 @@ use Symfony\Component\Process\Process;
  */
 class BrowserAuthCheckCommand extends Command
 {
-    protected $signature = 'browser:check {--json : Machine-readable output}';
+    protected $signature = 'browser:check
+                            {--json : Machine-readable output}
+                            {--headful : Prove a windowed launch rather than a headless one, which is a different question with a different answer}';
 
     protected $description = 'Check whether a headless login could run as the current user.';
 
@@ -288,7 +290,15 @@ class BrowserAuthCheckCommand extends Command
         }
 
         try {
-            $process = $extractor->runProbe('launch-probe.mjs', 60);
+            $process = $extractor->runProbe(
+                'launch-probe.mjs',
+                60,
+                // Asking the question the operator asked. A headless launch
+                // passing says nothing about a windowed one: the headless
+                // shell cannot open a window at all, and a windowed Chromium
+                // wants system libraries a headless one does not.
+                $this->option('headful') ? false : null,
+            );
         } catch (\Throwable $exception) {
             return ['ok' => false, 'detail' => $exception->getMessage()];
         }

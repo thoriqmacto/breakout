@@ -307,7 +307,12 @@ class BrowserTokenCommand extends Command
             // navigated anywhere: the only observation that speaks to whether
             // the login itself worked.
             'after submit' => $evidence['url_after_submit'] ?? null,
+            // Only when there was a login to have a form. A browser that never
+            // started reported "form gone: no -- the login was refused" under
+            // a run where no page was opened and no password was sent: the
+            // field defaults to false, and false is rendered as a verdict.
             'form gone' => array_key_exists('login_form_gone', $evidence)
+                && ($evidence['launch_error'] ?? null) === null
                 ? ($evidence['login_form_gone'] ? 'yes' : 'no -- the login was refused')
                 : null,
             'approval' => match (true) {
@@ -344,6 +349,19 @@ class BrowserTokenCommand extends Command
             'credentials' => ($evidence['login_form_gone'] ?? false) === true
                 && (int) ($evidence['credential_posts'] ?? 0) === 0
                 ? '<fg=red>never sent -- the form went, and nothing carried them to the portal</>'
+                : null,
+            // A window that was asked for and not given. Printed loudly,
+            // because the run otherwise looks like a successful headful one
+            // and any conclusion drawn from it would be worthless.
+            'not headful' => ($evidence['headful_ignored'] ?? false) === true
+                ? '<fg=red>a window was asked for and silently not given -- BROWSER_AUTH_CHROMIUM_PATH '
+                    .'is Playwright\'s headless shell, which ignores the request. This ran headless.</>'
+                : null,
+            // Why the browser would not start. Without it the only advice on
+            // offer is "install Chromium", which is wrong for three of the
+            // four reasons a launch fails.
+            'launch' => is_string($evidence['launch_error'] ?? null) && $evidence['launch_error'] !== ''
+                ? $evidence['launch_error']
                 : null,
             // Why a submit might send nothing: the handler threw, or it is
             // still awaiting something. The page is the only witness to both.

@@ -457,9 +457,16 @@ class BrowserTokenExtractor
      * The filename is always a literal from this codebase; basename() is there
      * so it stays that way if a future caller is careless.
      */
-    public function runProbe(string $filename, int $timeoutSeconds = 90): Process
+    public function runProbe(string $filename, int $timeoutSeconds = 90, ?bool $headless = null): Process
     {
         $environment = $this->childEnvironment() ?? [];
+
+        // Only when asked. A probe that inherited the configured default would
+        // make "can this box open a window?" unaskable on a box configured for
+        // headless -- which is every box that needs the question answered.
+        if ($headless === false) {
+            $environment['BROWSER_AUTH_HEADLESS'] = 'false';
+        }
 
         foreach ([
             'BROWSER_AUTH_CHROMIUM_PATH' => config('browser_auth.chromium_path'),
@@ -613,6 +620,28 @@ class BrowserTokenExtractor
                     ' The portal asked for this login to be approved on another device and waited %.0fs for it.',
                     $count('approval_waited_ms') / 1000,
                 );
+        }
+
+        // Why the browser would not start, when that is the failure. The
+        // generic explanation for this code -- install Chromium, or point
+        // BROWSER_AUTH_CHROMIUM_PATH at an existing one -- is right for
+        // exactly one of the reasons a launch fails, and was printed on a box
+        // where Chromium was installed and the path was already correct. The
+        // child knows which reason it was; this is the only channel by which
+        // it reaches anyone, since the child's own message is replaced above.
+        if (is_string($evidence['launch_error'] ?? null) && $evidence['launch_error'] !== '') {
+            return ' '.$evidence['launch_error'];
+        }
+
+        // A window asked for and silently not given. Said before anything
+        // else the run concluded, because it decides whether the run is
+        // evidence about a headful browser at all -- and it is not.
+        if (($evidence['headful_ignored'] ?? false) === true) {
+            $approval = ' This did not run with a window despite being asked to: '
+                .'BROWSER_AUTH_CHROMIUM_PATH is Playwright\'s headless shell, which accepts the '
+                .'request and ignores it. Whatever else is reported here, it is not evidence about '
+                .'what a windowed browser would do.'
+                .$approval;
         }
 
         // The fact that reframes every count below it. "Signed in, but no

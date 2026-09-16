@@ -826,6 +826,147 @@ class BrowserTokenApprovalTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * Why the browser would not start has to survive the trip to the operator.
+     *
+     * PHP replaces the child's message with its own explanation for the
+     * failure code, so a reason the child worked out and said only there is
+     * discarded before anyone reads it. A headful run on a box with only
+     * Playwright's headless shell therefore reported "Chromium could not start
+     * on this server. Install it, or point BROWSER_AUTH_CHROMIUM_PATH at an
+     * existing one" -- on a box where Chromium was installed, the path was
+     * correct, and neither was the problem.
+     */
+    public function test_why_the_browser_would_not_start_reaches_the_operator(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'BROWSER_LAUNCH_FAILED',
+            'message' => 'the child message is replaced and must not be relied on',
+            'evidence' => [
+                'requests' => 0,
+                'hosts' => [],
+                'launch_error' => 'Failed to launch: chrome-headless-shell -- BROWSER_AUTH_CHROMIUM_PATH '
+                    ."points at Playwright's headless shell, which cannot open a window.",
+            ],
+        ]));
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have failed.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertStringContainsString('headless shell', $exception->getMessage());
+
+            // And the counts it would otherwise recite, which are all zero and
+            // explain nothing, give way to the reason.
+            $this->assertStringNotContainsString('0 request(s)', $exception->getMessage());
+        }
+    }
+
+    public function test_the_launch_failure_is_printed_as_its_own_line(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'BROWSER_LAUNCH_FAILED',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 0,
+                'hosts' => [],
+                'launch_error' => 'Missing X server or $DISPLAY -- A headful run needs a display.',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('A headful run needs a display')
+            ->assertFailed();
+    }
+
+    /**
+     * And a browser that never started has no login to report on.
+     *
+     * login_form_gone defaults to false, and false is rendered as a verdict --
+     * so a launch failure printed "form gone: no -- the login was refused"
+     * under a run where no page was opened and no password was sent.
+     */
+    public function test_a_failed_launch_does_not_claim_the_login_was_refused(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'BROWSER_LAUNCH_FAILED',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 0,
+                'hosts' => [],
+                'login_form_gone' => false,
+                'launch_error' => 'Failed to launch -- Install it with "npx playwright install".',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->doesntExpectOutputToContain('the login was refused')
+            ->assertFailed();
+    }
+
+    /**
+     * A window asked for and silently not given.
+     *
+     * Playwright's chrome-headless-shell does not refuse `headless: false`. It
+     * accepts the request, ignores it, and launches headless anyway, reporting
+     * success -- verified directly, against the binary, with no display
+     * present. So a box pointed at the shell produces a run that reads as a
+     * successful headful one and is not one, and every conclusion drawn from
+     * comparing it against a headless run compares headless with headless.
+     */
+    public function test_a_headful_run_that_was_not_one_says_so(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 3000,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'headful_ignored' => true,
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('a window was asked for and silently not given')
+            ->assertFailed();
+    }
+
+    public function test_the_summary_disowns_a_run_that_was_not_headful(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 3000,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'headful_ignored' => true,
+            ],
+        ]));
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have failed.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertStringContainsString('did not run with a window', $exception->getMessage());
+            $this->assertStringContainsString(
+                'not evidence about what a windowed browser would do',
+                $exception->getMessage(),
+            );
+        }
+    }
+
     private function job(): string
     {
         $this->assertFileExists($this->jobPath(), 'the child was never handed a job');
