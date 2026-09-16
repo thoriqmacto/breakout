@@ -257,6 +257,7 @@ export function summariseEvidence(evidence) {
     approval_granted: evidence.approvalGranted,
     approval_waited_ms: evidence.approvalWaitedMs,
     auth_rejections: evidence.authRejections,
+    login_posts: evidence.loginPosts,
     rejected_by: evidence.rejectedBy,
     rejected_after_ms: evidence.rejectedAfterMs,
     probe_rejections: evidence.probeRejections,
@@ -269,6 +270,7 @@ export function summariseEvidence(evidence) {
     non_jwt_authorization: evidence.nonJwtAuthorization,
     non_jwt_bearer_shapes: evidence.nonJwtBearerShapes,
     screenshot_error: evidence.screenshotError,
+    waiting_screenshot: evidence.waitingScreenshot,
     json_responses: evidence.jsonResponses,
     storage_keys: evidence.storageKeys,
     cookies: evidence.cookies,
@@ -622,6 +624,13 @@ export function urlLooksApproval(url, hints = DEFAULT_APPROVAL_URL_HINTS) {
   return hints.some((hint) => typeof hint === 'string' && hint !== '' && path.includes(hint.toLowerCase()))
 }
 
+/** One line describing a post the login made: where, what it answered, and when. */
+function sprintfPost(where, status, submittedAt) {
+  const after = submittedAt === null ? '' : `, ${((Date.now() - submittedAt) / 1000).toFixed(1)}s after the submit`
+
+  return `POST ${where} ${status}${after}`
+}
+
 /** Does this text read like a portal waiting on another device? */
 export function mentionsApproval(text, hints = DEFAULT_APPROVAL_TEXT_HINTS) {
   if (typeof text !== 'string' || text === '') return false
@@ -884,6 +893,9 @@ export async function extractBearerToken(options) {
     nonJwtBearerShapes: [],
     // Why no picture was written, when one was asked for and none appeared.
     screenshotError: null,
+    // The page at the moment the login stalled, as distinct from the page it
+    // was on when the run gave up.
+    waitingScreenshot: null,
     jsonResponses: 0,
     hosts: new Set(),
     storageKeys: 0,
@@ -940,6 +952,9 @@ export async function extractBearerToken(options) {
     // arrived. A refusal one second in is the login being answered; one thirty
     // seconds in is something else entirely, and telling them apart was
     // impossible from a count.
+    // Every login-shaped POST the page made after the credentials went in, in
+    // order. Empty means nothing was ever submitted.
+    loginPosts: [],
     rejectedBy: null,
     rejectedAfterMs: null,
     // Refusals the probe's own tab provoked, and which were therefore ignored.
@@ -1033,6 +1048,31 @@ export async function extractBearerToken(options) {
       }
 
       const status = response.status()
+
+      // Whether the credentials were ever actually sent, and what came back.
+      //
+      // The single fact that separates the three ways this fails, and the one
+      // the evidence could not express: a run that never posted anything (the
+      // submit control was not the one that submits, or the portal blocked the
+      // attempt), a run whose post was refused, and a run whose post was
+      // accepted and still produced no session. All three end identically --
+      // form gone, no token, back on the login page.
+      //
+      // Posts the probe provoked are not this. The app posts to its refresh
+      // endpoint whenever it loads, signed out, which is every probe.
+      if (submitted
+        && evidence.loginPosts.length < 3
+        && probePage === null
+        && response.request().method().toUpperCase() === 'POST'
+        && /login|auth|token|session/i.test(url)) {
+        try {
+          const at = new URL(url)
+
+          evidence.loginPosts.push(sprintfPost(at.host + at.pathname, status, submittedAt))
+        } catch {
+          evidence.loginPosts.push(sprintfPost('(unparseable)', status, submittedAt))
+        }
+      }
 
       // A refusal on an authentication URL. Three different things arrive
       // here looking identical, and only one of them is a bad password:
@@ -1402,6 +1442,25 @@ export async function extractBearerToken(options) {
       const until = waitingSince + waitMs
 
       report('awaiting_device_approval', { wait_ms: waitMs, signal: approvalSignal })
+
+      // The page as it is *now*, which is the state that explains the failure.
+      // The picture taken at the end is of somewhere else: by then the run has
+      // opened the post-login page and been sent back to the login screen, so
+      // it shows a bounce-back rather than whatever the portal put up when the
+      // credentials went in. A sibling file, so the two are never confused.
+      if (config.screenshotPath && !evidence.waitingScreenshot) {
+        const waitingPath = config.screenshotPath.replace(/(\.[a-z]+)$/i, '-waiting$1')
+
+        await page
+          .screenshot({ path: waitingPath, fullPage: true })
+          .then(() => {
+            evidence.waitingScreenshot = waitingPath
+          })
+          .catch((error) => {
+            evidence.screenshotError = evidence.screenshotError
+              ?? redact(error?.message ?? 'unknown', secrets).slice(0, 200)
+          })
+      }
 
       /**
        * Ask the portal whether the session exists yet, without touching the

@@ -248,6 +248,14 @@ class BrowserTokenExtractor
             'approval_url_hints' => (array) config('browser_auth.approval_url_hints'),
             'approval_text_hints' => (array) config('browser_auth.approval_text_hints'),
             'device_trust_keys' => (array) config('browser_auth.device_trust_keys'),
+            // Null unless configured, which leaves Playwright's own -- and
+            // leaves it saying HeadlessChrome, which is what a portal running
+            // bot detection reads first.
+            'user_agent' => (static function (): ?string {
+                $agent = config('browser_auth.user_agent');
+
+                return is_string($agent) && trim($agent) !== '' ? trim($agent) : null;
+            })(),
             'token_keys' => (array) config('browser_auth.token_keys'),
             'url_hints' => (array) config('browser_auth.url_hints'),
             'chromium_path' => config('browser_auth.chromium_path'),

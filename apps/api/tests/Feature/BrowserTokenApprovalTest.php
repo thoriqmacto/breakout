@@ -364,6 +364,120 @@ class BrowserTokenApprovalTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * Whether anything was submitted at all, which nothing could previously say.
+     *
+     * A run that never posted the credentials, a run whose post was refused,
+     * and a run whose post was accepted and still produced no session all end
+     * the same way from the outside: the form is gone, there is no token, and
+     * the page is back on the login screen. They need entirely different work.
+     */
+    public function test_the_login_post_and_its_answer_are_reported(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4373,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'login_posts' => ['POST exodus.stockbit.com/login 200, 1.4s after the submit'],
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('POST exodus.stockbit.com/login 200, 1.4s after the submit')
+            ->assertFailed();
+    }
+
+    /**
+     * And the case that matters most: the form went, and nothing was sent.
+     */
+    public function test_a_submit_that_posted_nothing_says_so(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4373,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'login_posts' => [],
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('none -- nothing was ever posted')
+            ->assertFailed();
+    }
+
+    public function test_the_page_when_it_stalled_is_reported_separately(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 10,
+                'hosts' => ['stockbit.com'],
+                'waiting_screenshot' => '/tmp/sb-waiting.png',
+                'screenshot' => '/tmp/sb.png',
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('/tmp/sb-waiting.png')
+            ->assertFailed();
+    }
+
+    /**
+     * The one thing the browser says about itself that a portal reads first.
+     *
+     * Playwright's default user agent is `HeadlessChrome/<version>`. The
+     * extraction script has always accepted an override and the PHP side never
+     * sent one, so the .env value that would set it did not exist and the
+     * option was unreachable -- a capability present end to end except for the
+     * last link.
+     */
+    public function test_a_configured_user_agent_reaches_the_child(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.user_agent' => 'Mozilla/5.0 (X11; Linux x86_64) Chrome/141.0.0.0']);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"user_agent":"Mozilla\/5.0 (X11; Linux x86_64) Chrome\/141.0.0.0"', $this->job());
+    }
+
+    /**
+     * And unset stays unset: the default is the browser's own, not a disguise
+     * this chose on somebody's behalf.
+     */
+    public function test_no_user_agent_is_sent_when_none_is_configured(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.user_agent' => null]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"user_agent":null', $this->job());
+    }
+
     public function test_the_wait_can_be_switched_off_for_one_run(): void
     {
         $this->configureWith(

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfigureCors
@@ -20,6 +21,26 @@ class ConfigureCors
 
         if ($isAllowedOrigin) {
             $this->addCorsHeaders($request, $response, $origin);
+
+            return $response;
+        }
+
+        // A rejected origin is otherwise completely silent: the preflight
+        // answers 204 with no Access-Control-Allow-Origin, the browser says
+        // only that the header is missing, and nothing on this side records
+        // that an origin was offered and turned down. The one fact that
+        // resolves it -- which origin, against how many configured -- is known
+        // right here and nowhere else.
+        //
+        // The allowlist itself is not logged. The count is enough to tell a
+        // list that is missing an entry from one that was never configured,
+        // and the browser's Origin is not a secret.
+        if ($origin !== '') {
+            Log::warning('CORS: rejected an origin that is not in the allowlist.', [
+                'origin' => $origin,
+                'allowed_origins' => count($allowedOrigins),
+                'path' => $request->path(),
+            ]);
         }
 
         return $response;
