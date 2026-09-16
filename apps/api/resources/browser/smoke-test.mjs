@@ -2127,4 +2127,224 @@ const APPROVAL_SELECTORS = {
   }
 }
 
+
+/**
+ * A portal whose submit clears the form and then never sends anything.
+ *
+ * The shape the real portal turned out to have, and the one every other
+ * fixture here is unable to express: the click lands, the handler runs, the
+ * form is replaced by a spinner -- and no request carrying the credentials
+ * ever leaves the browser. From the outside that is indistinguishable from a
+ * login that succeeded and is merely slow, which is why it was read as one for
+ * several rounds.
+ *
+ * Two ways to arrive there, because they need opposite fixes:
+ *
+ *   "throws"   the handler raises after clearing the form;
+ *   "captcha"  it awaits a captcha verdict that never comes.
+ */
+function startStalledPortal({ mode = 'throws', challenge = false } = {}) {
+  const server = createServer((request, response) => {
+    const url = request.url ?? '/'
+
+    // The app's own startup renewal: a POST, answered 401 while signed out, on
+    // a path containing the word "login". Reported as the login being refused,
+    // it says a password was rejected in a run where none was ever sent.
+    if (url.startsWith('/api/auth/login/refresh')) {
+      response.writeHead(401, { 'content-type': 'application/json' })
+      response.end(JSON.stringify({ message: 'no session' }))
+
+      return
+    }
+
+    // Captcha setup traffic, and the interactive frame. Served from this
+    // fixture rather than from Google, since what identifies it is the path.
+    if (url.startsWith('/recaptcha/')) {
+      response.writeHead(200, { 'content-type': 'text/plain' })
+      response.end('')
+
+      return
+    }
+
+    if (url !== '/login') {
+      response.writeHead(404, { 'content-type': 'text/plain' })
+      response.end('not found')
+
+      return
+    }
+
+    const stall = mode === 'throws'
+      ? "throw new Error('Cannot read properties of undefined (reading \\'token\\')');"
+      : `await fetch('/recaptcha/api2/anchor');
+         ${challenge ? "await fetch('/recaptcha/api2/bframe');" : ''}
+         await new Promise(() => {});`
+
+    response.writeHead(200, { 'content-type': 'text/html' })
+    response.end(`<!doctype html>
+<html><body>
+  <form id="f">
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <button type="submit">Login</button>
+  </form>
+  <div id="status"></div>
+  <script>
+    // On a timer, not once on load. The real app posted its renewal 191.8s
+    // after the submit, and a renewal that only ever fires beforehand is
+    // invisible to a listener that starts collecting when the credentials go
+    // in -- which made the first version of this scenario vacuous.
+    const renew = () => fetch('/api/auth/login/refresh', { method: 'POST' }).catch(() => {});
+
+    renew();
+    setInterval(renew, 700);
+
+    document.getElementById('f').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      // The form goes first, exactly as it does on the real portal: this is
+      // the observation that was standing in for "the credentials were
+      // accepted", and it happens before anything is sent.
+      document.getElementById('f').remove();
+      document.getElementById('status').textContent = 'Authenticating...';
+      ${stall}
+    });
+  </script>
+</body></html>`)
+  })
+
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve({ server, port: server.address().port })
+    })
+  })
+}
+
+/** Run a stalled-portal login and hand back whatever it threw. */
+async function stalledRun(port) {
+  try {
+    await extractBearerToken({
+      loginUrl: `http://127.0.0.1:${port}/login`,
+      username: VALID_USER,
+      password: VALID_PASSWORD,
+      selectors: APPROVAL_SELECTORS,
+      approvalWaitMs: 4_000,
+      approvalProbeMs: 2_000,
+      timeoutMs: 12_000,
+    })
+  } catch (thrown) {
+    return thrown
+  }
+
+  return null
+}
+
+{
+  const { server, port } = await startStalledPortal({ mode: 'throws' })
+
+  try {
+    await check('a submit that throws is reported as credentials never sent', async () => {
+      const error = await stalledRun(port)
+
+      expect(error !== null, 'this portal issues no token, so the run must fail')
+
+      const evidence = error.evidence ?? {}
+
+      expect(
+        evidence.login_form_gone === true,
+        'the fixture removes the form on submit, so this scenario proves nothing',
+      )
+      expect(
+        evidence.credential_posts === 0,
+        `nothing carried the credentials, but ${evidence.credential_posts} post(s) were counted as having`,
+      )
+
+      // The page's own exception, which is the only witness to the difference
+      // between a handler that threw and one that is still waiting.
+      expect(
+        (evidence.page_errors ?? []).some((line) => line.includes('Cannot read properties of undefined')),
+        `the thrown error was not captured: ${JSON.stringify(evidence.page_errors)}`,
+      )
+
+      // And the password is not blamed for a request that was never made.
+      expect(
+        error.code !== ExtractionError.INVALID_CREDENTIALS,
+        `a password that was never sent was reported as rejected: ${error.message}`,
+      )
+      expect(
+        error.message.includes('never sent'),
+        `the message does not say the credentials were never sent: ${error.message}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  const { server, port } = await startStalledPortal({ mode: 'captcha', challenge: true })
+
+  try {
+    await check('a submit awaiting a captcha is reported as such, not as a bad password', async () => {
+      const error = await stalledRun(port)
+
+      expect(error !== null, 'this portal issues no token, so the run must fail')
+
+      const evidence = error.evidence ?? {}
+
+      expect(evidence.credential_posts === 0, 'nothing carried the credentials here either')
+      expect(
+        (evidence.page_errors ?? []).length === 0,
+        `nothing threw, but an exception was reported: ${JSON.stringify(evidence.page_errors)}`,
+      )
+      expect(
+        evidence.captcha_requests > 0,
+        'the captcha traffic was not counted, so the stall has no explanation',
+      )
+      expect(
+        evidence.captcha_challenged === true,
+        'the challenge frame was fetched and not noticed',
+      )
+      expect(
+        error.message.includes('captcha'),
+        `the message does not mention the captcha: ${error.message}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
+{
+  const { server, port } = await startStalledPortal({ mode: 'throws' })
+
+  try {
+    await check('the app\'s own startup renewal is not reported as the login being refused', async () => {
+      const error = await stalledRun(port)
+
+      expect(error !== null, 'this portal issues no token, so the run must fail')
+
+      const evidence = error.evidence ?? {}
+
+      // The 401 is real and is recorded -- suppressing it would be its own
+      // kind of lie, since the app plainly did something.
+      expect(
+        (evidence.login_posts ?? []).some((post) => post.includes('/api/auth/login/refresh')),
+        `the renewal was not recorded at all: ${JSON.stringify(evidence.login_posts)}`,
+      )
+      expect(
+        (evidence.login_posts ?? []).some((post) => post.includes('a session renewal, not the credentials')),
+        `the renewal was recorded as though it carried the credentials: ${JSON.stringify(evidence.login_posts)}`,
+      )
+
+      // But it is never the verdict. This is the line that read
+      // "refused POST .../login/refresh 401" under a run that sent no password.
+      expect(
+        evidence.rejected_by === null,
+        `a session renewal was named as the refusal: ${evidence.rejected_by}`,
+      )
+    })
+  } finally {
+    server.close()
+  }
+}
+
 console.log(process.exitCode === 1 ? 'FAILED' : 'all scenarios passed')

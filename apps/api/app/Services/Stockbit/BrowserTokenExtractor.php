@@ -246,6 +246,7 @@ class BrowserTokenExtractor
             'approval_wait_ms' => $approvalWait * 1000,
             'approval_probe_ms' => max(2, (int) config('browser_auth.approval_probe_seconds', 15)) * 1000,
             'approval_url_hints' => (array) config('browser_auth.approval_url_hints'),
+            'refresh_url_hints' => (array) config('browser_auth.refresh_url_hints'),
             'approval_text_hints' => (array) config('browser_auth.approval_text_hints'),
             'device_trust_keys' => (array) config('browser_auth.device_trust_keys'),
             // Null unless configured, which leaves Playwright's own -- and
@@ -604,6 +605,20 @@ class BrowserTokenExtractor
                 );
         }
 
+        // The fact that reframes every count below it. "Signed in, but no
+        // bearer token was seen" takes for granted that a login happened; when
+        // the form went and nothing carried the credentials, it did not, and
+        // every remedy the message goes on to suggest is for a different
+        // problem. Said first, and said plainly.
+        if (($evidence['login_form_gone'] ?? false) === true
+            && (int) ($evidence['credential_posts'] ?? 0) === 0
+            && ($evidence['awaiting_approval'] ?? false) !== true) {
+            $approval = ' The credentials were never sent: the form went away and no request carried them '
+                .'to the portal, so nothing was refused and nothing was issued.'
+                .$this->describeStalledSubmit($evidence)
+                .$approval;
+        }
+
         $hosts = array_values(array_filter(
             is_array($evidence['hosts'] ?? null) ? $evidence['hosts'] : [],
             static fn ($host): bool => is_string($host) && $host !== '',
@@ -644,6 +659,43 @@ class BrowserTokenExtractor
             implode(', ', $parts),
             $hosts === [] ? '' : ' Hosts: '.implode(', ', array_slice($hosts, 0, 8)).'.',
         );
+    }
+
+    /**
+     * Why a submit that cleared the form might have sent nothing.
+     *
+     * Two causes, opposite fixes, and identical from the outside: the handler
+     * threw partway, or it is still awaiting something that will not arrive.
+     * The page's own exception distinguishes them; captcha traffic names the
+     * usual candidate for the second, and is invisible in the host list
+     * because reCAPTCHA is served from www.google.com.
+     *
+     * @param  array<string, mixed>  $evidence
+     */
+    private function describeStalledSubmit(array $evidence): string
+    {
+        $errors = array_values(array_filter(
+            is_array($evidence['page_errors'] ?? null) ? $evidence['page_errors'] : [],
+            static fn ($line): bool => is_string($line) && $line !== '',
+        ));
+
+        if ($errors !== []) {
+            return ' The page threw: '.$errors[0];
+        }
+
+        if (($evidence['captcha_challenged'] ?? false) === true) {
+            return ' A captcha challenge frame was fetched, which a headless run cannot answer.';
+        }
+
+        if ((int) ($evidence['captcha_requests'] ?? 0) > 0) {
+            return sprintf(
+                ' The page made %d captcha request(s); an app that will not post until a captcha '
+                .'scores it stalls exactly like this.',
+                (int) $evidence['captcha_requests'],
+            );
+        }
+
+        return '';
     }
 
     /**

@@ -88,6 +88,21 @@ const DEFAULT_APPROVAL_URL_HINTS = [
 ]
 
 /**
+ * Paths where an app renews a session it already has, rather than opening one.
+ *
+ * The distinction the last round of evidence could not draw. An app loaded
+ * signed out posts to its own refresh endpoint and is answered 401, and that
+ * 401 was reported as "login post ... 401" and as "refused" -- which reads as
+ * the portal rejecting the password, when what actually happened is that the
+ * password was never sent at all. The opposite conclusion, printed with the
+ * same confidence.
+ *
+ * A refresh carries a token, not credentials. So it is never the login's own
+ * answer, and its refusal is never a verdict on anything that was typed.
+ */
+const DEFAULT_REFRESH_URL_HINTS = ['/refresh', '/renew', '/reissue']
+
+/**
  * What a page waiting for an approval says, in English and in Indonesian.
  *
  * Phrases rather than bare words: a cookie banner mentions "device", and the
@@ -121,6 +136,18 @@ const DEFAULT_APPROVAL_TEXT_HINTS = [
  * run that supplies a password.
  */
 const DEFAULT_DEVICE_TRUST_KEYS = ['trustedDevice', 'deviceTrusted', 'deviceId', 'device_id']
+
+/**
+ * Hosts and paths that belong to a captcha, whoever supplies it.
+ *
+ * Matched against the whole URL rather than the path, because what identifies
+ * these is the host: reCAPTCHA is served from www.google.com, which is exactly
+ * why it is invisible in a list of hosts the page talked to.
+ */
+const CAPTCHA_URL_PATTERN = /recaptcha|hcaptcha|challenges\.cloudflare\.com|\/turnstile\//i
+
+/** The interactive iframe within one, as opposed to its setup traffic. */
+const CAPTCHA_CHALLENGE_PATTERN = /\/bframe|hcaptcha.*\/challenge/i
 
 /** Anything else named after a device or a trust decision is kept too. */
 const DEVICE_TRUST_PATTERN = /device|trust/i
@@ -170,6 +197,7 @@ const DEFAULTS = {
   // happened to be left.
   approvalWaitMs: 0,
   approvalUrlHints: DEFAULT_APPROVAL_URL_HINTS,
+  refreshUrlHints: DEFAULT_REFRESH_URL_HINTS,
   approvalTextHints: DEFAULT_APPROVAL_TEXT_HINTS,
   deviceTrustKeys: DEFAULT_DEVICE_TRUST_KEYS,
   // How often, during an approval wait, to open a second tab and ask the
@@ -258,9 +286,14 @@ export function summariseEvidence(evidence) {
     approval_waited_ms: evidence.approvalWaitedMs,
     auth_rejections: evidence.authRejections,
     login_posts: evidence.loginPosts,
+    credential_posts: evidence.credentialPosts,
     rejected_by: evidence.rejectedBy,
     rejected_after_ms: evidence.rejectedAfterMs,
     probe_rejections: evidence.probeRejections,
+    page_errors: evidence.pageErrors,
+    console_errors: evidence.consoleErrors,
+    captcha_requests: evidence.captchaRequests,
+    captcha_challenged: evidence.captchaChallenged,
     websockets: evidence.websockets,
     websocket_frames: evidence.websocketFrames,
     held_open_unconfirmed: evidence.heldOpenUnconfirmed,
@@ -286,6 +319,31 @@ export function describeEvidence(evidence) {
       + `no session had appeared by the time the wait ran out. The app was opened ${evidence.approvalProbes} `
       + 'time(s) during the wait to check. If the approval was given, it was given after that, or the '
       + 'portal did not act on it.'
+  }
+
+  // Checked before anything that reasons about a session, because a run that
+  // never sent the credentials has no session to look for, and every message
+  // below proposes a fix for a login that happened. In particular it comes
+  // before the held-open branch, whose opening words are "the credentials
+  // were accepted -- the login form went": the form going is exactly what
+  // this shows to be no evidence of acceptance at all.
+  //
+  // After the approval branches, though. A portal that asked another device
+  // to approve this login was plainly sent something, whatever the POST
+  // listener managed to attribute.
+  if (evidence.loginFormGone && evidence.credentialPosts === 0 && !evidence.awaitingApproval) {
+    return 'The login form went away, but the credentials were never sent: nothing carried them to '
+      + 'the portal, because the page took the submit and made no request. So there is no session '
+      + 'because none was ever asked for, and no password was refused because none was offered.'
+      + (evidence.pageErrors.length > 0
+        ? ` The page threw: ${evidence.pageErrors[0]}`
+        : '')
+      + (evidence.captchaChallenged
+        ? ' A captcha challenge frame was fetched, which a headless run cannot answer.'
+        : evidence.captchaRequests > 0
+          ? ` The page made ${evidence.captchaRequests} captcha request(s); an app that will not post `
+            + 'until a captcha scores it stalls exactly like this.'
+          : '')
   }
 
   if (evidence.heldOpenUnconfirmed && !evidence.approvalGranted) {
@@ -613,6 +671,25 @@ function urlLooksAuthenticated(url, hints) {
  * target, the word "login".
  */
 export function urlLooksApproval(url, hints = DEFAULT_APPROVAL_URL_HINTS) {
+  let path
+
+  try {
+    path = new URL(url).pathname.toLowerCase()
+  } catch {
+    return false
+  }
+
+  return hints.some((hint) => typeof hint === 'string' && hint !== '' && path.includes(hint.toLowerCase()))
+}
+
+/**
+ * Is this the app renewing a session rather than opening one?
+ *
+ * Path only, for the same reason urlLooksApproval matches on the path: a hint
+ * like "/refresh" against a full URL would match a query string that happens
+ * to round-trip one.
+ */
+export function urlLooksRefresh(url, hints = DEFAULT_REFRESH_URL_HINTS) {
   let path
 
   try {
@@ -955,10 +1032,35 @@ export async function extractBearerToken(options) {
     // Every login-shaped POST the page made after the credentials went in, in
     // order. Empty means nothing was ever submitted.
     loginPosts: [],
+    // Of those, how many actually carried credentials. Zero with a form that
+    // has gone is the whole diagnosis: the page accepted the submit, dropped
+    // the form and never sent anything, so there is nothing for the portal to
+    // have refused and nothing for it to have issued.
+    credentialPosts: 0,
     rejectedBy: null,
     rejectedAfterMs: null,
     // Refusals the probe's own tab provoked, and which were therefore ignored.
     probeRejections: 0,
+    // Exceptions the page threw, and what it logged as an error.
+    //
+    // The gap every other field left open. A run can show the form gone, the
+    // spinner up and nothing posted, and those three facts together have two
+    // completely different causes -- the submit handler threw, or it is
+    // awaiting something that never settles -- which no amount of network
+    // evidence distinguishes. The page's own exception says which, in one
+    // line, the first time it happens.
+    pageErrors: [],
+    consoleErrors: [],
+    // Requests to a captcha service, and whether one put up a challenge.
+    //
+    // The most likely thing an automated browser awaits forever: a scored
+    // captcha decides a headless Chromium announcing navigator.webdriver is
+    // not a person, and an app that will not post until it holds a captcha
+    // token then sits on its spinner with nothing to show. A challenge frame
+    // being fetched at all settles it -- that is the picture-of-traffic-lights
+    // iframe, which nobody is going to solve in a headless run.
+    captchaRequests: 0,
+    captchaChallenged: false,
     // Rejections seen on an authentication URL. A count rather than a latch:
     // one of these is a verdict on the password only when nothing afterwards
     // contradicts it.
@@ -1065,12 +1167,26 @@ export async function extractBearerToken(options) {
         && probePage === null
         && response.request().method().toUpperCase() === 'POST'
         && /login|auth|token|session/i.test(url)) {
+        // A refresh is recorded but never counted as the credentials going
+        // out. Suppressing it entirely would be worse -- "nothing was ever
+        // posted" is true and the app plainly did something -- so it is
+        // reported as what it is, and the summary below reads the difference.
+        const renewal = urlLooksRefresh(url, config.refreshUrlHints)
+
+        if (!renewal) evidence.credentialPosts += 1
+
         try {
           const at = new URL(url)
 
-          evidence.loginPosts.push(sprintfPost(at.host + at.pathname, status, submittedAt))
+          evidence.loginPosts.push(
+            sprintfPost(at.host + at.pathname, status, submittedAt)
+              + (renewal ? ' (a session renewal, not the credentials)' : ''),
+          )
         } catch {
-          evidence.loginPosts.push(sprintfPost('(unparseable)', status, submittedAt))
+          evidence.loginPosts.push(
+            sprintfPost('(unparseable)', status, submittedAt)
+              + (renewal ? ' (a session renewal, not the credentials)' : ''),
+          )
         }
       }
 
@@ -1135,6 +1251,23 @@ export async function extractBearerToken(options) {
 
             return
           }
+        }
+
+        // And not a renewal, even though a renewal is a POST. An app opened
+        // without a session posts to its refresh endpoint and is answered 401
+        // -- on a path containing both "login" and "refresh" -- which is the
+        // app discovering the thing this run exists to fix, not the portal
+        // answering credentials it was never sent. Reported as the verdict, it
+        // says a password was refused in a run where no password was ever
+        // transmitted.
+        //
+        // After the probe check rather than before it. Both discard the same
+        // response, but a refusal the probe provoked is attributed to the
+        // probe first, so probeRejections goes on counting what it was written
+        // to count -- and the scenario that proves that logic works does not
+        // quietly stop exercising it.
+        if (urlLooksRefresh(url, config.refreshUrlHints)) {
+          return
         }
 
         // Which refusal this was, so the next round is a diagnosis rather than
@@ -1215,15 +1348,33 @@ export async function extractBearerToken(options) {
     context.on('request', (request) => {
       evidence.requests += 1
 
+      const url = request.url()
+
       try {
-        evidence.hosts.add(new URL(request.url()).host)
+        evidence.hosts.add(new URL(url).host)
       } catch {
         // A request URL that will not parse tells us nothing; skip it.
       }
 
+      // Traffic to a captcha service, which the hosts list shows only as
+      // "www.google.com" -- indistinguishable from a font or an analytics
+      // beacon, and the difference between "the page is idle" and "the page
+      // is waiting on a verdict about whether it is a robot".
+      if (CAPTCHA_URL_PATTERN.test(url)) {
+        evidence.captchaRequests += 1
+
+        // The interactive iframe. Fetched during setup by an invisible
+        // captcha as well as by one that is actually asking, so this is
+        // reported as "fetched" and never as "shown" -- but a headless run
+        // cannot answer it either way.
+        if (CAPTCHA_CHALLENGE_PATTERN.test(url)) {
+          evidence.captchaChallenged = true
+        }
+      }
+
       // The app asking about an approval is itself the signal that one was
       // asked for, and it arrives before any answer does.
-      if (submitted && urlLooksApproval(request.url(), config.approvalUrlHints)) {
+      if (submitted && urlLooksApproval(url, config.approvalUrlHints)) {
         noteApproval('approval-endpoint')
       }
 
@@ -1274,6 +1425,36 @@ export async function extractBearerToken(options) {
       socket.on('framereceived', () => {
         evidence.websocketFrames += 1
       })
+    })
+
+    // What the page itself thought went wrong.
+    //
+    // Everything else here observes the login from the outside -- what was
+    // requested, what came back, what the DOM looks like afterwards -- and
+    // outside observation cannot see a handler that threw halfway. A submit
+    // that raises after clearing the form and before sending the request
+    // leaves precisely the evidence of a successful login that is merely
+    // slow, forever.
+    //
+    // Redacted against the password and capped, because these are page-
+    // supplied strings and an app that logs its own request bodies would
+    // otherwise put the credentials in the terminal.
+    const noteFailure = (list, text, cap) => {
+      const line = redact(String(text ?? ''), secrets).replace(/\s+/g, ' ').trim().slice(0, 200)
+
+      if (line === '' || list.includes(line) || list.length >= cap) return
+
+      list.push(line)
+    }
+
+    page.on('pageerror', (error) => {
+      noteFailure(evidence.pageErrors, error?.message ?? error, 5)
+    })
+
+    page.on('console', (message) => {
+      if (message.type() !== 'error') return
+
+      noteFailure(evidence.consoleErrors, message.text(), 3)
     })
 
     try {
