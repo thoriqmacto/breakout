@@ -526,6 +526,208 @@ class BrowserTokenApprovalTest extends TestCase
         $this->assertStringContainsString('"device_trust_keys":["trustedDevice"]', $job);
     }
 
+    /**
+     * The renewal an app posts on load is not the login being refused.
+     *
+     * The run that provoked this printed, under a login whose credentials had
+     * never left the browser:
+     *
+     *     login post  POST exodus.stockbit.com/login/refresh 401, 191.8s after the submit
+     *     refused     POST exodus.stockbit.com/login/refresh 401, 192s after the submit
+     *
+     * Both lines are about a request that carried a token rather than a
+     * password, made by an app discovering it has no session -- which is the
+     * condition this run exists to fix, not a verdict on anything typed. Read
+     * as written, they say the portal rejected the credentials. The truth was
+     * the opposite: no credentials were sent at all.
+     */
+    public function test_a_session_renewal_is_not_reported_as_the_login_being_refused(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4314,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'login_posts' => [
+                    'POST exodus.stockbit.com/login/refresh 401, 191.8s after the submit'
+                        .' (a session renewal, not the credentials)',
+                ],
+                'credential_posts' => 0,
+                'rejected_by' => null,
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('a session renewal, not the credentials')
+            ->assertFailed();
+    }
+
+    /**
+     * And the conclusion that follows from it, said in the one line that matters.
+     */
+    public function test_credentials_that_never_left_the_browser_are_named_as_such(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4314,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('never sent')
+            ->assertFailed();
+    }
+
+    /**
+     * Why a submit that cleared the form might have sent nothing.
+     *
+     * An exception in the handler and a captcha that never answers produce
+     * identical evidence everywhere else -- form gone, spinner up, no request
+     * -- and need opposite fixes.
+     */
+    public function test_an_exception_the_page_threw_is_reported(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4314,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'page_errors' => ["Cannot read properties of undefined (reading 'token')"],
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('Cannot read properties of undefined')
+            ->assertFailed();
+    }
+
+    public function test_captcha_traffic_is_reported_because_the_host_list_hides_it(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4314,
+                // Served from www.google.com, and so indistinguishable in this
+                // list from a webfont or an analytics beacon.
+                'hosts' => ['stockbit.com', 'www.google.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'captcha_requests' => 14,
+                'captcha_challenged' => true,
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('14 request(s)')
+            ->assertFailed();
+    }
+
+    /**
+     * The same fact, in the message the dashboard shows rather than the terminal.
+     *
+     * "Signed in, but no bearer token was seen" takes a completed login for
+     * granted, and every remedy it goes on to offer -- BROWSER_AUTH_TOKEN_KEYS,
+     * a post-login URL -- is for a different problem.
+     */
+    public function test_the_summary_says_the_credentials_were_never_sent(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 4314,
+                'authorization_headers' => 12,
+                'storage_keys' => 24,
+                'cookies' => 10,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'captcha_requests' => 14,
+            ],
+        ]));
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have failed.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertStringContainsString(
+                'The credentials were never sent',
+                $exception->getMessage(),
+            );
+            $this->assertStringContainsString('captcha', $exception->getMessage());
+        }
+    }
+
+    /**
+     * But not when the portal said it was waiting on another device.
+     *
+     * A portal that asked a phone to approve this login was plainly sent
+     * something, whatever the response listener managed to attribute -- and
+     * telling that operator the credentials never left the browser would send
+     * them to re-type a password while the notification they need to tap is
+     * still on their screen.
+     */
+    public function test_an_outstanding_approval_is_not_reported_as_credentials_never_sent(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'AWAITING_DEVICE_APPROVAL',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 596,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'awaiting_approval' => true,
+                'approval_signal' => 'refusal-body',
+                'approval_waited_ms' => 180_000,
+            ],
+        ]));
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+            $this->fail('The extraction should have failed.');
+        } catch (BrowserTokenExtractionException $exception) {
+            $this->assertStringNotContainsString('never sent', $exception->getMessage());
+            $this->assertStringContainsString('approved on another device', $exception->getMessage());
+        }
+    }
+
+    public function test_the_child_is_told_which_paths_are_session_renewals(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.refresh_url_hints' => ['/refresh']]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"refresh_url_hints":["\/refresh"]', $this->job());
+    }
+
     private function job(): string
     {
         $this->assertFileExists($this->jobPath(), 'the child was never handed a job');

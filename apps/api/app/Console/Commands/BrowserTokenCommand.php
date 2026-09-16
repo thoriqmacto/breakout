@@ -333,6 +333,33 @@ class BrowserTokenCommand extends Command
             'login post' => is_array($evidence['login_posts'] ?? null) && $evidence['login_posts'] !== []
                 ? implode(' | ', array_map(static fn ($post): string => (string) $post, $evidence['login_posts']))
                 : (($evidence['login_form_gone'] ?? false) === true ? 'none -- nothing was ever posted' : null),
+            // And of those, whether any carried the credentials. An app opened
+            // without a session posts to its own refresh endpoint and is
+            // answered 401; printed as the login post, that says the password
+            // was refused in a run where no password was ever sent.
+            'credentials' => ($evidence['login_form_gone'] ?? false) === true
+                && (int) ($evidence['credential_posts'] ?? 0) === 0
+                ? '<fg=red>never sent -- the form went, and nothing carried them to the portal</>'
+                : null,
+            // Why a submit might send nothing: the handler threw, or it is
+            // still awaiting something. The page is the only witness to both.
+            'page threw' => is_array($evidence['page_errors'] ?? null) && $evidence['page_errors'] !== []
+                ? implode(' | ', array_map(static fn ($line): string => (string) $line, $evidence['page_errors']))
+                : null,
+            'page logged' => is_array($evidence['console_errors'] ?? null) && $evidence['console_errors'] !== []
+                ? implode(' | ', array_map(static fn ($line): string => (string) $line, $evidence['console_errors']))
+                : null,
+            // Captcha traffic, which the host list hides: reCAPTCHA is served
+            // from www.google.com, and so reads as a font or a beacon.
+            'captcha' => (int) ($evidence['captcha_requests'] ?? 0) > 0
+                ? sprintf(
+                    '%d request(s)%s',
+                    (int) $evidence['captcha_requests'],
+                    ($evidence['captcha_challenged'] ?? false) === true
+                        ? ' -- including the challenge frame, which a headless run cannot answer'
+                        : '',
+                )
+                : null,
             'refused' => is_string($evidence['rejected_by'] ?? null)
                 ? sprintf(
                     '%s%s',

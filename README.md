@@ -2017,8 +2017,40 @@ the cases:
 | Evidence | Meaning |
 | --- | --- |
 | `form gone: no` | still on the login form — a captcha, or a rejected submit |
+| `form gone: yes` **and** `credentials: never sent` | the page took the submit and posted nothing — see below; the password is not in question |
 | `form gone: yes` **and** `AWAITING_DEVICE_APPROVAL` | the credentials passed; a device approval is outstanding — approve it while the run is open |
-| `form gone: yes` **and** `INVALID_CREDENTIALS` | the portal answered 401/403 with nothing about a device — wrong username or password |
+| `form gone: yes` **and** `INVALID_CREDENTIALS` | the portal answered 401/403 on the login POST with nothing about a device — wrong username or password |
+
+**The form going away is not evidence that the credentials were accepted.** It is evidence that
+the page's submit handler ran, which is a much weaker claim, and one that held up a wrong diagnosis
+for several rounds: a run whose credentials never left the browser presents as `form gone: yes`, no
+token, back on the login page — identical to a login that succeeded and is merely slow, and
+identical again to one waiting on a phone. So `browser:token` now reports whether anything actually
+carried the credentials:
+
+```
+  login post   POST exodus.example.com/login/refresh 401 (a session renewal, not the credentials)
+  credentials  never sent -- the form went, and nothing carried them to the portal
+  page threw   Cannot read properties of undefined (reading 'token')
+  captcha      14 request(s) -- including the challenge frame, which a headless run cannot answer
+```
+
+Two things make that line possible, and both were previously reported as their opposite:
+
+- **A session renewal is not the login.** An app opened without a session posts to its own refresh
+  endpoint on load and is answered 401 — on some portals at `/login/refresh`, a path containing the
+  word "login". Counted as the login's own answer, it says a password was refused in a run where no
+  password was ever transmitted. Those paths are configurable in `BROWSER_AUTH_REFRESH_URL_HINTS`.
+- **The page is the only witness to why nothing was sent.** A handler that throws after clearing the
+  form and one that awaits a captcha verdict that never arrives leave identical evidence on the
+  network — which is to say none at all. `page threw` is the exception the page raised; `captcha`
+  counts traffic to a captcha service, which is otherwise invisible because reCAPTCHA is served from
+  `www.google.com` and reads as a webfont in the list of hosts.
+
+A headless Chromium announces `HeadlessChrome/<version>` and sets `navigator.webdriver`, so a scored
+captcha has every reason to withhold a verdict from it. `BROWSER_AUTH_USER_AGENT` will stop the first
+half of that, and is worth trying *after* the evidence above says a captcha is what the page is
+waiting on — not before, and knowing it does nothing about `navigator.webdriver`.
 
 If the credentials work in an ordinary browser but the headless login still gets 401, the portal
 is refusing the automated client specifically. Paste a bearer instead — `stockbit:token:set` reads

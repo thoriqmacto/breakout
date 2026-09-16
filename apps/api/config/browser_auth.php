@@ -207,6 +207,20 @@ return [
         )),
     ))),
 
+    /*
+    | Paths on which the app renews a session rather than opening one.
+    |
+    | A refresh carries a token, not credentials, so its refusal is never a
+    | verdict on anything that was typed. Without this the app's own startup
+    | refresh -- posted on every load, answered 401 while signed out, on a path
+    | reading "/login/refresh" -- was reported as the login being refused, in a
+    | run where the credentials had never been sent at all.
+    */
+    'refresh_url_hints' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('BROWSER_AUTH_REFRESH_URL_HINTS', '/refresh,/renew,/reissue')),
+    ))),
+
     'approval_text_hints' => array_values(array_filter(array_map(
         'trim',
         explode(',', (string) env(

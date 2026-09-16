@@ -93,6 +93,7 @@ async function main() {
       approvalWaitMs: job.approval_wait_ms,
       approvalProbeMs: job.approval_probe_ms,
       approvalUrlHints: job.approval_url_hints,
+      refreshUrlHints: job.refresh_url_hints,
       approvalTextHints: job.approval_text_hints,
       deviceTrustKeys: job.device_trust_keys,
       // Progress goes to stderr, one JSON object per line, because stdout is
