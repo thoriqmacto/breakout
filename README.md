@@ -1809,8 +1809,13 @@ npm run smoke      # 22 scenarios against a local fixture; no real portal, no cr
 >   user's home, which PHP-FPM cannot read. Install to a shared path, or point
 >   at a system Chromium:
 >
+>   Note which user runs it: root, writing somewhere `www-data` can read --
+>   never `sudo -u www-data`. `--with-deps` installs system packages and
+>   re-invokes `sudo` on its own, so run as `www-data` it prompts for a
+>   password that account does not have and gives up having installed nothing.
+>
 >   ```bash
->   sudo PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+>   sudo env PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
 >       npx playwright install --with-deps chromium
 >   sudo chmod -R a+rX /opt/ms-playwright
 >   # then, in .env:
@@ -2076,9 +2081,21 @@ headless. `browser:check --headful` refuses that binary outright, and a login ru
                    Playwright's headless shell, which ignores the request. This ran headless.
 ```
 
-The fix is either the full build (`npx playwright install --with-deps chromium`, then point
-`BROWSER_AUTH_CHROMIUM_PATH` at it) or unsetting `BROWSER_AUTH_CHROMIUM_PATH` entirely and letting
-Playwright pick the right binary for each mode.
+The fix is the full Chromium build, installed the way "Being a device the portal recognises" above
+describes — **as root, to the shared path**, never as `www-data`:
+
+```bash
+cd apps/api/resources/browser
+sudo env PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+    npx playwright install --with-deps chromium
+sudo chmod -R a+rX /opt/ms-playwright
+```
+
+`--with-deps` installs system packages, so it re-invokes `sudo` itself. Run under `sudo -u www-data`
+it therefore asks `www-data` for a password, which that account does not have, and gives up three
+prompts later having installed nothing — the browser has to be *placed* where `www-data` can read
+it, not installed *by* `www-data`. Splitting the two halves works too when the system packages are
+already present: `sudo npx playwright install-deps chromium`, then the install without `--with-deps`.
 
 If a login that sends nothing headless sends it under xvfb, the captcha is established as the cause
 rather than inferred, and `BROWSER_AUTH_HEADLESS=false` makes it the default — at the price of an
