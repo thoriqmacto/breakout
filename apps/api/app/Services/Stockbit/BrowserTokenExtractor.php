@@ -163,6 +163,7 @@ class BrowserTokenExtractor
         ?string $password = null,
         bool $forceLogin = false,
         ?int $approvalWaitSeconds = null,
+        ?bool $headless = null,
     ): array {
         if (! $this->enabled()) {
             throw new BrowserTokenExtractionException(
@@ -257,6 +258,15 @@ class BrowserTokenExtractor
 
                 return is_string($agent) && trim($agent) !== '' ? trim($agent) : null;
             })(),
+            // Headless unless told otherwise. The child has always accepted
+            // this and PHP never sent it, so the .env line that would turn it
+            // off did not exist -- the same last-link gap the user agent had.
+            //
+            // It matters because a headless Chromium is what a scored captcha
+            // reads first, and a captcha that withholds its verdict stalls an
+            // app that will not post a login without one. Turning it off needs
+            // a display on the server: run the command under xvfb-run.
+            'headless' => $headless ?? (bool) config('browser_auth.headless', true),
             'token_keys' => (array) config('browser_auth.token_keys'),
             'url_hints' => (array) config('browser_auth.url_hints'),
             'chromium_path' => config('browser_auth.chromium_path'),

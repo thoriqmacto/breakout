@@ -1089,10 +1089,20 @@ export async function extractBearerToken(options) {
         )
       }
     } catch (error) {
+      // A headful run on a server without a display fails here, and the
+      // stock advice -- reinstall Chromium -- sends the operator to reinstall
+      // a browser that is already present and working. The cause is named
+      // instead, with the one command that fixes it.
+      const needsDisplay = !config.headless
+        && /display|x server|xvfb/i.test(String(error.message ?? ''))
+
       throw new TokenExtractionError(
         ExtractionError.BROWSER_LAUNCH_FAILED,
         `Could not launch Chromium: ${redact(error.message, secrets)}. `
-          + 'Install it with "npx playwright install --with-deps chromium".',
+          + (needsDisplay
+            ? 'A headful run needs a display. On a server: "sudo apt-get install -y xvfb", '
+              + 'then run the command under "xvfb-run -a".'
+            : 'Install it with "npx playwright install --with-deps chromium".'),
         { cause: error },
       )
     }
@@ -1451,10 +1461,25 @@ export async function extractBearerToken(options) {
       noteFailure(evidence.pageErrors, error?.message ?? error, 5)
     })
 
+    // With the host that logged it, which is the whole of its meaning on a
+    // page like this one. "requestStorageAccess: Permission denied" from the
+    // captcha's own frame is the login stalling; the identical line from a
+    // "sign in with Google" button or an advertising pixel is noise, and the
+    // message alone cannot be told apart from either.
     page.on('console', (message) => {
       if (message.type() !== 'error') return
 
-      noteFailure(evidence.consoleErrors, message.text(), 3)
+      let where = ''
+
+      try {
+        const at = message.location()?.url
+
+        if (typeof at === 'string' && at !== '') where = ` [${new URL(at).host}]`
+      } catch {
+        // A location that will not parse names nothing; the text still stands.
+      }
+
+      noteFailure(evidence.consoleErrors, message.text() + where, 4)
     })
 
     try {

@@ -208,6 +208,27 @@ return [
     ))),
 
     /*
+    | Whether the browser runs without a display.
+    |
+    | Headless is right for anything scheduled, and is the only thing that
+    | works on a server with no X display at all. It is also the loudest signal
+    | an automated browser gives off: Chromium announces itself as
+    | "HeadlessChrome", sets navigator.webdriver, and a scored captcha reads
+    | both. A portal whose login will not post until a captcha has scored it
+    | therefore stalls forever, with nothing refused and nothing sent.
+    |
+    | Turning this off needs a display. On a headless VPS that means xvfb:
+    |
+    |     sudo apt-get install -y xvfb
+    |     BROWSER_AUTH_HEADLESS=false xvfb-run -a php artisan browser:token ...
+    |
+    | Worth doing as a diagnostic before it is worth doing as a habit: if a
+    | login that sends nothing headless sends it under xvfb, the captcha is
+    | established as the cause rather than inferred.
+    */
+    'headless' => filter_var(env('BROWSER_AUTH_HEADLESS', true), FILTER_VALIDATE_BOOL),
+
+    /*
     | Paths on which the app renews a session rather than opening one.
     |
     | A refresh carries a token, not credentials, so its refusal is never a
