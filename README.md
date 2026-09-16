@@ -2646,6 +2646,46 @@ The job runs at all only when `DEPLOY_ENABLED` is `true`, so reaching this step 
 
 With an empty `DEPLOY_HOST` the fallback `ssh-keyscan` exits non-zero, and the step runs under `bash -e`, which is why the whole job stops there with exit code 1 rather than continuing to a clearer error.
 
+### When the API returns 502, and the browser calls it a CORS error
+
+The dashboard could not sign in, and the browser said only that the preflight
+response was missing `Access-Control-Allow-Origin`. That is the whole of what a
+browser is able to report, and it points at the wrong thing: the allowlist was
+correct and the origin was on it. PHP-FPM had been killed by the kernel twelve
+hours earlier and never came back. nginx outlives its upstream, answers 502, and
+a 502 carries no CORS headers.
+
+The error names CORS. The cause is almost never CORS. In order:
+
+```bash
+# 1. Is the application answering at all? A 502 here is the answer.
+curl -sS -i https://<api-host>/up | head -3
+
+# 2. Is PHP-FPM running? "Result: oom-kill" is the one this section exists for.
+systemctl status php8.3-fpm --no-pager | head -8
+
+# 3. What did nginx fail to reach? "No such file or directory" on the socket
+#    means FPM is down -- or that this vhost names a PHP version that is not
+#    the one installed.
+sudo tail -20 /var/log/nginx/breakout-api.error.log
+
+# 4. Only once the app answers: is the origin allowed?
+sudo -u www-data php artisan config:show cors | grep allowed_origins
+```
+
+**Make the kill survivable.** Ubuntu's packaged `php*-fpm.service` sets no
+`Restart=`, so a killed master stays dead until a person notices. The drop-in in
+`deploy/systemd/php-fpm-restart.conf` brings it back in five seconds; its header
+carries the install and the verification, including how to prove it works by
+killing FPM on purpose rather than waiting for the next outage.
+
+**Then find what ate the memory.** Restarting automatically turns a twelve-hour
+outage into a blip; it does not stop the next one. The memory-hungry thing on
+this box is Chromium -- `browser:token`, the index catalogue read, and a scrape
+that renews its own token all launch one -- and the kill happened at 14:00 UTC,
+which is the evening collector window in Asia/Jakarta. `journalctl -k | grep -i
+oom` names the process the kernel chose and the one that grew.
+
 ## Repository Layout
 ```
 .
