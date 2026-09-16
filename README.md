@@ -2048,9 +2048,24 @@ Two things make that line possible, and both were previously reported as their o
   `www.google.com` and reads as a webfont in the list of hosts.
 
 A headless Chromium announces `HeadlessChrome/<version>` and sets `navigator.webdriver`, so a scored
-captcha has every reason to withhold a verdict from it. `BROWSER_AUTH_USER_AGENT` will stop the first
-half of that, and is worth trying *after* the evidence above says a captcha is what the page is
-waiting on — not before, and knowing it does nothing about `navigator.webdriver`.
+captcha has every reason to withhold a verdict from it. `BROWSER_AUTH_USER_AGENT` stops the first
+half of that and does nothing about the second, so the sharper test is to run with a display at all:
+
+```bash
+sudo apt-get install -y xvfb
+xvfb-run -a php artisan browser:token --headful --username=you@example.com --screenshot=/tmp/sb
+```
+
+If a login that sends nothing headless sends it under xvfb, the captcha is established as the cause
+rather than inferred, and `BROWSER_AUTH_HEADLESS=false` makes it the default — at the price of an
+X server on the box and a slower, heavier run. If it sends nothing either way, the captcha is not
+what is holding it and the console errors are the next thing to read.
+
+**A captcha that will not score this browser is not a bug to out-engineer.** It is the portal
+declining to be automated, and each round of looking more like a person is a round the portal can
+answer. The escape hatch is already here and costs nothing: sign in with an ordinary browser, copy
+the bearer, and hand it over with `php artisan stockbit:token:set`, which reads from stdin so the
+token never reaches your shell history. The scrape does not care where its token came from.
 
 If the credentials work in an ordinary browser but the headless login still gets 401, the portal
 is refusing the automated client specifically. Paste a bearer instead — `stockbit:token:set` reads

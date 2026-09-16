@@ -32,6 +32,7 @@ class BrowserTokenCommand extends Command
                             {--session : Use the saved browser profile without logging in}
                             {--screenshot= : Write a picture of the page here when no token is found}
                             {--approval-wait= : Seconds to hold the run open while you approve the login on another device}
+                            {--headful : Run the browser with a display, which needs xvfb-run on a server. A scored captcha reads a headless browser first, so this says whether that is what the login is waiting on}
                             {--dry-run : Report what was captured without storing it}';
 
     protected $description = 'Sign in to the portal with a headless browser and report what was captured.';
@@ -87,6 +88,9 @@ class BrowserTokenCommand extends Command
                 $password,
                 forceLogin: ! $sessionOnly,
                 approvalWaitSeconds: $approvalWait,
+                // Null leaves the configured value alone, so this is a switch
+                // for one run rather than a second place the default lives.
+                headless: $this->option('headful') ? false : null,
             );
         } catch (BrowserTokenExtractionException $exception) {
             $this->newLine();

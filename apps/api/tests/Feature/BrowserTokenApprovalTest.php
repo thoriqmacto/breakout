@@ -728,6 +728,104 @@ class BrowserTokenApprovalTest extends TestCase
         $this->assertStringContainsString('"refresh_url_hints":["\/refresh"]', $this->job());
     }
 
+    /**
+     * The browser runs headless unless something says otherwise.
+     *
+     * The child has always accepted this setting and PHP never sent it, so the
+     * .env line that would turn it off did not exist -- the same last-link gap
+     * the user agent had, found the same way: by needing it.
+     */
+    public function test_the_run_is_headless_by_default(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"headless":true', $this->job());
+    }
+
+    public function test_headless_can_be_turned_off_in_configuration(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.headless' => false]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"headless":false', $this->job());
+    }
+
+    /**
+     * And for one run, without touching a cached config on a live server.
+     */
+    public function test_headful_switches_a_single_run(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        $this->artisan('browser:token', [
+            '--username' => 'someone@example.test',
+            '--headful' => true,
+        ])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->assertFailed();
+
+        $this->assertStringContainsString('"headless":false', $this->job());
+    }
+
+    /**
+     * Without the flag the configured value stands, rather than being
+     * overwritten by the option's own default.
+     */
+    public function test_a_run_without_the_flag_keeps_the_configured_value(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.headless' => false]);
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->assertFailed();
+
+        $this->assertStringContainsString('"headless":false', $this->job());
+    }
+
+    /**
+     * A console error is useless without knowing who logged it.
+     *
+     * "requestStorageAccess: Permission denied" from the captcha's own frame is
+     * the login stalling. The identical line from a "sign in with Google"
+     * button is noise. The message alone cannot tell them apart, and the run
+     * that produced it had both scripts on the page.
+     */
+    public function test_a_console_error_is_reported_with_the_host_that_logged_it(): void
+    {
+        $this->configureWith((string) json_encode([
+            'ok' => false,
+            'code' => 'TOKEN_NOT_FOUND',
+            'message' => 'ignored',
+            'evidence' => [
+                'requests' => 3146,
+                'hosts' => ['stockbit.com'],
+                'login_form_gone' => true,
+                'credential_posts' => 0,
+                'console_errors' => ['requestStorageAccess: Permission denied. [www.google.com]'],
+            ],
+        ]));
+
+        $this->artisan('browser:token', ['--username' => 'someone@example.test'])
+            ->expectsQuestion('Portal password (not echoed, not stored)', 'a-secret-password')
+            ->expectsOutputToContain('[www.google.com]')
+            ->assertFailed();
+    }
+
     private function job(): string
     {
         $this->assertFileExists($this->jobPath(), 'the child was never handed a job');
