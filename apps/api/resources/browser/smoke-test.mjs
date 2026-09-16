@@ -2189,7 +2189,14 @@ function startStalledPortal({ mode = 'throws', challenge = false } = {}) {
   </form>
   <div id="status"></div>
   <script>
-    fetch('/api/auth/login/refresh', { method: 'POST' }).catch(() => {});
+    // On a timer, not once on load. The real app posted its renewal 191.8s
+    // after the submit, and a renewal that only ever fires beforehand is
+    // invisible to a listener that starts collecting when the credentials go
+    // in -- which made the first version of this scenario vacuous.
+    const renew = () => fetch('/api/auth/login/refresh', { method: 'POST' }).catch(() => {});
+
+    renew();
+    setInterval(renew, 700);
 
     document.getElementById('f').addEventListener('submit', async (event) => {
       event.preventDefault();

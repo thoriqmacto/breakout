@@ -332,9 +332,9 @@ export function describeEvidence(evidence) {
   // to approve this login was plainly sent something, whatever the POST
   // listener managed to attribute.
   if (evidence.loginFormGone && evidence.credentialPosts === 0 && !evidence.awaitingApproval) {
-    return 'The login form went away, but nothing ever carried the credentials to the portal: the '
-      + 'page took the submit and made no request. So there is no session because none was ever '
-      + 'asked for, and no password was refused because none was sent.'
+    return 'The login form went away, but the credentials were never sent: nothing carried them to '
+      + 'the portal, because the page took the submit and made no request. So there is no session '
+      + 'because none was ever asked for, and no password was refused because none was offered.'
       + (evidence.pageErrors.length > 0
         ? ` The page threw: ${evidence.pageErrors[0]}`
         : '')
@@ -1230,17 +1230,6 @@ export async function extractBearerToken(options) {
           return
         }
 
-        // And not a renewal, even though a renewal is a POST. An app opened
-        // without a session posts to its refresh endpoint and is answered 401
-        // -- on a path containing both "login" and "refresh" -- which is the
-        // app discovering the thing this run exists to fix, not the portal
-        // answering credentials it was never sent. Reported as the verdict, it
-        // says a password was refused in a run where no password was ever
-        // transmitted.
-        if (urlLooksRefresh(url, config.refreshUrlHints)) {
-          return
-        }
-
         // And never the probe's. Narrowing to the POST was not enough: an app
         // opened signed out posts to its own refresh endpoint and is answered
         // 401, so every probe manufactured the very response it was sent to
@@ -1262,6 +1251,23 @@ export async function extractBearerToken(options) {
 
             return
           }
+        }
+
+        // And not a renewal, even though a renewal is a POST. An app opened
+        // without a session posts to its refresh endpoint and is answered 401
+        // -- on a path containing both "login" and "refresh" -- which is the
+        // app discovering the thing this run exists to fix, not the portal
+        // answering credentials it was never sent. Reported as the verdict, it
+        // says a password was refused in a run where no password was ever
+        // transmitted.
+        //
+        // After the probe check rather than before it. Both discard the same
+        // response, but a refusal the probe provoked is attributed to the
+        // probe first, so probeRejections goes on counting what it was written
+        // to count -- and the scenario that proves that logic works does not
+        // quietly stop exercising it.
+        if (urlLooksRefresh(url, config.refreshUrlHints)) {
+          return
         }
 
         // Which refusal this was, so the next round is a diagnosis rather than
