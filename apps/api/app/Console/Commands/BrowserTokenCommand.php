@@ -327,6 +327,12 @@ class BrowserTokenCommand extends Command
             // rejected those credentials" is a claim with nothing behind it,
             // and the operator's only move is to re-type a password that was
             // never the problem.
+            // Whether the credentials were sent at all, and what answered.
+            // Nothing here means nothing was submitted: the control that was
+            // clicked did not submit, or the portal stopped the attempt.
+            'login post' => is_array($evidence['login_posts'] ?? null) && $evidence['login_posts'] !== []
+                ? implode(' | ', array_map(static fn ($post): string => (string) $post, $evidence['login_posts']))
+                : (($evidence['login_form_gone'] ?? false) === true ? 'none -- nothing was ever posted' : null),
             'refused' => is_string($evidence['rejected_by'] ?? null)
                 ? sprintf(
                     '%s%s',
@@ -338,6 +344,10 @@ class BrowserTokenCommand extends Command
                 : null,
             'landed on' => $evidence['landed_url'] ?? null,
             'page title' => $evidence['title'] ?? null,
+            // The page when it stalled, which is a different moment from the
+            // page it gave up on -- by then the run has opened the post-login
+            // page and been sent back.
+            'stalled shot' => $evidence['waiting_screenshot'] ?? null,
             'screenshot' => $evidence['screenshot'] ?? null,
             // A picture that was asked for and not written says so, rather
             // than leaving an absent line to be read as "none was requested".
