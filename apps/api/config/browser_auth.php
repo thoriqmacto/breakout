@@ -152,6 +152,27 @@ return [
     'approval_wait_seconds' => (int) env('BROWSER_AUTH_APPROVAL_WAIT_SECONDS', 180),
 
     /*
+    | What the browser announces itself as.
+    |
+    | Unset by default, which means Playwright's own -- and Playwright's own
+    | says `HeadlessChrome/141.0.0.0`, alongside `navigator.webdriver === true`.
+    | A portal running bot detection reads the first of those as a near
+    | certainty, and a login can then fail without ever being refused: the
+    | page's own script declines to send it, so there is no 401 to report and
+    | nothing to check a password against.
+    |
+    | Setting this is a decision rather than a fix, and it is yours. The
+    | approach this feature is built on is signing in at the front door and
+    | letting the portal remember the device through its own approval flow --
+    | see "Being a device the portal recognises" -- and a user agent chosen to
+    | conceal what is running is the opposite of that. It is exposed because
+    | the alternative is an .env value that silently does nothing, and because
+    | whether a portal's terms permit automated access at all is a question for
+    | its terms.
+    */
+    'user_agent' => env('BROWSER_AUTH_USER_AGENT'),
+
+    /*
     | How often, while waiting for a device approval, to open a second tab and
     | ask the portal whether the session exists yet.
     |

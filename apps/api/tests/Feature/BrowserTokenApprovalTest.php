@@ -435,6 +435,49 @@ class BrowserTokenApprovalTest extends TestCase
             ->assertFailed();
     }
 
+    /**
+     * The one thing the browser says about itself that a portal reads first.
+     *
+     * Playwright's default user agent is `HeadlessChrome/<version>`. The
+     * extraction script has always accepted an override and the PHP side never
+     * sent one, so the .env value that would set it did not exist and the
+     * option was unreachable -- a capability present end to end except for the
+     * last link.
+     */
+    public function test_a_configured_user_agent_reaches_the_child(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.user_agent' => 'Mozilla/5.0 (X11; Linux x86_64) Chrome/141.0.0.0']);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"user_agent":"Mozilla\/5.0 (X11; Linux x86_64) Chrome\/141.0.0.0"', $this->job());
+    }
+
+    /**
+     * And unset stays unset: the default is the browser's own, not a disguise
+     * this chose on somebody's behalf.
+     */
+    public function test_no_user_agent_is_sent_when_none_is_configured(): void
+    {
+        $this->configureWith($this->awaitingApprovalResult());
+
+        config(['browser_auth.user_agent' => null]);
+
+        try {
+            app(BrowserTokenExtractor::class)->extract('someone@example.test', 'a-secret-password');
+        } catch (BrowserTokenExtractionException) {
+            // The job is the subject.
+        }
+
+        $this->assertStringContainsString('"user_agent":null', $this->job());
+    }
+
     public function test_the_wait_can_be_switched_off_for_one_run(): void
     {
         $this->configureWith(
