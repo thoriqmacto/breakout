@@ -451,6 +451,44 @@ class BrokerSummaryDailyAutomationTest extends TestCase
         $this->assertSame(1, $metadata['days_behind']);
     }
 
+    /**
+     * An unconfirmed day has two causes, and only one of them is "wait".
+     *
+     * `trading_calendar` is derived from `trading_days`, and only by a refresh.
+     * A day already added to `trading_days` -- by hand, or by an import -- is
+     * invisible to this job until that rebuild runs, and the run then reports
+     * it exactly as it reports an evening before the market has settled. The
+     * two look identical and want opposite responses.
+     *
+     * What made it land: automation:ohlcv-daily only *warns* when the calendar
+     * has no row and collects the day anyway, so the same date can be fetched
+     * there and skipped here within a minute of each other.
+     */
+    public function test_an_unconfirmed_day_says_how_to_confirm_it(): void
+    {
+        $asset = Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);
+        $this->storeWindow($asset, '2026-08-26', '2026-08-26');
+        $this->twoWeeks('2026-08-27');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('marketDetectors')
+            ->once()
+            ->with('BBCA', '2026-08-27', '2026-08-27', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())
+            ->andReturn($this->detectorResponse('2026-08-27', '2026-08-27'));
+
+        Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));
+
+        try {
+            $this->artisan('automation:broker-summary-daily')
+                ->expectsOutputToContain('2026-08-28 is not yet confirmed as a trading day')
+                ->expectsOutputToContain('automation:trading-calendar-refresh')
+                ->assertSuccessful();
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function test_a_calendar_with_no_recent_trading_day_refuses_rather_than_guessing(): void
     {
         Asset::create(['symbol' => 'BBCA', 'name' => 'BBCA']);

@@ -261,6 +261,46 @@ incomplete.
 `automation:trading-calendar-refresh` reports the same condition as
 `null_close_count` / `null_close_dates` and marks the run partial.
 
+### `trading_days` is not `trading_calendar`
+
+Two tables, one derived from the other, and the jobs read different ones:
+
+| Table | Holds | Written by |
+| --- | --- | --- |
+| `trading_days` | `date` + `close` — the sessions the market demonstrably had | Yahoo import, the checked-in ledger, the seeder |
+| `trading_calendar` | `date` + `is_trading_day` / `is_weekend` / `is_holiday` | **only** `trading-calendar:build`, which `automation:trading-calendar-refresh` clamps to the last date in `trading_days` |
+
+So adding a session to `trading_days` does not make it a trading day to anything
+that asks the calendar. Until a refresh runs, the two disagree — and the jobs
+handle that disagreement in opposite ways:
+
+- `automation:ohlcv-daily` calls `describeDay()`. No row at all is a **warning**,
+  and the run fetches the day regardless.
+- `automation:broker-summary-daily` calls `latestTradingDayOnOrBefore()`, which
+  only counts rows with `is_trading_day = true`. No row means the day does not
+  exist, and the run collects up to the previous session instead.
+
+That is why a day can be fetched by one command and skipped by the next within a
+minute, and why `2026-09-16 is not yet confirmed as a trading day` has two quite
+different causes: the market genuinely has not settled (wait), or the calendar
+has not been rebuilt from a session `trading_days` already holds (run the
+refresh). The message names the second, because the first needs no instruction:
+
+```bash
+php artisan automation:trading-calendar-refresh
+php artisan automation:broker-summary-daily --date=2026-09-16
+```
+
+To see which of the two you are in:
+
+```bash
+php artisan tinker --execute="\
+  echo 'trading_days max: '.App\Models\TradingDay::max('date').PHP_EOL; \
+  var_dump(App\Models\TradingCalendarDay::whereDate('date','2026-09-16')->first()?->is_trading_day);"
+```
+
+A date in `trading_days` with nothing in `trading_calendar` is the second case.
+
 ### The date key
 
 `trading_days.date` is the primary key, and it is stored as a bare `Y-m-d`. It

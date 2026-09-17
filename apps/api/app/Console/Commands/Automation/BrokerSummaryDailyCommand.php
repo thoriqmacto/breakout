@@ -160,6 +160,25 @@ class BrokerSummaryDailyCommand extends Command
                 $marketDate->toDateString(),
                 $to->toDateString(),
             ));
+
+            // And what to do about it, when it is not just the clock.
+            //
+            // "Confirmed" here means a row in `trading_calendar`, which is
+            // derived from `trading_days` and only by a refresh. A day that
+            // has already been added to `trading_days` -- by hand, or by an
+            // import -- is invisible here until that rebuild runs, so the line
+            // above is read as "the market has not settled yet" when the truth
+            // is "the calendar has not been rebuilt yet". The two look
+            // identical and want opposite responses: wait, or run this.
+            //
+            // The asymmetry that makes it confusing: automation:ohlcv-daily
+            // only warns when the calendar has no row and collects anyway, so
+            // a day can be fetched there and skipped here in the same evening.
+            $this->line(sprintf(
+                '<fg=gray>If %s has already been added to trading_days, the calendar just has not been rebuilt from it yet: '
+                .'run "php artisan automation:trading-calendar-refresh", then this again.</>',
+                $marketDate->toDateString(),
+            ));
         }
 
         $tickers = $this->resolveTickers();
