@@ -220,6 +220,23 @@ it the same rule the table has, in both directions:
 own, which is the fastest way to restore a close the deployed database has lost
 but the repository still has.
 
+**The ledger is updated in a development checkout, never on the server.** The
+scheduled `automation:trading-calendar-refresh` therefore passes
+`--no-seeder-sync`, and `--seeder-sync` opts back in for a local run. The reason
+is that the deploy does `git reset --hard <sha>`: a write to a version-controlled
+file between deploys is discarded without a word, so the server can never make
+the ledger durable — only make it disagree with the repository for a few hours.
+Under `www-data` the write fails outright:
+
+```
+Unable to update trading day seeder: file_put_contents(.../trading_days.php): Failed to open stream: Permission denied
+```
+
+which reads like a permissions bug and invites a `chmod`. **Don't** — that turns
+a visible failure into a silent revert. The database is already correct when this
+appears; only the file was skipped. To move new sessions into the ledger, run
+`trading-days:build` in a checkout and commit the result.
+
 ### Fetch range vs persistence range
 
 The provider is asked for more than is stored:
@@ -260,6 +277,46 @@ only when neither knows the value is it a warning and the row stays honestly
 incomplete.
 `automation:trading-calendar-refresh` reports the same condition as
 `null_close_count` / `null_close_dates` and marks the run partial.
+
+### `trading_days` is not `trading_calendar`
+
+Two tables, one derived from the other, and the jobs read different ones:
+
+| Table | Holds | Written by |
+| --- | --- | --- |
+| `trading_days` | `date` + `close` — the sessions the market demonstrably had | Yahoo import, the checked-in ledger, the seeder |
+| `trading_calendar` | `date` + `is_trading_day` / `is_weekend` / `is_holiday` | **only** `trading-calendar:build`, which `automation:trading-calendar-refresh` clamps to the last date in `trading_days` |
+
+So adding a session to `trading_days` does not make it a trading day to anything
+that asks the calendar. Until a refresh runs, the two disagree — and the jobs
+handle that disagreement in opposite ways:
+
+- `automation:ohlcv-daily` calls `describeDay()`. No row at all is a **warning**,
+  and the run fetches the day regardless.
+- `automation:broker-summary-daily` calls `latestTradingDayOnOrBefore()`, which
+  only counts rows with `is_trading_day = true`. No row means the day does not
+  exist, and the run collects up to the previous session instead.
+
+That is why a day can be fetched by one command and skipped by the next within a
+minute, and why `2026-09-16 is not yet confirmed as a trading day` has two quite
+different causes: the market genuinely has not settled (wait), or the calendar
+has not been rebuilt from a session `trading_days` already holds (run the
+refresh). The message names the second, because the first needs no instruction:
+
+```bash
+php artisan automation:trading-calendar-refresh
+php artisan automation:broker-summary-daily --date=2026-09-16
+```
+
+To see which of the two you are in:
+
+```bash
+php artisan tinker --execute="\
+  echo 'trading_days max: '.App\Models\TradingDay::max('date').PHP_EOL; \
+  var_dump(App\Models\TradingCalendarDay::whereDate('date','2026-09-16')->first()?->is_trading_day);"
+```
+
+A date in `trading_days` with nothing in `trading_calendar` is the second case.
 
 ### The date key
 
@@ -1809,8 +1866,13 @@ npm run smoke      # 22 scenarios against a local fixture; no real portal, no cr
 >   user's home, which PHP-FPM cannot read. Install to a shared path, or point
 >   at a system Chromium:
 >
+>   Note which user runs it: root, writing somewhere `www-data` can read --
+>   never `sudo -u www-data`. `--with-deps` installs system packages and
+>   re-invokes `sudo` on its own, so run as `www-data` it prompts for a
+>   password that account does not have and gives up having installed nothing.
+>
 >   ```bash
->   sudo PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+>   sudo env PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
 >       npx playwright install --with-deps chromium
 >   sudo chmod -R a+rX /opt/ms-playwright
 >   # then, in .env:
@@ -2076,9 +2138,21 @@ headless. `browser:check --headful` refuses that binary outright, and a login ru
                    Playwright's headless shell, which ignores the request. This ran headless.
 ```
 
-The fix is either the full build (`npx playwright install --with-deps chromium`, then point
-`BROWSER_AUTH_CHROMIUM_PATH` at it) or unsetting `BROWSER_AUTH_CHROMIUM_PATH` entirely and letting
-Playwright pick the right binary for each mode.
+The fix is the full Chromium build, installed the way "Being a device the portal recognises" above
+describes — **as root, to the shared path**, never as `www-data`:
+
+```bash
+cd apps/api/resources/browser
+sudo env PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+    npx playwright install --with-deps chromium
+sudo chmod -R a+rX /opt/ms-playwright
+```
+
+`--with-deps` installs system packages, so it re-invokes `sudo` itself. Run under `sudo -u www-data`
+it therefore asks `www-data` for a password, which that account does not have, and gives up three
+prompts later having installed nothing — the browser has to be *placed* where `www-data` can read
+it, not installed *by* `www-data`. Splitting the two halves works too when the system packages are
+already present: `sudo npx playwright install-deps chromium`, then the install without `--with-deps`.
 
 If a login that sends nothing headless sends it under xvfb, the captcha is established as the cause
 rather than inferred, and `BROWSER_AUTH_HEADLESS=false` makes it the default — at the price of an

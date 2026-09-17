@@ -137,6 +137,20 @@ class TradingDaysBuild extends Command
             $this->syncLedgerFile();
         } catch (\Throwable $e) {
             $this->warn('Unable to update trading day seeder: '.$e->getMessage());
+
+            // Where that is expected, and why making it writable is the wrong
+            // answer. The ledger is version controlled; the deploy does
+            // `git reset --hard`, so a write that lands on a deployed checkout
+            // is discarded at the next deploy without a word. A chmod turns
+            // this warning into a silent revert, which is strictly worse.
+            if (str_contains($e->getMessage(), 'Permission denied')) {
+                $this->line(
+                    '<fg=gray>On a deployed checkout this is expected: the ledger is version controlled, and the '
+                    .'deploy resets the working tree, so a write here would be thrown away anyway. Do not chmod it -- '
+                    .'update the ledger in a development checkout and commit it, or pass --no-seeder-sync to skip this '
+                    .'step. The database itself is already up to date.</>'
+                );
+            }
         }
 
         return self::SUCCESS;
