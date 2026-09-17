@@ -1,11 +1,55 @@
 "use client"
 
-import { History, Pencil, Play, Power, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Eye, EyeOff, History, Pencil, Play, Power, Trash2 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge, ConditionBadge, EnabledBadge, RunStatusBadge } from "@/components/automation/badges"
 import { formatJakarta, type ScheduledTask } from "@/lib/automation-client"
+import { cn } from "@/lib/utils"
+
+const SHOW_DISABLED_STORAGE_KEY = "automationShowDisabledTasks"
+
+/**
+ * Disabled tasks are hidden by default: a long-retired automation is noise on
+ * the list an operator reads every morning. The preference is remembered so
+ * somebody who does want the full list is not re-hiding it on every visit.
+ *
+ * Read from an effect rather than the initial state so the server-rendered
+ * markup and the first client render agree.
+ */
+const readStoredShowDisabled = (): boolean => {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  try {
+    return window.localStorage.getItem(SHOW_DISABLED_STORAGE_KEY) === "true"
+  } catch (error) {
+    console.error("Unable to read the stored automation visibility preference", error)
+    return false
+  }
+}
+
+const storeShowDisabled = (value: boolean) => {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(SHOW_DISABLED_STORAGE_KEY, String(value))
+  } catch (error) {
+    console.error("Unable to store the automation visibility preference", error)
+  }
+}
 
 export function TaskTable({
   tasks,
@@ -24,6 +68,21 @@ export function TaskTable({
   onDelete: (task: ScheduledTask) => void
   onHistory: (task: ScheduledTask) => void
 }) {
+  const [showDisabled, setShowDisabled] = useState(false)
+
+  useEffect(() => {
+    setShowDisabled(readStoredShowDisabled())
+  }, [])
+
+  const changeShowDisabled = (next: boolean) => {
+    setShowDisabled(next)
+    storeShowDisabled(next)
+  }
+
+  const disabledCount = tasks.filter((task) => !task.enabled).length
+  const visibleTasks = showDisabled ? tasks : tasks.filter((task) => task.enabled)
+  const hiddenCount = tasks.length - visibleTasks.length
+
   return (
     <Card>
       <CardHeader>
@@ -33,6 +92,34 @@ export function TaskTable({
           <code className="text-xs">scheduler:dispatch</code>. Changes here take effect on the
           next tick — no deploy required.
         </CardDescription>
+
+        <CardAction>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              type="button"
+              aria-pressed={showDisabled}
+              onClick={() => changeShowDisabled(!showDisabled)}
+              className={cn(
+                buttonVariants({ variant: showDisabled ? "secondary" : "outline", size: "sm" }),
+                "px-3",
+              )}
+            >
+              {showDisabled ? (
+                <>
+                  <Eye className="size-3.5" aria-hidden /> Showing disabled
+                </>
+              ) : (
+                <>
+                  <EyeOff className="size-3.5" aria-hidden /> Show disabled
+                </>
+              )}
+              {disabledCount > 0 ? (
+                <span className="text-muted-foreground">({disabledCount})</span>
+              ) : null}
+            </button>
+            <span className="text-xs text-muted-foreground">Saved as your default view</span>
+          </div>
+        </CardAction>
       </CardHeader>
 
       <CardContent>
@@ -60,7 +147,23 @@ export function TaskTable({
                 </tr>
               ) : null}
 
-              {tasks.map((task) => {
+              {tasks.length > 0 && visibleTasks.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-6 text-center text-muted-foreground">
+                    Every automation is disabled, so none are shown.{" "}
+                    <button
+                      type="button"
+                      onClick={() => changeShowDisabled(true)}
+                      className="font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      Show the {disabledCount} disabled {disabledCount === 1 ? "one" : "ones"}
+                    </button>
+                    .
+                  </td>
+                </tr>
+              ) : null}
+
+              {visibleTasks.map((task) => {
                 const busy = busyId === task.id
 
                 return (
@@ -167,6 +270,13 @@ export function TaskTable({
             </tbody>
           </table>
         </div>
+
+        {hiddenCount > 0 && visibleTasks.length > 0 ? (
+          <p className="mt-3 text-xs text-muted-foreground">
+            {hiddenCount} disabled {hiddenCount === 1 ? "automation is" : "automations are"} hidden.
+            Disabling a task here removes it from this list until you show disabled tasks again.
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   )
