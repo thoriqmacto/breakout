@@ -272,6 +272,55 @@ class TradingCalendarRefreshTest extends TestCase
         $this->assertStringContainsString('days behind', (string) $metadata['error_summary']);
     }
 
+    /**
+     * The checked-in ledger is not rewritten by the scheduled refresh.
+     *
+     * It is version controlled, and this command runs on the deployed box
+     * where the deploy does `git reset --hard <sha>` -- so a write to a tracked
+     * file between deploys is discarded without a word. Under www-data it does
+     * not get that far: the run warns "Permission denied" every evening, which
+     * reads as a misconfiguration and invites a chmod. The chmod is the wrong
+     * fix, because it converts a visible failure into a silent revert.
+     */
+    public function test_the_checked_in_ledger_is_left_alone_by_default(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));
+
+        $ledger = $this->databasePath.'/seeders/data/trading_days.php';
+        file_put_contents($ledger, "<?php return ['untouched'];\n");
+
+        $this->tradingDay('2026-08-27');
+        $this->stubYahoo(['2026-08-28']);
+
+        Artisan::call('automation:trading-calendar-refresh', ['--lookback' => 10]);
+
+        // The database is current either way; only the file is spared.
+        $this->assertTrue($this->calendar()['2026-08-28']->is_trading_day);
+        $this->assertSame("<?php return ['untouched'];\n", file_get_contents($ledger));
+    }
+
+    /**
+     * And is rewritten when asked, which is a development-checkout thing to do.
+     */
+    public function test_seeder_sync_rewrites_the_ledger_when_asked(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));
+
+        $ledger = $this->databasePath.'/seeders/data/trading_days.php';
+        file_put_contents($ledger, "<?php return ['untouched'];\n");
+
+        $this->tradingDay('2026-08-27');
+        $this->stubYahoo(['2026-08-28']);
+
+        Artisan::call('automation:trading-calendar-refresh', [
+            '--lookback' => 10,
+            '--seeder-sync' => true,
+        ]);
+
+        $this->assertNotSame("<?php return ['untouched'];\n", file_get_contents($ledger));
+        $this->assertStringContainsString('2026-08-28', (string) file_get_contents($ledger));
+    }
+
     public function test_skip_import_rebuilds_without_touching_yahoo(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-08-28 11:00:00', 'UTC'));

@@ -220,6 +220,23 @@ it the same rule the table has, in both directions:
 own, which is the fastest way to restore a close the deployed database has lost
 but the repository still has.
 
+**The ledger is updated in a development checkout, never on the server.** The
+scheduled `automation:trading-calendar-refresh` therefore passes
+`--no-seeder-sync`, and `--seeder-sync` opts back in for a local run. The reason
+is that the deploy does `git reset --hard <sha>`: a write to a version-controlled
+file between deploys is discarded without a word, so the server can never make
+the ledger durable — only make it disagree with the repository for a few hours.
+Under `www-data` the write fails outright:
+
+```
+Unable to update trading day seeder: file_put_contents(.../trading_days.php): Failed to open stream: Permission denied
+```
+
+which reads like a permissions bug and invites a `chmod`. **Don't** — that turns
+a visible failure into a silent revert. The database is already correct when this
+appears; only the file was skipped. To move new sessions into the ledger, run
+`trading-days:build` in a checkout and commit the result.
+
 ### Fetch range vs persistence range
 
 The provider is asked for more than is stored:

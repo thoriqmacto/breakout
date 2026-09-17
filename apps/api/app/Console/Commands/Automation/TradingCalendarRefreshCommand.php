@@ -43,7 +43,8 @@ class TradingCalendarRefreshCommand extends Command
     protected $signature = 'automation:trading-calendar-refresh
         {--lookback=45 : Days of history to re-import and rebuild}
         {--from= : Explicit start date (YYYY-MM-DD), overriding --lookback}
-        {--skip-import : Rebuild from the existing trading_days rows without calling Yahoo}';
+        {--skip-import : Rebuild from the existing trading_days rows without calling Yahoo}
+        {--seeder-sync : Also rewrite database/seeders/data/trading_days.php. Only useful in a development checkout -- see below}';
 
     protected $description = 'Refresh trading_days from Yahoo and rebuild trading_calendar up to the last observed trading day.';
 
@@ -241,6 +242,20 @@ class TradingCalendarRefreshCommand extends Command
      */
     private function importTradingDays(Carbon $from, Carbon $today, RunMetadata $metadata): void
     {
+        // The seeder file is left alone unless asked for, because this command
+        // runs on the deployed box and the file is version controlled there.
+        //
+        // The deploy does `git reset --hard <sha>`, so anything written to a
+        // tracked file between deploys is discarded without a word. Under
+        // www-data the write does not even get that far -- it fails with
+        // "Permission denied" on every scheduled run, which reads as a
+        // misconfiguration and invites a chmod. The chmod is the wrong fix: it
+        // converts a visible failure into a silent revert, and leaves the
+        // ledger disagreeing with the repository in between.
+        //
+        // The ledger's value is that it is committed. That makes updating it a
+        // development-checkout job, which --seeder-sync is for.
+
         if ($this->option('skip-import')) {
             $metadata->set('trading_days_import', ['status' => 'skipped']);
             $this->line('Yahoo import skipped (--skip-import).');
@@ -249,10 +264,10 @@ class TradingCalendarRefreshCommand extends Command
         }
 
         try {
-            Artisan::call('trading-days:build', [
+            Artisan::call('trading-days:build', array_merge([
                 '--from' => $from->toDateString(),
                 '--to' => $today->toDateString(),
-            ], $this->getOutput());
+            ], $this->option('seeder-sync') ? [] : ['--no-seeder-sync' => true]), $this->getOutput());
 
             $metadata->set('trading_days_import', ['status' => 'ok']);
         } catch (Throwable $exception) {
