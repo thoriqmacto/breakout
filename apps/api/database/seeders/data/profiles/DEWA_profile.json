@@ -1,0 +1,1168 @@
+{
+    "symbol": "DEWA",
+    "name": "DEWA",
+    "address": [
+        {
+            "id": "134",
+            "email": [
+                "corporate.secretary@ptdh.co.id"
+            ],
+            "fax": "-",
+            "npwp": "01.565.295.1-091.000",
+            "phone": "021- 5025 8888",
+            "website": "www.ptdh.co.id ",
+            "key": "",
+            "lastupdate": "2024-11-11T16:09:41+07:00",
+            "value": "",
+            "office": "Prosperity Tower Lantai 39, SCBD, District 8, Lot 28, Jl. Jenderal Sudirman Kav. 52-53, Kelurahan Senayan, Kecamatan Kebayoran Baru, Jakarta Selatan, 12190"
+        }
+    ],
+    "background": "PT Darma Henwa Tbk adalah perusahaan yang bergerak di bidang kontraktor pertambangan dan energi. Lini usahanya mencakup kontrak alat berat, Kontrak aktivitas pertambangan, Kontrak pengupasan bumi, konstruksi sipil, dan pemeliharaan.\n",
+    "history": {
+        "amount": "1,055 B",
+        "board": "Papan Utama",
+        "date": "26 Sep 2007",
+        "price": "335",
+        "registrar": "",
+        "shares": "3,150,000,128",
+        "underwriters": [
+            "PT. Danatama Makmur"
+        ],
+        "administrative_bureau": "PT Ficomindo Buana Registrar",
+        "free_float": "49.70%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "34866357",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "NALINKANT AMRATLAL RATHOD"
+            },
+            {
+                "id": "34866362",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "WISNU WAHYUDIN PETTALOLO"
+            },
+            {
+                "id": "34866363",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "SORIMUDA PULUNGAN"
+            }
+        ],
+        "director": [
+            {
+                "id": "34866358",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "FREDIA YUZIRWAN"
+            },
+            {
+                "id": "34866359",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "FARUK FAUZI"
+            },
+            {
+                "id": "34866360",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "RICARDO SILAEN"
+            },
+            {
+                "id": "34866366",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "MAHMUD SAMURI"
+            },
+            {
+                "id": "34866367",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "MUKSON ARIF ROSYIDI"
+            },
+            {
+                "id": "34866368",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "ANNY TJANDRA"
+            },
+            {
+                "id": "34866354",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "JOSEPH LEMBAYUNG"
+            },
+            {
+                "id": "34866353",
+                "key": "Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "AHMAD HILYADI"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "34866369",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "GORIES MERE"
+            },
+            {
+                "id": "34866364",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "SUKARNI ILYAS"
+            },
+            {
+                "id": "34866356",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "AGUS SUHARYONO"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "34866355",
+                "key": "President Commissioner",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "BAMBANG IRAWAN HENDRADI"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "34866365",
+                "key": "President Director",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "TEGUH BOENTORO"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [
+            {
+                "id": "34866361",
+                "key": "Vice President Commissioner (Independent)",
+                "lastupdate": "2026-07-01T15:30:55+07:00",
+                "value": "SUADI ATMA"
+            }
+        ],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529259",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:38+07:00",
+            "value": "{\"name\":\"Mukson Arif Rosyidi\",\"phone\":\"(021) 2991 2350\",\"email\":\"Corporate.secretary@ptdh.co.id\\r\\n\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "67.83%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "27.60 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "9.38%",
+            "name": "GOLDWAVE CAPITAL LIMITED",
+            "value": "3.82 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "6.38%",
+            "name": "CGS INTERNATIONAL SECURITIES HONG KONG LIMITED",
+            "value": "2.60 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "6.2%",
+            "name": "PT ANDHESTI TUNGKAS PRATAMA ",
+            "value": "2.53 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "6.18%",
+            "name": "ZURICH ASSET INTERNATIONAL LTD",
+            "value": "2.51 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "4.03%",
+            "name": "SAHAM TREASURY",
+            "value": "1.64 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT DH Services",
+            "percentage": "95.55%",
+            "types": "Jasa reparasi mesin dan penunjang pertambangan",
+            "value": "2613226"
+        },
+        {
+            "company": "Prove Energy Investments Limited",
+            "percentage": "20.00%",
+            "types": "Perusahaan investasi",
+            "value": "68162516"
+        },
+        {
+            "company": "PT Cipta Multi Prima",
+            "percentage": "99.52%",
+            "types": "Macam-macam jasa",
+            "value": "9991001"
+        },
+        {
+            "company": "PT Dire Pratama",
+            "percentage": "99.72%",
+            "types": "Jasa kepelabuhanan",
+            "value": "10027545"
+        },
+        {
+            "company": "PT Rocky Investments Group",
+            "percentage": "99.50%",
+            "types": "Perusahaan dagang dan jasa pertambangan",
+            "value": "342649"
+        },
+        {
+            "company": "PT Fajar Harapan Buana",
+            "percentage": "49.75%",
+            "types": "Macam-macam jasa",
+            "value": "21827"
+        },
+        {
+            "company": "PT Sabina Mahardika",
+            "percentage": "99.89%",
+            "types": "Konsultasi manajemen",
+            "value": "40283918"
+        },
+        {
+            "company": "PT Mahadaya Imajinasi Nusantara",
+            "percentage": "99.89%",
+            "types": "Konsultasi manajemen",
+            "value": "71797485"
+        },
+        {
+            "company": "PT Dire Pratama Services",
+            "percentage": "99.00%",
+            "types": "Macam-macam jasa",
+            "value": "352636"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "193,018",
+            "change": -6768,
+            "change_formatted": "(-6,768)",
+            "change_value": "-6768"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "199,786",
+            "change": -1744,
+            "change_formatted": "(-1,744)",
+            "change_value": "-1744"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "201,530",
+            "change": 4623,
+            "change_formatted": "(+4,623)",
+            "change_value": "4623"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "196,907",
+            "change": -2777,
+            "change_formatted": "(-2,777)",
+            "change_value": "-2777"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "199,684",
+            "change": -3129,
+            "change_formatted": "(-3,129)",
+            "change_value": "-3129"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "202,813",
+            "change": -2750,
+            "change_formatted": "(-2,750)",
+            "change_value": "-2750"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "RICARDO SILAEN",
+            "value": "3.24 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2007-09-26T00:00:00+07:00",
+    "ipo_price": 335,
+    "float": 49.7,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "134",
+                "email": [
+                    "corporate.secretary@ptdh.co.id"
+                ],
+                "fax": "-",
+                "npwp": "01.565.295.1-091.000",
+                "phone": "021- 5025 8888",
+                "website": "www.ptdh.co.id ",
+                "key": "",
+                "lastupdate": "2024-11-11T16:09:41+07:00",
+                "value": "",
+                "office": "Prosperity Tower Lantai 39, SCBD, District 8, Lot 28, Jl. Jenderal Sudirman Kav. 52-53, Kelurahan Senayan, Kecamatan Kebayoran Baru, Jakarta Selatan, 12190"
+            }
+        ],
+        "background": "PT Darma Henwa Tbk adalah perusahaan yang bergerak di bidang kontraktor pertambangan dan energi. Lini usahanya mencakup kontrak alat berat, Kontrak aktivitas pertambangan, Kontrak pengupasan bumi, konstruksi sipil, dan pemeliharaan.\n",
+        "history": {
+            "amount": "1,055 B",
+            "board": "Papan Utama",
+            "date": "26 Sep 2007",
+            "price": "335",
+            "registrar": "",
+            "shares": "3,150,000,128",
+            "underwriters": [
+                "PT. Danatama Makmur"
+            ],
+            "administrative_bureau": "PT Ficomindo Buana Registrar",
+            "free_float": "49.70%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "34866357",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "NALINKANT AMRATLAL RATHOD"
+                },
+                {
+                    "id": "34866362",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "WISNU WAHYUDIN PETTALOLO"
+                },
+                {
+                    "id": "34866363",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "SORIMUDA PULUNGAN"
+                }
+            ],
+            "director": [
+                {
+                    "id": "34866358",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "FREDIA YUZIRWAN"
+                },
+                {
+                    "id": "34866359",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "FARUK FAUZI"
+                },
+                {
+                    "id": "34866360",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "RICARDO SILAEN"
+                },
+                {
+                    "id": "34866366",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "MAHMUD SAMURI"
+                },
+                {
+                    "id": "34866367",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "MUKSON ARIF ROSYIDI"
+                },
+                {
+                    "id": "34866368",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "ANNY TJANDRA"
+                },
+                {
+                    "id": "34866354",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "JOSEPH LEMBAYUNG"
+                },
+                {
+                    "id": "34866353",
+                    "key": "Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "AHMAD HILYADI"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "34866369",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "GORIES MERE"
+                },
+                {
+                    "id": "34866364",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "SUKARNI ILYAS"
+                },
+                {
+                    "id": "34866356",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "AGUS SUHARYONO"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "34866355",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "BAMBANG IRAWAN HENDRADI"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "34866365",
+                    "key": "President Director",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "TEGUH BOENTORO"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [
+                {
+                    "id": "34866361",
+                    "key": "Vice President Commissioner (Independent)",
+                    "lastupdate": "2026-07-01T15:30:55+07:00",
+                    "value": "SUADI ATMA"
+                }
+            ],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529259",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:38+07:00",
+                "value": "{\"name\":\"Mukson Arif Rosyidi\",\"phone\":\"(021) 2991 2350\",\"email\":\"Corporate.secretary@ptdh.co.id\\r\\n\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "67.83%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "27.60 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "9.38%",
+                "name": "GOLDWAVE CAPITAL LIMITED",
+                "value": "3.82 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "6.38%",
+                "name": "CGS INTERNATIONAL SECURITIES HONG KONG LIMITED",
+                "value": "2.60 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "6.2%",
+                "name": "PT ANDHESTI TUNGKAS PRATAMA ",
+                "value": "2.53 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "6.18%",
+                "name": "ZURICH ASSET INTERNATIONAL LTD",
+                "value": "2.51 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "4.03%",
+                "name": "SAHAM TREASURY",
+                "value": "1.64 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT DH Services",
+                "percentage": "95.55%",
+                "types": "Jasa reparasi mesin dan penunjang pertambangan",
+                "value": "2613226"
+            },
+            {
+                "company": "Prove Energy Investments Limited",
+                "percentage": "20.00%",
+                "types": "Perusahaan investasi",
+                "value": "68162516"
+            },
+            {
+                "company": "PT Cipta Multi Prima",
+                "percentage": "99.52%",
+                "types": "Macam-macam jasa",
+                "value": "9991001"
+            },
+            {
+                "company": "PT Dire Pratama",
+                "percentage": "99.72%",
+                "types": "Jasa kepelabuhanan",
+                "value": "10027545"
+            },
+            {
+                "company": "PT Rocky Investments Group",
+                "percentage": "99.50%",
+                "types": "Perusahaan dagang dan jasa pertambangan",
+                "value": "342649"
+            },
+            {
+                "company": "PT Fajar Harapan Buana",
+                "percentage": "49.75%",
+                "types": "Macam-macam jasa",
+                "value": "21827"
+            },
+            {
+                "company": "PT Sabina Mahardika",
+                "percentage": "99.89%",
+                "types": "Konsultasi manajemen",
+                "value": "40283918"
+            },
+            {
+                "company": "PT Mahadaya Imajinasi Nusantara",
+                "percentage": "99.89%",
+                "types": "Konsultasi manajemen",
+                "value": "71797485"
+            },
+            {
+                "company": "PT Dire Pratama Services",
+                "percentage": "99.00%",
+                "types": "Macam-macam jasa",
+                "value": "352636"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "193,018",
+                "change": -6768,
+                "change_formatted": "(-6,768)",
+                "change_value": "-6768"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "199,786",
+                "change": -1744,
+                "change_formatted": "(-1,744)",
+                "change_value": "-1744"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "201,530",
+                "change": 4623,
+                "change_formatted": "(+4,623)",
+                "change_value": "4623"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "196,907",
+                "change": -2777,
+                "change_formatted": "(-2,777)",
+                "change_value": "-2777"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "199,684",
+                "change": -3129,
+                "change_formatted": "(-3,129)",
+                "change_value": "-3129"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "202,813",
+                "change": -2750,
+                "change_formatted": "(-2,750)",
+                "change_value": "-2750"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "RICARDO SILAEN",
+                "value": "3.24 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "BAPAK NIRWAN DERMAWAN BAKRIE"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "9.38%",
+                    "name": "GOLDWAVE CAPITAL",
+                    "value": "3,815,217,000",
+                    "badges": [],
+                    "id": "9087",
+                    "type": "OT",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "MALAYSIA",
+                    "scripless": "3,815,217,000",
+                    "scrip": "0",
+                    "value_formatted": "3.82 B",
+                    "classification": "Private Equity",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "6.38%",
+                    "name": "CGS INTERNATIONAL SECURITIES HONG KONG",
+                    "value": "2,595,655,200",
+                    "badges": [],
+                    "id": "1000001204",
+                    "type": "SC",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "HONG KONG",
+                    "scripless": "2,595,655,200",
+                    "scrip": "0",
+                    "value_formatted": "2.60 B",
+                    "classification": "Investment Manager",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "6.21%",
+                    "name": "ANDHESTI TUNGKAS PRATAMA",
+                    "value": "2,525,000,066",
+                    "badges": [],
+                    "id": "14281",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "2,525,000,066",
+                    "scrip": "0",
+                    "value_formatted": "2.53 B",
+                    "classification": "Firm",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "6.18%",
+                    "name": "ZURICH ASSETS",
+                    "value": "2,513,178,390",
+                    "badges": [],
+                    "id": "9086",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "CAPE VERDE",
+                    "scripless": "2,513,178,390",
+                    "scrip": "0",
+                    "value_formatted": "2.51 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.65%",
+                    "name": "BCA SEKURITAS",
+                    "value": "1,892,667,372",
+                    "badges": [],
+                    "id": "10215",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,892,667,372",
+                    "scrip": "0",
+                    "value_formatted": "1.89 B",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.46%",
+                    "name": "PETROMINE ENERGY TRADING",
+                    "value": "1,814,059,000",
+                    "badges": [],
+                    "id": "1000004016",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,814,059,000",
+                    "scrip": "0",
+                    "value_formatted": "1.81 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.03%",
+                    "name": "DARMA HENWA",
+                    "value": "1,638,793,874",
+                    "badges": [],
+                    "id": "11740",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,638,793,874",
+                    "scrip": "0",
+                    "value_formatted": "1.64 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.75%",
+                    "name": "CGS INTERNATIONAL SEKURITAS INDONESIA",
+                    "value": "1,524,390,469",
+                    "badges": [],
+                    "id": "13898",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,524,390,469",
+                    "scrip": "0",
+                    "value_formatted": "1.52 B",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.21%",
+                    "name": "ADAM GIFARI SE",
+                    "value": "898,087,100",
+                    "badges": [],
+                    "id": "1000000491",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "898,087,100",
+                    "scrip": "0",
+                    "value_formatted": "898.09 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.90%",
+                    "name": "PRODIGY ENERGY RESOURCES",
+                    "value": "773,000,000",
+                    "badges": [],
+                    "id": "1000004082",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "773,000,000",
+                    "scrip": "0",
+                    "value_formatted": "773.00 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.39%",
+                    "name": "MAYBANK SEKURITAS INDONESIA - REGISTRAR",
+                    "value": "567,018,400",
+                    "badges": [],
+                    "id": "1000003290",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "567,018,400",
+                    "scrip": "0",
+                    "value_formatted": "567.02 M",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.11%",
+                    "name": "KB VALBURY SEKURITAS",
+                    "value": "453,218,700",
+                    "badges": [],
+                    "id": "12294",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "453,218,700",
+                    "scrip": "0",
+                    "value_formatted": "453.22 M",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "7",
+                "name": "Energi",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "19",
+                "name": "Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "118",
+                "name": "Pendukung Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "191",
+                "name": "Jasa & Perlengkapan Minyak, Gas & Batu Bara",
+                "symbol": "Jasa Migas & Batu Bara"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:51+00:00"
+}

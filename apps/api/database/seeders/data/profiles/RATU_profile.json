@@ -1,0 +1,688 @@
+{
+    "symbol": "RATU",
+    "name": "RATU",
+    "address": [
+        {
+            "id": "1000005299",
+            "email": [
+                "corsec@rec.co.id"
+            ],
+            "fax": "(62-21) 23579812",
+            "npwp": "02.604.262.2-072.000",
+            "phone": "(62-21) 23579812",
+            "website": "www.rec.co.id",
+            "key": "",
+            "lastupdate": "2025-01-08T02:01:43+07:00",
+            "value": "",
+            "office": "Office Park Thamrin Residences A01-05\nJl. Thamrin Boulevard, Kebon Melati, Kec. Tanah Abang\nJakarta Pusat, DKI Jakarta "
+        }
+    ],
+    "background": "PT Raharja Energi Cepu Tbk (“Perseroan”), sebelumnya dikenal sebagai PT Syabas Usaha Migas dan PT DSME ENR Cepu, didirikan pada tanggal 16 Oktober 2006. Saat ini, Perseroan fokus sebagai perusahaan holding dengan aktivitas utama pengelolaan investasi di sektor minyak dan gas bumi.\nPerseroan memiliki investasi di dua blok produksi minyak dan gas bumi. Yang pertama adalah Blok Cepu. Melalui Perusahaan Asosiasi, PT Petrogas Jatim Utama Cendana,  memiliki participating interest sebesar 2,2423%. Dengan ExxonMobil sebagai Operator tentunya memberikan keunggulan dalam manajemen operasi dan pengembangan blok tersebut. Blok kedua yang menjadi aset strategis Perseroan adalah Blok Jabung. Melalui Perusahaan Anak, PT Raharja Energi Tanjung Jabung, Perseroan berhasil mengakuisisi kepemilikan participating interest sebesar 8%. Blok ini dikelola oleh PetroChina, salah satu perusahaan minyak dan gas bumi terbesar di Asia, sebagai operator. Dengan sisa kontrak yang masih panjang, yaitu 19 tahun dan sisa cadangan yang cukup besar, Blok Jabung menyimpan potensi untuk pengembangan lapangan yang ada saat ini maupun dari lapangan-lapangan prospect & lead yang masih memerlukan eksplorasi tambahan untuk membuktikan adanya cadangan baru.\nDengan komitmen yang kuat dan strategi investasi yang terarah, Perseroan berupaya memaksimalkan nilai investasi bagi para pemegang saham, sekaligus memberikan kontribusi nyata dalam mendukung ketahanan energi nasional.",
+    "history": {
+        "amount": "624 B",
+        "board": "Papan Pengembangan",
+        "date": "8 Jan 2025",
+        "price": "1150",
+        "registrar": "",
+        "shares": "543,010,800",
+        "underwriters": [
+            "Henan Putihrai Sekuritas",
+            "Sucor Sekuritas"
+        ],
+        "administrative_bureau": "PT Ficomindo Buana Registrar",
+        "free_float": "30.93%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "28225112",
+                "key": "Commissioner",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "MERLY"
+            }
+        ],
+        "director": [
+            {
+                "id": "28225115",
+                "key": "Director",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "ADRIAN HARTADI"
+            },
+            {
+                "id": "28225114",
+                "key": "Director",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "ALEXANDRA SINTA WAHJUDEWANTI"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "28225111",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "TAUFIK AHMAD"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "28225110",
+                "key": "President Commissioner",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "ORIAS PETRUS MOEDAK"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "28225113",
+                "key": "President Director",
+                "lastupdate": "2026-05-11T16:20:29+07:00",
+                "value": "SUMANTRI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [],
+    "shareholder": [
+        {
+            "percentage": "68.68%",
+            "name": " PT RUKUN RAHARJA TBK",
+            "value": "1.86 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "31.32%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "850.34 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "48,884",
+            "change": 3101,
+            "change_formatted": "(+3,101)",
+            "change_value": "3101"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "47,808",
+            "change": 2025,
+            "change_formatted": "(+2,025)",
+            "change_value": "2025"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "45,783",
+            "change": -1191,
+            "change_formatted": "(-1,191)",
+            "change_value": "-1191"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "46,974",
+            "change": 1351,
+            "change_formatted": "(+1,351)",
+            "change_value": "1351"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "45,623",
+            "change": -2302,
+            "change_formatted": "(-2,302)",
+            "change_value": "-2302"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "47,925",
+            "change": 0,
+            "change_formatted": "(0)",
+            "change_value": "0"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "ALEXANDRA SINTA WAHJUDEWANTI ",
+            "value": "50.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ADRIAN HARTADI",
+            "value": "45.70 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2025-01-08T00:00:00+07:00",
+    "ipo_price": 1150,
+    "float": 30.93,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000005299",
+                "email": [
+                    "corsec@rec.co.id"
+                ],
+                "fax": "(62-21) 23579812",
+                "npwp": "02.604.262.2-072.000",
+                "phone": "(62-21) 23579812",
+                "website": "www.rec.co.id",
+                "key": "",
+                "lastupdate": "2025-01-08T02:01:43+07:00",
+                "value": "",
+                "office": "Office Park Thamrin Residences A01-05\nJl. Thamrin Boulevard, Kebon Melati, Kec. Tanah Abang\nJakarta Pusat, DKI Jakarta "
+            }
+        ],
+        "background": "PT Raharja Energi Cepu Tbk (“Perseroan”), sebelumnya dikenal sebagai PT Syabas Usaha Migas dan PT DSME ENR Cepu, didirikan pada tanggal 16 Oktober 2006. Saat ini, Perseroan fokus sebagai perusahaan holding dengan aktivitas utama pengelolaan investasi di sektor minyak dan gas bumi.\nPerseroan memiliki investasi di dua blok produksi minyak dan gas bumi. Yang pertama adalah Blok Cepu. Melalui Perusahaan Asosiasi, PT Petrogas Jatim Utama Cendana,  memiliki participating interest sebesar 2,2423%. Dengan ExxonMobil sebagai Operator tentunya memberikan keunggulan dalam manajemen operasi dan pengembangan blok tersebut. Blok kedua yang menjadi aset strategis Perseroan adalah Blok Jabung. Melalui Perusahaan Anak, PT Raharja Energi Tanjung Jabung, Perseroan berhasil mengakuisisi kepemilikan participating interest sebesar 8%. Blok ini dikelola oleh PetroChina, salah satu perusahaan minyak dan gas bumi terbesar di Asia, sebagai operator. Dengan sisa kontrak yang masih panjang, yaitu 19 tahun dan sisa cadangan yang cukup besar, Blok Jabung menyimpan potensi untuk pengembangan lapangan yang ada saat ini maupun dari lapangan-lapangan prospect & lead yang masih memerlukan eksplorasi tambahan untuk membuktikan adanya cadangan baru.\nDengan komitmen yang kuat dan strategi investasi yang terarah, Perseroan berupaya memaksimalkan nilai investasi bagi para pemegang saham, sekaligus memberikan kontribusi nyata dalam mendukung ketahanan energi nasional.",
+        "history": {
+            "amount": "624 B",
+            "board": "Papan Pengembangan",
+            "date": "8 Jan 2025",
+            "price": "1150",
+            "registrar": "",
+            "shares": "543,010,800",
+            "underwriters": [
+                "Henan Putihrai Sekuritas",
+                "Sucor Sekuritas"
+            ],
+            "administrative_bureau": "PT Ficomindo Buana Registrar",
+            "free_float": "30.93%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "28225112",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "MERLY"
+                }
+            ],
+            "director": [
+                {
+                    "id": "28225115",
+                    "key": "Director",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "ADRIAN HARTADI"
+                },
+                {
+                    "id": "28225114",
+                    "key": "Director",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "ALEXANDRA SINTA WAHJUDEWANTI"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "28225111",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "TAUFIK AHMAD"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "28225110",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "ORIAS PETRUS MOEDAK"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "28225113",
+                    "key": "President Director",
+                    "lastupdate": "2026-05-11T16:20:29+07:00",
+                    "value": "SUMANTRI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [],
+        "shareholder": [
+            {
+                "percentage": "68.68%",
+                "name": " PT RUKUN RAHARJA TBK",
+                "value": "1.86 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "31.32%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "850.34 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "48,884",
+                "change": 3101,
+                "change_formatted": "(+3,101)",
+                "change_value": "3101"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "47,808",
+                "change": 2025,
+                "change_formatted": "(+2,025)",
+                "change_value": "2025"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "45,783",
+                "change": -1191,
+                "change_formatted": "(-1,191)",
+                "change_value": "-1191"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "46,974",
+                "change": 1351,
+                "change_formatted": "(+1,351)",
+                "change_value": "1351"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "45,623",
+                "change": -2302,
+                "change_formatted": "(-2,302)",
+                "change_value": "-2302"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "47,925",
+                "change": 0,
+                "change_formatted": "(0)",
+                "change_value": "0"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "ALEXANDRA SINTA WAHJUDEWANTI ",
+                "value": "50.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ADRIAN HARTADI",
+                "value": "45.70 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "HAPSORO"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "68.68%",
+                    "name": "RUKUN RAHARJA",
+                    "value": "1,864,621,000",
+                    "badges": [],
+                    "id": "11986",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,864,621,000",
+                    "scrip": "0",
+                    "value_formatted": "1.86 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.99%",
+                    "name": "CHANDRA DAYA INVESTASI",
+                    "value": "135,481,100",
+                    "badges": [],
+                    "id": "1000001209",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "135,481,100",
+                    "scrip": "0",
+                    "value_formatted": "135.48 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.88%",
+                    "name": "PETRINDO JAYA KREASI",
+                    "value": "51,116,900",
+                    "badges": [],
+                    "id": "1000004013",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "51,116,900",
+                    "scrip": "0",
+                    "value_formatted": "51.12 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.36%",
+                    "name": "PETROSEA",
+                    "value": "37,052,400",
+                    "badges": [],
+                    "id": "11979",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "37,052,400",
+                    "scrip": "0",
+                    "value_formatted": "37.05 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "7",
+                "name": "Energi",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "19",
+                "name": "Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "110",
+                "name": "Minyak & Gas",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "231",
+                "name": "Produksi & Penyulingan Minyak & Gas",
+                "symbol": "Produksi & Penyulingan Migas"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:53+00:00"
+}

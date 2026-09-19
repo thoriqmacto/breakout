@@ -1,0 +1,1018 @@
+{
+    "symbol": "JPFA",
+    "name": "JPFA",
+    "address": [
+        {
+            "id": "231",
+            "email": [
+                "maya.pradjono@japfa.com",
+                " yakobus.sugeng@japfa.com",
+                " corsec@japfa.com"
+            ],
+            "fax": "021-8310309",
+            "npwp": "01.002.845.4-092.000",
+            "phone": "021-28545680",
+            "website": "http://www.japfacomfeed.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:23+07:00",
+            "value": "<td colspan='4'>Wisma Millenia Lt. 7 Jl. MT Haryono Kav. 16 Jakarta 12810\n\n        \t\t  \t\t\tPhone: 021-28545680\n        \t\t  \t\t\tFax: 021-8310309\n                            NPWP: 01.002.845.4-092.000\n        \t\t  \t\t\tEmail: maya.pradjono@japfa.com\n yakobus.sugeng@japfa.com\n corsec@japfa.com\n        \t\t  \t\t\tWebsite: http://www.japfacomfeed.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Wisma Millenia Lt. 7 Jl. MT Haryono Kav. 16 Jakarta 12810"
+        }
+    ],
+    "background": "PT Japfa Comfeed Indonesia Tbk (Japfa) merupakan salah satu pemain utama di industri peternakan terintegrasi di Indonesia. Didirikan awalnya sebagai PT Java Pelletizing Factory Ltd yang memproduksi pelet kopra, perusahaan merambah bisnis pakan ternak pada tahun 1975 dan mengembangkan pembibitan ayam pada tahun 1982, dengan hak eksklusif mendistribusikan bibit ayam Indian River dari Aviagen untuk ayam pedaging melalui merek MB202. Pertumbuhan pesat tercermin dari pencatatan saham di Bursa Efek Indonesia tahun 1989, akuisisi lima unit pabrik pakan ternak dan udang pada tahun 1990, serta perubahan nama menjadi PT Japfa Comfeed Indonesia Tbk pada tahun 1996, yang semakin diperkuat dengan integrasi vertikal melalui akuisisi PT So Good Food pada tahun 2020, menempatkan Japfa sebagai salah satu perusahaan agri-food terbesar dan terpercaya di tanah air.",
+    "history": {
+        "amount": "29 B",
+        "board": "Papan Utama",
+        "date": "23 Oct 1989",
+        "price": "7200",
+        "registrar": "",
+        "shares": "4,000,000",
+        "underwriters": [
+            "PT. Ficorinvest"
+        ],
+        "administrative_bureau": "PT Adimitra Jasa Korpora",
+        "free_float": "40.58%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "35761711",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "ANTONIUS HARWANTO SURYO SEMBODO"
+            },
+            {
+                "id": "35761710",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "HENDRICK KOLONAS"
+            }
+        ],
+        "director": [
+            {
+                "id": "35761707",
+                "key": "Director",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "LEO HANDOKO LAKSONO"
+            },
+            {
+                "id": "35761713",
+                "key": "Director",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "GABRIELLA SANTOSA"
+            },
+            {
+                "id": "35761709",
+                "key": "Director",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "ARIF WIDJAJA"
+            },
+            {
+                "id": "35761708",
+                "key": "Director",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "RACHMAT INDRAJAYA"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "35761716",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "ITO SUMARDI DJUNI SANYOTO"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "35761714",
+                "key": "President Commissioner",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "HAJI SYAMSIR SIREGAR"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "35761712",
+                "key": "President Director",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "RENALDO SANTOSA"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "35761706",
+                "key": "Vice President",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "-"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [
+            {
+                "id": "35761715",
+                "key": "Vice President Commissioner (Independent)",
+                "lastupdate": "2026-07-07T18:31:52+07:00",
+                "value": "BAMBANG BUDI HENDARTO"
+            }
+        ],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12530472",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:23+07:00",
+            "value": "{\"name\":\"Maya Pradjono\",\"phone\":\"(021) 2854 5680\",\"email\":\"mayap@japfacomfeed.co.id; sugeng@japfacomfeed.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "56.34%",
+            "name": "JAPFA PTE. LTD.",
+            "value": "6.61 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "43.02%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.05 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.43%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "50.98 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.19%",
+            "name": "SAHAM TREASURY",
+            "value": "21.70 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "",
+            "percentage": "0.00%",
+            "types": "",
+            "value": "0"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "25,695",
+            "change": 484,
+            "change_formatted": "(+484)",
+            "change_value": "484"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "25,211",
+            "change": -500,
+            "change_formatted": "(-500)",
+            "change_value": "-500"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "25,711",
+            "change": 2783,
+            "change_formatted": "(+2,783)",
+            "change_value": "2783"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "22,928",
+            "change": -1958,
+            "change_formatted": "(-1,958)",
+            "change_value": "-1958"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "24,886",
+            "change": -5656,
+            "change_formatted": "(-5,656)",
+            "change_value": "-5656"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "30,542",
+            "change": -3592,
+            "change_formatted": "(-3,592)",
+            "change_value": "-3592"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.01%",
+            "name": "LEO HANDOKO LAKSONO",
+            "value": "1.00 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.01%",
+            "name": "ARIF WIDJAJA",
+            "value": "635.90 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ANTONIUS HARWANTO SURYO SEMBODO",
+            "value": "240.00 K",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "komisaris",
+                    "color": "purple"
+                }
+            ]
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "IR. RACHMAT INDRAJAYA",
+            "value": "164.80 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1989-10-23T00:00:00+07:00",
+    "ipo_price": 7200,
+    "float": 40.58,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "231",
+                "email": [
+                    "maya.pradjono@japfa.com",
+                    " yakobus.sugeng@japfa.com",
+                    " corsec@japfa.com"
+                ],
+                "fax": "021-8310309",
+                "npwp": "01.002.845.4-092.000",
+                "phone": "021-28545680",
+                "website": "http://www.japfacomfeed.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:23+07:00",
+                "value": "<td colspan='4'>Wisma Millenia Lt. 7 Jl. MT Haryono Kav. 16 Jakarta 12810\n\n        \t\t  \t\t\tPhone: 021-28545680\n        \t\t  \t\t\tFax: 021-8310309\n                            NPWP: 01.002.845.4-092.000\n        \t\t  \t\t\tEmail: maya.pradjono@japfa.com\n yakobus.sugeng@japfa.com\n corsec@japfa.com\n        \t\t  \t\t\tWebsite: http://www.japfacomfeed.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Wisma Millenia Lt. 7 Jl. MT Haryono Kav. 16 Jakarta 12810"
+            }
+        ],
+        "background": "PT Japfa Comfeed Indonesia Tbk (Japfa) merupakan salah satu pemain utama di industri peternakan terintegrasi di Indonesia. Didirikan awalnya sebagai PT Java Pelletizing Factory Ltd yang memproduksi pelet kopra, perusahaan merambah bisnis pakan ternak pada tahun 1975 dan mengembangkan pembibitan ayam pada tahun 1982, dengan hak eksklusif mendistribusikan bibit ayam Indian River dari Aviagen untuk ayam pedaging melalui merek MB202. Pertumbuhan pesat tercermin dari pencatatan saham di Bursa Efek Indonesia tahun 1989, akuisisi lima unit pabrik pakan ternak dan udang pada tahun 1990, serta perubahan nama menjadi PT Japfa Comfeed Indonesia Tbk pada tahun 1996, yang semakin diperkuat dengan integrasi vertikal melalui akuisisi PT So Good Food pada tahun 2020, menempatkan Japfa sebagai salah satu perusahaan agri-food terbesar dan terpercaya di tanah air.",
+        "history": {
+            "amount": "29 B",
+            "board": "Papan Utama",
+            "date": "23 Oct 1989",
+            "price": "7200",
+            "registrar": "",
+            "shares": "4,000,000",
+            "underwriters": [
+                "PT. Ficorinvest"
+            ],
+            "administrative_bureau": "PT Adimitra Jasa Korpora",
+            "free_float": "40.58%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "35761711",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "ANTONIUS HARWANTO SURYO SEMBODO"
+                },
+                {
+                    "id": "35761710",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "HENDRICK KOLONAS"
+                }
+            ],
+            "director": [
+                {
+                    "id": "35761707",
+                    "key": "Director",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "LEO HANDOKO LAKSONO"
+                },
+                {
+                    "id": "35761713",
+                    "key": "Director",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "GABRIELLA SANTOSA"
+                },
+                {
+                    "id": "35761709",
+                    "key": "Director",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "ARIF WIDJAJA"
+                },
+                {
+                    "id": "35761708",
+                    "key": "Director",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "RACHMAT INDRAJAYA"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "35761716",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "ITO SUMARDI DJUNI SANYOTO"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "35761714",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "HAJI SYAMSIR SIREGAR"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "35761712",
+                    "key": "President Director",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "RENALDO SANTOSA"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "35761706",
+                    "key": "Vice President",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "-"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [
+                {
+                    "id": "35761715",
+                    "key": "Vice President Commissioner (Independent)",
+                    "lastupdate": "2026-07-07T18:31:52+07:00",
+                    "value": "BAMBANG BUDI HENDARTO"
+                }
+            ],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12530472",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:23+07:00",
+                "value": "{\"name\":\"Maya Pradjono\",\"phone\":\"(021) 2854 5680\",\"email\":\"mayap@japfacomfeed.co.id; sugeng@japfacomfeed.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "56.34%",
+                "name": "JAPFA PTE. LTD.",
+                "value": "6.61 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "43.02%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.05 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.43%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "50.98 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.19%",
+                "name": "SAHAM TREASURY",
+                "value": "21.70 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "",
+                "percentage": "0.00%",
+                "types": "",
+                "value": "0"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "25,695",
+                "change": 484,
+                "change_formatted": "(+484)",
+                "change_value": "484"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "25,211",
+                "change": -500,
+                "change_formatted": "(-500)",
+                "change_value": "-500"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "25,711",
+                "change": 2783,
+                "change_formatted": "(+2,783)",
+                "change_value": "2783"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "22,928",
+                "change": -1958,
+                "change_formatted": "(-1,958)",
+                "change_value": "-1958"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "24,886",
+                "change": -5656,
+                "change_formatted": "(-5,656)",
+                "change_value": "-5656"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "30,542",
+                "change": -3592,
+                "change_formatted": "(-3,592)",
+                "change_value": "-3592"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.01%",
+                "name": "LEO HANDOKO LAKSONO",
+                "value": "1.00 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.01%",
+                "name": "ARIF WIDJAJA",
+                "value": "635.90 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ANTONIUS HARWANTO SURYO SEMBODO",
+                "value": "240.00 K",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "komisaris",
+                        "color": "purple"
+                    }
+                ]
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "IR. RACHMAT INDRAJAYA",
+                "value": "164.80 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "RENALDO SANTOSA, GABRIELLA SANTOSA*"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "56.34%",
+                    "name": "JAPFA",
+                    "value": "6,606,181,816",
+                    "badges": [],
+                    "id": "1000002678",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "6,606,181,816",
+                    "scrip": "0",
+                    "value_formatted": "6.61 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.40%",
+                    "name": "TREE OF BLESSING",
+                    "value": "515,637,480",
+                    "badges": [],
+                    "id": "11306",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "515,637,480",
+                    "scrip": "0",
+                    "value_formatted": "515.64 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.38%",
+                    "name": "BANK JULIUS BAER &",
+                    "value": "396,323,400",
+                    "badges": [],
+                    "id": "1000000987",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "396,323,400",
+                    "scrip": "0",
+                    "value_formatted": "396.32 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.21%",
+                    "name": "UNION BANCAIRE PRIVEE, UBP SA SINGAPORE BRANCH",
+                    "value": "376,258,035",
+                    "badges": [],
+                    "id": "1000005211",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "376,258,035",
+                    "scrip": "0",
+                    "value_formatted": "376.26 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.03%",
+                    "name": "UBP SG - SUCCESS JOY TRADING",
+                    "value": "355,668,595",
+                    "badges": [],
+                    "id": "1000005199",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "VIRGIN ISLANDS, BRITISH",
+                    "scripless": "355,668,595",
+                    "scrip": "0",
+                    "value_formatted": "355.67 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.24%",
+                    "name": "MIEKE SANTOSA",
+                    "value": "263,122,585",
+                    "badges": [],
+                    "id": "11378",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "263,122,585",
+                    "scrip": "0",
+                    "value_formatted": "263.12 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.85%",
+                    "name": "UBS AG SINGAPORE BRANCH",
+                    "value": "216,579,900",
+                    "badges": [],
+                    "id": "13933",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "216,579,900",
+                    "scrip": "0",
+                    "value_formatted": "216.58 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.14%",
+                    "name": "CALIFORNIA PUBLIC EMPLOYEES RETIREMENT SYSTEM",
+                    "value": "134,159,832",
+                    "badges": [],
+                    "id": "1000001174",
+                    "type": "PF",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "UNITED STATES",
+                    "scripless": "134,159,832",
+                    "scrip": "0",
+                    "value_formatted": "134.16 M",
+                    "classification": "Pension Funds",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.08%",
+                    "name": "UNITED OVERSEAS BANK NOMINEES",
+                    "value": "126,717,860",
+                    "badges": [],
+                    "id": "11090",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "126,717,860",
+                    "scrip": "0",
+                    "value_formatted": "126.72 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "1",
+                "name": "Barang Konsumen Primer",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "15",
+                "name": "Makanan & Minuman",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "96",
+                "name": "Produk Makanan Pertanian",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "170",
+                "name": "Ikan, Daging & Produk Unggas",
+                "symbol": "Daging, Ayam & Ikan"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:53+00:00"
+}

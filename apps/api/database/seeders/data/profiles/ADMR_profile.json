@@ -1,0 +1,709 @@
+{
+    "symbol": "ADMR",
+    "name": "ADMR",
+    "address": [
+        {
+            "id": "1000003548",
+            "email": [
+                "corsec@alamtriminerals.id"
+            ],
+            "fax": "(021) 2553 3059",
+            "npwp": "0026721639063000",
+            "phone": "(021) 2553 3060",
+            "website": "www.alamtriminerals.id",
+            "key": "",
+            "lastupdate": "2025-08-05T16:16:20+07:00",
+            "value": "",
+            "office": "Cyber 2 Tower Lantai 34, Jl. H.R. Rasuna Said Blok X-5, No.13 Jakarta Selatan 12950"
+        }
+    ],
+    "background": "Adaro Minerals Indonesia Tbk. (ADMR) adalah perusahaan induk yang menjalankan kegiatan usaha pertambangan dan perdagangan batu bara metalurgi melalui Perusahaan Anak. Dalam menjalankan kegiatan usaha tersebut, Perusahaan Anak mempunyai 5 konsesi tambang PKP2B yang berlokasi di Kalimantan Timur dan Kalimantan Tengah. Pada tanggal 31 Agustus 2021, PKP2B tersebut memiliki sumber daya sebesar 980.0 juta ton dan cadangan sebesar 170.7 juta ton batu bara metalurgi yang berkualitas tinggi. Untuk tambang MC yang saat ini aktif, estimasi sumber daya dan cadangan menggunakan data topography 25 Mei 2021. Kelima PKP2B tersebut merupakan bagian dari Cekungan Kutei Atas (Upper Kutei Basin), yang memiliki endapan batu bara metalurgi yang merupakan salah satu area greenfields terbesar secara global.\n\nPada tahun 2020, ADMR memproduksi batu bara sebesar 1,88 juta ton, atau 70% di atas produksi pada tahun 2019 yang mencapai 1,1 juta ton. Seluruh batu bara yang diproduksi pada tahun 2020 merupakan batu bara metalurgi jenis HCC dari konsesi Maruwai yang memulai produksi pada tahun 2019. Konsesi Maruwai mengandung batu bara HCC mid-vol kualitas tinggi dengan kandungan abu dan fosfor yang rendah.\n\nPada periode delapan bulan yang berakhir pada tanggal 31 Agustus 2021, ADMR telah melakukan penjualan sebanyak 1,43 juta metrik ton batu bara yang dikirim ke pasar internasional meliputi China, India, Jepang dan Indonesia. ADMR terus mengembangkan pasar batu bara metalurgi dan bermaksud untuk meningkatkan produksinya seiring pertumbuhan penjualan. Di saat yang sama, ADMR juga terus melakukan investasi pada sarana pendukung dan fasilitas penambangan.\nADMR melalui Perusahaan Anak memiliki 5 area PKP2B konsesi pertambangan dengan total luas hingga 146.579 hektar.",
+    "history": {
+        "amount": "605 B",
+        "board": "Papan Utama",
+        "date": "3 Jan 2022",
+        "price": "100",
+        "registrar": "",
+        "shares": "6,048,580,000",
+        "underwriters": [
+            "Ciptadana Sekuritas Asia"
+        ],
+        "administrative_bureau": "PT Ficomindo Buana Registrar",
+        "free_float": "11.91%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "25518044",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "MOHAMMAD SYAH INDRA AMAN"
+            },
+            {
+                "id": "25518043",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "MICHAEL WILLIAM P. SOERYADJAYA"
+            }
+        ],
+        "director": [
+            {
+                "id": "25518041",
+                "key": "Director",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "HERI GUNAWAN"
+            },
+            {
+                "id": "25518046",
+                "key": "Director",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "WITO KRISNAHADI"
+            },
+            {
+                "id": "25518040",
+                "key": "Director",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "HENDRI TAMRIN"
+            },
+            {
+                "id": "25518039",
+                "key": "Director",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "TOTOK AZHARIYANTO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "25518047",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "LINDAWATI GANI"
+            },
+            {
+                "id": "25518045",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "MOHAMMAD EFFENDI"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "25518042",
+                "key": "President Commissioner",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "GARIBALDI THOHIR"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "25518048",
+                "key": "President Director",
+                "lastupdate": "2026-04-17T23:47:26+07:00",
+                "value": "IWAN DEWONO BUDIYUWONO"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12537053",
+            "key": "",
+            "lastupdate": "2022-01-04T09:16:02+07:00",
+            "value": "{\"name\":\"Heri Gunawan\",\"phone\":\"(021) 2553 3060\",\"email\":\"corsec@adarominerals.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "85.448%",
+            "name": "PT ALAMTRI RESOURCES INDONESIA TBK",
+            "value": "34.93 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "14.552%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.95 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Alam Tri Daya Indonesia",
+            "percentage": "99.99%",
+            "types": "Aktivitas kantor pusat dan konsultasi manajemen lainnya",
+            "value": "778394932"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "42,136",
+            "change": -2652,
+            "change_formatted": "(-2,652)",
+            "change_value": "-2652"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "44,788",
+            "change": 1051,
+            "change_formatted": "(+1,051)",
+            "change_value": "1051"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "43,737",
+            "change": 725,
+            "change_formatted": "(+725)",
+            "change_value": "725"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "43,012",
+            "change": -1400,
+            "change_formatted": "(-1,400)",
+            "change_value": "-1400"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "44,412",
+            "change": 2175,
+            "change_formatted": "(+2,175)",
+            "change_value": "2175"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "42,237",
+            "change": -1589,
+            "change_formatted": "(-1,589)",
+            "change_value": "-1589"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "<0.0001%",
+            "name": "WITO KRISNAHADI",
+            "value": "69.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2022-01-03T00:00:00+07:00",
+    "ipo_price": 100,
+    "float": 11.91,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000003548",
+                "email": [
+                    "corsec@alamtriminerals.id"
+                ],
+                "fax": "(021) 2553 3059",
+                "npwp": "0026721639063000",
+                "phone": "(021) 2553 3060",
+                "website": "www.alamtriminerals.id",
+                "key": "",
+                "lastupdate": "2025-08-05T16:16:20+07:00",
+                "value": "",
+                "office": "Cyber 2 Tower Lantai 34, Jl. H.R. Rasuna Said Blok X-5, No.13 Jakarta Selatan 12950"
+            }
+        ],
+        "background": "Adaro Minerals Indonesia Tbk. (ADMR) adalah perusahaan induk yang menjalankan kegiatan usaha pertambangan dan perdagangan batu bara metalurgi melalui Perusahaan Anak. Dalam menjalankan kegiatan usaha tersebut, Perusahaan Anak mempunyai 5 konsesi tambang PKP2B yang berlokasi di Kalimantan Timur dan Kalimantan Tengah. Pada tanggal 31 Agustus 2021, PKP2B tersebut memiliki sumber daya sebesar 980.0 juta ton dan cadangan sebesar 170.7 juta ton batu bara metalurgi yang berkualitas tinggi. Untuk tambang MC yang saat ini aktif, estimasi sumber daya dan cadangan menggunakan data topography 25 Mei 2021. Kelima PKP2B tersebut merupakan bagian dari Cekungan Kutei Atas (Upper Kutei Basin), yang memiliki endapan batu bara metalurgi yang merupakan salah satu area greenfields terbesar secara global.\n\nPada tahun 2020, ADMR memproduksi batu bara sebesar 1,88 juta ton, atau 70% di atas produksi pada tahun 2019 yang mencapai 1,1 juta ton. Seluruh batu bara yang diproduksi pada tahun 2020 merupakan batu bara metalurgi jenis HCC dari konsesi Maruwai yang memulai produksi pada tahun 2019. Konsesi Maruwai mengandung batu bara HCC mid-vol kualitas tinggi dengan kandungan abu dan fosfor yang rendah.\n\nPada periode delapan bulan yang berakhir pada tanggal 31 Agustus 2021, ADMR telah melakukan penjualan sebanyak 1,43 juta metrik ton batu bara yang dikirim ke pasar internasional meliputi China, India, Jepang dan Indonesia. ADMR terus mengembangkan pasar batu bara metalurgi dan bermaksud untuk meningkatkan produksinya seiring pertumbuhan penjualan. Di saat yang sama, ADMR juga terus melakukan investasi pada sarana pendukung dan fasilitas penambangan.\nADMR melalui Perusahaan Anak memiliki 5 area PKP2B konsesi pertambangan dengan total luas hingga 146.579 hektar.",
+        "history": {
+            "amount": "605 B",
+            "board": "Papan Utama",
+            "date": "3 Jan 2022",
+            "price": "100",
+            "registrar": "",
+            "shares": "6,048,580,000",
+            "underwriters": [
+                "Ciptadana Sekuritas Asia"
+            ],
+            "administrative_bureau": "PT Ficomindo Buana Registrar",
+            "free_float": "11.91%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "25518044",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "MOHAMMAD SYAH INDRA AMAN"
+                },
+                {
+                    "id": "25518043",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "MICHAEL WILLIAM P. SOERYADJAYA"
+                }
+            ],
+            "director": [
+                {
+                    "id": "25518041",
+                    "key": "Director",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "HERI GUNAWAN"
+                },
+                {
+                    "id": "25518046",
+                    "key": "Director",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "WITO KRISNAHADI"
+                },
+                {
+                    "id": "25518040",
+                    "key": "Director",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "HENDRI TAMRIN"
+                },
+                {
+                    "id": "25518039",
+                    "key": "Director",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "TOTOK AZHARIYANTO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "25518047",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "LINDAWATI GANI"
+                },
+                {
+                    "id": "25518045",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "MOHAMMAD EFFENDI"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "25518042",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "GARIBALDI THOHIR"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "25518048",
+                    "key": "President Director",
+                    "lastupdate": "2026-04-17T23:47:26+07:00",
+                    "value": "IWAN DEWONO BUDIYUWONO"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12537053",
+                "key": "",
+                "lastupdate": "2022-01-04T09:16:02+07:00",
+                "value": "{\"name\":\"Heri Gunawan\",\"phone\":\"(021) 2553 3060\",\"email\":\"corsec@adarominerals.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "85.448%",
+                "name": "PT ALAMTRI RESOURCES INDONESIA TBK",
+                "value": "34.93 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "14.552%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.95 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Alam Tri Daya Indonesia",
+                "percentage": "99.99%",
+                "types": "Aktivitas kantor pusat dan konsultasi manajemen lainnya",
+                "value": "778394932"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "42,136",
+                "change": -2652,
+                "change_formatted": "(-2,652)",
+                "change_value": "-2652"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "44,788",
+                "change": 1051,
+                "change_formatted": "(+1,051)",
+                "change_value": "1051"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "43,737",
+                "change": 725,
+                "change_formatted": "(+725)",
+                "change_value": "725"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "43,012",
+                "change": -1400,
+                "change_formatted": "(-1,400)",
+                "change_value": "-1400"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "44,412",
+                "change": 2175,
+                "change_formatted": "(+2,175)",
+                "change_value": "2175"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "42,237",
+                "change": -1589,
+                "change_formatted": "(-1,589)",
+                "change_value": "-1589"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "<0.0001%",
+                "name": "WITO KRISNAHADI",
+                "value": "69.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "GARIBALDI THOHIR"
+            },
+            {
+                "name": "CHRISTIAN ARIANO RACHMAT"
+            },
+            {
+                "name": "ARINI SARASWATY SUBIANTO"
+            },
+            {
+                "name": "MICHAEL W. P. SOERYADJAYA"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "85.45%",
+                    "name": "ALAMTRI RESOURCES INDONESIA",
+                    "value": "34,933,166,100",
+                    "badges": [],
+                    "id": "1000000569",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "34,933,166,100",
+                    "scrip": "0",
+                    "value_formatted": "34.93 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.30%",
+                    "name": "VERANUS CAPITAL",
+                    "value": "532,762,560",
+                    "badges": [],
+                    "id": "1000005236",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "532,762,560",
+                    "scrip": "0",
+                    "value_formatted": "532.76 M",
+                    "classification": "Investment Advisors",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.07%",
+                    "name": "SILVERCITY ENTERPRISE",
+                    "value": "436,463,680",
+                    "badges": [],
+                    "id": "1000004632",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "HONG KONG",
+                    "scripless": "436,463,680",
+                    "scrip": "0",
+                    "value_formatted": "436.46 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "7",
+                "name": "Energi",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "19",
+                "name": "Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "95",
+                "name": "Batu Bara",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "158",
+                "name": "Produksi Batu Bara",
+                "symbol": "Batu Bara"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:49+00:00"
+}

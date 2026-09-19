@@ -1,0 +1,961 @@
+{
+    "symbol": "HRUM",
+    "name": "HRUM",
+    "address": [
+        {
+            "id": "192",
+            "email": [
+                "corsec@harumenergy.com "
+            ],
+            "fax": "021-3983-1289",
+            "npwp": "01.746.590.7-091.000",
+            "phone": " 021-3983-1288  ",
+            "website": "www.harumenergy.com",
+            "key": "",
+            "lastupdate": "2026-09-08T16:38:56+07:00",
+            "value": "",
+            "office": "Gedung Deutsche Bank, Lantai 9 Jl. Imam Bonjol No. 80 Jakarta Pusat, 10310 Indonesia "
+        }
+    ],
+    "background": "Perseroan didirikan dengan nama PT Asia Antrasit pada tanggal 12 Oktober 1995, yang kemudian berubah nama menjadi PT Harum Energy pada tanggal 13 November 2007. Perseroan bergerak di bidang pertambangan, industri, perdagangan, dan jasa yang terkait dengan batubara. Kegiatan usaha tersebut dijalankan bersama dengan Entitas Anak dan Entitas Asosiasi.",
+    "history": {
+        "amount": "2,600 B",
+        "board": "Papan Utama",
+        "date": "6 Oct 2010",
+        "price": "5200",
+        "registrar": "",
+        "shares": "500,000,000",
+        "underwriters": [
+            "PT. Ciptadana Securities",
+            "Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT Datindo Entrycom",
+        "free_float": "17.16%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13836513",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Steven Scott Barki"
+            },
+            {
+                "id": "13836512",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Drs. Yun Mulyana"
+            }
+        ],
+        "director": [
+            {
+                "id": "13836510",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Hariyadi"
+            },
+            {
+                "id": "13836509",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Kenneth Scott Andrew Thompson"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13836515",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Astria Wizayanti"
+            },
+            {
+                "id": "13836514",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Dody Hasril"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "13836511",
+                "key": "President Commissioner",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Lawrence Barki"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "13836508",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:38:19+07:00",
+                "value": "Ray Antonio Gunara"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529981",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:13+07:00",
+            "value": "{\"name\":\"Ray Antonio Gunara\",\"phone\":\" 021 - 3983 1288 \",\"email\":\"corsec@harumenergy.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "79.792%",
+            "name": "PT KARUNIA BARA PERKASA",
+            "value": "10.79 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "17.181%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "2.32 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "2.734%",
+            "name": "SAHAM TREASURY",
+            "value": "369.54 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.092%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "12.50 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Mahakam Sumber Jaya",
+            "percentage": "80.00%",
+            "types": "Pertambangan Batubara",
+            "value": "170983080"
+        },
+        {
+            "company": "PT Layar Lintas Jaya",
+            "percentage": "99.11%",
+            "types": "Pelayaran",
+            "value": "44331275"
+        },
+        {
+            "company": "Harum Energy Australia Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "3035"
+        },
+        {
+            "company": "PT Tambang Batubara Harum",
+            "percentage": "99.97%",
+            "types": "Pertambangan Batubara",
+            "value": "3344994"
+        },
+        {
+            "company": "PT Tanito Harum Nickel",
+            "percentage": "99.99%",
+            "types": "Investasi",
+            "value": "150450818"
+        },
+        {
+            "company": "Harum Energy Capital Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "1636"
+        },
+        {
+            "company": "PT Karya Usaha Pertiwi",
+            "percentage": "50.50%",
+            "types": "Pertambangan Batubara",
+            "value": "25073534"
+        },
+        {
+            "company": "PT Bumi Karunia Pertiwi",
+            "percentage": "99.99%",
+            "types": "Pertambangan Batubara",
+            "value": "7875814"
+        },
+        {
+            "company": "PT Santan Batubara",
+            "percentage": "99.99%",
+            "types": "Pertambangan Batubara",
+            "value": "17939566"
+        },
+        {
+            "company": "Harum Asia Capital Pte Ltd",
+            "percentage": "100%",
+            "types": "Investasi",
+            "value": "10"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "35,735",
+            "change": 1230,
+            "change_formatted": "(+1,230)",
+            "change_value": "1230"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "34,505",
+            "change": -377,
+            "change_formatted": "(-377)",
+            "change_value": "-377"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "34,882",
+            "change": -644,
+            "change_formatted": "(-644)",
+            "change_value": "-644"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "35,526",
+            "change": -1018,
+            "change_formatted": "(-1,018)",
+            "change_value": "-1018"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "36,544",
+            "change": -658,
+            "change_formatted": "(-658)",
+            "change_value": "-658"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "37,202",
+            "change": 1202,
+            "change_formatted": "(+1,202)",
+            "change_value": "1202"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.095%",
+            "name": "LAWRENCE BARKI",
+            "value": "12.88 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "komisaris",
+                    "color": "purple"
+                }
+            ]
+        },
+        {
+            "percentage": "0.085%",
+            "name": "STEVEN SCOTT BARKI",
+            "value": "11.48 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "komisaris",
+                    "color": "purple"
+                }
+            ]
+        },
+        {
+            "percentage": "0.021%",
+            "name": "RAY ANTONIO GUNARA",
+            "value": "2.80 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2010-10-06T00:00:00+07:00",
+    "ipo_price": 5200,
+    "float": 17.16,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "192",
+                "email": [
+                    "corsec@harumenergy.com "
+                ],
+                "fax": "021-3983-1289",
+                "npwp": "01.746.590.7-091.000",
+                "phone": " 021-3983-1288  ",
+                "website": "www.harumenergy.com",
+                "key": "",
+                "lastupdate": "2026-09-08T16:38:56+07:00",
+                "value": "",
+                "office": "Gedung Deutsche Bank, Lantai 9 Jl. Imam Bonjol No. 80 Jakarta Pusat, 10310 Indonesia "
+            }
+        ],
+        "background": "Perseroan didirikan dengan nama PT Asia Antrasit pada tanggal 12 Oktober 1995, yang kemudian berubah nama menjadi PT Harum Energy pada tanggal 13 November 2007. Perseroan bergerak di bidang pertambangan, industri, perdagangan, dan jasa yang terkait dengan batubara. Kegiatan usaha tersebut dijalankan bersama dengan Entitas Anak dan Entitas Asosiasi.",
+        "history": {
+            "amount": "2,600 B",
+            "board": "Papan Utama",
+            "date": "6 Oct 2010",
+            "price": "5200",
+            "registrar": "",
+            "shares": "500,000,000",
+            "underwriters": [
+                "PT. Ciptadana Securities",
+                "Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT Datindo Entrycom",
+            "free_float": "17.16%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13836513",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Steven Scott Barki"
+                },
+                {
+                    "id": "13836512",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Drs. Yun Mulyana"
+                }
+            ],
+            "director": [
+                {
+                    "id": "13836510",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Hariyadi"
+                },
+                {
+                    "id": "13836509",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Kenneth Scott Andrew Thompson"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13836515",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Astria Wizayanti"
+                },
+                {
+                    "id": "13836514",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Dody Hasril"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "13836511",
+                    "key": "President Commissioner",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Lawrence Barki"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "13836508",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:38:19+07:00",
+                    "value": "Ray Antonio Gunara"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529981",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:13+07:00",
+                "value": "{\"name\":\"Ray Antonio Gunara\",\"phone\":\" 021 - 3983 1288 \",\"email\":\"corsec@harumenergy.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "79.792%",
+                "name": "PT KARUNIA BARA PERKASA",
+                "value": "10.79 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "17.181%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "2.32 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "2.734%",
+                "name": "SAHAM TREASURY",
+                "value": "369.54 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.092%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "12.50 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Mahakam Sumber Jaya",
+                "percentage": "80.00%",
+                "types": "Pertambangan Batubara",
+                "value": "170983080"
+            },
+            {
+                "company": "PT Layar Lintas Jaya",
+                "percentage": "99.11%",
+                "types": "Pelayaran",
+                "value": "44331275"
+            },
+            {
+                "company": "Harum Energy Australia Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "3035"
+            },
+            {
+                "company": "PT Tambang Batubara Harum",
+                "percentage": "99.97%",
+                "types": "Pertambangan Batubara",
+                "value": "3344994"
+            },
+            {
+                "company": "PT Tanito Harum Nickel",
+                "percentage": "99.99%",
+                "types": "Investasi",
+                "value": "150450818"
+            },
+            {
+                "company": "Harum Energy Capital Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "1636"
+            },
+            {
+                "company": "PT Karya Usaha Pertiwi",
+                "percentage": "50.50%",
+                "types": "Pertambangan Batubara",
+                "value": "25073534"
+            },
+            {
+                "company": "PT Bumi Karunia Pertiwi",
+                "percentage": "99.99%",
+                "types": "Pertambangan Batubara",
+                "value": "7875814"
+            },
+            {
+                "company": "PT Santan Batubara",
+                "percentage": "99.99%",
+                "types": "Pertambangan Batubara",
+                "value": "17939566"
+            },
+            {
+                "company": "Harum Asia Capital Pte Ltd",
+                "percentage": "100%",
+                "types": "Investasi",
+                "value": "10"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "35,735",
+                "change": 1230,
+                "change_formatted": "(+1,230)",
+                "change_value": "1230"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "34,505",
+                "change": -377,
+                "change_formatted": "(-377)",
+                "change_value": "-377"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "34,882",
+                "change": -644,
+                "change_formatted": "(-644)",
+                "change_value": "-644"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "35,526",
+                "change": -1018,
+                "change_formatted": "(-1,018)",
+                "change_value": "-1018"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "36,544",
+                "change": -658,
+                "change_formatted": "(-658)",
+                "change_value": "-658"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "37,202",
+                "change": 1202,
+                "change_formatted": "(+1,202)",
+                "change_value": "1202"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.095%",
+                "name": "LAWRENCE BARKI",
+                "value": "12.88 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "komisaris",
+                        "color": "purple"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.085%",
+                "name": "STEVEN SCOTT BARKI",
+                "value": "11.48 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "komisaris",
+                        "color": "purple"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.021%",
+                "name": "RAY ANTONIO GUNARA",
+                "value": "2.80 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "LAWRENCE BARKI"
+            },
+            {
+                "name": "STEVEN SCOTT BARKI"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "79.79%",
+                    "name": "KARUNIA BARA PERKASA",
+                    "value": "10,786,374,000",
+                    "badges": [],
+                    "id": "9217",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "2,049,204,000",
+                    "scrip": "8,737,170,000",
+                    "value_formatted": "10.79 B",
+                    "classification": "Firm",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.73%",
+                    "name": "HARUM ENERGY",
+                    "value": "369,543,600",
+                    "badges": [],
+                    "id": "9216",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "369,543,600",
+                    "scrip": "0",
+                    "value_formatted": "369.54 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.39%",
+                    "name": "DJS KETENAGAKERJAAN PROGRAM JAMINAN PENSIUN",
+                    "value": "188,392,500",
+                    "badges": [],
+                    "id": "1000001595",
+                    "type": "IS",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "188,392,500",
+                    "scrip": "0",
+                    "value_formatted": "188.39 M",
+                    "classification": "Insurance",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.08%",
+                    "name": "DJS KETENAGAKERJAAN PROGRAM JAMINAN HARI TUA",
+                    "value": "146,519,200",
+                    "badges": [],
+                    "id": "1000000062",
+                    "type": "IS",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "146,519,200",
+                    "scrip": "0",
+                    "value_formatted": "146.52 M",
+                    "classification": "Insurance",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "7",
+                "name": "Energi",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "19",
+                "name": "Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "95",
+                "name": "Batu Bara",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "158",
+                "name": "Produksi Batu Bara",
+                "symbol": "Batu Bara"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:52+00:00"
+}

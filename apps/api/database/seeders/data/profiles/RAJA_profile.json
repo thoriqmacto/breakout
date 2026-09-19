@@ -1,0 +1,932 @@
+{
+    "symbol": "RAJA",
+    "name": "RAJA",
+    "address": [
+        {
+            "id": "354",
+            "email": [
+                "corsec@raja.co.id"
+            ],
+            "fax": "021 23579803",
+            "npwp": "01.581.976.6-054.000",
+            "phone": "021 29291053",
+            "website": "www.raja.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:53+07:00",
+            "value": "",
+            "office": "Office Park Thamrin Residence Blok A. no. 01-05, Jl. Thamrin Boulevard, Kebon Melati, Tanah Abang, DKI Jakarta 10230"
+        }
+    ],
+    "background": "\"PT Rukun Raharja sebelumnya bergerak dalam bidang real estate menjadi bergerak dalam bidang penyedia energi terintegrasi dari hulu sampai dengan hilir yaitu menjalankan usaha di bidang jasa atau pelayanan yang meliputi jasa-jasa penunjang pertambangan minyak dan gas bumi, penyediaan tenaga listrik, konsultasi bidang pertambangan, pengelolaan \n",
+    "history": {
+        "amount": "13 B",
+        "board": "Papan Utama",
+        "date": "22 Jan 2003",
+        "price": "110",
+        "registrar": "",
+        "shares": "120,000,000",
+        "underwriters": [
+            "-"
+        ],
+        "administrative_bureau": "PT Ficomindo Buana Registrar",
+        "free_float": "22.79%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "34730440",
+                "key": "Commissioner",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "M ARSJAD RASJID P M"
+            }
+        ],
+        "director": [
+            {
+                "id": "34730439",
+                "key": "Director",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "PRABA DIWANGKARA"
+            },
+            {
+                "id": "34730438",
+                "key": "Director",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "OGI RULINO"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "34730443",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "D ANDHI NIRWANTO"
+            },
+            {
+                "id": "34730441",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "RACHMAD GOBEL"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "34730442",
+                "key": "President Commissioner",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "RUDIANTARA"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "34730437",
+                "key": "President Director",
+                "lastupdate": "2026-06-30T14:00:41+07:00",
+                "value": "DJAUHAR MAULIDI"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12531895",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:53+07:00",
+            "value": "{\"name\":\"Yuni Pattinasarani\",\"phone\":\"+622129291053\",\"email\":\"yuni.pattinasarani@raja.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "35.73%",
+            "name": "SENTOSA BERSAMA MITRA",
+            "value": "7.55 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "27.52%",
+            "name": "HAPSORO",
+            "value": "5.82 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "23.82%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "5.04 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "12.38%",
+            "name": "PT TIRTA ORISA YASA",
+            "value": "2.62 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.35%",
+            "name": "SAHAM TREASURY",
+            "value": "73.71 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Triguna Internusa Pratama",
+            "percentage": "100%",
+            "types": "Transmisi Gas dan Kompresi Gas",
+            "value": "30518"
+        },
+        {
+            "company": "PT Panji Raya Alamindo",
+            "percentage": "67.00%",
+            "types": "Investasi",
+            "value": "59008"
+        },
+        {
+            "company": "PT PDPDE Gas",
+            "percentage": "85.00%",
+            "types": "Distributor Gas Alam",
+            "value": "11074"
+        },
+        {
+            "company": "PT REC",
+            "percentage": "100.00%",
+            "types": "Jasa konsultasi manajemen dan bisnis dan turut serta permodalan dalam perusahaan lain di Indonesia",
+            "value": "22340"
+        },
+        {
+            "company": "PT RDE",
+            "percentage": "99.00%",
+            "types": "Pengembang/ Developers",
+            "value": "557"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "71,721",
+            "change": -731,
+            "change_formatted": "(-731)",
+            "change_value": "-731"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "72,452",
+            "change": 14065,
+            "change_formatted": "(+14,065)",
+            "change_value": "14065"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "58,387",
+            "change": 108,
+            "change_formatted": "(+108)",
+            "change_value": "108"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "58,279",
+            "change": -212,
+            "change_formatted": "(-212)",
+            "change_value": "-212"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "58,491",
+            "change": -5432,
+            "change_formatted": "(-5,432)",
+            "change_value": "-5432"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "63,923",
+            "change": 1004,
+            "change_formatted": "(+1,004)",
+            "change_value": "1004"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "0.14%",
+            "name": "DJAUHAR MAULIDI",
+            "value": "28.75 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.05%",
+            "name": "OGI RULINO",
+            "value": "11.25 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.01%",
+            "name": "PRABA DIWANGKARA PUTRA CARAKA SOMA",
+            "value": "2.11 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2003-01-22T00:00:00+07:00",
+    "ipo_price": 110,
+    "float": 22.79,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "354",
+                "email": [
+                    "corsec@raja.co.id"
+                ],
+                "fax": "021 23579803",
+                "npwp": "01.581.976.6-054.000",
+                "phone": "021 29291053",
+                "website": "www.raja.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:53+07:00",
+                "value": "",
+                "office": "Office Park Thamrin Residence Blok A. no. 01-05, Jl. Thamrin Boulevard, Kebon Melati, Tanah Abang, DKI Jakarta 10230"
+            }
+        ],
+        "background": "\"PT Rukun Raharja sebelumnya bergerak dalam bidang real estate menjadi bergerak dalam bidang penyedia energi terintegrasi dari hulu sampai dengan hilir yaitu menjalankan usaha di bidang jasa atau pelayanan yang meliputi jasa-jasa penunjang pertambangan minyak dan gas bumi, penyediaan tenaga listrik, konsultasi bidang pertambangan, pengelolaan \n",
+        "history": {
+            "amount": "13 B",
+            "board": "Papan Utama",
+            "date": "22 Jan 2003",
+            "price": "110",
+            "registrar": "",
+            "shares": "120,000,000",
+            "underwriters": [
+                "-"
+            ],
+            "administrative_bureau": "PT Ficomindo Buana Registrar",
+            "free_float": "22.79%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "34730440",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "M ARSJAD RASJID P M"
+                }
+            ],
+            "director": [
+                {
+                    "id": "34730439",
+                    "key": "Director",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "PRABA DIWANGKARA"
+                },
+                {
+                    "id": "34730438",
+                    "key": "Director",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "OGI RULINO"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "34730443",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "D ANDHI NIRWANTO"
+                },
+                {
+                    "id": "34730441",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "RACHMAD GOBEL"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "34730442",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "RUDIANTARA"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "34730437",
+                    "key": "President Director",
+                    "lastupdate": "2026-06-30T14:00:41+07:00",
+                    "value": "DJAUHAR MAULIDI"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12531895",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:53+07:00",
+                "value": "{\"name\":\"Yuni Pattinasarani\",\"phone\":\"+622129291053\",\"email\":\"yuni.pattinasarani@raja.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "35.73%",
+                "name": "SENTOSA BERSAMA MITRA",
+                "value": "7.55 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "27.52%",
+                "name": "HAPSORO",
+                "value": "5.82 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "23.82%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "5.04 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "12.38%",
+                "name": "PT TIRTA ORISA YASA",
+                "value": "2.62 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.35%",
+                "name": "SAHAM TREASURY",
+                "value": "73.71 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Triguna Internusa Pratama",
+                "percentage": "100%",
+                "types": "Transmisi Gas dan Kompresi Gas",
+                "value": "30518"
+            },
+            {
+                "company": "PT Panji Raya Alamindo",
+                "percentage": "67.00%",
+                "types": "Investasi",
+                "value": "59008"
+            },
+            {
+                "company": "PT PDPDE Gas",
+                "percentage": "85.00%",
+                "types": "Distributor Gas Alam",
+                "value": "11074"
+            },
+            {
+                "company": "PT REC",
+                "percentage": "100.00%",
+                "types": "Jasa konsultasi manajemen dan bisnis dan turut serta permodalan dalam perusahaan lain di Indonesia",
+                "value": "22340"
+            },
+            {
+                "company": "PT RDE",
+                "percentage": "99.00%",
+                "types": "Pengembang/ Developers",
+                "value": "557"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "71,721",
+                "change": -731,
+                "change_formatted": "(-731)",
+                "change_value": "-731"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "72,452",
+                "change": 14065,
+                "change_formatted": "(+14,065)",
+                "change_value": "14065"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "58,387",
+                "change": 108,
+                "change_formatted": "(+108)",
+                "change_value": "108"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "58,279",
+                "change": -212,
+                "change_formatted": "(-212)",
+                "change_value": "-212"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "58,491",
+                "change": -5432,
+                "change_formatted": "(-5,432)",
+                "change_value": "-5432"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "63,923",
+                "change": 1004,
+                "change_formatted": "(+1,004)",
+                "change_value": "1004"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "0.14%",
+                "name": "DJAUHAR MAULIDI",
+                "value": "28.75 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.05%",
+                "name": "OGI RULINO",
+                "value": "11.25 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.01%",
+                "name": "PRABA DIWANGKARA PUTRA CARAKA SOMA",
+                "value": "2.11 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "HAPSORO"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "35.73%",
+                    "name": "SENTOSA BERSAMA MITRA",
+                    "value": "7,552,062,520",
+                    "badges": [],
+                    "id": "9539",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "7,552,062,520",
+                    "scrip": "0",
+                    "value_formatted": "7.55 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "27.52%",
+                    "name": "HAPSORO",
+                    "value": "5,816,180,500",
+                    "badges": [],
+                    "id": "9540",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "5,816,180,500",
+                    "scrip": "0",
+                    "value_formatted": "5.82 B",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "12.38%",
+                    "name": "TIRTA ORISA YASA",
+                    "value": "2,615,870,000",
+                    "badges": [],
+                    "id": "1000005122",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "2,615,870,000",
+                    "scrip": "0",
+                    "value_formatted": "2.62 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.04%",
+                    "name": "NG DOBIAS ISKANDAR",
+                    "value": "220,407,000",
+                    "badges": [],
+                    "id": "1000005829",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "220,407,000",
+                    "scrip": "0",
+                    "value_formatted": "220.41 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.04%",
+                    "name": "GOVERNMENT OF NORWAY",
+                    "value": "219,500,000",
+                    "badges": [],
+                    "id": "1000002104",
+                    "type": "OT",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "NORWAY",
+                    "scripless": "219,500,000",
+                    "scrip": "0",
+                    "value_formatted": "219.50 M",
+                    "classification": "Sovereign Wealth Fund",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "7",
+                "name": "Energi",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "19",
+                "name": "Minyak, Gas & Batu Bara",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "110",
+                "name": "Minyak & Gas",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "175",
+                "name": "Penyimpanan & Distribusi Minyak & Gas",
+                "symbol": "Penyimpanan & Distribusi Migas"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:53+00:00"
+}

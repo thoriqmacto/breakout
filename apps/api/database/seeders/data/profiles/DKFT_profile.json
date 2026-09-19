@@ -1,0 +1,910 @@
+{
+    "symbol": "DKFT",
+    "name": "DKFT",
+    "address": [
+        {
+            "id": "137",
+            "email": [
+                "\t021-515 3533"
+            ],
+            "fax": "\t021-515 3533",
+            "npwp": "\t01.690.378.3-091.000",
+            "phone": "\t021-515 3533",
+            "website": "centralomega.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:39+07:00",
+            "value": "<td colspan='4'>Plaza Asia Lantai 6 Jl.Jend.Sudirman Kav 59 Jakarta - 12190\n\n        \t\t  \t\t\tPhone: \t021-515 3533\n        \t\t  \t\t\tFax: \t021-515 3533\n                            NPWP: \t01.690.378.3-091.000\n        \t\t  \t\t\tEmail: \t021-515 3533\n        \t\t  \t\t\tWebsite: centralomega.com\n\n        \t  \t\t\t</td>",
+            "office": "Plaza Asia Lantai 6 Jl.Jend.Sudirman Kav 59 Jakarta - 12190"
+        }
+    ],
+    "background": "PT Central Omega Resources Tbk didirikan tahun 1995.\n\nSejak tahun 2008, perusahaan mulai  terjun di bidang pertambangan bijih nikel dan pada tahun 2011, perusahaan mulai mengekspor bijih nikel ke luar negeri. Dalam waktu yang relatif singkat, Perusahaan sudah mampu memproduksi bijih nikel sebanyak 3 juta ton per tahun.\nTambang bijih nikel perusahaan berlokasi di Sulawesi , yang merupakan salah satu sumber cadangan nikel laterite terbesar di dunia, tepatnya di Morowali, Sulawesi Tengah dan Konawe Utara, Sulawesi Tenggara.\n\nUntuk memenuhi ketentuan Pemerintah dalam UU Minerba Nomor 4 tahun 2009, Perusahaan berencana untuk melakukan hilirisasi produk pertambangan bijih nikelnya dengan membangun fasilitas smelter Ferronikel (FeNi) di Morowali Utara, Sulawesi Tengah. Pembangunan ini dilaksanakan Perusahaan bekerjasama dengan PT Macrilink Nickel Development dengan membentuk satu perusahaan baru, PT COR Industri Indonesia.\n\nDengan komitmen untuk menjadi perusahaan nikel yang penting di Indonesia, PT Central Omega Resources Tbk bersama dengan PT Macrolink Nickel Development sedang melakukan langkah strategis, baik dalam perbaikan tata kelola tambang yang berkelanjutan maupun peningkatan nilai tambah sumberdaya mineral bijih nikel, salahsatunya dengan pengoperasian smelter FeNi di Morowali Utara, Sulawesi Tengah. Untuk tahap pertama, akan dioperasikan smelter dengan kapasitas produksi FeNi sebesar 100 ribu t/a, smelter tahap pertama ini dijadwalkan akan beroperasi pada tahun 2017.",
+    "history": {
+        "amount": "13 B",
+        "board": "Papan Utama",
+        "date": "21 Nov 1997",
+        "price": "500",
+        "registrar": "",
+        "shares": "26,000,000",
+        "underwriters": [
+            "PT. Trimegah Securities"
+        ],
+        "administrative_bureau": "PT Sinartama Gunita",
+        "free_float": "32.44%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "26297424",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "LIM ANTHONY"
+            }
+        ],
+        "director": [
+            {
+                "id": "26297429",
+                "key": "Director",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "ANDI JAYA"
+            },
+            {
+                "id": "26297428",
+                "key": "Director",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "FENI SILVIANI BUDIMAN"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "26297426",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "CHANG ENG THING"
+            },
+            {
+                "id": "26297425",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "MUHAMMAD RUSJDI"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "26297423",
+                "key": "President Commissioner",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "KURNIADI ATMOSASMITO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "26297427",
+                "key": "President Director",
+                "lastupdate": "2026-04-23T18:32:26+07:00",
+                "value": "KIKI HAMIDJAJA"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12529295",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:39+07:00",
+            "value": "{\"name\":\"Yohanes Supriady\",\"phone\":\"021-29035625\",\"email\":\"corsec@centralomega.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "63.79%",
+            "name": "PT JINSHENG MINING",
+            "value": "3.60 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "33.22%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "1.87 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.23%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "13.00 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Mulia Pacific Resources",
+            "percentage": "99.99%",
+            "types": "Pertambangan dan Perdagangan Barang Tambang",
+            "value": "15062641658"
+        },
+        {
+            "company": "PT Itamatra Nusantara",
+            "percentage": "99.99%",
+            "types": "Pertambangan dan Perdagangan Barang Tambang",
+            "value": "87154639264"
+        },
+        {
+            "company": "PT Bumi Konawe Abadi",
+            "percentage": "99.80%",
+            "types": "Pertambangan dan Perdagangan Barang Tambang",
+            "value": "204495908945"
+        },
+        {
+            "company": "PT COR Industri Indonesia",
+            "percentage": "60.00%",
+            "types": "Pengolahan dan Perdagangan Hasil Tambang",
+            "value": "2162012179253"
+        },
+        {
+            "company": "PT Mega Buana Resources",
+            "percentage": "99.60%",
+            "types": "Pertambangan",
+            "value": "1276118"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "12,639",
+            "change": -1113,
+            "change_formatted": "(-1,113)",
+            "change_value": "-1113"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "13,752",
+            "change": 618,
+            "change_formatted": "(+618)",
+            "change_value": "618"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "13,134",
+            "change": -216,
+            "change_formatted": "(-216)",
+            "change_value": "-216"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "13,350",
+            "change": 862,
+            "change_formatted": "(+862)",
+            "change_value": "862"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "12,488",
+            "change": -94,
+            "change_formatted": "(-94)",
+            "change_value": "-94"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "12,582",
+            "change": -1384,
+            "change_formatted": "(-1,384)",
+            "change_value": "-1384"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "2.53%",
+            "name": "KIKI HAMIDJAJA",
+            "value": "142.40 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                },
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.23%",
+            "name": "FENI SILVIANI BUDIMAN",
+            "value": "13.01 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "<0.0001%",
+            "name": "ANDI JAYA",
+            "value": "63.77 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1997-11-21T00:00:00+07:00",
+    "ipo_price": 500,
+    "float": 32.44,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "137",
+                "email": [
+                    "\t021-515 3533"
+                ],
+                "fax": "\t021-515 3533",
+                "npwp": "\t01.690.378.3-091.000",
+                "phone": "\t021-515 3533",
+                "website": "centralomega.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:39+07:00",
+                "value": "<td colspan='4'>Plaza Asia Lantai 6 Jl.Jend.Sudirman Kav 59 Jakarta - 12190\n\n        \t\t  \t\t\tPhone: \t021-515 3533\n        \t\t  \t\t\tFax: \t021-515 3533\n                            NPWP: \t01.690.378.3-091.000\n        \t\t  \t\t\tEmail: \t021-515 3533\n        \t\t  \t\t\tWebsite: centralomega.com\n\n        \t  \t\t\t</td>",
+                "office": "Plaza Asia Lantai 6 Jl.Jend.Sudirman Kav 59 Jakarta - 12190"
+            }
+        ],
+        "background": "PT Central Omega Resources Tbk didirikan tahun 1995.\n\nSejak tahun 2008, perusahaan mulai  terjun di bidang pertambangan bijih nikel dan pada tahun 2011, perusahaan mulai mengekspor bijih nikel ke luar negeri. Dalam waktu yang relatif singkat, Perusahaan sudah mampu memproduksi bijih nikel sebanyak 3 juta ton per tahun.\nTambang bijih nikel perusahaan berlokasi di Sulawesi , yang merupakan salah satu sumber cadangan nikel laterite terbesar di dunia, tepatnya di Morowali, Sulawesi Tengah dan Konawe Utara, Sulawesi Tenggara.\n\nUntuk memenuhi ketentuan Pemerintah dalam UU Minerba Nomor 4 tahun 2009, Perusahaan berencana untuk melakukan hilirisasi produk pertambangan bijih nikelnya dengan membangun fasilitas smelter Ferronikel (FeNi) di Morowali Utara, Sulawesi Tengah. Pembangunan ini dilaksanakan Perusahaan bekerjasama dengan PT Macrilink Nickel Development dengan membentuk satu perusahaan baru, PT COR Industri Indonesia.\n\nDengan komitmen untuk menjadi perusahaan nikel yang penting di Indonesia, PT Central Omega Resources Tbk bersama dengan PT Macrolink Nickel Development sedang melakukan langkah strategis, baik dalam perbaikan tata kelola tambang yang berkelanjutan maupun peningkatan nilai tambah sumberdaya mineral bijih nikel, salahsatunya dengan pengoperasian smelter FeNi di Morowali Utara, Sulawesi Tengah. Untuk tahap pertama, akan dioperasikan smelter dengan kapasitas produksi FeNi sebesar 100 ribu t/a, smelter tahap pertama ini dijadwalkan akan beroperasi pada tahun 2017.",
+        "history": {
+            "amount": "13 B",
+            "board": "Papan Utama",
+            "date": "21 Nov 1997",
+            "price": "500",
+            "registrar": "",
+            "shares": "26,000,000",
+            "underwriters": [
+                "PT. Trimegah Securities"
+            ],
+            "administrative_bureau": "PT Sinartama Gunita",
+            "free_float": "32.44%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "26297424",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "LIM ANTHONY"
+                }
+            ],
+            "director": [
+                {
+                    "id": "26297429",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "ANDI JAYA"
+                },
+                {
+                    "id": "26297428",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "FENI SILVIANI BUDIMAN"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "26297426",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "CHANG ENG THING"
+                },
+                {
+                    "id": "26297425",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "MUHAMMAD RUSJDI"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "26297423",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "KURNIADI ATMOSASMITO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "26297427",
+                    "key": "President Director",
+                    "lastupdate": "2026-04-23T18:32:26+07:00",
+                    "value": "KIKI HAMIDJAJA"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12529295",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:39+07:00",
+                "value": "{\"name\":\"Yohanes Supriady\",\"phone\":\"021-29035625\",\"email\":\"corsec@centralomega.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "63.79%",
+                "name": "PT JINSHENG MINING",
+                "value": "3.60 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "33.22%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "1.87 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.23%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "13.00 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Mulia Pacific Resources",
+                "percentage": "99.99%",
+                "types": "Pertambangan dan Perdagangan Barang Tambang",
+                "value": "15062641658"
+            },
+            {
+                "company": "PT Itamatra Nusantara",
+                "percentage": "99.99%",
+                "types": "Pertambangan dan Perdagangan Barang Tambang",
+                "value": "87154639264"
+            },
+            {
+                "company": "PT Bumi Konawe Abadi",
+                "percentage": "99.80%",
+                "types": "Pertambangan dan Perdagangan Barang Tambang",
+                "value": "204495908945"
+            },
+            {
+                "company": "PT COR Industri Indonesia",
+                "percentage": "60.00%",
+                "types": "Pengolahan dan Perdagangan Hasil Tambang",
+                "value": "2162012179253"
+            },
+            {
+                "company": "PT Mega Buana Resources",
+                "percentage": "99.60%",
+                "types": "Pertambangan",
+                "value": "1276118"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "12,639",
+                "change": -1113,
+                "change_formatted": "(-1,113)",
+                "change_value": "-1113"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "13,752",
+                "change": 618,
+                "change_formatted": "(+618)",
+                "change_value": "618"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "13,134",
+                "change": -216,
+                "change_formatted": "(-216)",
+                "change_value": "-216"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "13,350",
+                "change": 862,
+                "change_formatted": "(+862)",
+                "change_value": "862"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "12,488",
+                "change": -94,
+                "change_formatted": "(-94)",
+                "change_value": "-94"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "12,582",
+                "change": -1384,
+                "change_formatted": "(-1,384)",
+                "change_value": "-1384"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "2.53%",
+                "name": "KIKI HAMIDJAJA",
+                "value": "142.40 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    },
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.23%",
+                "name": "FENI SILVIANI BUDIMAN",
+                "value": "13.01 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "<0.0001%",
+                "name": "ANDI JAYA",
+                "value": "63.77 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "KIKI HAMIDJAJA"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "63.79%",
+                    "name": "JINSHENG MINING",
+                    "value": "3,596,671,278",
+                    "badges": [],
+                    "id": "9097",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "3,596,671,278",
+                    "scrip": "0",
+                    "value_formatted": "3.60 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.58%",
+                    "name": "INDRAWATI KAMARUDIN",
+                    "value": "258,104,900",
+                    "badges": [],
+                    "id": "1000002555",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "258,104,900",
+                    "scrip": "0",
+                    "value_formatted": "258.10 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.25%",
+                    "name": "ANDY UNTONO",
+                    "value": "239,601,500",
+                    "badges": [],
+                    "id": "9105",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "239,601,500",
+                    "scrip": "0",
+                    "value_formatted": "239.60 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.38%",
+                    "name": "TALITHA SARAH UNTONO",
+                    "value": "190,691,600",
+                    "badges": [],
+                    "id": "1000005037",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "190,691,600",
+                    "scrip": "0",
+                    "value_formatted": "190.69 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.53%",
+                    "name": "KIKI HAMIDJAJA",
+                    "value": "142,400,044",
+                    "badges": [],
+                    "id": "9385",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "142,400,044",
+                    "scrip": "0",
+                    "value_formatted": "142.40 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.21%",
+                    "name": "SUCOR INVESTAMA",
+                    "value": "124,760,725",
+                    "badges": [],
+                    "id": "10681",
+                    "type": "",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "124,760,725",
+                    "scrip": "0",
+                    "value_formatted": "124.76 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.44%",
+                    "name": "UBS AG SINGAPORE BRANCH",
+                    "value": "81,261,200",
+                    "badges": [],
+                    "id": "13933",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "81,261,200",
+                    "scrip": "0",
+                    "value_formatted": "81.26 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "8",
+                "name": "Barang Baku",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "22",
+                "name": "Barang Baku",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "113",
+                "name": "Logam & Mineral",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "185",
+                "name": "Logam & Mineral Lainnya",
+                "symbol": "Logam & Mineral Lainnya"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:51+00:00"
+}

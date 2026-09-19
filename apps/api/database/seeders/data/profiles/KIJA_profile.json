@@ -1,0 +1,1219 @@
+{
+    "symbol": "KIJA",
+    "name": "KIJA",
+    "address": [
+        {
+            "id": "247",
+            "email": [
+                "corsec@jababeka.com"
+            ],
+            "fax": "5727279",
+            "npwp": "01.067.835.7-054.000",
+            "phone": "5727337",
+            "website": "www.jababeka.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:27+07:00",
+            "value": "<td colspan='4'>Menara Batavia Lt. 25\r\nJl. K.H. Mas Mansyur Kav. 126\r\nJakarta 10220\n\n        \t\t  \t\t\tPhone: 5727337\n        \t\t  \t\t\tFax: 5727279\n                            NPWP: 01.067.835.7-054.000\n        \t\t  \t\t\tEmail: corsec@jababeka.com\n        \t\t  \t\t\tWebsite: www.jababeka.com\n\n        \t  \t\t\t</td>",
+            "office": "Menara Batavia Lt. 25 Jl. K.H. Mas Mansyur Kav. 126 Jakarta 10220"
+        }
+    ],
+    "background": "PT. Kawasan Industri Jababeka Tbk (KIJA) bergerak dalam pengembangan dan penjualan kawasan industri dan fasilitas dan layanan terkait termasuk, antara lain, kawasan perumahan, apartemen, gedung perkantoran, pusat perbelanjaan, pengembangan dan pemasangan pabrik pengolahan air, pengolahan air limbah, telepon , listrik dan fasilitas lainnya untuk mendukung kawasan industri, selain itu Perusahaan menyediakan fasilitas olahraga dan rekreasi, dan juga ekspor dan impor barang untuk bisnis yang terkait dengan pengembangan dan pengelolaan kawasan industri. Perusahaan berdomisili di Bekasi dan Anak Perusahaan berdomisili di Bekasi, Pandeglang, Jakarta, Amsterdam dan Kendal. Perusahaan mulai beroperasi secara komersial pada tahun 1990.",
+    "history": {
+        "amount": "233 B",
+        "board": "Papan Utama",
+        "date": "10 Jan 1995",
+        "price": "4,950",
+        "registrar": "",
+        "shares": "47,000,000",
+        "underwriters": [
+            "PT. Baring Sec.",
+            "PT. Bhakti Investama",
+            "PT. Niaga Securities"
+        ],
+        "administrative_bureau": "PT Datindo Entrycom",
+        "free_float": "54.85%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "13837236",
+                "key": "Commissioner",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "GAN MICHAEL "
+            }
+        ],
+        "director": [
+            {
+                "id": "13837233",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "TJAHJADI RAHARDJA"
+            },
+            {
+                "id": "13837234",
+                "key": "Director",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "HYANTO WIHADHI"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "13837237",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "BASURI TJAHAJA PURNAMA"
+            }
+        ],
+        "president_commissioner": [],
+        "president_director": [
+            {
+                "id": "13837231",
+                "key": "President Director",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "SETYONO DJUANDI DARMONO"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "13837232",
+                "key": "Vice President Director",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "TEDJO BUDIANTO LIMAN"
+            }
+        ],
+        "vice_president_commissioner": [],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": [
+            {
+                "id": "13837235",
+                "key": "President Commissioner (Independent)",
+                "lastupdate": "2025-07-09T09:39:24+07:00",
+                "value": "DRS. H. SUHARDI ALIUS, MH"
+            }
+        ]
+    },
+    "secretary": [
+        {
+            "id": "12530656",
+            "key": "",
+            "lastupdate": "2021-12-28T14:01:27+07:00",
+            "value": "{\"name\":\"Budianto Liman\",\"phone\":\"5727337\",\"email\":\"secr_ckr@jababeka.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "62.153%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "12.94 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "21.087%",
+            "name": "MU MIN ALI GUNAWAN",
+            "value": "4.39 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "11.526%",
+            "name": "ISLAMIC DEVELOPMENT BANK ",
+            "value": "2.40 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "5.234%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "1.09 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Tanjung Lesung Leisure Industry (TLLI) - (TLLI melalui BWJ)",
+            "percentage": "100%",
+            "types": "Kawasan wisata",
+            "value": "54912"
+        },
+        {
+            "company": "PT Jababeka International B.V. (JIBV)",
+            "percentage": "100%",
+            "types": "Jasa Keuangan",
+            "value": "4437309"
+        },
+        {
+            "company": "PT Jababeka Morotai (JM) - (JM melalui IP)",
+            "percentage": "100%",
+            "types": "Konstruksi, pembangunan dan jasa pengelolaan kawasan industri",
+            "value": "156797"
+        },
+        {
+            "company": "PT Jababeka Longlife City (JLC)-(JLC melalui GBC)",
+            "percentage": "80.00%",
+            "types": "Jasa perhotelan dan sewa atas real estates aktivitas yang terkait",
+            "value": "2727"
+        },
+        {
+            "company": "PT Karyamas Griya Utama (KGU) - (KGU melalui GBC)",
+            "percentage": "100%",
+            "types": "Sarana penunjang kawasan perumahan",
+            "value": "44"
+        },
+        {
+            "company": "PT Patriamanunggal Jaya (PMJ) - (PMJ melalui GBC)",
+            "percentage": "100%",
+            "types": "Pembangunan dan pengelolaan kawasan industri",
+            "value": "48401"
+        },
+        {
+            "company": "PT Kawasan Industri Kendal (KIK) - (KIK melalui GBC)",
+            "percentage": "51.00%",
+            "types": "Pembangunan, pengembangan dan jasa pengelolaan kawasan industri",
+            "value": "1927876"
+        },
+        {
+            "company": "PT United Power (UP) - (UP melalui BP)",
+            "percentage": "100%",
+            "types": "Pembangkit dan distributor listrik",
+            "value": "41896"
+        },
+        {
+            "company": "PT Rumah Prima Sehat (RPS) - (RPS melalui GBC)",
+            "percentage": "90.00%",
+            "types": "Aktivitas Kesehatan Manusia",
+            "value": "4000"
+        },
+        {
+            "company": "PT Tanjung Lesung Power (TLP) - (TLP melalui JI)",
+            "percentage": "100%",
+            "types": "Pembangkit dan distributor listrik",
+            "value": "100"
+        },
+        {
+            "company": "PT Infrastruktur Cakrawala Telekomunikasi (ICT) - (ICT melalui JI)",
+            "percentage": "100%",
+            "types": "Jasa dan pembangunan",
+            "value": "69896"
+        },
+        {
+            "company": "PT Nusantara Gas Energi (NGE) - (NGE melalui JI)",
+            "percentage": "51.00%",
+            "types": "Perdagangan, Pengangkutan, Industri dan Jasa",
+            "value": "15248"
+        },
+        {
+            "company": "PT Jababeka PP Properti (JPP)",
+            "percentage": "51.00%",
+            "types": "Perdagangan,jasa,pembangunan real estate dan manajemen bangunan",
+            "value": "155760"
+        },
+        {
+            "company": "PT Jababeka Creed Residence (JCR)-(JCR melalui GBC)",
+            "percentage": "60.00%",
+            "types": "Perdagangan,jasa pembangunan real estat dan manajemen bangunan",
+            "value": "162175"
+        },
+        {
+            "company": "PT Mitra Pengembang Kawasan (MPK)-(MPK melalui IP)",
+            "percentage": "100%",
+            "types": "Pembangunan, perdagangan, pertanian dan jasa",
+            "value": "2971"
+        },
+        {
+            "company": "PT Jababeka Plaza Indonesia (JPI) - (JPI melalui GBC)",
+            "percentage": "70.00%",
+            "types": "Penbangunan, perdagangan dan jasa",
+            "value": "52115"
+        },
+        {
+            "company": "PT Duta Bandara Banten (DBB) - (DBB melalui BWJ)",
+            "percentage": "99.00%",
+            "types": "Pembangunan, jasa dan perdaganagn",
+            "value": "1297"
+        },
+        {
+            "company": "PT Tanjung Sari Power (TSP) - (TSP melalui BP)",
+            "percentage": "100%",
+            "types": "Pembangkit dan distributor listrik",
+            "value": "100"
+        },
+        {
+            "company": "PT Proteksi Usaha Indonesia (PUI)-(PUI memalui CIP)",
+            "percentage": "70.00%",
+            "types": "Perdagangan Umum",
+            "value": "2718"
+        },
+        {
+            "company": "PT Jababeka Keihan Residence (JKR)-(JKR melalui GBC)-(dahulu PT Jababeka Keihan Nice)",
+            "percentage": "52.00%",
+            "types": "Perdagangan,jasa pembangunan real estat dan manajemen bangunan",
+            "value": "200547"
+        },
+        {
+            "company": "PT Grahabuana Cikarang (GBC)",
+            "percentage": "100%",
+            "types": "Kawasan perumahan dan Industri",
+            "value": "5309352"
+        },
+        {
+            "company": "PT Jababeka Infrastruktur (JI)",
+            "percentage": "100%",
+            "types": "Industri pengolahan, bidang pengadaan, pengelolaan, konstruksi, perdagangan, pengangkutan, pergudangan, informasi, real estat, aktiivitas profesional",
+            "value": "3022300"
+        },
+        {
+            "company": "PT Indocargomas Persada (IP)",
+            "percentage": "100%",
+            "types": "Kawasan Industri",
+            "value": "804434"
+        },
+        {
+            "company": "PT Saranapratama Pengembangan Kota (SPPK)",
+            "percentage": "100%",
+            "types": "Sarana penunjang kawasan perumahan",
+            "value": "13507"
+        },
+        {
+            "company": "PT Mercuagung Graha Realty (MGR)",
+            "percentage": "100%",
+            "types": "Kawasan perumahan",
+            "value": "73599"
+        },
+        {
+            "company": "PT Banten West Java Tourism Development (BWJ)",
+            "percentage": "100%",
+            "types": "Kawasan wisata",
+            "value": "918063"
+        },
+        {
+            "company": "PT Media Membangun Negeri (MMN)-(MMN melalui MPK)",
+            "percentage": "51.00%",
+            "types": "Percetakan, media, periklanan, telekomunikasi, konsultan, hiburan dan Pendidikan",
+            "value": "1120"
+        },
+        {
+            "company": "PT Sarana Indah Permai Residen (SIPR)-(SIPR melalui PGC)",
+            "percentage": "100%",
+            "types": "Apartemen hotel dan kondominium hotel",
+            "value": "526"
+        },
+        {
+            "company": "PT Gerbang Teknologi Cikarang (GTC) - (GTC melalui JI)",
+            "percentage": "100%",
+            "types": "Kawasan industri",
+            "value": "826878"
+        },
+        {
+            "company": "PT Bekasi Power (BP) - (BP melalui JI)",
+            "percentage": "100%",
+            "types": "Pembangkit dan distributor listrik",
+            "value": "1549874"
+        },
+        {
+            "company": "PT Cikarang Inland Port (CIP) - (CIP melalui JI)",
+            "percentage": "100%",
+            "types": "Jasa",
+            "value": "169248"
+        },
+        {
+            "company": "PT Padang Golf Cikarang (PGC) - (PGC melalui GBC)",
+            "percentage": "100%",
+            "types": "Pengelolaan lapangan golf",
+            "value": "74727"
+        },
+        {
+            "company": "PT Metropark Condominium Indah (MCI) - (MCI melalui IP)",
+            "percentage": "100%",
+            "types": "Hunian Kondominium",
+            "value": "21645"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "40,375",
+            "change": 6392,
+            "change_formatted": "(+6,392)",
+            "change_value": "6392"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "33,983",
+            "change": 668,
+            "change_formatted": "(+668)",
+            "change_value": "668"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "33,315",
+            "change": -1724,
+            "change_formatted": "(-1,724)",
+            "change_value": "-1724"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "35,039",
+            "change": -594,
+            "change_formatted": "(-594)",
+            "change_value": "-594"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "35,633",
+            "change": 2897,
+            "change_formatted": "(+2,897)",
+            "change_value": "2897"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "32,736",
+            "change": -594,
+            "change_formatted": "(-594)",
+            "change_value": "-594"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1995-01-10T00:00:00+07:00",
+    "ipo_price": 4950,
+    "float": 54.85,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "247",
+                "email": [
+                    "corsec@jababeka.com"
+                ],
+                "fax": "5727279",
+                "npwp": "01.067.835.7-054.000",
+                "phone": "5727337",
+                "website": "www.jababeka.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:27+07:00",
+                "value": "<td colspan='4'>Menara Batavia Lt. 25\r\nJl. K.H. Mas Mansyur Kav. 126\r\nJakarta 10220\n\n        \t\t  \t\t\tPhone: 5727337\n        \t\t  \t\t\tFax: 5727279\n                            NPWP: 01.067.835.7-054.000\n        \t\t  \t\t\tEmail: corsec@jababeka.com\n        \t\t  \t\t\tWebsite: www.jababeka.com\n\n        \t  \t\t\t</td>",
+                "office": "Menara Batavia Lt. 25 Jl. K.H. Mas Mansyur Kav. 126 Jakarta 10220"
+            }
+        ],
+        "background": "PT. Kawasan Industri Jababeka Tbk (KIJA) bergerak dalam pengembangan dan penjualan kawasan industri dan fasilitas dan layanan terkait termasuk, antara lain, kawasan perumahan, apartemen, gedung perkantoran, pusat perbelanjaan, pengembangan dan pemasangan pabrik pengolahan air, pengolahan air limbah, telepon , listrik dan fasilitas lainnya untuk mendukung kawasan industri, selain itu Perusahaan menyediakan fasilitas olahraga dan rekreasi, dan juga ekspor dan impor barang untuk bisnis yang terkait dengan pengembangan dan pengelolaan kawasan industri. Perusahaan berdomisili di Bekasi dan Anak Perusahaan berdomisili di Bekasi, Pandeglang, Jakarta, Amsterdam dan Kendal. Perusahaan mulai beroperasi secara komersial pada tahun 1990.",
+        "history": {
+            "amount": "233 B",
+            "board": "Papan Utama",
+            "date": "10 Jan 1995",
+            "price": "4,950",
+            "registrar": "",
+            "shares": "47,000,000",
+            "underwriters": [
+                "PT. Baring Sec.",
+                "PT. Bhakti Investama",
+                "PT. Niaga Securities"
+            ],
+            "administrative_bureau": "PT Datindo Entrycom",
+            "free_float": "54.85%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "13837236",
+                    "key": "Commissioner",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "GAN MICHAEL "
+                }
+            ],
+            "director": [
+                {
+                    "id": "13837233",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "TJAHJADI RAHARDJA"
+                },
+                {
+                    "id": "13837234",
+                    "key": "Director",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "HYANTO WIHADHI"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "13837237",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "BASURI TJAHAJA PURNAMA"
+                }
+            ],
+            "president_commissioner": [],
+            "president_director": [
+                {
+                    "id": "13837231",
+                    "key": "President Director",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "SETYONO DJUANDI DARMONO"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "13837232",
+                    "key": "Vice President Director",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "TEDJO BUDIANTO LIMAN"
+                }
+            ],
+            "vice_president_commissioner": [],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": [
+                {
+                    "id": "13837235",
+                    "key": "President Commissioner (Independent)",
+                    "lastupdate": "2025-07-09T09:39:24+07:00",
+                    "value": "DRS. H. SUHARDI ALIUS, MH"
+                }
+            ]
+        },
+        "secretary": [
+            {
+                "id": "12530656",
+                "key": "",
+                "lastupdate": "2021-12-28T14:01:27+07:00",
+                "value": "{\"name\":\"Budianto Liman\",\"phone\":\"5727337\",\"email\":\"secr_ckr@jababeka.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "62.153%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "12.94 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "21.087%",
+                "name": "MU MIN ALI GUNAWAN",
+                "value": "4.39 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "11.526%",
+                "name": "ISLAMIC DEVELOPMENT BANK ",
+                "value": "2.40 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "5.234%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "1.09 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Tanjung Lesung Leisure Industry (TLLI) - (TLLI melalui BWJ)",
+                "percentage": "100%",
+                "types": "Kawasan wisata",
+                "value": "54912"
+            },
+            {
+                "company": "PT Jababeka International B.V. (JIBV)",
+                "percentage": "100%",
+                "types": "Jasa Keuangan",
+                "value": "4437309"
+            },
+            {
+                "company": "PT Jababeka Morotai (JM) - (JM melalui IP)",
+                "percentage": "100%",
+                "types": "Konstruksi, pembangunan dan jasa pengelolaan kawasan industri",
+                "value": "156797"
+            },
+            {
+                "company": "PT Jababeka Longlife City (JLC)-(JLC melalui GBC)",
+                "percentage": "80.00%",
+                "types": "Jasa perhotelan dan sewa atas real estates aktivitas yang terkait",
+                "value": "2727"
+            },
+            {
+                "company": "PT Karyamas Griya Utama (KGU) - (KGU melalui GBC)",
+                "percentage": "100%",
+                "types": "Sarana penunjang kawasan perumahan",
+                "value": "44"
+            },
+            {
+                "company": "PT Patriamanunggal Jaya (PMJ) - (PMJ melalui GBC)",
+                "percentage": "100%",
+                "types": "Pembangunan dan pengelolaan kawasan industri",
+                "value": "48401"
+            },
+            {
+                "company": "PT Kawasan Industri Kendal (KIK) - (KIK melalui GBC)",
+                "percentage": "51.00%",
+                "types": "Pembangunan, pengembangan dan jasa pengelolaan kawasan industri",
+                "value": "1927876"
+            },
+            {
+                "company": "PT United Power (UP) - (UP melalui BP)",
+                "percentage": "100%",
+                "types": "Pembangkit dan distributor listrik",
+                "value": "41896"
+            },
+            {
+                "company": "PT Rumah Prima Sehat (RPS) - (RPS melalui GBC)",
+                "percentage": "90.00%",
+                "types": "Aktivitas Kesehatan Manusia",
+                "value": "4000"
+            },
+            {
+                "company": "PT Tanjung Lesung Power (TLP) - (TLP melalui JI)",
+                "percentage": "100%",
+                "types": "Pembangkit dan distributor listrik",
+                "value": "100"
+            },
+            {
+                "company": "PT Infrastruktur Cakrawala Telekomunikasi (ICT) - (ICT melalui JI)",
+                "percentage": "100%",
+                "types": "Jasa dan pembangunan",
+                "value": "69896"
+            },
+            {
+                "company": "PT Nusantara Gas Energi (NGE) - (NGE melalui JI)",
+                "percentage": "51.00%",
+                "types": "Perdagangan, Pengangkutan, Industri dan Jasa",
+                "value": "15248"
+            },
+            {
+                "company": "PT Jababeka PP Properti (JPP)",
+                "percentage": "51.00%",
+                "types": "Perdagangan,jasa,pembangunan real estate dan manajemen bangunan",
+                "value": "155760"
+            },
+            {
+                "company": "PT Jababeka Creed Residence (JCR)-(JCR melalui GBC)",
+                "percentage": "60.00%",
+                "types": "Perdagangan,jasa pembangunan real estat dan manajemen bangunan",
+                "value": "162175"
+            },
+            {
+                "company": "PT Mitra Pengembang Kawasan (MPK)-(MPK melalui IP)",
+                "percentage": "100%",
+                "types": "Pembangunan, perdagangan, pertanian dan jasa",
+                "value": "2971"
+            },
+            {
+                "company": "PT Jababeka Plaza Indonesia (JPI) - (JPI melalui GBC)",
+                "percentage": "70.00%",
+                "types": "Penbangunan, perdagangan dan jasa",
+                "value": "52115"
+            },
+            {
+                "company": "PT Duta Bandara Banten (DBB) - (DBB melalui BWJ)",
+                "percentage": "99.00%",
+                "types": "Pembangunan, jasa dan perdaganagn",
+                "value": "1297"
+            },
+            {
+                "company": "PT Tanjung Sari Power (TSP) - (TSP melalui BP)",
+                "percentage": "100%",
+                "types": "Pembangkit dan distributor listrik",
+                "value": "100"
+            },
+            {
+                "company": "PT Proteksi Usaha Indonesia (PUI)-(PUI memalui CIP)",
+                "percentage": "70.00%",
+                "types": "Perdagangan Umum",
+                "value": "2718"
+            },
+            {
+                "company": "PT Jababeka Keihan Residence (JKR)-(JKR melalui GBC)-(dahulu PT Jababeka Keihan Nice)",
+                "percentage": "52.00%",
+                "types": "Perdagangan,jasa pembangunan real estat dan manajemen bangunan",
+                "value": "200547"
+            },
+            {
+                "company": "PT Grahabuana Cikarang (GBC)",
+                "percentage": "100%",
+                "types": "Kawasan perumahan dan Industri",
+                "value": "5309352"
+            },
+            {
+                "company": "PT Jababeka Infrastruktur (JI)",
+                "percentage": "100%",
+                "types": "Industri pengolahan, bidang pengadaan, pengelolaan, konstruksi, perdagangan, pengangkutan, pergudangan, informasi, real estat, aktiivitas profesional",
+                "value": "3022300"
+            },
+            {
+                "company": "PT Indocargomas Persada (IP)",
+                "percentage": "100%",
+                "types": "Kawasan Industri",
+                "value": "804434"
+            },
+            {
+                "company": "PT Saranapratama Pengembangan Kota (SPPK)",
+                "percentage": "100%",
+                "types": "Sarana penunjang kawasan perumahan",
+                "value": "13507"
+            },
+            {
+                "company": "PT Mercuagung Graha Realty (MGR)",
+                "percentage": "100%",
+                "types": "Kawasan perumahan",
+                "value": "73599"
+            },
+            {
+                "company": "PT Banten West Java Tourism Development (BWJ)",
+                "percentage": "100%",
+                "types": "Kawasan wisata",
+                "value": "918063"
+            },
+            {
+                "company": "PT Media Membangun Negeri (MMN)-(MMN melalui MPK)",
+                "percentage": "51.00%",
+                "types": "Percetakan, media, periklanan, telekomunikasi, konsultan, hiburan dan Pendidikan",
+                "value": "1120"
+            },
+            {
+                "company": "PT Sarana Indah Permai Residen (SIPR)-(SIPR melalui PGC)",
+                "percentage": "100%",
+                "types": "Apartemen hotel dan kondominium hotel",
+                "value": "526"
+            },
+            {
+                "company": "PT Gerbang Teknologi Cikarang (GTC) - (GTC melalui JI)",
+                "percentage": "100%",
+                "types": "Kawasan industri",
+                "value": "826878"
+            },
+            {
+                "company": "PT Bekasi Power (BP) - (BP melalui JI)",
+                "percentage": "100%",
+                "types": "Pembangkit dan distributor listrik",
+                "value": "1549874"
+            },
+            {
+                "company": "PT Cikarang Inland Port (CIP) - (CIP melalui JI)",
+                "percentage": "100%",
+                "types": "Jasa",
+                "value": "169248"
+            },
+            {
+                "company": "PT Padang Golf Cikarang (PGC) - (PGC melalui GBC)",
+                "percentage": "100%",
+                "types": "Pengelolaan lapangan golf",
+                "value": "74727"
+            },
+            {
+                "company": "PT Metropark Condominium Indah (MCI) - (MCI melalui IP)",
+                "percentage": "100%",
+                "types": "Hunian Kondominium",
+                "value": "21645"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "40,375",
+                "change": 6392,
+                "change_formatted": "(+6,392)",
+                "change_value": "6392"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "33,983",
+                "change": 668,
+                "change_formatted": "(+668)",
+                "change_value": "668"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "33,315",
+                "change": -1724,
+                "change_formatted": "(-1,724)",
+                "change_value": "-1724"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "35,039",
+                "change": -594,
+                "change_formatted": "(-594)",
+                "change_value": "-594"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "35,633",
+                "change": 2897,
+                "change_formatted": "(+2,897)",
+                "change_value": "2897"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "32,736",
+                "change": -594,
+                "change_formatted": "(-594)",
+                "change_value": "-594"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "SETYONO DJUANDI DARMONO"
+            },
+            {
+                "name": "AIDA GARNIDA"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "21.09%",
+                    "name": "MU MIN ALI GUNAWAN",
+                    "value": "4,391,370,788",
+                    "badges": [],
+                    "id": "9306",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "-",
+                    "scripless": "0",
+                    "scrip": "4,391,370,788",
+                    "value_formatted": "4.39 B",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "11.53%",
+                    "name": "ISLAMIC DEVELOPMENT BANK",
+                    "value": "2,400,359,372",
+                    "badges": [],
+                    "id": "9305",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "UNITED ARAB EMIRATES",
+                    "scripless": "2,400,359,372",
+                    "scrip": "0",
+                    "value_formatted": "2.40 B",
+                    "classification": "Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.89%",
+                    "name": "UBS AG SINGAPORE BRANCH",
+                    "value": "810,703,377",
+                    "badges": [],
+                    "id": "13933",
+                    "type": "IB",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "810,703,377",
+                    "scrip": "0",
+                    "value_formatted": "810.70 M",
+                    "classification": "Private Bank",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.78%",
+                    "name": "INTELLITOP FINANCE",
+                    "value": "788,149,632",
+                    "badges": [],
+                    "id": "1000002572",
+                    "type": "",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "-",
+                    "scripless": "0",
+                    "scrip": "788,149,632",
+                    "value_formatted": "788.15 M",
+                    "classification": "Investor",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.79%",
+                    "name": "AIDA GARNIDA",
+                    "value": "580,637,352",
+                    "badges": [],
+                    "id": "1000000558",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "580,637,352",
+                    "scrip": "0",
+                    "value_formatted": "580.64 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.19%",
+                    "name": "REKSA DANA PRATAMA DANA DINAMIS SAHAM",
+                    "value": "455,380,391",
+                    "badges": [],
+                    "id": "1000004195",
+                    "type": "MF",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "455,380,391",
+                    "scrip": "0",
+                    "value_formatted": "455.38 M",
+                    "classification": "Mutual Funds",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.62%",
+                    "name": "GOVERNMENT OF NORWAY",
+                    "value": "336,486,700",
+                    "badges": [],
+                    "id": "1000002104",
+                    "type": "OT",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "NORWAY",
+                    "scripless": "336,486,700",
+                    "scrip": "0",
+                    "value_formatted": "336.49 M",
+                    "classification": "Sovereign Wealth Fund",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.43%",
+                    "name": "PANIN SEKURITAS",
+                    "value": "298,032,905",
+                    "badges": [],
+                    "id": "9394",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "298,032,905",
+                    "scrip": "0",
+                    "value_formatted": "298.03 M",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.40%",
+                    "name": "KIWANTARA MARDJUKI",
+                    "value": "291,307,775",
+                    "badges": [],
+                    "id": "1000003026",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "291,307,775",
+                    "scrip": "0",
+                    "value_formatted": "291.31 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.27%",
+                    "name": "HENGKI MARDJUKI",
+                    "value": "264,059,219",
+                    "badges": [],
+                    "id": "1000002241",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "264,059,219",
+                    "scrip": "0",
+                    "value_formatted": "264.06 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.23%",
+                    "name": "CHRISTINE DEWI",
+                    "value": "256,196,659",
+                    "badges": [],
+                    "id": "1000001246",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "-",
+                    "scripless": "256,196,659",
+                    "scrip": "0",
+                    "value_formatted": "256.20 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.04%",
+                    "name": "RICHARD BUDI GUNAWAN",
+                    "value": "216,693,118",
+                    "badges": [],
+                    "id": "1000004241",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "216,693,118",
+                    "scrip": "0",
+                    "value_formatted": "216.69 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.03%",
+                    "name": "KINOLOGI SEMESTA NUSANTARA",
+                    "value": "213,509,574",
+                    "badges": [],
+                    "id": "1000003023",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "213,509,574",
+                    "scrip": "0",
+                    "value_formatted": "213.51 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "5",
+                "name": "Properti & Real Estat",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "29",
+                "name": "Properti & Real Estat",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "102",
+                "name": "Pengelola & Pengembang Real Estat",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "165",
+                "name": "Pengembang & Operator Real Estat",
+                "symbol": "Developer Properti"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:53+00:00"
+}

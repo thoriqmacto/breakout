@@ -1,0 +1,1084 @@
+{
+    "symbol": "BKSL",
+    "name": "BKSL",
+    "address": [
+        {
+            "id": "76",
+            "email": [
+                "corsec@sentulcity.co.id"
+            ],
+            "fax": "87961036; ",
+            "npwp": "01.614.952.8-054.000",
+            "phone": "8796-0023\r\n522-6848 ",
+            "website": "www.bukitsentul.co.id",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:24+07:00",
+            "value": "<td colspan='4'>Kantor Pusat : Gedung Menara Sudirman, Lantai 25, Jl.Jend.Sudirman  Kav.60, Jakarta 12190, Indonesia\r\n\r\nKantor Operasional : Sentul City Building, Jl.MH. Thamrin Kav.8, Sentul City, Bogor 16810, Indonesia\n\n        \t\t  \t\t\tPhone: 8796-0023\r\n522-6848 \n        \t\t  \t\t\tFax: 87961036; \n                            NPWP: 01.614.952.8-054.000\n        \t\t  \t\t\tEmail: corsec@sentulcity.co.id\n        \t\t  \t\t\tWebsite: www.bukitsentul.co.id\n\n        \t  \t\t\t</td>",
+            "office": "Kantor Pusat : Gedung Menara Sudirman, Lantai 25, Jl.Jend.Sudirman  Kav.60, Jakarta 12190, Indonesia  Kantor Operasional : Sentul City Building, Jl.MH. Thamrin Kav.8, Sentul City, Bogor 16810, Indonesia"
+        }
+    ],
+    "background": "PT Sentul City Tbk merupakan perusahaan properti yang bergerak di bidang pengembangan, penjualan, pengoperasian, dan penyewaan perumahan, gedung kantor, pusat perbelanjaan, tempat rekreasi, dan lainnya. Perusahaan yang dahulu bernama PT Bukit Sentul Tbk ini mempunyai kawasan yang disebut \"Kota mandiri\" di daerah sentul, Jawa Barat.\n",
+    "history": {
+        "amount": "200 B",
+        "board": "Papan Utama",
+        "date": "28 Jul 1997",
+        "price": "500",
+        "registrar": "",
+        "shares": "400,000,000",
+        "underwriters": [
+            "PT. Trimega Securindo Lestari"
+        ],
+        "administrative_bureau": "PT Sirca Datapro Perdana",
+        "free_float": "23.63%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "35002233",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "GATOT SUDARIYONO"
+            },
+            {
+                "id": "35002238",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "YUSWANDI ARSYAD TEMENGGUNG"
+            },
+            {
+                "id": "35002243",
+                "key": "Commissioner",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "SUMARSONO"
+            }
+        ],
+        "director": [
+            {
+                "id": "35002235",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "DANIEL OTTO KUMALA"
+            },
+            {
+                "id": "35002237",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "IWAN BUDIHARSANA"
+            },
+            {
+                "id": "35002229",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "ADI SYAHRUZAD"
+            },
+            {
+                "id": "35002241",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "STEPHANIE ALIM"
+            },
+            {
+                "id": "35002242",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "JEYSON PRIBADI"
+            },
+            {
+                "id": "35002230",
+                "key": "Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "HARTAN GUNADI HARJA"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "35002239",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "JONNARDI"
+            },
+            {
+                "id": "35002232",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "WAHYU UTOMO"
+            },
+            {
+                "id": "35002228",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "LUKITA DINARSYAH TUWO"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "35002231",
+                "key": "President Commissioner",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "BASARIA PANJAITAN"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "35002240",
+                "key": "President Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "HIRAMSYAH SAMBUDHY THAIB"
+            }
+        ],
+        "vice_president": [
+            {
+                "id": "35002234",
+                "key": "Vice President Director",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "ANDRIAN BUDI UTAMA"
+            }
+        ],
+        "vice_president_commissioner": [
+            {
+                "id": "35002236",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2026-07-02T14:40:31+07:00",
+                "value": "REINA KUMALA KWEE"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12528570",
+            "key": "",
+            "lastupdate": "2021-12-28T14:00:24+07:00",
+            "value": "{\"name\":\"Kwee Liana Kumala\",\"phone\":\"021 8792 3959\",\"email\":\"corsec@sentulcity.co.id\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "65.27%",
+            "name": "PT. SAKTI GENERASI PERDANA",
+            "value": "109.46 B",
+            "badges": [
+                "pengendali"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "percentage": "27.39%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "45.94 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "6.7%",
+            "name": "STELLA ISABELLA DJOHAN",
+            "value": "11.24 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.64%",
+            "name": "MASYARAKAT WARKAT",
+            "value": "1.07 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT FAUNA LAND",
+            "percentage": "70.00%",
+            "types": "PARIWISATA",
+            "value": "20000000000"
+        },
+        {
+            "company": "PT SENTUL CITY PROPERTI",
+            "percentage": "99.90%",
+            "types": "REAL ESTAT",
+            "value": "2164330018"
+        },
+        {
+            "company": "PT SENTUL GRAHA SEJAHTERA",
+            "percentage": "99.90%",
+            "types": "REAL ESTAT",
+            "value": "250000000"
+        },
+        {
+            "company": "PT CENTERRA MANAJEMEN PROPERTI",
+            "percentage": "99.90%",
+            "types": "PENGELOLAAN APARTEMEN",
+            "value": "61756000"
+        },
+        {
+            "company": "PT BUKIT JONGGOL ASRI (D/H PT KOTA ULUNG SELARAS)",
+            "percentage": "80.00%",
+            "types": "REAL ESTAT",
+            "value": "4384202689567"
+        },
+        {
+            "company": "PT SENTUL PP PROPERTI",
+            "percentage": "51.00%",
+            "types": "REAL ESTAT",
+            "value": "170682671664"
+        },
+        {
+            "company": "PT AFTANESIA RAYA",
+            "percentage": "99.99%",
+            "types": "REAL ESTAT",
+            "value": "445536507279"
+        },
+        {
+            "company": "PT NATURA CITY DEVELOPMENTS (D/H PT SERPONG KARYA CEMERLANG)",
+            "percentage": "29.23%",
+            "types": "PERDAGANGAN UMUM",
+            "value": "982403027849"
+        },
+        {
+            "company": "PT GUNUNGGEULIS ELOK ABADI",
+            "percentage": "99.99%",
+            "types": "RESTORAN DAN PARIWISATA",
+            "value": "213235561544"
+        },
+        {
+            "company": "PT KARYA MEGAH SUKSES",
+            "percentage": "99.99%",
+            "types": "PERDAGANGAN DAN JASA",
+            "value": "55518198898"
+        },
+        {
+            "company": "PT SUKAPUTRA GRAHA CEMERLANG",
+            "percentage": "99.99%",
+            "types": "PENGELOLAAN KOTA",
+            "value": "180505465525"
+        },
+        {
+            "company": "PT GAZELLE INDONESIA",
+            "percentage": "99.99%",
+            "types": "REAL ESTAT",
+            "value": "213506434687"
+        },
+        {
+            "company": "PT SENTUL AIR NUSANTARA",
+            "percentage": "99.95%",
+            "types": "PENGELOLAAN AIR",
+            "value": "17960856649"
+        },
+        {
+            "company": "PT LANGGENG SAKTI MANDIRI",
+            "percentage": "99.99%",
+            "types": "PENGELOLAAN AIR",
+            "value": "5419111968"
+        },
+        {
+            "company": "PT BINTANG PERDANA MULIA",
+            "percentage": "99.83%",
+            "types": "REAL ESTAT",
+            "value": "54048280034"
+        },
+        {
+            "company": "PT JASA SELARAS UTAMA",
+            "percentage": "99.99%",
+            "types": "JASA PARKIR",
+            "value": "2898111937"
+        },
+        {
+            "company": "PT SERPONG NATURA HIJAU SENTOSA",
+            "percentage": "99.00%",
+            "types": "PERDAGANGAN DAN JASA",
+            "value": "709573297"
+        },
+        {
+            "company": "PT GRAHA SEJAHTERA ABADI",
+            "percentage": "99.99%",
+            "types": "PERDAGANGAN DAN JASA",
+            "value": "2487359440777"
+        },
+        {
+            "company": "PT JAYA SELARAS GEMILANG",
+            "percentage": "99.20%",
+            "types": "REAL ESTAT",
+            "value": "11613546725"
+        },
+        {
+            "company": "PT KENCANA PONDOK SEJAHTERA",
+            "percentage": "99.80%",
+            "types": "REAL ESTAT",
+            "value": "2889700458"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "87,632",
+            "change": 1262,
+            "change_formatted": "(+1,262)",
+            "change_value": "1262"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "86,370",
+            "change": -1064,
+            "change_formatted": "(-1,064)",
+            "change_value": "-1064"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "87,434",
+            "change": -1877,
+            "change_formatted": "(-1,877)",
+            "change_value": "-1877"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "89,311",
+            "change": 1160,
+            "change_formatted": "(+1,160)",
+            "change_value": "1160"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "88,151",
+            "change": -796,
+            "change_formatted": "(-796)",
+            "change_value": "-796"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "88,947",
+            "change": -4182,
+            "change_formatted": "(-4,182)",
+            "change_value": "-4182"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "1997-07-28T00:00:00+07:00",
+    "ipo_price": 500,
+    "float": 23.63,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "76",
+                "email": [
+                    "corsec@sentulcity.co.id"
+                ],
+                "fax": "87961036; ",
+                "npwp": "01.614.952.8-054.000",
+                "phone": "8796-0023\r\n522-6848 ",
+                "website": "www.bukitsentul.co.id",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:24+07:00",
+                "value": "<td colspan='4'>Kantor Pusat : Gedung Menara Sudirman, Lantai 25, Jl.Jend.Sudirman  Kav.60, Jakarta 12190, Indonesia\r\n\r\nKantor Operasional : Sentul City Building, Jl.MH. Thamrin Kav.8, Sentul City, Bogor 16810, Indonesia\n\n        \t\t  \t\t\tPhone: 8796-0023\r\n522-6848 \n        \t\t  \t\t\tFax: 87961036; \n                            NPWP: 01.614.952.8-054.000\n        \t\t  \t\t\tEmail: corsec@sentulcity.co.id\n        \t\t  \t\t\tWebsite: www.bukitsentul.co.id\n\n        \t  \t\t\t</td>",
+                "office": "Kantor Pusat : Gedung Menara Sudirman, Lantai 25, Jl.Jend.Sudirman  Kav.60, Jakarta 12190, Indonesia  Kantor Operasional : Sentul City Building, Jl.MH. Thamrin Kav.8, Sentul City, Bogor 16810, Indonesia"
+            }
+        ],
+        "background": "PT Sentul City Tbk merupakan perusahaan properti yang bergerak di bidang pengembangan, penjualan, pengoperasian, dan penyewaan perumahan, gedung kantor, pusat perbelanjaan, tempat rekreasi, dan lainnya. Perusahaan yang dahulu bernama PT Bukit Sentul Tbk ini mempunyai kawasan yang disebut \"Kota mandiri\" di daerah sentul, Jawa Barat.\n",
+        "history": {
+            "amount": "200 B",
+            "board": "Papan Utama",
+            "date": "28 Jul 1997",
+            "price": "500",
+            "registrar": "",
+            "shares": "400,000,000",
+            "underwriters": [
+                "PT. Trimega Securindo Lestari"
+            ],
+            "administrative_bureau": "PT Sirca Datapro Perdana",
+            "free_float": "23.63%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "35002233",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "GATOT SUDARIYONO"
+                },
+                {
+                    "id": "35002238",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "YUSWANDI ARSYAD TEMENGGUNG"
+                },
+                {
+                    "id": "35002243",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "SUMARSONO"
+                }
+            ],
+            "director": [
+                {
+                    "id": "35002235",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "DANIEL OTTO KUMALA"
+                },
+                {
+                    "id": "35002237",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "IWAN BUDIHARSANA"
+                },
+                {
+                    "id": "35002229",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "ADI SYAHRUZAD"
+                },
+                {
+                    "id": "35002241",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "STEPHANIE ALIM"
+                },
+                {
+                    "id": "35002242",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "JEYSON PRIBADI"
+                },
+                {
+                    "id": "35002230",
+                    "key": "Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "HARTAN GUNADI HARJA"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "35002239",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "JONNARDI"
+                },
+                {
+                    "id": "35002232",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "WAHYU UTOMO"
+                },
+                {
+                    "id": "35002228",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "LUKITA DINARSYAH TUWO"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "35002231",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "BASARIA PANJAITAN"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "35002240",
+                    "key": "President Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "HIRAMSYAH SAMBUDHY THAIB"
+                }
+            ],
+            "vice_president": [
+                {
+                    "id": "35002234",
+                    "key": "Vice President Director",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "ANDRIAN BUDI UTAMA"
+                }
+            ],
+            "vice_president_commissioner": [
+                {
+                    "id": "35002236",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2026-07-02T14:40:31+07:00",
+                    "value": "REINA KUMALA KWEE"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12528570",
+                "key": "",
+                "lastupdate": "2021-12-28T14:00:24+07:00",
+                "value": "{\"name\":\"Kwee Liana Kumala\",\"phone\":\"021 8792 3959\",\"email\":\"corsec@sentulcity.co.id\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "65.27%",
+                "name": "PT. SAKTI GENERASI PERDANA",
+                "value": "109.46 B",
+                "badges": [
+                    "pengendali"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    }
+                ]
+            },
+            {
+                "percentage": "27.39%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "45.94 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "6.7%",
+                "name": "STELLA ISABELLA DJOHAN",
+                "value": "11.24 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.64%",
+                "name": "MASYARAKAT WARKAT",
+                "value": "1.07 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT FAUNA LAND",
+                "percentage": "70.00%",
+                "types": "PARIWISATA",
+                "value": "20000000000"
+            },
+            {
+                "company": "PT SENTUL CITY PROPERTI",
+                "percentage": "99.90%",
+                "types": "REAL ESTAT",
+                "value": "2164330018"
+            },
+            {
+                "company": "PT SENTUL GRAHA SEJAHTERA",
+                "percentage": "99.90%",
+                "types": "REAL ESTAT",
+                "value": "250000000"
+            },
+            {
+                "company": "PT CENTERRA MANAJEMEN PROPERTI",
+                "percentage": "99.90%",
+                "types": "PENGELOLAAN APARTEMEN",
+                "value": "61756000"
+            },
+            {
+                "company": "PT BUKIT JONGGOL ASRI (D/H PT KOTA ULUNG SELARAS)",
+                "percentage": "80.00%",
+                "types": "REAL ESTAT",
+                "value": "4384202689567"
+            },
+            {
+                "company": "PT SENTUL PP PROPERTI",
+                "percentage": "51.00%",
+                "types": "REAL ESTAT",
+                "value": "170682671664"
+            },
+            {
+                "company": "PT AFTANESIA RAYA",
+                "percentage": "99.99%",
+                "types": "REAL ESTAT",
+                "value": "445536507279"
+            },
+            {
+                "company": "PT NATURA CITY DEVELOPMENTS (D/H PT SERPONG KARYA CEMERLANG)",
+                "percentage": "29.23%",
+                "types": "PERDAGANGAN UMUM",
+                "value": "982403027849"
+            },
+            {
+                "company": "PT GUNUNGGEULIS ELOK ABADI",
+                "percentage": "99.99%",
+                "types": "RESTORAN DAN PARIWISATA",
+                "value": "213235561544"
+            },
+            {
+                "company": "PT KARYA MEGAH SUKSES",
+                "percentage": "99.99%",
+                "types": "PERDAGANGAN DAN JASA",
+                "value": "55518198898"
+            },
+            {
+                "company": "PT SUKAPUTRA GRAHA CEMERLANG",
+                "percentage": "99.99%",
+                "types": "PENGELOLAAN KOTA",
+                "value": "180505465525"
+            },
+            {
+                "company": "PT GAZELLE INDONESIA",
+                "percentage": "99.99%",
+                "types": "REAL ESTAT",
+                "value": "213506434687"
+            },
+            {
+                "company": "PT SENTUL AIR NUSANTARA",
+                "percentage": "99.95%",
+                "types": "PENGELOLAAN AIR",
+                "value": "17960856649"
+            },
+            {
+                "company": "PT LANGGENG SAKTI MANDIRI",
+                "percentage": "99.99%",
+                "types": "PENGELOLAAN AIR",
+                "value": "5419111968"
+            },
+            {
+                "company": "PT BINTANG PERDANA MULIA",
+                "percentage": "99.83%",
+                "types": "REAL ESTAT",
+                "value": "54048280034"
+            },
+            {
+                "company": "PT JASA SELARAS UTAMA",
+                "percentage": "99.99%",
+                "types": "JASA PARKIR",
+                "value": "2898111937"
+            },
+            {
+                "company": "PT SERPONG NATURA HIJAU SENTOSA",
+                "percentage": "99.00%",
+                "types": "PERDAGANGAN DAN JASA",
+                "value": "709573297"
+            },
+            {
+                "company": "PT GRAHA SEJAHTERA ABADI",
+                "percentage": "99.99%",
+                "types": "PERDAGANGAN DAN JASA",
+                "value": "2487359440777"
+            },
+            {
+                "company": "PT JAYA SELARAS GEMILANG",
+                "percentage": "99.20%",
+                "types": "REAL ESTAT",
+                "value": "11613546725"
+            },
+            {
+                "company": "PT KENCANA PONDOK SEJAHTERA",
+                "percentage": "99.80%",
+                "types": "REAL ESTAT",
+                "value": "2889700458"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "87,632",
+                "change": 1262,
+                "change_formatted": "(+1,262)",
+                "change_value": "1262"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "86,370",
+                "change": -1064,
+                "change_formatted": "(-1,064)",
+                "change_value": "-1064"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "87,434",
+                "change": -1877,
+                "change_formatted": "(-1,877)",
+                "change_value": "-1877"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "89,311",
+                "change": 1160,
+                "change_formatted": "(+1,160)",
+                "change_value": "1160"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "88,151",
+                "change": -796,
+                "change_formatted": "(-796)",
+                "change_value": "-796"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "88,947",
+                "change": -4182,
+                "change_formatted": "(-4,182)",
+                "change_value": "-4182"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "STELLA ISABELLA DJOHAN"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "65.27%",
+                    "name": "SAKTI GENERASI PERDANA",
+                    "value": "109,462,099,825",
+                    "badges": [],
+                    "id": "10373",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "52,471,755,460",
+                    "scrip": "56,990,344,365",
+                    "value_formatted": "109.46 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "6.70%",
+                    "name": "STELLA ISABELLA DJOHAN",
+                    "value": "11,235,277,812",
+                    "badges": [],
+                    "id": "10129",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "2,979,277,812",
+                    "scrip": "8,256,000,000",
+                    "value_formatted": "11.24 B",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.07%",
+                    "name": "SAMUEL SEKURITAS INDONESIA",
+                    "value": "6,825,427,954",
+                    "badges": [],
+                    "id": "12601",
+                    "type": "SC",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "6,825,427,954",
+                    "scrip": "0",
+                    "value_formatted": "6.83 B",
+                    "classification": "Securities Company",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.15%",
+                    "name": "BUKIT WAHANA GEMILANG",
+                    "value": "3,601,214,800",
+                    "badges": [],
+                    "id": "1000001143",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "3,601,214,800",
+                    "scrip": "0",
+                    "value_formatted": "3.60 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.58%",
+                    "name": "PARADISO RESOURCES",
+                    "value": "2,644,714,200",
+                    "badges": [],
+                    "id": "11410",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "VIRGIN ISLANDS, BRITISH",
+                    "scripless": "2,644,714,200",
+                    "scrip": "0",
+                    "value_formatted": "2.64 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.13%",
+                    "name": "GOVERNMENT OF NORWAY",
+                    "value": "1,890,000,000",
+                    "badges": [],
+                    "id": "1000002104",
+                    "type": "OT",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "NORWAY",
+                    "scripless": "1,890,000,000",
+                    "scrip": "0",
+                    "value_formatted": "1.89 B",
+                    "classification": "Sovereign Wealth Fund",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.10%",
+                    "name": "HJ MEGAWATI TAUFIQ",
+                    "value": "1,849,400,000",
+                    "badges": [],
+                    "id": "1000002476",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,849,400,000",
+                    "scrip": "0",
+                    "value_formatted": "1.85 B",
+                    "classification": "Individual",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "5",
+                "name": "Properti & Real Estat",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "29",
+                "name": "Properti & Real Estat",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "102",
+                "name": "Pengelola & Pengembang Real Estat",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "165",
+                "name": "Pengembang & Operator Real Estat",
+                "symbol": "Developer Properti"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:50+00:00"
+}

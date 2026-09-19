@@ -1,0 +1,2278 @@
+{
+    "symbol": "HEAL",
+    "name": "HEAL",
+    "address": [
+        {
+            "id": "1000000009",
+            "email": [
+                "corporate.secretary@herminahospitals.com"
+            ],
+            "fax": "021 - 8560601",
+            "npwp": "01.920.115.1-007.000",
+            "phone": "021 - 8572525",
+            "website": "www.herminahospitals.com",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:55+07:00",
+            "value": "<td colspan='4'>Jalan Raya Jatinegara Barat No. 126\r\nJakarta Timur 13320\n\n        \t\t  \t\t\tPhone: 021 - 8572525\n        \t\t  \t\t\tFax: 021 - 8560601\n                            NPWP: 01.920.115.1-007.000\n        \t\t  \t\t\tEmail: corporate.secretary@herminahospitals.com\n        \t\t  \t\t\tWebsite: www.herminahospitals.com\n\n        \t  \t\t\t</td>",
+            "office": "Jalan Raya Jatinegara Barat No. 126 Jakarta Timur 13320"
+        }
+    ],
+    "background": "PT Medikaloka Hermina Tbk atau Hermina (Perseroan) adalah salah satu jaringan rumah sakit umum swasta terbesar di Indonesia. Didukung sejarah pengalaman yang panjang di bidang kesehatan ibu dan anak, Perseroan menawarkan layanan kesehatan ibu dan anak yang paling komprehensif dibandingkan dengan jaringan rumah sakit swasta terkemuka lainnya di Indonesia. ",
+    "history": {
+        "amount": "1,300 B",
+        "board": "Papan Utama",
+        "date": "16 May 2018",
+        "price": "3700",
+        "registrar": "",
+        "shares": "351,380,800",
+        "underwriters": [
+            "PT. Citigroup Sekuritas Indonesia",
+            "PT. Credit Suisse Sekuritas Indonesia",
+            "PT. DBS Vickers Sekuritas Indonesia",
+            "PT. Mandiri Sekuritas"
+        ],
+        "administrative_bureau": "PT Datindo Entrycom",
+        "free_float": "41.89%"
+    },
+    "key_executive": {
+        "commissioner": [
+            {
+                "id": "26246368",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "HUSEN SUTAKARIA"
+            },
+            {
+                "id": "26246366",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "ISWAN KOSASIH"
+            },
+            {
+                "id": "26246364",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "GIDION HASAN"
+            },
+            {
+                "id": "26246371",
+                "key": "Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "MEIJANI WIBOWO"
+            }
+        ],
+        "director": [
+            {
+                "id": "26246367",
+                "key": "Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "YUSTINUS IMMANUEL HERAWAN"
+            },
+            {
+                "id": "26246361",
+                "key": "Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "ADIA SUSANTI"
+            },
+            {
+                "id": "26246358",
+                "key": "Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "HERIDADI"
+            },
+            {
+                "id": "26246357",
+                "key": "Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "TAN SURYANTI GUNADI"
+            },
+            {
+                "id": "26246370",
+                "key": "Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "SUSI SETYAWATI"
+            }
+        ],
+        "independent_commissioner": [
+            {
+                "id": "26246360",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "KUMALA INSIWI SURYO"
+            },
+            {
+                "id": "26246365",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "AMIT VARMA"
+            },
+            {
+                "id": "26246369",
+                "key": "Commissioner (Independent)",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "ALEXANDER STEVEN RUSLI"
+            }
+        ],
+        "president_commissioner": [
+            {
+                "id": "26246362",
+                "key": "President Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "HASMORO"
+            }
+        ],
+        "president_director": [
+            {
+                "id": "26246356",
+                "key": "President Director",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "YULISAR KHIAT"
+            }
+        ],
+        "vice_president": [],
+        "vice_president_commissioner": [
+            {
+                "id": "26246363",
+                "key": "Vice President Commissioner",
+                "lastupdate": "2026-04-23T13:54:42+07:00",
+                "value": "BINSAR PARASIAN SIMORANGKIR"
+            }
+        ],
+        "independent_vice_president_commissioner": [],
+        "independent_president_commissioner": []
+    },
+    "secretary": [
+        {
+            "id": "12534877",
+            "key": "",
+            "lastupdate": "2021-12-28T14:02:55+07:00",
+            "value": "{\"name\":\"Susi Setiawaty\",\"phone\":\"021 - 39702525\",\"email\":\"corporate.secretary@herminahospitals.com\"}"
+        }
+    ],
+    "shareholder": [
+        {
+            "percentage": "51.6638%",
+            "name": "MASYARAKAT NON WARKAT",
+            "value": "7.94 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "13.65%",
+            "name": "PT ASTRA HEALTHCARE INDONESIA",
+            "value": "2.10 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "7.23%",
+            "name": "PT ASTRA INTERNATIONAL TBK",
+            "value": "1.11 B",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "5.56%",
+            "name": "LYDIA IMMANUEL",
+            "value": "855.08 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        },
+        {
+            "percentage": "0.78%",
+            "name": "SAHAM TREASURY",
+            "value": "120.25 M",
+            "badges": [],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": []
+        }
+    ],
+    "subsidiary": [
+        {
+            "company": "PT Medika Loka Podomoro (M Podomoro)",
+            "percentage": "85.38%",
+            "types": "Rumah Sakit",
+            "value": "180093"
+        },
+        {
+            "company": "PT Medika Loka Mitra Farmasi (MM Farmasi)",
+            "percentage": "99.00%",
+            "types": "Jasa & Perdagangan",
+            "value": "11452"
+        },
+        {
+            "company": "PT Medika Loka Salatiga (M Salatiga)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "38095"
+        },
+        {
+            "company": "PT Medika Loka Balikpapan (M Balikpapan)",
+            "percentage": "61.50%",
+            "types": "Rumah Sakit",
+            "value": "132639"
+        },
+        {
+            "company": "PT Medika Loka Pendidikan Pelatihan (M Pendidikan",
+            "percentage": "99.00%",
+            "types": "Jasa Pendidikan",
+            "value": "24866"
+        },
+        {
+            "company": "PT Medika Loka Soreang \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n\t(M Soreang)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "23082"
+        },
+        {
+            "company": "PT Medika Loka Ciledug \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n\t(M Ciledug)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakir",
+            "value": "47942"
+        },
+        {
+            "company": "PT Medika Loka Investama (M Investama)",
+            "percentage": "99.00%",
+            "types": "Jasa & Perdagangan",
+            "value": "112572"
+        },
+        {
+            "company": "PT Medika Loka Cilegon (M Cilegon)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "60813"
+        },
+        {
+            "company": "PT Medika Loka Denpasar (M Denpasar)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "900"
+        },
+        {
+            "company": "PT Medika Loka Ambon (M Ambon)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "16340"
+        },
+        {
+            "company": "PT Medika Loka Cibitung (M Cibitung)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "78113"
+        },
+        {
+            "company": "PT Medika Loka Manajemen",
+            "percentage": "99.90%",
+            "types": "Jasa Manajemen dan Konsultasi",
+            "value": "4349"
+        },
+        {
+            "company": "PT Medika Loka Manado (M Manado)",
+            "percentage": "99.91%",
+            "types": "Rumah Sakit",
+            "value": "111277"
+        },
+        {
+            "company": "PT Medika Loka Ciawi (M Ciawi)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "914"
+        },
+        {
+            "company": "PT Medika Loka Kupang (M Kupang)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "928"
+        },
+        {
+            "company": "PT Medika Loka Lampung (M Lampung)",
+            "percentage": "66.50%",
+            "types": "Rumah Sakit",
+            "value": "122821"
+        },
+        {
+            "company": "PT Medika Loka Pekalongan (M Pekalongan)",
+            "percentage": "82.32%",
+            "types": "Rumah Sakit",
+            "value": "69185"
+        },
+        {
+            "company": "PT Medikaloka Internusa (M Internusa)",
+            "percentage": "65.50%",
+            "types": "Rumah Sakit",
+            "value": "490232"
+        },
+        {
+            "company": "PT Medikaloka Sejahtera (M Sejahtera)",
+            "percentage": "74.00%",
+            "types": "Rumah Sakit",
+            "value": "422034"
+        },
+        {
+            "company": "PT Medikaloka Husada (M Husada)",
+            "percentage": "78.75%",
+            "types": "Rumah Sakit",
+            "value": "227448"
+        },
+        {
+            "company": "PT Medikaloka Daan Mogot (M Daan Mogot)",
+            "percentage": "72.00%",
+            "types": "Rumah Sakit",
+            "value": "280513"
+        },
+        {
+            "company": "PT Medikaloka Bogor (M Bogor)",
+            "percentage": "83.75%",
+            "types": "Rumah Sakit",
+            "value": "148670"
+        },
+        {
+            "company": "PT Medikaloka Mitra Pasteur (MM Pasteur)",
+            "percentage": "64.17%",
+            "types": "Investasi",
+            "value": "17148"
+        },
+        {
+            "company": "PT Medikaloka Pasteur (M Pasteur)",
+            "percentage": "16.75%",
+            "types": "Rumah Sakit",
+            "value": "168162"
+        },
+        {
+            "company": "PT Medikaloka Malang (M Malang)",
+            "percentage": "65.50%",
+            "types": "Rumah Sakit",
+            "value": "104334"
+        },
+        {
+            "company": "PT Medikaloka Mitra Pandanaran (MM Pandanaran)",
+            "percentage": "70.00%",
+            "types": "Investasi",
+            "value": "7091"
+        },
+        {
+            "company": "PT Medikaloka Pandanaran (M Pandanaran)",
+            "percentage": "26.43%",
+            "types": "Rumah Sakit",
+            "value": "102421"
+        },
+        {
+            "company": "PT Medikaloka Mitra Arcamanik (MM Arcamanik)",
+            "percentage": "65.71%",
+            "types": "Investasi",
+            "value": "23804"
+        },
+        {
+            "company": "PT Medikaloka Mitra Sukabumi (MM Sukabumi)",
+            "percentage": "68.83%",
+            "types": "Investasi",
+            "value": "11522"
+        },
+        {
+            "company": "PT Medikaloka Sukabumi (M Sukabumi)",
+            "percentage": "16.00%",
+            "types": "Rumah Sakit",
+            "value": "100621"
+        },
+        {
+            "company": "PT Medikaloka Mitra Grand Bekasi (MM Grand Bekasi)",
+            "percentage": "68.14%",
+            "types": "Investasi",
+            "value": "19937"
+        },
+        {
+            "company": "PT Medikaloka Mitra Tangerang (MM Tangerang)",
+            "percentage": "81.11%",
+            "types": "Investasi",
+            "value": "20857"
+        },
+        {
+            "company": "PT Medikaloka Arcamanik (M Arcamanik)",
+            "percentage": "11.25%",
+            "types": "Rumah Sakit",
+            "value": "176328"
+        },
+        {
+            "company": "PT Medikaloka Tangerang (M Tangerang)",
+            "percentage": "20.75%",
+            "types": "Rumah Sakit",
+            "value": "218154"
+        },
+        {
+            "company": "PT Medikaloka Grand Bekasi (M Grand Bekasi)",
+            "percentage": "25.25%",
+            "types": "Rumah Sakit",
+            "value": "249643"
+        },
+        {
+            "company": "PT Medikaloka Mitra Palembang (MM Palembang)",
+            "percentage": "69.37%",
+            "types": "Investasi",
+            "value": "26822"
+        },
+        {
+            "company": "PT Medika Loka Wonogiri (M Wonogiri)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "41957"
+        },
+        {
+            "company": "PT Medikaloka Mitra Ciputat (MM Ciputat)",
+            "percentage": "68.64%",
+            "types": "Investasi",
+            "value": "21847"
+        },
+        {
+            "company": "PT Medikaloka Mitra Galaxy (MM Galaxy)",
+            "percentage": "65.00%",
+            "types": "Investasi",
+            "value": "12419"
+        },
+        {
+            "company": "PT Medikaloka Galaxy (M Galaxy)",
+            "percentage": "5.00%",
+            "types": "Rumah Sakit",
+            "value": "119465"
+        },
+        {
+            "company": "PT Medikaloka Mitra Cileungsi (MM Cileungsi)",
+            "percentage": "57.69%",
+            "types": "Investasi",
+            "value": "31984"
+        },
+        {
+            "company": "PT Medikaloka Ciputat (M Ciputat)",
+            "percentage": "27.50%",
+            "types": "Rumah Sakit",
+            "value": "161334"
+        },
+        {
+            "company": "PT Medikaloka Palembang (M Palembang)",
+            "percentage": "37.25%",
+            "types": "Rumah Sakit",
+            "value": "181543"
+        },
+        {
+            "company": "PT Medikaloka Mitra Banyumanik (MM Banyumanik)",
+            "percentage": "63.46%",
+            "types": "Investasi",
+            "value": "34213"
+        },
+        {
+            "company": "PT Medikaloka Mitra Solo (MM Solo)",
+            "percentage": "56.36%",
+            "types": "Investasi",
+            "value": "31021"
+        },
+        {
+            "company": "PT Medikaloka Cileungsi (M Cileungsi)",
+            "percentage": "29.75%",
+            "types": "Rumah Sakit",
+            "value": "145645"
+        },
+        {
+            "company": "PT Medikaloka Mitra Serpong (MM Serpong)",
+            "percentage": "73.53%",
+            "types": "Investasi",
+            "value": "19816"
+        },
+        {
+            "company": "PT Medikaloka Banyumanik (M Banyumanik)",
+            "percentage": "18.50%",
+            "types": "Rumah Sakit",
+            "value": "109355"
+        },
+        {
+            "company": "PT Medika Loka Ciruas (M Ciruas)",
+            "percentage": "66.20%",
+            "types": "Rumah Sakit",
+            "value": "129002"
+        },
+        {
+            "company": "PT Medika Loka Yogya (M Yogya)",
+            "percentage": "59.00%",
+            "types": "Rumah Sakit",
+            "value": "85092"
+        },
+        {
+            "company": "PT Medika Loka Padang (M Padang)",
+            "percentage": "67.50%",
+            "types": "Rumah Sakit",
+            "value": "124592"
+        },
+        {
+            "company": "PT Medika Loka Bitung (M Bitung)",
+            "percentage": "58.61%",
+            "types": "Rumah Sakit",
+            "value": "157017"
+        },
+        {
+            "company": "PT Medika Loka Purwokerto (M Purwokerto)",
+            "percentage": "62.85%",
+            "types": "Rumah Sakit",
+            "value": "120027"
+        },
+        {
+            "company": "PT Medika Loka Samarinda (M Samarinda)",
+            "percentage": "81.50%",
+            "types": "Rumah Sakit",
+            "value": "139899"
+        },
+        {
+            "company": "PT Medika Loka Makassar (M Makassar)",
+            "percentage": "56.50%",
+            "types": "Rumah Sakit",
+            "value": "133764"
+        },
+        {
+            "company": "PT Medika Loka Jakabaring (M Jakabaring)",
+            "percentage": "58.00%",
+            "types": "Rumah Sakit",
+            "value": "132905"
+        },
+        {
+            "company": "PT Medika Loka Karawang (M Karawang)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "214399"
+        },
+        {
+            "company": "PT Medika Loka Kendari (M Kendari)",
+            "percentage": "80.40%",
+            "types": "Rumah Sakit",
+            "value": "103461"
+        },
+        {
+            "company": "PT Medika Loka Surabaya (M Surabaya)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "900"
+        },
+        {
+            "company": "PT Medika Loka Pekanbaru (M Pekanbaru)",
+            "percentage": "79.55%",
+            "types": "Rumah Sakit",
+            "value": "115343"
+        },
+        {
+            "company": "PT Medika Loka Kutabumi (M Kutabumi)",
+            "percentage": "99.00%",
+            "types": "Rumah Sakit",
+            "value": "121267"
+        },
+        {
+            "company": "PT Medika Loka Medan (M Medan)",
+            "percentage": "66.00%",
+            "types": "Rumah Sakit",
+            "value": "139191"
+        }
+    ],
+    "profile": {
+        "fund_type": {
+            "value": "",
+            "info": ""
+        },
+        "inception_date": "",
+        "fund_manager": "",
+        "fund_manager_ico": "",
+        "custodian_bank": "",
+        "custodian_ico": "",
+        "risk_level": {
+            "value": "",
+            "info": ""
+        },
+        "aum": {
+            "value": "",
+            "info": ""
+        },
+        "maxdrawdown": {
+            "value": "",
+            "info": ""
+        },
+        "cagr5year": {
+            "value": "",
+            "info": ""
+        },
+        "expense_ratio": {
+            "value": "",
+            "info": ""
+        },
+        "average_yield": {
+            "value": "",
+            "info": ""
+        },
+        "prospectus": {
+            "name": "",
+            "file": "",
+            "dir": "",
+            "url": ""
+        },
+        "fund_fact_sheet": [],
+        "redemption_bank_name": "",
+        "min_buy": "",
+        "buy_fee": "",
+        "sell_fee": ""
+    },
+    "fee": [],
+    "asset_allocation": [],
+    "shareholder_reksa": [],
+    "pdf": [],
+    "shareholder_numbers": [
+        {
+            "shareholder_date": "31 Aug 2026",
+            "total_share": "11,205",
+            "change": 1151,
+            "change_formatted": "(+1,151)",
+            "change_value": "1151"
+        },
+        {
+            "shareholder_date": "31 Jul 2026",
+            "total_share": "10,054",
+            "change": 1526,
+            "change_formatted": "(+1,526)",
+            "change_value": "1526"
+        },
+        {
+            "shareholder_date": "30 Jun 2026",
+            "total_share": "8,528",
+            "change": 78,
+            "change_formatted": "(+78)",
+            "change_value": "78"
+        },
+        {
+            "shareholder_date": "31 May 2026",
+            "total_share": "8,450",
+            "change": 1054,
+            "change_formatted": "(+1,054)",
+            "change_value": "1054"
+        },
+        {
+            "shareholder_date": "30 Apr 2026",
+            "total_share": "7,396",
+            "change": 220,
+            "change_formatted": "(+220)",
+            "change_value": "220"
+        },
+        {
+            "shareholder_date": "31 Mar 2026",
+            "total_share": "7,176",
+            "change": -163,
+            "change_formatted": "(-163)",
+            "change_value": "-163"
+        }
+    ],
+    "badges": [
+        "direktur",
+        "komisaris",
+        "pengendali"
+    ],
+    "top_holdings": [],
+    "shareholder_director_commissioner": [
+        {
+            "percentage": "6.46%",
+            "name": "YULISAR KHIAT",
+            "value": "993.80 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                },
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "5.14%",
+            "name": "DR. BINSAR PARASIAN SIMORANGKIR",
+            "value": "789.86 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                },
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "5.04%",
+            "name": "DR. HASMORO",
+            "value": "774.67 M",
+            "badges": [
+                "pengendali",
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                },
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "2.47%",
+            "name": "DR. HUSEN SUTAKARIA",
+            "value": "379.25 M",
+            "badges": [
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "komisaris",
+                    "color": "purple"
+                }
+            ]
+        },
+        {
+            "percentage": "1.97%",
+            "name": "MEIJANI WIBOWO",
+            "value": "303.18 M",
+            "badges": [
+                "pengendali",
+                "komisaris"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "pengendali",
+                    "color": "blue"
+                },
+                {
+                    "role": "komisaris",
+                    "color": "purple"
+                }
+            ]
+        },
+        {
+            "percentage": "0.03%",
+            "name": "DR. TAN SURYANTI GUNADI",
+            "value": "4.60 M",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.005%",
+            "name": "DRG. SUSI SETYAWATI",
+            "value": "699.77 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        },
+        {
+            "percentage": "0.0012%",
+            "name": "YUSTINUS I HERAWAN",
+            "value": "190.00 K",
+            "badges": [
+                "direksi"
+            ],
+            "id": "0",
+            "type": "",
+            "location": "",
+            "nationality": "",
+            "domicile": "",
+            "scripless": "",
+            "scrip": "",
+            "value_formatted": "",
+            "classification": "",
+            "badge_details": [
+                {
+                    "role": "direksi",
+                    "color": "green"
+                }
+            ]
+        }
+    ],
+    "listing_information": {
+        "exercise_start_date": "",
+        "exercise_end_date": "",
+        "exercise_price": 0,
+        "expire_date": "",
+        "listing_date": "",
+        "foreign_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "local_percentage": {
+            "raw": 0,
+            "formatted": ""
+        },
+        "number_of_securities": 0,
+        "total_shares": 0
+    },
+    "ipo_date": "2018-05-16T00:00:00+07:00",
+    "ipo_price": 3700,
+    "float": 41.89,
+    "ticker_profile_payload": {
+        "address": [
+            {
+                "id": "1000000009",
+                "email": [
+                    "corporate.secretary@herminahospitals.com"
+                ],
+                "fax": "021 - 8560601",
+                "npwp": "01.920.115.1-007.000",
+                "phone": "021 - 8572525",
+                "website": "www.herminahospitals.com",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:55+07:00",
+                "value": "<td colspan='4'>Jalan Raya Jatinegara Barat No. 126\r\nJakarta Timur 13320\n\n        \t\t  \t\t\tPhone: 021 - 8572525\n        \t\t  \t\t\tFax: 021 - 8560601\n                            NPWP: 01.920.115.1-007.000\n        \t\t  \t\t\tEmail: corporate.secretary@herminahospitals.com\n        \t\t  \t\t\tWebsite: www.herminahospitals.com\n\n        \t  \t\t\t</td>",
+                "office": "Jalan Raya Jatinegara Barat No. 126 Jakarta Timur 13320"
+            }
+        ],
+        "background": "PT Medikaloka Hermina Tbk atau Hermina (Perseroan) adalah salah satu jaringan rumah sakit umum swasta terbesar di Indonesia. Didukung sejarah pengalaman yang panjang di bidang kesehatan ibu dan anak, Perseroan menawarkan layanan kesehatan ibu dan anak yang paling komprehensif dibandingkan dengan jaringan rumah sakit swasta terkemuka lainnya di Indonesia. ",
+        "history": {
+            "amount": "1,300 B",
+            "board": "Papan Utama",
+            "date": "16 May 2018",
+            "price": "3700",
+            "registrar": "",
+            "shares": "351,380,800",
+            "underwriters": [
+                "PT. Citigroup Sekuritas Indonesia",
+                "PT. Credit Suisse Sekuritas Indonesia",
+                "PT. DBS Vickers Sekuritas Indonesia",
+                "PT. Mandiri Sekuritas"
+            ],
+            "administrative_bureau": "PT Datindo Entrycom",
+            "free_float": "41.89%"
+        },
+        "key_executive": {
+            "commissioner": [
+                {
+                    "id": "26246368",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "HUSEN SUTAKARIA"
+                },
+                {
+                    "id": "26246366",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "ISWAN KOSASIH"
+                },
+                {
+                    "id": "26246364",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "GIDION HASAN"
+                },
+                {
+                    "id": "26246371",
+                    "key": "Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "MEIJANI WIBOWO"
+                }
+            ],
+            "director": [
+                {
+                    "id": "26246367",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "YUSTINUS IMMANUEL HERAWAN"
+                },
+                {
+                    "id": "26246361",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "ADIA SUSANTI"
+                },
+                {
+                    "id": "26246358",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "HERIDADI"
+                },
+                {
+                    "id": "26246357",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "TAN SURYANTI GUNADI"
+                },
+                {
+                    "id": "26246370",
+                    "key": "Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "SUSI SETYAWATI"
+                }
+            ],
+            "independent_commissioner": [
+                {
+                    "id": "26246360",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "KUMALA INSIWI SURYO"
+                },
+                {
+                    "id": "26246365",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "AMIT VARMA"
+                },
+                {
+                    "id": "26246369",
+                    "key": "Commissioner (Independent)",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "ALEXANDER STEVEN RUSLI"
+                }
+            ],
+            "president_commissioner": [
+                {
+                    "id": "26246362",
+                    "key": "President Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "HASMORO"
+                }
+            ],
+            "president_director": [
+                {
+                    "id": "26246356",
+                    "key": "President Director",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "YULISAR KHIAT"
+                }
+            ],
+            "vice_president": [],
+            "vice_president_commissioner": [
+                {
+                    "id": "26246363",
+                    "key": "Vice President Commissioner",
+                    "lastupdate": "2026-04-23T13:54:42+07:00",
+                    "value": "BINSAR PARASIAN SIMORANGKIR"
+                }
+            ],
+            "independent_vice_president_commissioner": [],
+            "independent_president_commissioner": []
+        },
+        "secretary": [
+            {
+                "id": "12534877",
+                "key": "",
+                "lastupdate": "2021-12-28T14:02:55+07:00",
+                "value": "{\"name\":\"Susi Setiawaty\",\"phone\":\"021 - 39702525\",\"email\":\"corporate.secretary@herminahospitals.com\"}"
+            }
+        ],
+        "shareholder": [
+            {
+                "percentage": "51.6638%",
+                "name": "MASYARAKAT NON WARKAT",
+                "value": "7.94 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "13.65%",
+                "name": "PT ASTRA HEALTHCARE INDONESIA",
+                "value": "2.10 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "7.23%",
+                "name": "PT ASTRA INTERNATIONAL TBK",
+                "value": "1.11 B",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "5.56%",
+                "name": "LYDIA IMMANUEL",
+                "value": "855.08 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            },
+            {
+                "percentage": "0.78%",
+                "name": "SAHAM TREASURY",
+                "value": "120.25 M",
+                "badges": [],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": []
+            }
+        ],
+        "subsidiary": [
+            {
+                "company": "PT Medika Loka Podomoro (M Podomoro)",
+                "percentage": "85.38%",
+                "types": "Rumah Sakit",
+                "value": "180093"
+            },
+            {
+                "company": "PT Medika Loka Mitra Farmasi (MM Farmasi)",
+                "percentage": "99.00%",
+                "types": "Jasa & Perdagangan",
+                "value": "11452"
+            },
+            {
+                "company": "PT Medika Loka Salatiga (M Salatiga)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "38095"
+            },
+            {
+                "company": "PT Medika Loka Balikpapan (M Balikpapan)",
+                "percentage": "61.50%",
+                "types": "Rumah Sakit",
+                "value": "132639"
+            },
+            {
+                "company": "PT Medika Loka Pendidikan Pelatihan (M Pendidikan",
+                "percentage": "99.00%",
+                "types": "Jasa Pendidikan",
+                "value": "24866"
+            },
+            {
+                "company": "PT Medika Loka Soreang \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n\t(M Soreang)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "23082"
+            },
+            {
+                "company": "PT Medika Loka Ciledug \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n\t(M Ciledug)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakir",
+                "value": "47942"
+            },
+            {
+                "company": "PT Medika Loka Investama (M Investama)",
+                "percentage": "99.00%",
+                "types": "Jasa & Perdagangan",
+                "value": "112572"
+            },
+            {
+                "company": "PT Medika Loka Cilegon (M Cilegon)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "60813"
+            },
+            {
+                "company": "PT Medika Loka Denpasar (M Denpasar)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "900"
+            },
+            {
+                "company": "PT Medika Loka Ambon (M Ambon)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "16340"
+            },
+            {
+                "company": "PT Medika Loka Cibitung (M Cibitung)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "78113"
+            },
+            {
+                "company": "PT Medika Loka Manajemen",
+                "percentage": "99.90%",
+                "types": "Jasa Manajemen dan Konsultasi",
+                "value": "4349"
+            },
+            {
+                "company": "PT Medika Loka Manado (M Manado)",
+                "percentage": "99.91%",
+                "types": "Rumah Sakit",
+                "value": "111277"
+            },
+            {
+                "company": "PT Medika Loka Ciawi (M Ciawi)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "914"
+            },
+            {
+                "company": "PT Medika Loka Kupang (M Kupang)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "928"
+            },
+            {
+                "company": "PT Medika Loka Lampung (M Lampung)",
+                "percentage": "66.50%",
+                "types": "Rumah Sakit",
+                "value": "122821"
+            },
+            {
+                "company": "PT Medika Loka Pekalongan (M Pekalongan)",
+                "percentage": "82.32%",
+                "types": "Rumah Sakit",
+                "value": "69185"
+            },
+            {
+                "company": "PT Medikaloka Internusa (M Internusa)",
+                "percentage": "65.50%",
+                "types": "Rumah Sakit",
+                "value": "490232"
+            },
+            {
+                "company": "PT Medikaloka Sejahtera (M Sejahtera)",
+                "percentage": "74.00%",
+                "types": "Rumah Sakit",
+                "value": "422034"
+            },
+            {
+                "company": "PT Medikaloka Husada (M Husada)",
+                "percentage": "78.75%",
+                "types": "Rumah Sakit",
+                "value": "227448"
+            },
+            {
+                "company": "PT Medikaloka Daan Mogot (M Daan Mogot)",
+                "percentage": "72.00%",
+                "types": "Rumah Sakit",
+                "value": "280513"
+            },
+            {
+                "company": "PT Medikaloka Bogor (M Bogor)",
+                "percentage": "83.75%",
+                "types": "Rumah Sakit",
+                "value": "148670"
+            },
+            {
+                "company": "PT Medikaloka Mitra Pasteur (MM Pasteur)",
+                "percentage": "64.17%",
+                "types": "Investasi",
+                "value": "17148"
+            },
+            {
+                "company": "PT Medikaloka Pasteur (M Pasteur)",
+                "percentage": "16.75%",
+                "types": "Rumah Sakit",
+                "value": "168162"
+            },
+            {
+                "company": "PT Medikaloka Malang (M Malang)",
+                "percentage": "65.50%",
+                "types": "Rumah Sakit",
+                "value": "104334"
+            },
+            {
+                "company": "PT Medikaloka Mitra Pandanaran (MM Pandanaran)",
+                "percentage": "70.00%",
+                "types": "Investasi",
+                "value": "7091"
+            },
+            {
+                "company": "PT Medikaloka Pandanaran (M Pandanaran)",
+                "percentage": "26.43%",
+                "types": "Rumah Sakit",
+                "value": "102421"
+            },
+            {
+                "company": "PT Medikaloka Mitra Arcamanik (MM Arcamanik)",
+                "percentage": "65.71%",
+                "types": "Investasi",
+                "value": "23804"
+            },
+            {
+                "company": "PT Medikaloka Mitra Sukabumi (MM Sukabumi)",
+                "percentage": "68.83%",
+                "types": "Investasi",
+                "value": "11522"
+            },
+            {
+                "company": "PT Medikaloka Sukabumi (M Sukabumi)",
+                "percentage": "16.00%",
+                "types": "Rumah Sakit",
+                "value": "100621"
+            },
+            {
+                "company": "PT Medikaloka Mitra Grand Bekasi (MM Grand Bekasi)",
+                "percentage": "68.14%",
+                "types": "Investasi",
+                "value": "19937"
+            },
+            {
+                "company": "PT Medikaloka Mitra Tangerang (MM Tangerang)",
+                "percentage": "81.11%",
+                "types": "Investasi",
+                "value": "20857"
+            },
+            {
+                "company": "PT Medikaloka Arcamanik (M Arcamanik)",
+                "percentage": "11.25%",
+                "types": "Rumah Sakit",
+                "value": "176328"
+            },
+            {
+                "company": "PT Medikaloka Tangerang (M Tangerang)",
+                "percentage": "20.75%",
+                "types": "Rumah Sakit",
+                "value": "218154"
+            },
+            {
+                "company": "PT Medikaloka Grand Bekasi (M Grand Bekasi)",
+                "percentage": "25.25%",
+                "types": "Rumah Sakit",
+                "value": "249643"
+            },
+            {
+                "company": "PT Medikaloka Mitra Palembang (MM Palembang)",
+                "percentage": "69.37%",
+                "types": "Investasi",
+                "value": "26822"
+            },
+            {
+                "company": "PT Medika Loka Wonogiri (M Wonogiri)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "41957"
+            },
+            {
+                "company": "PT Medikaloka Mitra Ciputat (MM Ciputat)",
+                "percentage": "68.64%",
+                "types": "Investasi",
+                "value": "21847"
+            },
+            {
+                "company": "PT Medikaloka Mitra Galaxy (MM Galaxy)",
+                "percentage": "65.00%",
+                "types": "Investasi",
+                "value": "12419"
+            },
+            {
+                "company": "PT Medikaloka Galaxy (M Galaxy)",
+                "percentage": "5.00%",
+                "types": "Rumah Sakit",
+                "value": "119465"
+            },
+            {
+                "company": "PT Medikaloka Mitra Cileungsi (MM Cileungsi)",
+                "percentage": "57.69%",
+                "types": "Investasi",
+                "value": "31984"
+            },
+            {
+                "company": "PT Medikaloka Ciputat (M Ciputat)",
+                "percentage": "27.50%",
+                "types": "Rumah Sakit",
+                "value": "161334"
+            },
+            {
+                "company": "PT Medikaloka Palembang (M Palembang)",
+                "percentage": "37.25%",
+                "types": "Rumah Sakit",
+                "value": "181543"
+            },
+            {
+                "company": "PT Medikaloka Mitra Banyumanik (MM Banyumanik)",
+                "percentage": "63.46%",
+                "types": "Investasi",
+                "value": "34213"
+            },
+            {
+                "company": "PT Medikaloka Mitra Solo (MM Solo)",
+                "percentage": "56.36%",
+                "types": "Investasi",
+                "value": "31021"
+            },
+            {
+                "company": "PT Medikaloka Cileungsi (M Cileungsi)",
+                "percentage": "29.75%",
+                "types": "Rumah Sakit",
+                "value": "145645"
+            },
+            {
+                "company": "PT Medikaloka Mitra Serpong (MM Serpong)",
+                "percentage": "73.53%",
+                "types": "Investasi",
+                "value": "19816"
+            },
+            {
+                "company": "PT Medikaloka Banyumanik (M Banyumanik)",
+                "percentage": "18.50%",
+                "types": "Rumah Sakit",
+                "value": "109355"
+            },
+            {
+                "company": "PT Medika Loka Ciruas (M Ciruas)",
+                "percentage": "66.20%",
+                "types": "Rumah Sakit",
+                "value": "129002"
+            },
+            {
+                "company": "PT Medika Loka Yogya (M Yogya)",
+                "percentage": "59.00%",
+                "types": "Rumah Sakit",
+                "value": "85092"
+            },
+            {
+                "company": "PT Medika Loka Padang (M Padang)",
+                "percentage": "67.50%",
+                "types": "Rumah Sakit",
+                "value": "124592"
+            },
+            {
+                "company": "PT Medika Loka Bitung (M Bitung)",
+                "percentage": "58.61%",
+                "types": "Rumah Sakit",
+                "value": "157017"
+            },
+            {
+                "company": "PT Medika Loka Purwokerto (M Purwokerto)",
+                "percentage": "62.85%",
+                "types": "Rumah Sakit",
+                "value": "120027"
+            },
+            {
+                "company": "PT Medika Loka Samarinda (M Samarinda)",
+                "percentage": "81.50%",
+                "types": "Rumah Sakit",
+                "value": "139899"
+            },
+            {
+                "company": "PT Medika Loka Makassar (M Makassar)",
+                "percentage": "56.50%",
+                "types": "Rumah Sakit",
+                "value": "133764"
+            },
+            {
+                "company": "PT Medika Loka Jakabaring (M Jakabaring)",
+                "percentage": "58.00%",
+                "types": "Rumah Sakit",
+                "value": "132905"
+            },
+            {
+                "company": "PT Medika Loka Karawang (M Karawang)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "214399"
+            },
+            {
+                "company": "PT Medika Loka Kendari (M Kendari)",
+                "percentage": "80.40%",
+                "types": "Rumah Sakit",
+                "value": "103461"
+            },
+            {
+                "company": "PT Medika Loka Surabaya (M Surabaya)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "900"
+            },
+            {
+                "company": "PT Medika Loka Pekanbaru (M Pekanbaru)",
+                "percentage": "79.55%",
+                "types": "Rumah Sakit",
+                "value": "115343"
+            },
+            {
+                "company": "PT Medika Loka Kutabumi (M Kutabumi)",
+                "percentage": "99.00%",
+                "types": "Rumah Sakit",
+                "value": "121267"
+            },
+            {
+                "company": "PT Medika Loka Medan (M Medan)",
+                "percentage": "66.00%",
+                "types": "Rumah Sakit",
+                "value": "139191"
+            }
+        ],
+        "profile": {
+            "fund_type": {
+                "value": "",
+                "info": ""
+            },
+            "inception_date": "",
+            "fund_manager": "",
+            "fund_manager_ico": "",
+            "custodian_bank": "",
+            "custodian_ico": "",
+            "risk_level": {
+                "value": "",
+                "info": ""
+            },
+            "aum": {
+                "value": "",
+                "info": ""
+            },
+            "maxdrawdown": {
+                "value": "",
+                "info": ""
+            },
+            "cagr5year": {
+                "value": "",
+                "info": ""
+            },
+            "expense_ratio": {
+                "value": "",
+                "info": ""
+            },
+            "average_yield": {
+                "value": "",
+                "info": ""
+            },
+            "prospectus": {
+                "name": "",
+                "file": "",
+                "dir": "",
+                "url": ""
+            },
+            "fund_fact_sheet": [],
+            "redemption_bank_name": "",
+            "min_buy": "",
+            "buy_fee": "",
+            "sell_fee": ""
+        },
+        "fee": [],
+        "asset_allocation": [],
+        "shareholder_reksa": [],
+        "pdf": [],
+        "shareholder_numbers": [
+            {
+                "shareholder_date": "31 Aug 2026",
+                "total_share": "11,205",
+                "change": 1151,
+                "change_formatted": "(+1,151)",
+                "change_value": "1151"
+            },
+            {
+                "shareholder_date": "31 Jul 2026",
+                "total_share": "10,054",
+                "change": 1526,
+                "change_formatted": "(+1,526)",
+                "change_value": "1526"
+            },
+            {
+                "shareholder_date": "30 Jun 2026",
+                "total_share": "8,528",
+                "change": 78,
+                "change_formatted": "(+78)",
+                "change_value": "78"
+            },
+            {
+                "shareholder_date": "31 May 2026",
+                "total_share": "8,450",
+                "change": 1054,
+                "change_formatted": "(+1,054)",
+                "change_value": "1054"
+            },
+            {
+                "shareholder_date": "30 Apr 2026",
+                "total_share": "7,396",
+                "change": 220,
+                "change_formatted": "(+220)",
+                "change_value": "220"
+            },
+            {
+                "shareholder_date": "31 Mar 2026",
+                "total_share": "7,176",
+                "change": -163,
+                "change_formatted": "(-163)",
+                "change_value": "-163"
+            }
+        ],
+        "badges": [
+            "direktur",
+            "komisaris",
+            "pengendali"
+        ],
+        "top_holdings": [],
+        "shareholder_director_commissioner": [
+            {
+                "percentage": "6.46%",
+                "name": "YULISAR KHIAT",
+                "value": "993.80 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    },
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "5.14%",
+                "name": "DR. BINSAR PARASIAN SIMORANGKIR",
+                "value": "789.86 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    },
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "5.04%",
+                "name": "DR. HASMORO",
+                "value": "774.67 M",
+                "badges": [
+                    "pengendali",
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    },
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "2.47%",
+                "name": "DR. HUSEN SUTAKARIA",
+                "value": "379.25 M",
+                "badges": [
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "komisaris",
+                        "color": "purple"
+                    }
+                ]
+            },
+            {
+                "percentage": "1.97%",
+                "name": "MEIJANI WIBOWO",
+                "value": "303.18 M",
+                "badges": [
+                    "pengendali",
+                    "komisaris"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "pengendali",
+                        "color": "blue"
+                    },
+                    {
+                        "role": "komisaris",
+                        "color": "purple"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.03%",
+                "name": "DR. TAN SURYANTI GUNADI",
+                "value": "4.60 M",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.005%",
+                "name": "DRG. SUSI SETYAWATI",
+                "value": "699.77 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            },
+            {
+                "percentage": "0.0012%",
+                "name": "YUSTINUS I HERAWAN",
+                "value": "190.00 K",
+                "badges": [
+                    "direksi"
+                ],
+                "id": "0",
+                "type": "",
+                "location": "",
+                "nationality": "",
+                "domicile": "",
+                "scripless": "",
+                "scrip": "",
+                "value_formatted": "",
+                "classification": "",
+                "badge_details": [
+                    {
+                        "role": "direksi",
+                        "color": "green"
+                    }
+                ]
+            }
+        ],
+        "listing_information": {
+            "exercise_start_date": "",
+            "exercise_end_date": "",
+            "exercise_price": 0,
+            "expire_date": "",
+            "listing_date": "",
+            "foreign_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "local_percentage": {
+                "raw": 0,
+                "formatted": ""
+            },
+            "number_of_securities": 0,
+            "total_shares": 0
+        },
+        "beneficiary": [
+            {
+                "name": "BINSAR PARASIAN SIMORANGKIR"
+            },
+            {
+                "name": "LYDIA IMMANUEL"
+            },
+            {
+                "name": "MEIJANI WIBOWO"
+            },
+            {
+                "name": "HASMORO"
+            },
+            {
+                "name": "SOEDIBJO TOELOES"
+            },
+            {
+                "name": "YULISAR KHIAT"
+            },
+            {
+                "name": "HUSEN SUTAKARIA"
+            }
+        ],
+        "shareholder_one_percent": {
+            "shareholder": [
+                {
+                    "percentage": "13.65%",
+                    "name": "ASTRA HEALTHCARE INDONESIA",
+                    "value": "2,097,640,200",
+                    "badges": [],
+                    "id": "1000000179",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "2,097,640,200",
+                    "scrip": "0",
+                    "value_formatted": "2.10 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "7.23%",
+                    "name": "ASTRA",
+                    "value": "1,110,824,000",
+                    "badges": [],
+                    "id": "1000000759",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "1,110,824,000",
+                    "scrip": "0",
+                    "value_formatted": "1.11 B",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "6.47%",
+                    "name": "YULISAR KHIAT",
+                    "value": "993,800,666",
+                    "badges": [],
+                    "id": "10572",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "993,800,666",
+                    "scrip": "0",
+                    "value_formatted": "993.80 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "5.56%",
+                    "name": "LYDIA IMMANUEL",
+                    "value": "855,082,000",
+                    "badges": [],
+                    "id": "10575",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "855,082,000",
+                    "scrip": "0",
+                    "value_formatted": "855.08 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "5.14%",
+                    "name": "B P SIMORANGKIR SPOG",
+                    "value": "789,863,411",
+                    "badges": [],
+                    "id": "11273",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "789,863,411",
+                    "scrip": "0",
+                    "value_formatted": "789.86 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "5.04%",
+                    "name": "HASMORO",
+                    "value": "774,672,689",
+                    "badges": [],
+                    "id": "14721",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "774,672,689",
+                    "scrip": "0",
+                    "value_formatted": "774.67 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "4.07%",
+                    "name": "LUMINOUS INVESTMENT HOLDINGS",
+                    "value": "625,000,000",
+                    "badges": [],
+                    "id": "1000003212",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "625,000,000",
+                    "scrip": "0",
+                    "value_formatted": "625.00 M",
+                    "classification": "Private Equity",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.72%",
+                    "name": "HERITAGE INVESTMENT HOLDINGS",
+                    "value": "570,899,500",
+                    "badges": [],
+                    "id": "1000002255",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "570,899,500",
+                    "scrip": "0",
+                    "value_formatted": "570.90 M",
+                    "classification": "Private Equity",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.64%",
+                    "name": "DWIMURIA INVESTAMA ANDALAN",
+                    "value": "559,185,300",
+                    "badges": [],
+                    "id": "8911",
+                    "type": "CP",
+                    "location": "Local",
+                    "nationality": "-",
+                    "domicile": "INDONESIA",
+                    "scripless": "559,185,300",
+                    "scrip": "0",
+                    "value_formatted": "559.19 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "3.07%",
+                    "name": "LILY SOEPARDIMAN",
+                    "value": "471,466,000",
+                    "badges": [],
+                    "id": "1000003157",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "471,466,000",
+                    "scrip": "0",
+                    "value_formatted": "471.47 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.59%",
+                    "name": "SOEDIBJO TOELOES",
+                    "value": "398,065,100",
+                    "badges": [],
+                    "id": "1000004670",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "398,065,100",
+                    "scrip": "0",
+                    "value_formatted": "398.07 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.47%",
+                    "name": "HUSEN SUTAKARIA",
+                    "value": "379,246,696",
+                    "badges": [],
+                    "id": "1000000176",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "379,246,696",
+                    "scrip": "0",
+                    "value_formatted": "379.25 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "2.28%",
+                    "name": "ASIAN DEVELOPMENT BANK (ADB)",
+                    "value": "350,000,000",
+                    "badges": [],
+                    "id": "1000000751",
+                    "type": "OT",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "PHILIPPINES",
+                    "scripless": "350,000,000",
+                    "scrip": "0",
+                    "value_formatted": "350.00 M",
+                    "classification": "International organization",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.97%",
+                    "name": "MEIJANI WIBOWO",
+                    "value": "303,181,367",
+                    "badges": [],
+                    "id": "1000000175",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "303,181,367",
+                    "scrip": "0",
+                    "value_formatted": "303.18 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.93%",
+                    "name": "INDRAJANI WIBOWO",
+                    "value": "296,653,567",
+                    "badges": [],
+                    "id": "1000002552",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "296,653,567",
+                    "scrip": "0",
+                    "value_formatted": "296.65 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.78%",
+                    "name": "RICKY DHARSONO WIBOWO",
+                    "value": "272,937,167",
+                    "badges": [],
+                    "id": "1000004248",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "272,937,167",
+                    "scrip": "0",
+                    "value_formatted": "272.94 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.53%",
+                    "name": "ADITYAWARMAN",
+                    "value": "235,733,000",
+                    "badges": [],
+                    "id": "1000000521",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "235,733,000",
+                    "scrip": "0",
+                    "value_formatted": "235.73 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.38%",
+                    "name": "WISNI SETYAWATI WAHJUDI",
+                    "value": "212,282,408",
+                    "badges": [],
+                    "id": "1000005551",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "212,282,408",
+                    "scrip": "0",
+                    "value_formatted": "212.28 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.32%",
+                    "name": "APOLLO AURORA",
+                    "value": "203,000,000",
+                    "badges": [],
+                    "id": "1000000681",
+                    "type": "CP",
+                    "location": "Foreign",
+                    "nationality": "-",
+                    "domicile": "SINGAPORE",
+                    "scripless": "203,000,000",
+                    "scrip": "0",
+                    "value_formatted": "203.00 M",
+                    "classification": "Corporate",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.27%",
+                    "name": "PUSTIKA AMALIA WAHIDIYAT",
+                    "value": "195,184,600",
+                    "badges": [],
+                    "id": "1000004106",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "195,184,600",
+                    "scrip": "0",
+                    "value_formatted": "195.18 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.19%",
+                    "name": "KHIAT KHIN SIANG",
+                    "value": "182,186,598",
+                    "badges": [],
+                    "id": "1000003015",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "INDONESIA",
+                    "scripless": "182,186,598",
+                    "scrip": "0",
+                    "value_formatted": "182.19 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                },
+                {
+                    "percentage": "1.16%",
+                    "name": "LILY ANGGRAINI SULAIMAN",
+                    "value": "177,848,822",
+                    "badges": [],
+                    "id": "1000003155",
+                    "type": "ID",
+                    "location": "Local",
+                    "nationality": "INDONESIAN",
+                    "domicile": "-",
+                    "scripless": "177,848,822",
+                    "scrip": "0",
+                    "value_formatted": "177.85 M",
+                    "classification": "Individual",
+                    "badge_details": []
+                }
+            ],
+            "last_updated": "2026-09-02"
+        },
+        "classification": {
+            "sector": {
+                "id": "2",
+                "name": "Kesehatan",
+                "symbol": ""
+            },
+            "sub_sector": {
+                "id": "61",
+                "name": "Jasa & Peralatan Kesehatan",
+                "symbol": ""
+            },
+            "industry": {
+                "id": "131",
+                "name": "Penyedia Jasa Kesehatan",
+                "symbol": ""
+            },
+            "sub_industry": {
+                "id": "211",
+                "name": "Penyedia Jasa Kesehatan",
+                "symbol": "Rumah Sakit"
+            }
+        }
+    },
+    "profile_synced_at": "2026-09-19T16:33:52+00:00"
+}
