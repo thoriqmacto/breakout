@@ -158,6 +158,84 @@ class AssetProfileUpdaterTest extends TestCase
         }
     }
 
+    /**
+     * The deployed box asks for this: the profile still lands in the database,
+     * the version-controlled directory is left alone, and the symbol comes back
+     * as a gap so the run can say which files are missing.
+     */
+    public function test_seeder_sync_can_be_disabled(): void
+    {
+        $symbol = 'ZZNOSYNC';
+
+        $asset = Asset::create(['symbol' => $symbol, 'name' => $symbol]);
+        $profilePath = database_path("seeders/data/profiles/{$symbol}_profile.json");
+        $this->assertFileDoesNotExist($profilePath, 'The probe symbol must not be a committed profile.');
+
+        $client = $this->createMock(StockbitExodusClient::class);
+        $client->method('tickerProfile')->willReturn(['data' => $this->sampleProfile]);
+
+        $service = (new AssetProfileUpdater($client))->withoutSeederSync();
+
+        try {
+            $result = $service->sync($asset);
+
+            $this->assertTrue($result['ok']);
+            $this->assertEquals(28.88, $asset->fresh()->float, 'The database is still updated.');
+            $this->assertFileDoesNotExist($profilePath);
+
+            $gaps = $service->takeSeederProfileGaps();
+            $this->assertArrayHasKey($symbol, $gaps);
+            $this->assertStringContainsString('--no-seeder-sync', $gaps[$symbol]);
+            $this->assertSame([], $service->takeSeederProfileGaps(), 'Gaps are cleared as they are read.');
+        } finally {
+            File::delete($profilePath);
+        }
+    }
+
+    /**
+     * The bug this guards: under www-data the write raised "Permission denied",
+     * Laravel promoted it to an ErrorException, and the scrape died on the first
+     * ticker with no committed profile -- which is every newly added asset.
+     */
+    public function test_a_failed_seeder_write_does_not_abort_the_sync(): void
+    {
+        $symbol = 'ZZUNWRITABLE';
+
+        $asset = Asset::create(['symbol' => $symbol, 'name' => $symbol]);
+
+        // A regular file where the directory tree has to go, so creating it
+        // fails for everyone -- including root, which a chmod would not.
+        $blocker = tempnam(sys_get_temp_dir(), 'profile-blocker');
+        $this->app->useDatabasePath($blocker);
+
+        $client = $this->createMock(StockbitExodusClient::class);
+        $client->method('tickerProfile')->willReturn(['data' => $this->sampleProfile]);
+
+        $service = new AssetProfileUpdater($client);
+
+        try {
+            $result = $service->sync($asset);
+
+            $this->assertTrue($result['ok'], 'A profile that cannot be filed is still applied.');
+            $this->assertEquals(28.88, $asset->fresh()->float);
+
+            $gaps = $service->takeSeederProfileGaps();
+            $this->assertArrayHasKey($symbol, $gaps);
+            $this->assertStringStartsWith('write failed', $gaps[$symbol]);
+        } finally {
+            @unlink($blocker);
+        }
+    }
+
+    public function test_guidance_names_the_command_and_the_tickers(): void
+    {
+        $guidance = AssetProfileUpdater::missingProfileGuidance(['admr', 'BREN']);
+
+        $this->assertStringContainsString('php artisan stockbit:scrape ADMR BREN', $guidance);
+        $this->assertStringContainsString('commit', $guidance);
+        $this->assertStringContainsString('Do not chmod', $guidance);
+    }
+
     public function test_it_returns_error_when_client_reports_issue(): void
     {
         $client = $this->createMock(StockbitExodusClient::class);

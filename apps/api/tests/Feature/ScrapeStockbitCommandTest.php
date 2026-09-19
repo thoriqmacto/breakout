@@ -317,6 +317,10 @@ class ScrapeStockbitCommandTest extends TestCase
             ->andReturn($profilePayload);
 
         $profileUpdater = Mockery::mock(AssetProfileUpdater::class);
+
+        $profileUpdater->shouldReceive('withoutSeederSync')->withAnyArgs()->andReturnSelf()->byDefault();
+
+        $profileUpdater->shouldReceive('takeSeederProfileGaps')->withAnyArgs()->andReturn([])->byDefault();
         $profileUpdater->shouldReceive('getIPODate')->withAnyArgs()->andReturnNull()->byDefault();
         $profileUpdater->shouldReceive('applyTickerProfileResponse')
             ->once()
@@ -449,6 +453,56 @@ class ScrapeStockbitCommandTest extends TestCase
         }
     }
 
+    /**
+     * The regression from the JII70 additions, end to end.
+     *
+     * A newly tracked symbol has no committed profile JSON, so --no-profile-sync
+     * does not spare it a profile fetch: the scraper still needs its IPO date,
+     * and getIPODate() falls back to the API. What used to follow was a write
+     * into the version-controlled seeder directory, fatal under www-data, which
+     * killed the run on the first such ticker. --no-seeder-sync skips the write
+     * and the run reports the gap instead.
+     */
+    public function test_no_seeder_sync_keeps_a_new_symbol_out_of_the_seeder_directory(): void
+    {
+        Storage::fake('local');
+
+        $symbol = 'ZZNEWSYM';
+        $profilePath = database_path("seeders/data/profiles/{$symbol}_profile.json");
+        $this->assertFileDoesNotExist($profilePath, 'The probe symbol must not be a committed profile.');
+
+        Asset::create(['symbol' => $symbol, 'name' => $symbol]);
+
+        $api = $this->makeStockbitMock();
+        $api->shouldReceive('marketDetectors')->never();
+        $api->shouldReceive('historicalSummary')->never();
+        // Once, from getIPODate() -- not from the skipped profile-sync step.
+        $api->shouldReceive('tickerProfile')
+            ->once()
+            ->with($symbol)
+            ->andReturn(['data' => ['history' => ['date' => '30 Jul 1990']]]);
+
+        $this->app->instance(StockbitExodusClient::class, $api);
+
+        try {
+            $exitCode = Artisan::call('stockbit:scrape', [
+                'tickers' => [$symbol],
+                '--no-profile-sync' => true,
+                '--no-seeder-sync' => true,
+            ]);
+
+            $output = Artisan::output();
+
+            $this->assertSame(0, $exitCode, 'A symbol with no profile JSON must not fail the run.');
+            $this->assertFileDoesNotExist($profilePath);
+            $this->assertStringContainsString('1 asset(s) have no seeder profile JSON: '.$symbol, $output);
+            $this->assertStringContainsString('php artisan stockbit:scrape '.$symbol, $output);
+            $this->assertStringContainsString('Do not chmod', $output);
+        } finally {
+            File::delete($profilePath);
+        }
+    }
+
     private function makeStockbitMock()
     {
         $mock = Mockery::mock(StockbitExodusClient::class);
@@ -465,6 +519,8 @@ class ScrapeStockbitCommandTest extends TestCase
     private function bindStubProfileUpdater(): void
     {
         $mock = Mockery::mock(AssetProfileUpdater::class);
+        $mock->shouldReceive('withoutSeederSync')->withAnyArgs()->andReturnSelf()->byDefault();
+        $mock->shouldReceive('takeSeederProfileGaps')->withAnyArgs()->andReturn([])->byDefault();
         $mock->shouldReceive('getIPODate')->withAnyArgs()->andReturnNull()->byDefault();
         $mock->shouldReceive('applyTickerProfileResponse')
             ->withAnyArgs()

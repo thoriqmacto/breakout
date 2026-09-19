@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Services\AssetProfileUpdater;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -66,6 +67,46 @@ class AssetProfileJsonSeeder extends Seeder
         foreach ($files as $file) {
             $this->seedProfileFromJson($file->getPathname());
         }
+
+        $this->reportAssetsWithoutProfileJson($files);
+    }
+
+    /**
+     * Name the assets this seeder had nothing to seed from.
+     *
+     * An asset can reach the database without a profile JSON -- the index panel
+     * creates one on the spot, and the scraper is told not to write the file
+     * back on a deployed box -- so the two sets drift. That costs a profile
+     * fetch per ticker on every scrape, and on a fresh deployment it means the
+     * asset is seeded without its IPO date, free float or listing information.
+     *
+     * Reported rather than fetched: this seeder must not depend on a live
+     * Stockbit token, and the fix is a commit, not a run.
+     *
+     * @param  Collection<int, \SplFileInfo>  $files
+     */
+    private function reportAssetsWithoutProfileJson($files): void
+    {
+        $seeded = $files
+            ->map(fn ($file) => Str::upper(Str::beforeLast($file->getFilename(), '_profile.json')))
+            ->all();
+
+        $missing = Asset::query()
+            ->orderBy('symbol')
+            ->pluck('symbol')
+            ->map(fn ($symbol) => Str::upper((string) $symbol))
+            ->reject(fn (string $symbol) => $symbol === '' || in_array($symbol, $seeded, true))
+            ->values()
+            ->all();
+
+        if ($missing === []) {
+            return;
+        }
+
+        $this->command?->warn(
+            count($missing).' asset(s) have no profile JSON to seed from: '.implode(', ', $missing)
+        );
+        $this->command?->line('<fg=gray>'.AssetProfileUpdater::missingProfileGuidance($missing).'</>');
     }
 
     private function seedProfileFromJson(string $path): void

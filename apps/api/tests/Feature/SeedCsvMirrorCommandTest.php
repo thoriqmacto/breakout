@@ -232,6 +232,10 @@ class SeedCsvMirrorCommandTest extends TestCase
         $this->app->instance(StockbitExodusClient::class, $mock);
 
         $profileUpdater = Mockery::mock(AssetProfileUpdater::class);
+
+        $profileUpdater->shouldReceive('withoutSeederSync')->withAnyArgs()->andReturnSelf()->byDefault();
+
+        $profileUpdater->shouldReceive('takeSeederProfileGaps')->withAnyArgs()->andReturn([])->byDefault();
         $profileUpdater->shouldReceive('getIPODate')->andReturn(null);
         $this->app->instance(AssetProfileUpdater::class, $profileUpdater);
 

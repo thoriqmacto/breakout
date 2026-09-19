@@ -126,9 +126,19 @@ class BackfillAssetHistoryJob implements ShouldBeUnique, ShouldQueue
         try {
             // No --from on purpose: that is what makes the scraper sync the
             // profile, read the IPO date off it and start there.
+            //
+            // --no-seeder-sync keeps that profile out of the version-controlled
+            // seeder directory. A symbol added through the index panel is by
+            // definition one with no profile JSON committed yet, so this is the
+            // job that would always attempt the write -- and on the deployed
+            // box fail it, which failed the whole backfill and left the new
+            // asset with no history at all. The profile still reaches the
+            // database; only the file is skipped, and the output below names
+            // the symbol so it can be committed from a development checkout.
             $exitCode = Artisan::call('stockbit:scrape', [
                 'tickers' => [$symbol],
                 '--historical' => true,
+                '--no-seeder-sync' => true,
             ], $output);
 
             Log::info('Backfilled price history.', [

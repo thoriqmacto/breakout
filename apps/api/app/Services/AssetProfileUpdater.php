@@ -10,7 +10,74 @@ use Illuminate\Support\Str;
 
 class AssetProfileUpdater
 {
+    /**
+     * Whether a freshly fetched profile is also written to the seeder directory.
+     *
+     * The directory is version controlled, so writing to it belongs in a
+     * development checkout. See writeProfileSeederJson() for why a deployed box
+     * is told not to, and missingProfileGuidance() for what to do instead.
+     */
+    private bool $seederSync = true;
+
+    /**
+     * Symbols this instance wanted a seeder profile for but did not write.
+     *
+     * Keyed by symbol so a ticker seen twice in one run is reported once; the
+     * value is the reason, which is either the opt-out or a failed write.
+     *
+     * @var array<string, string>
+     */
+    private array $seederProfileGaps = [];
+
     public function __construct(private StockbitExodusClient $client) {}
+
+    /**
+     * Stop writing profile JSON into the version-controlled seeder directory.
+     *
+     * For the scheduled automation, which runs on the deployed box.
+     */
+    public function withoutSeederSync(): static
+    {
+        $this->seederSync = false;
+
+        return $this;
+    }
+
+    /**
+     * Symbols missing a seeder profile, cleared as they are read.
+     *
+     * Callers report these once at the end of a run rather than per ticker,
+     * because the interesting thing is the list, not each occurrence.
+     *
+     * @return array<string, string>
+     */
+    public function takeSeederProfileGaps(): array
+    {
+        $gaps = $this->seederProfileGaps;
+        $this->seederProfileGaps = [];
+
+        return $gaps;
+    }
+
+    /**
+     * How to get missing profiles into the repository, where they belong.
+     *
+     * Shown by anything that notices a gap: the scraper when it fetches a
+     * profile it cannot file, and the seeder when it finds an asset with no
+     * profile to seed from.
+     *
+     * @param  array<int, string>  $symbols
+     */
+    public static function missingProfileGuidance(array $symbols): string
+    {
+        $tickers = implode(' ', array_map(static fn (string $symbol): string => Str::upper($symbol), $symbols));
+
+        return 'To add them, run `php artisan stockbit:scrape '.$tickers.'` in a development checkout and commit '
+            .'the generated database/seeders/data/profiles/*.json. That is what a fresh deployment seeds from, and '
+            .'it saves a profile fetch per ticker on every run. Do not chmod the directory on a deployed box: it is '
+            .'version controlled and the deploy resets the working tree, so a write there is discarded at the next '
+            .'deploy.';
+    }
 
     /**
      * Sync an asset record with the latest ticker profile information from Stockbit.
@@ -307,21 +374,39 @@ class AssetProfileUpdater
         return $directory.DIRECTORY_SEPARATOR.Str::upper($asset->symbol).'_profile.json';
     }
 
+    /**
+     * File a fetched profile in the seeder directory, if that is this run's job.
+     *
+     * It usually is not. The directory is version controlled and the deploy
+     * does `git reset --hard <sha>`, so a write that lands on a deployed
+     * checkout is discarded at the next deploy without a word. Under www-data
+     * it does not get that far: file_put_contents fails with "Permission
+     * denied", and because Laravel promotes the warning to an ErrorException
+     * that used to abort the whole scrape on the first ticker with no profile
+     * on disk -- which is every newly added asset.
+     *
+     * So the write is skipped when asked (--no-seeder-sync) and is never fatal
+     * when attempted. Either way the symbol is recorded as a gap, because the
+     * file really is missing and somebody should commit it.
+     */
     private function writeProfileSeederJson(Asset $asset, array $profile, array $updates): void
     {
-        $directory = database_path('seeders/data/profiles');
-        if (! File::isDirectory($directory)) {
-            File::makeDirectory($directory, 0755, true);
-        }
-
         $path = $this->profileSeederPath($asset);
         if (File::exists($path)) {
             return;
         }
 
+        $symbol = Str::upper($asset->symbol);
+
+        if (! $this->seederSync) {
+            $this->seederProfileGaps[$symbol] = 'not written (--no-seeder-sync)';
+
+            return;
+        }
+
         $payload = array_merge(
             [
-                'symbol' => Str::upper($asset->symbol),
+                'symbol' => $symbol,
                 'name' => $asset->name,
             ],
             $updates
@@ -336,6 +421,25 @@ class AssetProfileUpdater
             }
         }
 
-        File::put($path, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        try {
+            $directory = database_path('seeders/data/profiles');
+            if (! File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            // File::put returns false on a failed write, but Laravel's error
+            // handler turns the underlying warning into an ErrorException
+            // first, so both outcomes have to be caught to stay non-fatal.
+            $written = File::put(
+                $path,
+                json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            );
+
+            if ($written === false) {
+                $this->seederProfileGaps[$symbol] = 'write failed';
+            }
+        } catch (\Throwable $exception) {
+            $this->seederProfileGaps[$symbol] = 'write failed: '.$exception->getMessage();
+        }
     }
 }

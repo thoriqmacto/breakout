@@ -173,6 +173,16 @@ class OhlcvDailyCommand extends Command
      * re-fetching it for every ticker every afternoon is a large number of
      * calls that change nothing.
      *
+     * --no-seeder-sync matters for a different reason. It does not stop the
+     * profile fetch that an asset with no profile JSON still triggers -- the
+     * scraper needs its IPO date to pick a range -- it stops that profile being
+     * written back into database/seeders/data/profiles, which is version
+     * controlled. This command runs on the deployed box, where the deploy does
+     * `git reset --hard <sha>`, so such a write is discarded at the next deploy
+     * even where it is permitted; where it is not, it used to abort the run on
+     * the first newly added ticker. The file belongs in a development checkout,
+     * committed, which the run now says at the end.
+     *
      * @param  array<int, string>  $tickers
      */
     private function scrape(array $tickers, Carbon $date): int
@@ -183,6 +193,7 @@ class OhlcvDailyCommand extends Command
             '--from' => $date->toDateString(),
             '--to' => $date->toDateString(),
             '--no-profile-sync' => true,
+            '--no-seeder-sync' => true,
         ];
 
         $disk = $this->option('disk');

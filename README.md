@@ -90,6 +90,38 @@ The Laravel console already includes helpers for refreshing the trading calendar
    ```
    Use `--resolve=extra-bars` to prune stray rows or `--resolve=missing-days --force-delete` when you want missing trading days removed from the calendar after attempted recovery.
 
+### Asset profiles are committed, like the trading-day ledger
+
+`database/seeders/data/profiles/<SYMBOL>_profile.json` is version controlled and
+is what a fresh deployment seeds an asset's IPO date, free float and listing
+information from. It is also what saves a profile fetch per ticker on every
+scrape: `stockbit:scrape` needs an IPO date to pick its default range, and when
+the file is missing it asks Stockbit for the whole profile instead — which is
+why `--no-profile-sync` does not spare a new symbol that call.
+
+**So a newly tracked asset needs its profile committed.** Adding one through the
+index panel (JII70, LQ45, …) creates the asset and backfills its history, but
+cannot add the file: the server must not write there, for the same reason the
+[trading-day ledger](#the-checked-in-ledger) is not written there — the deploy
+does `git reset --hard <sha>`, so the write is discarded at the next deploy, and
+under `www-data` it fails outright. That failure used to be fatal and would end
+the run on the first such ticker:
+
+```
+file_put_contents(.../database/seeders/data/profiles/ADMR_profile.json): Failed to open stream: Permission denied
+```
+
+The scheduled collectors and the index-panel backfill now pass
+`--no-seeder-sync`, the write is never fatal where it is still attempted, and
+both the scraper and `AssetProfileJsonSeeder` end by naming the assets whose
+profile is missing. **Don't `chmod` the directory** — that turns a reported gap
+into a silent revert. To close it, run the command they print in a development
+checkout and commit the result:
+
+```bash
+php artisan stockbit:scrape ADMR BREN CDIA
+```
+
 ## Feature Extraction Usage
 Use the feature extraction command to persist daily OHLCV and broker metrics into `features_daily`.
 
