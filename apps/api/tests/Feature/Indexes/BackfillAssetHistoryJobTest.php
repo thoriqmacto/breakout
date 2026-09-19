@@ -56,6 +56,7 @@ class BackfillAssetHistoryJobTest extends TestCase
                 {--to=}
                 {--no-persist}
                 {--no-profile-sync}
+                {--no-seeder-sync}
                 {--eod}
                 {--watchlist-id=}
                 {--overwrite}
@@ -67,6 +68,7 @@ class BackfillAssetHistoryJobTest extends TestCase
                 BackfillAssetHistoryJobTest::$calls[] = [
                     'tickers' => $this->argument('tickers'),
                     'historical' => (bool) $this->option('historical'),
+                    'no_seeder_sync' => (bool) $this->option('no-seeder-sync'),
                     'from' => $this->option('from'),
                     'to' => $this->option('to'),
                 ];
@@ -118,6 +120,11 @@ class BackfillAssetHistoryJobTest extends TestCase
         // sync the profile and start at the IPO date.
         $this->assertNull(self::$calls[0]['from']);
         $this->assertNull(self::$calls[0]['to']);
+        // That profile must not be written back into the version-controlled
+        // seeder directory: a symbol added here never has one committed yet,
+        // so this is the call that would always attempt it, and on a deployed
+        // box the failed write used to fail the whole backfill.
+        $this->assertTrue(self::$calls[0]['no_seeder_sync']);
     }
 
     public function test_a_dead_token_defers_the_backfill_instead_of_spending_it(): void

@@ -132,6 +132,8 @@ class ScrapeStockbitTokenOptionTest extends TestCase
     private function makeProfileUpdaterMock(): AssetProfileUpdater
     {
         $mock = Mockery::mock(AssetProfileUpdater::class);
+        $mock->shouldReceive('withoutSeederSync')->withAnyArgs()->andReturnSelf()->byDefault();
+        $mock->shouldReceive('takeSeederProfileGaps')->withAnyArgs()->andReturn([])->byDefault();
         $mock->shouldReceive('getIPODate')->withAnyArgs()->andReturnNull();
         $mock->shouldReceive('applyTickerProfileResponse')->withAnyArgs()->andReturn(['ok' => true, 'asset' => (object) ['profile_synced_at' => null], 'profile' => []]);
 

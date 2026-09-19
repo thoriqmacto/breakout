@@ -31,6 +31,7 @@ class ScrapeStockbit extends Command
         {--to=   : YYYY-MM-DD (default: today)}
         {--no-persist : Skip persisting EOD OHLCV data to CSV/DB}
         {--no-profile-sync : Skip syncing asset profiles}
+        {--no-seeder-sync : Skip writing database/seeders/data/profiles/<SYMBOL>_profile.json. The scheduled automation passes this because that directory is version controlled}
         {--eod : Capture EOD watchlist snapshot}
         {--watchlist-id= : Override watchlist ID for --eod snapshot}
         {--overwrite : Force refreshing the --eod watchlist snapshot JSON}
@@ -73,6 +74,10 @@ class ScrapeStockbit extends Command
         $fetchHistorical = (bool) $this->option('historical');
         $fromOption = ($fetchMarketDetector || $fetchHistorical) ? $this->option('from') : null;
         $toOption = ($fetchMarketDetector || $fetchHistorical) ? $this->option('to') : null;
+
+        if ($this->option('no-seeder-sync')) {
+            $profileUpdater->withoutSeederSync();
+        }
 
         $disk = (string) config('stockbit.save_disk');
         $jsonDir = trim((string) config('stockbit.save_dir'), '/');
@@ -485,8 +490,41 @@ class ScrapeStockbit extends Command
         }
 
         $this->flushSeedCsvs(array_values($this->touchedSymbols));
+        $this->reportMissingSeederProfiles($profileUpdater);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Name the assets whose profile JSON is not in the repository.
+     *
+     * An asset with no profile on disk costs a profile fetch on every run --
+     * the scraper needs its IPO date to pick a range, and falls back to the API
+     * when the file is missing. Reported once at the end, because the useful
+     * output is the list of tickers to pass to the command that fixes it.
+     */
+    private function reportMissingSeederProfiles(AssetProfileUpdater $profileUpdater): void
+    {
+        $gaps = $profileUpdater->takeSeederProfileGaps();
+
+        if ($gaps === []) {
+            return;
+        }
+
+        $symbols = array_keys($gaps);
+
+        $this->warn(
+            count($symbols).' asset(s) have no seeder profile JSON: '.implode(', ', $symbols)
+        );
+
+        // A failed write is worth naming: it means this checkout tried and
+        // could not, which is the deployed box and not something to chmod.
+        $failures = array_filter($gaps, static fn (string $reason): bool => str_starts_with($reason, 'write failed'));
+        foreach ($failures as $symbol => $reason) {
+            $this->line("<fg=gray>  {$symbol}: {$reason}</>");
+        }
+
+        $this->line('<fg=gray>'.AssetProfileUpdater::missingProfileGuidance($symbols).'</>');
     }
 
     /**

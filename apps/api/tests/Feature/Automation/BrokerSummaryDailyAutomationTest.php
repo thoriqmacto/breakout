@@ -110,6 +110,8 @@ class BrokerSummaryDailyAutomationTest extends TestCase
     private function stubProfileUpdater(): void
     {
         $mock = Mockery::mock(AssetProfileUpdater::class);
+        $mock->shouldReceive('withoutSeederSync')->withAnyArgs()->andReturnSelf()->byDefault();
+        $mock->shouldReceive('takeSeederProfileGaps')->withAnyArgs()->andReturn([])->byDefault();
         $mock->shouldReceive('getIPODate')->withAnyArgs()->andReturnNull()->byDefault();
         $mock->shouldReceive('applyTickerProfileResponse')->withAnyArgs()->andReturn([
             'ok' => true, 'asset' => (object) ['profile_synced_at' => null], 'profile' => [],

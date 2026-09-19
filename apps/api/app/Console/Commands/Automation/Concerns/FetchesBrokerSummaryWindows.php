@@ -33,11 +33,16 @@ trait FetchesBrokerSummaryWindows
      */
     protected function scrapeWindow(array $tickers, string $from, string $to): int
     {
+        // --no-seeder-sync for the same reason as the daily OHLCV collector:
+        // an asset with no committed profile JSON still costs a profile fetch
+        // here, because the scraper reads its IPO date, and the write-back
+        // lands in a version-controlled directory on a deployed box.
         $parameters = [
             '--market-detector' => true,
             '--from' => $from,
             '--to' => $to,
             '--no-profile-sync' => true,
+            '--no-seeder-sync' => true,
         ];
 
         // --all is the documented invocation and is used verbatim whenever the
