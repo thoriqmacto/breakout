@@ -2,15 +2,15 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState, type ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 import {
   Bot,
   Boxes,
+  ChevronDown,
   HandCoins,
   LayoutDashboard,
+  Menu,
   LineChart,
-  PanelLeft,
-  PanelRight,
   Briefcase,
   DatabaseBackup,
   SlidersHorizontal,
@@ -21,68 +21,135 @@ import type { LucideIcon } from "lucide-react"
 
 import { AutomationAlertBanner } from "@/components/automation/alert-banner"
 import { useAuth } from "@/components/auth-provider"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 type NavigationItem = {
   label: string
   href: string
+  description: string
   disabled?: boolean
   icon: LucideIcon
 }
 
-const navigation: NavigationItem[] = [
+type NavigationGroup = {
+  label: string
+  items: NavigationItem[]
+}
+
+/**
+ * Overview stays a plain link: a dropdown holding one destination is a click
+ * spent on nothing.
+ */
+const overview: NavigationItem = {
+  label: "Overview",
+  href: "/dashboard",
+  description: "Portfolio, market and automation at a glance.",
+  icon: LayoutDashboard,
+}
+
+/**
+ * Grouped by the question being asked rather than by the page's machinery:
+ * what is the market doing, what am I doing about it, and is the plumbing
+ * healthy. Ten flat entries in a sidebar made every one of them equally
+ * prominent, which meant scanning the list every time.
+ */
+const navigationGroups: NavigationGroup[] = [
   {
-    label: "Overview",
-    href: "/dashboard",
-    icon: LayoutDashboard,
+    label: "Market",
+    items: [
+      {
+        label: "Assets",
+        href: "/dashboard/assets",
+        description: "Coverage, prices and the trading calendar.",
+        icon: Boxes,
+      },
+      {
+        label: "Broker Summary",
+        href: "/dashboard/broker-summary",
+        description: "Accumulation and distribution by broker.",
+        icon: HandCoins,
+      },
+    ],
   },
   {
-    label: "Assets",
-    href: "/dashboard/assets",
-    icon: Boxes,
+    label: "Trading",
+    items: [
+      {
+        label: "Portfolio",
+        href: "/dashboard/portfolio",
+        description: "Holdings, cash and realised performance.",
+        icon: Briefcase,
+      },
+      {
+        label: "Execution",
+        href: "/dashboard/execution",
+        description: "Planned entries, stops and open positions.",
+        icon: Target,
+      },
+      {
+        label: "Watchlist",
+        href: "/dashboard/strategy/watchlist",
+        description: "What the scan surfaced for tomorrow.",
+        icon: LineChart,
+      },
+      {
+        label: "Strategies",
+        href: "/dashboard/strategy",
+        description: "Rules, parameters and backtests.",
+        icon: SlidersHorizontal,
+      },
+    ],
   },
   {
-    label: "Portfolio",
-    href: "/dashboard/portfolio",
-    icon: Briefcase,
-  },
-  {
-    label: "Broker Summary",
-    href: "/dashboard/broker-summary",
-    icon: HandCoins,
-  },
-  {
-    label: "Execution",
-    href: "/dashboard/execution",
-    icon: Target,
-  },
-  {
-    label: "Watchlist",
-    href: "/dashboard/strategy/watchlist",
-    icon: LineChart,
-  },
-  {
-    label: "Strategies",
-    href: "/dashboard/strategy",
-    icon: SlidersHorizontal,
-  },
-  {
-    label: "Scrapers",
-    href: "/dashboard/scrapers",
-    icon: Terminal,
-  },
-  {
-    label: "Backups & Recovery",
-    href: "/dashboard/backups",
-    icon: DatabaseBackup,
-  },
-  {
-    label: "Automation",
-    href: "/dashboard/automation",
-    icon: Bot,
+    label: "Operations",
+    items: [
+      {
+        label: "Automation",
+        href: "/dashboard/automation",
+        description: "Scheduled jobs and their last outcome.",
+        icon: Bot,
+      },
+      {
+        label: "Scrapers",
+        href: "/dashboard/scrapers",
+        description: "Stockbit session and manual fetches.",
+        icon: Terminal,
+      },
+      {
+        label: "Backups & Recovery",
+        href: "/dashboard/backups",
+        description: "Mirror state and restore points.",
+        icon: DatabaseBackup,
+      },
+    ],
   },
 ]
+
+/**
+ * A group is current when the open page lives inside it, so the trigger can
+ * carry the same highlight a selected item would. Longest match wins, because
+ * /dashboard/strategy/watchlist is inside /dashboard/strategy.
+ */
+const isItemActive = (pathname: string, href: string) =>
+  pathname === href || pathname.startsWith(`${href}/`)
+
+const activeItemHref = (pathname: string): string | null => {
+  const candidates = [overview, ...navigationGroups.flatMap((group) => group.items)]
+    .map((item) => item.href)
+    .filter((href) => (href === "/dashboard" ? pathname === href : isItemActive(pathname, href)))
+    .sort((first, second) => second.length - first.length)
+
+  return candidates[0] ?? null
+}
 
 export default function DashboardLayout({
   children,
@@ -92,27 +159,12 @@ export default function DashboardLayout({
   const { user, loading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [isHeaderCondensed, setIsHeaderCondensed] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login")
     }
   }, [loading, router, user])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsHeaderCondensed(window.scrollY > 16)
-    }
-
-    handleScroll()
-    window.addEventListener("scroll", handleScroll)
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
 
   if (loading || !user) {
     return (
@@ -123,174 +175,193 @@ export default function DashboardLayout({
     )
   }
 
-  return (
-    <div className="flex min-h-screen bg-muted/30">
-      <aside
-        className={cn(
-          "sticky top-0 hidden h-screen shrink-0 flex-col border-r bg-sidebar transition-all duration-300 ease-in-out lg:flex",
-          isSidebarCollapsed ? "w-16 px-2 py-6" : "w-64 px-6 py-8",
-        )}
-      >
-        <div className="flex h-full flex-col gap-6">
-          <div
-            className={cn(
-              "space-y-2 pb-4 transition-opacity duration-200",
-              isSidebarCollapsed ? "pointer-events-none opacity-0" : "opacity-100",
-            )}
-          >
-            <Link
-              href="/dashboard"
-              className="block text-lg font-semibold"
-              tabIndex={isSidebarCollapsed ? -1 : 0}
-            >
-              Breakout Dashboard
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              Stay up to date with trading performance.
-            </p>
-          </div>
+  const currentHref = activeItemHref(pathname)
 
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            <nav
+  return (
+    <div className="flex min-h-screen flex-col bg-muted/30">
+      {/*
+        Sticky rather than fixed: it stays put while the page scrolls, which is
+        what a table's header row needs above it, without the content having to
+        carry a matching top offset that drifts whenever the bar's height
+        changes.
+
+        One fixed height (h-14), not the previous condense-on-scroll pair. The
+        bar was 88px tall at rest and animated to 56px, which moved the top of
+        every table on the first wheel click; 56px throughout is the smaller of
+        the two and never moves.
+      */}
+      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="flex h-14 items-center gap-2 px-4 sm:px-6">
+          <Link href="/dashboard" className="mr-1 shrink-0 text-sm font-semibold tracking-tight">
+            Breakout
+          </Link>
+
+          {/*
+            Under 640px the four triggers do not fit beside the account menu,
+            and letting the row scroll sideways hides whole sections behind a
+            gesture nobody thinks to try. One menu holding everything is the
+            honest version of the same navigation.
+          */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
               className={cn(
-                "flex flex-col gap-1",
-                isSidebarCollapsed ? "items-center" : undefined,
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "shrink-0 data-[state=open]:bg-accent sm:hidden",
               )}
             >
-              {navigation.map((item) => {
-                const isActive = pathname === item.href
-                const Icon = item.icon
-                const className = buttonVariants({
-                  variant: isActive ? "secondary" : "ghost",
-                  size: "sm",
-                })
+              <Menu className="size-4" aria-hidden />
+              <span>Menu</span>
+            </DropdownMenuTrigger>
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.disabled ? "#" : item.href}
-                    className={cn(
-                      className,
-                      "w-full",
-                      isSidebarCollapsed ? "justify-center px-0" : "justify-start",
-                      item.disabled ? "pointer-events-none opacity-50" : undefined,
-                    )}
-                    aria-disabled={item.disabled}
-                  >
-                    <Icon className="size-4" aria-hidden />
-                    {isSidebarCollapsed ? (
-                      <span className="sr-only">{item.label}</span>
-                    ) : (
-                      <span className="truncate">{item.label}</span>
-                    )}
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
-        </div>
-      </aside>
-
-      {isSidebarCollapsed ? (
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          className="fixed left-4 top-4 z-40 hidden lg:inline-flex"
-          onClick={() => setIsSidebarCollapsed(false)}
-          aria-label="Expand sidebar"
-        >
-          <PanelRight className="size-4" />
-        </Button>
-      ) : null}
-
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-        <header
-          className={cn(
-            "sticky top-0 z-30 flex flex-col gap-4 border-b bg-background/95 px-6 transition-all duration-300 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:flex-row lg:items-center lg:justify-between",
-            isHeaderCondensed ? "py-2 shadow-sm" : "py-4",
-          )}
-        >
-          <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-3 lg:items-center">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="hidden lg:inline-flex"
-                onClick={() => setIsSidebarCollapsed((previous) => !previous)}
-                aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                aria-expanded={!isSidebarCollapsed}
-              >
-                {isSidebarCollapsed ? <PanelRight className="size-4" /> : <PanelLeft className="size-4" />}
-              </Button>
-              <div className="flex min-w-0 flex-col text-left">
-                {isHeaderCondensed ? (
-                  <p className="text-sm font-medium text-foreground">
-                    <span className="block truncate">
-                      {user.name}
-                      {user.email ? ` · ${user.email}` : ""}
-                    </span>
-                  </p>
-                ) : (
-                  <>
-                    <p className="text-xs uppercase text-muted-foreground">Signed in as</p>
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="hidden items-center gap-3 lg:flex">
-              <Button asChild variant="ghost">
-                <Link href="/logout">Log out</Link>
-              </Button>
-            </div>
-          </div>
-
-          <nav className="flex flex-wrap items-center gap-2 lg:hidden">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.disabled ? "#" : item.href}
-                  className={`${buttonVariants({
-                    variant: isActive ? "secondary" : "ghost",
-                    size: "sm",
-                  })} ${item.disabled ? "pointer-events-none opacity-50" : ""}`}
-                  aria-disabled={item.disabled}
-                >
-                  {item.label}
+            <DropdownMenuContent align="start" className="w-72">
+              <DropdownMenuItem asChild className={currentHref === overview.href ? "bg-accent/60" : undefined}>
+                <Link href={overview.href}>
+                  <overview.icon className="size-4 text-muted-foreground" aria-hidden />
+                  <span className="font-medium">{overview.label}</span>
                 </Link>
+              </DropdownMenuItem>
+
+              {navigationGroups.map((group) => (
+                <div key={group.label}>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                  {group.items.map((item) => {
+                    const Icon = item.icon
+
+                    return (
+                      <DropdownMenuItem
+                        key={item.href}
+                        asChild
+                        disabled={item.disabled}
+                        className={item.href === currentHref ? "bg-accent/60" : undefined}
+                      >
+                        <Link href={item.disabled ? "#" : item.href}>
+                          <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                          <span className="font-medium">{item.label}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )
+                  })}
+                </div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <nav className="hidden min-w-0 flex-1 items-center gap-1 sm:flex">
+            <Link
+              href={overview.href}
+              className={cn(
+                buttonVariants({
+                  variant: currentHref === overview.href ? "secondary" : "ghost",
+                  size: "sm",
+                }),
+                "shrink-0",
+              )}
+            >
+              <overview.icon className="size-4" aria-hidden />
+              <span>{overview.label}</span>
+            </Link>
+
+            {navigationGroups.map((group) => {
+              const hasCurrent = group.items.some((item) => item.href === currentHref)
+
+              return (
+                <DropdownMenu key={group.label}>
+                  <DropdownMenuTrigger
+                    className={cn(
+                      buttonVariants({ variant: hasCurrent ? "secondary" : "ghost", size: "sm" }),
+                      "group shrink-0 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+                    )}
+                  >
+                    {group.label}
+                    <ChevronDown
+                      className="size-3.5 opacity-60 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                      aria-hidden
+                    />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="start" className="w-72">
+                    <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {group.items.map((item) => {
+                      const Icon = item.icon
+
+                      return (
+                        <DropdownMenuItem
+                          key={item.href}
+                          asChild
+                          disabled={item.disabled}
+                          className={cn(
+                            "items-start py-2",
+                            item.href === currentHref ? "bg-accent/60" : undefined,
+                          )}
+                        >
+                          <Link href={item.disabled ? "#" : item.href}>
+                            <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
+                            <span className="flex min-w-0 flex-col">
+                              <span className="font-medium">{item.label}</span>
+                              <span className="text-xs text-muted-foreground">{item.description}</span>
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )
             })}
           </nav>
 
-          <div className="flex items-center gap-3 lg:hidden">
-            <Button asChild variant="ghost">
-              <Link href="/logout">Log out</Link>
-            </Button>
-          </div>
-        </header>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "ml-auto shrink-0 data-[state=open]:bg-accent",
+              )}
+            >
+              <span className="hidden max-w-[12rem] truncate sm:inline">{user.name}</span>
+              <span className="sm:hidden">Account</span>
+              <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+            </DropdownMenuTrigger>
 
-        <main data-dashboard-main className="flex-1 px-6 py-8">
-          {/*
-            The Stockbit token is the single point of failure for every
-            scheduled market-data job, and it can only be renewed by a person.
-            Surfacing the warning on every authenticated page -- rather than
-            only on /dashboard/automation -- is what gives someone the chance
-            to act before the 16:00 WIB scrape stands down.
-          */}
-          <AutomationAlertBanner />
-          {children}
-        </main>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
+              <div className="px-2 pb-1.5">
+                <p className="truncate text-sm font-medium">{user.name}</p>
+                {user.email ? (
+                  <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                ) : null}
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/logout">Log out</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
 
-        <footer className="border-t bg-background px-6 py-4 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Breakout Technologies. All rights reserved.
-        </footer>
-      </div>
+      {/*
+        No sidebar, and no max-width: the widest table here asks for 1500px and
+        the old 256px rail guaranteed it was scrolled sideways on a 1440px
+        screen. The page gutter is the only thing between a table and the
+        viewport edge now, and it tightens on small screens where it costs most.
+      */}
+      <main data-dashboard-main className="w-full flex-1 px-4 py-6 sm:px-6">
+        {/*
+          The Stockbit token is the single point of failure for every
+          scheduled market-data job, and it can only be renewed by a person.
+          Surfacing the warning on every authenticated page -- rather than
+          only on /dashboard/automation -- is what gives someone the chance
+          to act before the 16:00 WIB scrape stands down.
+        */}
+        <AutomationAlertBanner />
+        {children}
+      </main>
+
+      <footer className="border-t bg-background px-4 py-4 text-sm text-muted-foreground sm:px-6">
+        © {new Date().getFullYear()} Breakout Technologies. All rights reserved.
+      </footer>
     </div>
   )
 }
