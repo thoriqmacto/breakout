@@ -18,6 +18,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { InfoTip } from "@/components/ui/info-tip"
 import { Input } from "@/components/ui/input"
 import { formatBytes, formatTime } from "@/components/backup-status"
 import type {
@@ -390,9 +391,58 @@ export function FlowSnapshotCard({ snapshot }: { snapshot: FlowSnapshot }) {
             window={snapshot.window}
           />
         </div>
-        <p className="text-xs text-muted-foreground">{snapshot.note}</p>
+        <FlowLegend snapshot={snapshot} />
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * What the two numbers on a row actually are.
+ *
+ * The percentage was the unexplained half: a row reads "+5 over 5/5
+ * session(s) · +0.10%" and nothing on the card said the percentage was a
+ * price move rather than a share of anything, nor what it was measured over.
+ *
+ * The last paragraph is the part that is easy to get wrong. The balance counts
+ * broker sessions and the return counts stored price bars, which are two
+ * different series of the same length -- so a symbol with two broker sessions
+ * still shows a full-window return beside it, and reading them as the same
+ * five days is the wrong inference.
+ */
+function FlowLegend({ snapshot }: { snapshot: FlowSnapshot }) {
+  return (
+    <div className="space-y-3 border-t pt-4 text-xs text-muted-foreground">
+      <p className="font-medium text-foreground">How to read a row</p>
+
+      <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+        <div>
+          <dt className="text-foreground">
+            <span className="font-medium">+5 over 5/5 session(s)</span> — flow balance
+          </dt>
+          <dd className="mt-0.5">{snapshot.note}</dd>
+        </div>
+
+        <div>
+          <dt className="text-foreground">
+            <span className="font-medium">+0.10%</span> — price return
+          </dt>
+          <dd className="mt-0.5">
+            The close-to-close move over the last {snapshot.window} stored price bars: the latest
+            close against the close {snapshot.window} bars earlier. It is what price did alongside
+            the flow, not a return the flow produced. A dash means fewer than {snapshot.window + 1}{" "}
+            bars are stored, so there is nothing to measure from.
+          </dd>
+        </div>
+      </dl>
+
+      <p>
+        The two are measured on different series — the balance counts broker sessions, the return
+        counts price bars — so a symbol under <em>Insufficient daily data</em> can show a full{" "}
+        {snapshot.window}-bar return beside only a session or two of broker flow. Descriptive only;
+        neither number is a recommendation.
+      </p>
+    </div>
   )
 }
 
@@ -572,8 +622,12 @@ export function ReconciliationTable({
                 <th className="px-4 py-3">OHLCV</th>
                 <th className="px-4 py-3">Daily broker</th>
                 <th className="px-4 py-3">Gaps</th>
-                <th className="px-4 py-3">Flow {window}d</th>
-                <th className="px-4 py-3">Return {window}d</th>
+                <th className="px-4 py-3">
+                  <InfoTip term="flowBalance">Flow {window}d</InfoTip>
+                </th>
+                <th className="px-4 py-3">
+                  <InfoTip term="priceReturn">Return {window}d</InfoTip>
+                </th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
