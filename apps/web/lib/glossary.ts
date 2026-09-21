@@ -291,6 +291,21 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
     term: "Why",
     definition: "The conditions that produced this row — expand to see what passed and what did not.",
   },
+
+  // -------------------------------------------------------- Reconciliation
+  flowBalance: {
+    term: "Flow balance",
+    definition:
+      "The accumulation/distribution label summed over the most recent genuine single-day broker sessions, one point per session. The fraction beside it is how many of those sessions actually exist for this symbol, so +3 out of 3 available is a different statement from +3 out of 5.",
+    range: "Runs from −N to +N over an N-session window. 0 is a balanced window, not missing data.",
+  },
+  priceReturn: {
+    term: "Price return",
+    definition:
+      "The close-to-close move over the same number of stored price bars: the latest close measured against the close that many bars earlier. It is what price did alongside the broker flow, not a return the flow produced, and the two are read together rather than one explaining the other.",
+    range:
+      "A percentage, signed. Shown as — when fewer than one more bar than the window is stored, since there is nothing to measure from.",
+  },
 }
 
 /** The definition for a term id, or null when nothing is registered. */
