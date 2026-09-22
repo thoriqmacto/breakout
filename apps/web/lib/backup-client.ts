@@ -290,3 +290,61 @@ export async function pushToDrive(
 export function symbolOf(fileName: string): string {
   return fileName.replace(/\.[^.]+$/, "").toUpperCase()
 }
+
+/**
+ * Whether Drive has a grant, and where it came from.
+ *
+ * `source` is "store" for a grant made through the connect button, "env" for
+ * an installation still running on a pasted GOOGLE_DRIVE_REFRESH_TOKEN, and
+ * "none" when there is nothing to authenticate with. The token itself is
+ * never sent; `fingerprint` is four characters of a hash, enough to tell one
+ * grant from the next.
+ */
+export type DriveConnection = {
+  configured: boolean
+  connected: boolean
+  source: "store" | "env" | "none"
+  account: string | null
+  fingerprint: string | null
+  connected_at: string | null
+}
+
+export function fetchDriveConnection(token: string): Promise<DriveConnection> {
+  return get<DriveConnection>(
+    token,
+    "/v1/integrations/google-drive",
+    "Unable to read the Google Drive connection",
+  )
+}
+
+/**
+ * Start the consent round-trip.
+ *
+ * Returns the URL to send the browser to; consent happens on Google's own
+ * origin, so this must be a full navigation rather than a fetch.
+ */
+export async function startDriveConnection(token: string): Promise<string> {
+  const response = await fetch(buildApiUrl("/v1/integrations/google-drive/redirect"), {
+    method: "POST",
+    headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+  })
+  const payload = await parseJson<ApiResponse<{ authorization_url: string }>>(response)
+
+  if (!response.ok || !payload || payload.status !== "success") {
+    throw new Error(message(payload, "Unable to start the Google Drive connection"))
+  }
+
+  return payload.data.authorization_url
+}
+
+export async function disconnectDrive(token: string): Promise<void> {
+  const response = await fetch(buildApiUrl("/v1/integrations/google-drive"), {
+    method: "DELETE",
+    headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+  })
+  const payload = await parseJson<ApiResponse<unknown>>(response)
+
+  if (!response.ok || !payload || payload.status !== "success") {
+    throw new Error(message(payload, "Unable to disconnect Google Drive"))
+  }
+}

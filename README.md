@@ -1287,17 +1287,18 @@ Authentication is OAuth 2.0 as a real Google user, not a service account. A serv
 1. In the [Google Cloud console](https://console.cloud.google.com/), create (or pick) a project and **enable the Google Drive API**.
 2. Configure the **OAuth consent screen**. Add the Gmail account that will own the files as a test user if the app stays in Testing.
 3. Create an **OAuth 2.0 Client ID** of type **Web application**.
-4. Add `https://developers.google.com/oauthplayground` as an **authorized redirect URI** — this is what lets the Playground mint the refresh token below.
-5. Open the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/), and in the gear menu tick **Use your own OAuth credentials**, pasting the client ID and secret.
-6. In step 1 enter the scope `https://www.googleapis.com/auth/drive` — the full Drive scope. `drive.file` and the read-only scopes are not enough for the mirror.
-7. Authorize as the Gmail account that should own the backups, then **Exchange authorization code for tokens**.
-8. Copy the **refresh token**. That is the credential the VPS uses; it lets scheduled and CLI jobs authenticate with no browser.
-9. Fill in `apps/api/.env` on the server:
+4. Add this API's callback as an **authorized redirect URI**, exactly as the server will send it — Google compares the string verbatim, down to the scheme and any trailing slash:
+
+   ```
+   https://api.example.com/api/v1/integrations/google-drive/callback
+   ```
+
+5. Fill in `apps/api/.env` on the server:
 
    ```dotenv
    GOOGLE_DRIVE_CLIENT_ID=xxxx.apps.googleusercontent.com
    GOOGLE_DRIVE_CLIENT_SECRET=xxxx
-   GOOGLE_DRIVE_REFRESH_TOKEN=xxxx
+   GOOGLE_DRIVE_REDIRECT_URI=https://api.example.com/api/v1/integrations/google-drive/callback
 
    GOOGLE_DRIVE_FOLDER_ID=              # blank = My Drive root
    GOOGLE_DRIVE_ROOT=breakout-data
@@ -1306,13 +1307,19 @@ Authentication is OAuth 2.0 as a real Google user, not a service account. A serv
    CSV_MIRROR_PATH=seeds/historical
    ```
 
-   Those values are placeholders. `GOOGLE_DRIVE_CLIENT_SECRET` and `GOOGLE_DRIVE_REFRESH_TOKEN` are credentials — never commit them, and there is no longer any JSON key file to protect.
+   Those values are placeholders. `GOOGLE_DRIVE_CLIENT_SECRET` is a credential — never commit it, and there is no longer any JSON key file to protect.
 
    Leaving `GOOGLE_DRIVE_FOLDER_ID` blank puts everything under `My Drive/breakout-data`. Set it only to nest the app folder inside an existing folder, and then it must hold just the id from that folder's URL.
 
-10. **While the consent screen is in Testing, refresh tokens expire after seven days.** For a VPS that should keep working, publish the app in the Google Cloud console. This is the single most common cause of Drive working for a week and then failing with `invalid_grant`.
+6. Run `php artisan config:cache`, then open **Backups & Recovery** in the dashboard and press **Connect Google Drive**. Consent happens on Google's own pages and the browser comes back to that page; the refresh token is exchanged and stored by the API, encrypted with `APP_KEY`, and never passes through the browser.
 
-11. Apply the configuration and verify:
+   That button is also the renewal. When a grant is revoked or lapses, the card reports *Authentication required* and the same button reads **Reconnect** — no `.env` edit, no `config:cache`, no deploy.
+
+   **The grant belongs to the installation, not to whoever pressed the button.** The scheduled collectors and the mirror push run under cron and the queue worker with nobody signed in, and they authenticate with this one stored token.
+
+7. **While the consent screen is in Testing, refresh tokens expire after seven days.** For a VPS that should keep working, publish the app in the Google Cloud console. This is the single most common cause of Drive working for a week and then failing with `invalid_grant`.
+
+8. Apply the configuration and verify:
 
     ```bash
     cd apps/api
@@ -1322,6 +1329,10 @@ Authentication is OAuth 2.0 as a real Google user, not a service account. A serv
     ```
 
     `gdrive:check` reports each credential as `set` or `unset` — never their values — then writes, reads back, overwrites and deletes a probe file, naming whichever step fails. `--keep` leaves the probe in place so you can see it in Drive.
+
+#### Migrating from `GOOGLE_DRIVE_REFRESH_TOKEN`
+
+Older installations pasted a refresh token minted in the OAuth Playground into `GOOGLE_DRIVE_REFRESH_TOKEN`. That variable is still read when nothing has been connected through the dashboard, so an existing server keeps working across this change untouched. Pressing **Connect** once stores a grant on the server, which takes precedence from then on; the card says which of the two is in use. The variable can be removed from `.env` after that.
 
 ### Migrating existing CSVs to the mirror
 

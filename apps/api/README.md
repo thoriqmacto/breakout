@@ -106,7 +106,8 @@ Key environment variables (see `.env.example`):
 | `CSV_MIRROR_PATH` | Path prefix for the mirrored CSVs (default `seeds/historical`). |
 | `GOOGLE_DRIVE_CLIENT_ID` | OAuth client id for the Drive integration. |
 | `GOOGLE_DRIVE_CLIENT_SECRET` | OAuth client secret. **Credential — never commit.** |
-| `GOOGLE_DRIVE_REFRESH_TOKEN` | Long-lived refresh token for the Gmail account that owns the files. **Credential — never commit.** |
+| `GOOGLE_DRIVE_REDIRECT_URI` | Callback this API exposes, registered verbatim on the OAuth client. Connecting happens from Backups & Recovery. |
+| `GOOGLE_DRIVE_REFRESH_TOKEN` | Legacy fallback, read only when nothing has been connected from the dashboard. **Credential — never commit.** |
 | `GOOGLE_DRIVE_FOLDER_ID` | Optional parent folder id. Blank uses the account's My Drive root. |
 | `GOOGLE_DRIVE_ROOT` | Folder created under the parent (default `breakout-data`). |
 

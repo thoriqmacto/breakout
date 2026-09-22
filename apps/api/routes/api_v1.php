@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\BrokerSummaryController;
 use App\Http\Controllers\Api\V1\BrokerSummaryWindowController;
 use App\Http\Controllers\Api\V1\CashMovementController;
 use App\Http\Controllers\Api\V1\ExecutionCandidateController;
+use App\Http\Controllers\Api\V1\GoogleDriveOAuthController;
 use App\Http\Controllers\Api\V1\MarketIndexController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\PortfolioImportController;
@@ -23,9 +24,31 @@ use App\Http\Controllers\Api\V1\StrategyWatchlistController;
 use App\Http\Controllers\Api\V1\TradingDayController;
 use Illuminate\Support\Facades\Route;
 
+/*
+ * The Google Drive consent callback, necessarily unauthenticated: the browser
+ * arrives here straight from accounts.google.com carrying no Authorization
+ * header. The single-use `state` parameter is what binds the callback to a
+ * flow this server started -- see GoogleDriveOAuthController::callback().
+ */
+Route::prefix('v1')->group(function () {
+    Route::get('integrations/google-drive/callback', [GoogleDriveOAuthController::class, 'callback'])
+        ->name('google-drive.callback');
+});
+
 Route::prefix('v1')->middleware(['auth:sanctum,jwt'])->group(function () {
     Route::get('backup-status', [BackupStatusController::class, 'index'])
         ->name('backup-status.index');
+
+    // Connecting Drive from the dashboard. The consent URL is minted on the
+    // API so the client secret stays here; the browser is only redirected.
+    Route::get('integrations/google-drive', [GoogleDriveOAuthController::class, 'show'])
+        ->name('google-drive.show');
+
+    Route::post('integrations/google-drive/redirect', [GoogleDriveOAuthController::class, 'redirect'])
+        ->name('google-drive.redirect');
+
+    Route::delete('integrations/google-drive', [GoogleDriveOAuthController::class, 'destroy'])
+        ->name('google-drive.destroy');
 
     Route::post('backup-status/mirror-push', [BackupStatusController::class, 'mirrorPush'])
         ->name('backup-status.mirror-push');

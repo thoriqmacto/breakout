@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\GoogleDriveTokenStore;
 use Google\Client as GoogleClient;
 use Google\Service\Drive as GoogleDriveService;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -16,11 +17,13 @@ use Throwable;
  * Registers the "gdrive" filesystem driver so Google Drive can back any disk
  * through the regular Storage facade.
  *
- * Authentication is OAuth 2.0 against a personal Google account: a client id,
- * client secret and long-lived refresh token, all from the environment. There
- * is no credentials file. A service account was tried first and cannot work
- * here -- Google gives service accounts no storage quota, so one can create
- * folders in My Drive but never own a file in them.
+ * Authentication is OAuth 2.0 against a personal Google account: a client id
+ * and secret from the environment, and a long-lived refresh token from
+ * GoogleDriveTokenStore -- granted through the consent screen on the Backups
+ * page, or read from GOOGLE_DRIVE_REFRESH_TOKEN where nothing has been
+ * connected yet. There is no credentials file. A service account was tried
+ * first and cannot work here -- Google gives service accounts no storage
+ * quota, so one can create folders in My Drive but never own a file in them.
  *
  * Drive is durable cold storage for file artifacts only. The relational tables
  * (`price_bars`, `features_daily`) stay the query layer, and secrets such as
@@ -44,7 +47,20 @@ class GoogleDriveServiceProvider extends ServiceProvider
         Storage::extend('gdrive', function ($app, array $config): FilesystemAdapter {
             $clientId = $this->requireConfig($config, 'clientId', 'GOOGLE_DRIVE_CLIENT_ID');
             $clientSecret = $this->requireConfig($config, 'clientSecret', 'GOOGLE_DRIVE_CLIENT_SECRET');
-            $refreshToken = $this->requireConfig($config, 'refreshToken', 'GOOGLE_DRIVE_REFRESH_TOKEN');
+
+            // The grant made through the dashboard's connect button, falling
+            // back to GOOGLE_DRIVE_REFRESH_TOKEN. The store reads that
+            // variable itself when nothing has been connected here yet, so an
+            // installation still running on a pasted token is unaffected until
+            // somebody presses the button.
+            $refreshToken = trim((string) app(GoogleDriveTokenStore::class)->get());
+
+            if ($refreshToken === '') {
+                throw new InvalidArgumentException(
+                    'Google Drive is not connected. Connect it from the Backups & Recovery page, '
+                    .'or set GOOGLE_DRIVE_REFRESH_TOKEN.'
+                );
+            }
 
             $client = new GoogleClient;
             $client->setClientId($clientId);
@@ -95,8 +111,9 @@ class GoogleDriveServiceProvider extends ServiceProvider
             // carries the client secret and refresh token.
             throw new InvalidArgumentException(
                 'Google Drive OAuth request failed: '.$e->getMessage().' '.
-                'Check GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET and '.
-                'GOOGLE_DRIVE_REFRESH_TOKEN, and that the host can reach accounts.google.com.'
+                'Check GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET, that Drive is '.
+                'connected on the Backups & Recovery page, and that the host can reach '.
+                'accounts.google.com.'
             );
         }
 
@@ -126,7 +143,8 @@ class GoogleDriveServiceProvider extends ServiceProvider
 
         if (! is_array($token) || ! isset($token['access_token'])) {
             throw new InvalidArgumentException(
-                'Google Drive OAuth returned no access token. Regenerate GOOGLE_DRIVE_REFRESH_TOKEN.'
+                'Google Drive OAuth returned no access token. Reconnect Drive from the '.
+                'Backups & Recovery page.'
             );
         }
     }

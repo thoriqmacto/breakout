@@ -12,15 +12,19 @@ import {
   TriangleAlert,
 } from "lucide-react"
 
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   STATE_HINTS,
   STATE_LABELS,
+  disconnectDrive,
+  startDriveConnection,
   symbolOf,
   type BackupFile,
   type BackupState,
   type Collection,
+  type DriveConnection,
   type DriveHealth,
   type PushResult,
 } from "@/lib/backup-client"
@@ -98,10 +102,16 @@ export function StateBadge({ state }: { state: BackupState }) {
   )
 }
 
-export function DriveHealthCard({ health }: { health: DriveHealth }) {
-  const [open, setOpen] = useState(false)
+export function DriveHealthCard({
+  health,
+  connection,
+  onConnectionChanged,
+}: {
+  health: DriveHealth
+  connection: DriveConnection | null
+  onConnectionChanged: () => void
+}) {
   const healthy = health.status === "healthy"
-  const needsRenewal = health.refresh_token_status === "renew_required"
 
   const tokenLabel: Record<DriveHealth["refresh_token_status"], string> = {
     valid: "Valid",
@@ -122,7 +132,11 @@ export function DriveHealthCard({ health }: { health: DriveHealth }) {
                 <span
                   className={`size-2.5 rounded-full ${healthy ? "bg-emerald-500" : "bg-destructive"}`}
                 />
-                {healthy ? "Connected" : needsRenewal ? "Authentication required" : "Unavailable"}
+                {healthy
+                  ? "Connected"
+                  : health.refresh_token_status === "renew_required"
+                    ? "Authentication required"
+                    : "Unavailable"}
               </CardDescription>
             </div>
           </div>
@@ -166,41 +180,7 @@ export function DriveHealthCard({ health }: { health: DriveHealth }) {
           </p>
         ) : null}
 
-        {needsRenewal ? (
-          <div className="rounded-lg border">
-            <button
-              type="button"
-              onClick={() => setOpen((value) => !value)}
-              className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm font-medium"
-            >
-              Show renewal instructions
-              <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
-            </button>
-            {open ? (
-              <ol className="list-decimal space-y-1.5 border-t px-4 py-3 pl-9 text-sm text-muted-foreground">
-                <li>Open the Google OAuth Playground.</li>
-                <li>Enable &ldquo;Use your own OAuth credentials&rdquo;.</li>
-                <li>Enter the same client ID and client secret already configured on the server.</li>
-                <li>Set the access type to Offline.</li>
-                <li>
-                  Authorise the scope{" "}
-                  <code className="font-mono text-xs">https://www.googleapis.com/auth/drive</code>.
-                </li>
-                <li>Exchange the authorisation code for tokens and copy the refresh token.</li>
-                <li>
-                  Set <code className="font-mono text-xs">GOOGLE_DRIVE_REFRESH_TOKEN</code> on the
-                  server.
-                </li>
-                <li>
-                  Run <code className="font-mono text-xs">php artisan optimize:clear</code>, then{" "}
-                  <code className="font-mono text-xs">php artisan config:cache</code>, then{" "}
-                  <code className="font-mono text-xs">php artisan gdrive:check</code>.
-                </li>
-                <li>Refresh this page.</li>
-              </ol>
-            ) : null}
-          </div>
-        ) : null}
+        <DriveConnectPanel connection={connection} onChanged={onConnectionChanged} />
 
         <p className="text-xs text-muted-foreground">
           If the Google OAuth application is still in Testing mode, Google issues refresh tokens with
@@ -210,6 +190,141 @@ export function DriveHealthCard({ health }: { health: DriveHealth }) {
         </p>
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * Granting Drive access, in one click instead of nine steps.
+ *
+ * This replaced a collapsible list that told the reader to open the OAuth
+ * Playground, tick "use your own credentials", mint a refresh token by hand,
+ * paste it into .env and re-cache the config. Every one of those steps was a
+ * chance to put the wrong value somewhere unreadable, and the whole procedure
+ * had to be remembered again the next time the grant lapsed -- which, on a
+ * consent screen still in Testing, is weekly.
+ *
+ * Consent happens on Google's own origin, so connecting is a full navigation
+ * rather than a fetch, and the browser comes back to this page carrying a
+ * ?drive= outcome. Nothing sensitive passes through here: the API mints the
+ * URL, receives the callback, and keeps the token.
+ */
+function DriveConnectPanel({
+  connection,
+  onChanged,
+}: {
+  connection: DriveConnection | null
+  onChanged: () => void
+}) {
+  const { accessToken } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (connection === null) return null
+
+  if (!connection.configured) {
+    return (
+      <div className="rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
+        <p className="font-medium text-foreground">Connecting is not available yet</p>
+        <p className="mt-1">
+          The server needs <code className="font-mono text-xs">GOOGLE_DRIVE_CLIENT_ID</code>,{" "}
+          <code className="font-mono text-xs">GOOGLE_DRIVE_CLIENT_SECRET</code> and{" "}
+          <code className="font-mono text-xs">GOOGLE_DRIVE_REDIRECT_URI</code>, and that redirect URI
+          has to be registered on the OAuth client in Google Cloud Console.
+        </p>
+      </div>
+    )
+  }
+
+  const connect = async () => {
+    if (!accessToken) return
+
+    setBusy(true)
+    setError(null)
+
+    try {
+      // Assigned rather than opened: consent is on accounts.google.com, and
+      // the API redirects back here when it is done.
+      window.location.href = await startDriveConnection(accessToken)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to start the connection.")
+      setBusy(false)
+    }
+  }
+
+  const disconnect = async () => {
+    if (!accessToken) return
+
+    // Backups stop the moment this succeeds, so it asks first.
+    if (
+      !window.confirm(
+        "Disconnect Google Drive? Scheduled backups and the mirror push will fail until it is " +
+          "connected again.",
+      )
+    ) {
+      return
+    }
+
+    setBusy(true)
+    setError(null)
+
+    try {
+      await disconnectDrive(accessToken)
+      onChanged()
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to disconnect.")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2 rounded-lg border px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0 text-sm">
+          <p className="font-medium">
+            {connection.connected ? "Google account" : "No account connected"}
+          </p>
+          <p className="text-muted-foreground">
+            {connection.connected
+              ? connection.account ?? `Grant ending ${connection.fingerprint ?? "—"}`
+              : "Grant access to store backups in Drive."}
+          </p>
+        </div>
+
+        <div className="flex shrink-0 gap-2">
+          <Button size="sm" onClick={() => void connect()} disabled={busy}>
+            {connection.connected ? "Reconnect" : "Connect Google Drive"}
+          </Button>
+          {connection.connected && connection.source === "store" ? (
+            <Button size="sm" variant="ghost" onClick={() => void disconnect()} disabled={busy}>
+              Disconnect
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {connection.connected_at ? (
+        <p className="text-xs text-muted-foreground">
+          Connected {formatTime(connection.connected_at)}.
+        </p>
+      ) : null}
+
+      {/*
+        Worth saying plainly: this installation is still running on the token
+        pasted into .env, so the button has never been used here. Reconnecting
+        moves it into the encrypted store, after which renewals no longer touch
+        the environment or need a deploy.
+      */}
+      {connection.source === "env" ? (
+        <p className="text-xs text-muted-foreground">
+          Using <code className="font-mono">GOOGLE_DRIVE_REFRESH_TOKEN</code> from the environment.
+          Reconnect to replace it with a grant stored on the server, which can then be renewed from
+          this page.
+        </p>
+      ) : null}
+
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    </div>
   )
 }
 
