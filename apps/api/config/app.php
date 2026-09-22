@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Dashboard URL
+    |--------------------------------------------------------------------------
+    |
+    | Where the Next.js dashboard is served. FRONTEND_URL already drives the
+    | CORS origin; this exposes it as configuration so a redirect built at
+    | runtime does not have to read env() -- which a cached config leaves null,
+    | and which would send every OAuth callback in production to localhost.
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

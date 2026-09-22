@@ -37,4 +37,31 @@ return [
 
     'grant_warn_before_days' => (int) env('GOOGLE_DRIVE_GRANT_WARN_BEFORE_DAYS', 2),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Where Google sends the browser back to
+    |--------------------------------------------------------------------------
+    |
+    | The callback route on this API, which must be registered verbatim as an
+    | authorized redirect URI on the OAuth client in Google Cloud Console --
+    | Google compares it exactly, down to the scheme and trailing slash.
+    |
+    |   https://api.example.com/api/v1/integrations/google-drive/callback
+    |
+    | It points at the API rather than the dashboard because the client secret
+    | and the refresh token never leave this side: the browser is only ever
+    | redirected through. Leave it unset and the connect button reports the
+    | integration as unconfigured rather than failing at Google.
+    |
+    */
+
+    'redirect_uri' => env('GOOGLE_DRIVE_REDIRECT_URI'),
+
+    /*
+    | Where the browser is sent once the round-trip finishes, carrying a
+    | ?drive= outcome for the page to report. Falls back to FRONTEND_URL.
+    */
+
+    'return_path' => env('GOOGLE_DRIVE_RETURN_PATH', '/dashboard/backups'),
+
 ];

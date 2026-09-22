@@ -292,9 +292,10 @@ class GoogleDriveCheckCommand extends Command
             $this->line('longer matches the OAuth client, or when it was issued while the consent');
             $this->line('screen was still in Testing -- those expire after seven days.');
             $this->newLine();
-            $this->line('Generate a new one and put it in GOOGLE_DRIVE_REFRESH_TOKEN, then run');
-            $this->line('php artisan config:cache. For a token that keeps working, move the OAuth');
-            $this->line('consent screen out of Testing in the Google Cloud console.');
+            $this->line('Open Backups & Recovery in the dashboard and press Reconnect Google Drive.');
+            $this->line('The new grant is stored on the server and takes effect immediately -- no');
+            $this->line('.env edit and no config:cache. For a token that keeps working, move the');
+            $this->line('OAuth consent screen out of Testing in the Google Cloud console.');
 
             return;
         }

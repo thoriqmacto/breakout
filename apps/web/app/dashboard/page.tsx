@@ -2,10 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 
-import Link from "next/link"
-
 import { useAuth } from "@/components/auth-provider"
-import { StrategyCards } from "@/components/strategy-cards"
 import {
   Card,
   CardContent,
@@ -17,11 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { buildApiUrl, parseJson, type ApiResponse } from "@/lib/api-client"
 import { fetchPortfolios, type PositionRecord } from "@/lib/portfolio-client"
-import {
-  fetchBuiltInStrategies,
-  fetchStrategies,
-  type StrategyRecord,
-} from "@/lib/strategy-builder-client"
+import { fetchBuiltInStrategies } from "@/lib/strategy-builder-client"
 import { fetchAutomationAlerts, type AutomationAlert } from "@/lib/automation-client"
 import { formatIdr } from "@/lib/currency"
 
@@ -118,7 +111,6 @@ type AverageTransaction = {
 
 export default function DashboardPage() {
   const { user, accessToken } = useAuth()
-  const [strategies, setStrategies] = useState<StrategyRecord[]>([])
   const [strategiesError, setStrategiesError] = useState<string | null>(null)
   const [strategyCounts, setStrategyCounts] = useState<{ user: number; builtIn: number } | null>(
     null,
@@ -188,7 +180,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!accessToken) {
-      setStrategies([])
       setStrategiesError("Sign in to view your strategies.")
       return
     }
@@ -196,22 +187,12 @@ export default function DashboardPage() {
     let cancelled = false
     setStrategiesError(null)
 
-    fetchStrategies(accessToken, "all")
-      .then((rows) => {
-        if (!cancelled) setStrategies(rows)
-      })
-      .catch((cause) => {
-        if (!cancelled) {
-          setStrategiesError(
-            cause instanceof Error ? cause.message : "Unable to load strategies.",
-          )
-        }
-      })
-
-    // The counts come from the API rather than from the list above: that list
-    // is scoped "all" and includes public strategies belonging to other
-    // people, so counting it would answer a different question from the one
-    // the card asks.
+    // Only the counts. The full "all"-scoped list was fetched here to fill a
+    // Strategies section on this page; with that section gone the rows had no
+    // reader, and the request was a page-load cost paid for nothing. The
+    // counts are a different question anyway -- the list includes public
+    // strategies belonging to other people, so counting it would not answer
+    // what the card asks.
     fetchBuiltInStrategies(accessToken)
       .then((payload) => {
         if (!cancelled) {
@@ -913,35 +894,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">Strategies</h2>
-            <p className="text-sm text-muted-foreground">
-              Latest run for each strategy you own or can see.
-            </p>
-          </div>
-          <Link href="/dashboard/strategy">
-            <Button variant="outline" size="sm">
-              Manage
-            </Button>
-          </Link>
-        </div>
-
-        {strategiesError ? (
-          <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
-              {strategiesError}
-            </CardContent>
-          </Card>
-        ) : (
-          <StrategyCards
-            strategies={strategies}
-            emptyMessage="No strategies yet. Create one to start scanning."
-          />
-        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

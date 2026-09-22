@@ -103,7 +103,8 @@ class GoogleDriveOAuthClassifier
             'refresh_token_status' => 'not_configured',
             'message' => 'Google Drive is not configured.',
             'guidance' => [
-                'Set GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET and GOOGLE_DRIVE_REFRESH_TOKEN, then run php artisan config:cache.',
+                'Set GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET and GOOGLE_DRIVE_REDIRECT_URI, then run php artisan config:cache.',
+                'Then press Connect Google Drive on this page to grant access.',
             ],
         ];
     }
@@ -121,9 +122,8 @@ class GoogleDriveOAuthClassifier
             'message' => 'The Google OAuth refresh token was rejected and needs to be replaced.',
             'guidance' => [
                 'The refresh token has expired, been revoked, or no longer matches the OAuth client.',
-                'Generate a new refresh token using the same client ID and client secret, with offline access and the https://www.googleapis.com/auth/drive scope.',
-                'Update GOOGLE_DRIVE_REFRESH_TOKEN on the server, then run php artisan config:cache.',
-                'A consent screen still in Testing issues refresh tokens that stop working after seven days.',
+                'Press Reconnect Google Drive on this page and grant access again. The new token is stored on the server and takes effect immediately -- no .env edit and no deploy.',
+                'A consent screen still in Testing issues refresh tokens that stop working after seven days. Publishing the app is what stops that recurring.',
             ],
         ];
     }

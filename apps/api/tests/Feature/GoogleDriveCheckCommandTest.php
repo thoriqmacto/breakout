@@ -141,8 +141,13 @@ class GoogleDriveCheckCommandTest extends TestCase
     /**
      * The hint must follow what Google said. A rejected refresh token is the
      * failure an operator is most likely to hit, and it needs its own advice.
+     *
+     * That advice used to be "put a new token in GOOGLE_DRIVE_REFRESH_TOKEN
+     * and re-cache the config". The dashboard now grants one through the
+     * consent screen, so pointing at the variable would send a reader to edit
+     * a value the server no longer prefers.
      */
-    public function test_an_invalid_grant_recommends_regenerating_the_refresh_token(): void
+    public function test_an_invalid_grant_points_at_the_reconnect_button(): void
     {
         $this->registerFailingDriver('invalid-grant', '(400) invalid_grant: Token has been expired or revoked.');
         config(['filesystems.disks.gdrive' => ['driver' => 'invalid-grant', 'throw' => false]]);
@@ -150,8 +155,10 @@ class GoogleDriveCheckCommandTest extends TestCase
         Artisan::call('gdrive:check', ['--disk' => 'gdrive']);
         $output = Artisan::output();
 
-        $this->assertStringContainsString('GOOGLE_DRIVE_REFRESH_TOKEN', $output);
+        $this->assertStringContainsString('Reconnect Google Drive', $output);
         $this->assertStringContainsString('Testing', $output);
+        // The old remedy must not linger: it is no longer the shortest fix.
+        $this->assertStringNotContainsString('put it in GOOGLE_DRIVE_REFRESH_TOKEN', $output);
         // Service-account advice must never appear again.
         $this->assertStringNotContainsString('Shared Drive', $output);
         $this->assertStringNotContainsString('iam.gserviceaccount.com', $output);

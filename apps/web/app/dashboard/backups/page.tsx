@@ -25,8 +25,10 @@ import {
 } from "@/components/reconciliation-status"
 import {
   fetchAudit,
+  fetchDriveConnection,
   fetchReadiness,
   pushToDrive,
+  type DriveConnection,
   type PushResult,
   type ReadinessReport,
   type Report,
@@ -51,6 +53,9 @@ export default function BackupStatusPage() {
   const [audit, setAudit] = useState<Report | null>(null)
   const [auditing, setAuditing] = useState(false)
 
+  const [connection, setConnection] = useState<DriveConnection | null>(null)
+  const [connectionNotice, setConnectionNotice] = useState<string | null>(null)
+
   const [loading, setLoading] = useState(true)
   const [listLoading, setListLoading] = useState(false)
   const [pushing, setPushing] = useState(false)
@@ -70,9 +75,52 @@ export default function BackupStatusPage() {
     }
   }, [accessToken])
 
+  const loadConnection = useCallback(async () => {
+    if (!accessToken) return
+    try {
+      setConnection(await fetchDriveConnection(accessToken))
+    } catch {
+      // A status the page cannot read is not a disconnected Drive. The panel
+      // stays hidden rather than offering a button whose state is a guess.
+      setConnection(null)
+    }
+  }, [accessToken])
+
   useEffect(() => {
     void loadReadiness()
-  }, [loadReadiness])
+    void loadConnection()
+  }, [loadReadiness, loadConnection])
+
+  /*
+   * The outcome of a consent round-trip, reported once.
+   *
+   * The API callback redirects here with ?drive=<code> because it has nowhere
+   * else to put the result -- the browser arrives from Google, not from this
+   * app. The parameter is stripped afterwards so a reload does not re-announce
+   * a connection made minutes ago.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const code = new URLSearchParams(window.location.search).get("drive")
+    if (!code) return
+
+    const messages: Record<string, string> = {
+      connected: "Google Drive connected.",
+      denied: "Google Drive authorization was cancelled.",
+      invalid: "Google returned an incomplete response. Please try again.",
+      invalid_state: "That authorization link has expired or was already used. Please try again.",
+      failed: "Google Drive could not be connected. The reason was logged on the server.",
+    }
+
+    setConnectionNotice(messages[code] ?? null)
+    window.history.replaceState({}, "", window.location.pathname)
+
+    // A fresh grant changes both the stored connection and whether the disk
+    // resolves at all, so the health probe is re-run rather than left stale.
+    void loadConnection()
+    void loadReadiness()
+  }, [loadConnection, loadReadiness])
 
   // The list is a manifest read, so re-querying on every filter change costs
   // one file read regardless of how many symbols the universe carries.
@@ -206,6 +254,12 @@ export default function BackupStatusPage() {
         </Card>
       ) : null}
 
+      {connectionNotice ? (
+        <Card className="border-emerald-500/40">
+          <CardContent className="py-4 text-sm">{connectionNotice}</CardContent>
+        </Card>
+      ) : null}
+
       {loading && !readiness ? (
         <div className="grid gap-4 md:grid-cols-2">
           {[0, 1].map((index) => (
@@ -225,6 +279,22 @@ export default function BackupStatusPage() {
           />
 
           {outcome ? <PushOutcome result={outcome} /> : null}
+
+          {/*
+            Drive health, and with it the connect button, on the page as it
+            opens. The same card is repeated under the deep audit against that
+            report's own probe, but reaching it there means running a file-by-
+            file comparison first -- which is a long wait to be offered the
+            button that fixes a rejected grant.
+          */}
+          <DriveHealthCard
+            health={readiness.google_drive}
+            connection={connection}
+            onConnectionChanged={() => {
+              void loadConnection()
+              void loadReadiness()
+            }}
+          />
 
           <FlowSnapshotCard snapshot={readiness.flow_snapshot} />
         </>
@@ -277,7 +347,14 @@ export default function BackupStatusPage() {
                 available={audit.locations.find((l) => l.key === "local")?.available ?? true}
                 scanStatus={audit.locations.find((l) => l.key === "local")?.scan_status ?? "ok"}
               />
-              <DriveHealthCard health={audit.google_drive} />
+              <DriveHealthCard
+                health={audit.google_drive}
+                connection={connection}
+                onConnectionChanged={() => {
+                  void loadConnection()
+                  void loadReadiness()
+                }}
+              />
             </div>
 
             {audit.collections.map((collection) => (
