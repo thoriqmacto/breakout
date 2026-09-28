@@ -143,6 +143,41 @@ class TradingWeekResolver
     }
 
     /**
+     * Every date the calendar records as traded in a closed range, oldest
+     * first.
+     *
+     * One query rather than a walk of nextTradingDayOnOrAfter(): a gap to
+     * recover is usually a few sessions, but an asset that has been stale for
+     * a month would otherwise cost a query per day to enumerate.
+     *
+     * Only positive rows count. A date with no calendar row is unknown rather
+     * than traded, and a backfill that requested it would file whatever came
+     * back -- often nothing, sometimes a neighbouring session -- as a day the
+     * market is not known to have opened.
+     *
+     * @return array<int, Carbon>
+     */
+    public function tradingDaysBetween(Carbon $from, Carbon $to): array
+    {
+        $start = $this->today($from);
+        $end = $this->today($to);
+
+        if ($start->greaterThan($end)) {
+            return [];
+        }
+
+        return TradingCalendarDay::query()
+            ->whereDate('date', '>=', $start->toDateString())
+            ->whereDate('date', '<=', $end->toDateString())
+            ->where('is_trading_day', true)
+            ->orderBy('date')
+            ->pluck('date')
+            ->map(fn ($value): Carbon => $this->marketDate($value))
+            ->values()
+            ->all();
+    }
+
+    /**
      * A stored calendar value as a Jakarta midnight.
      *
      * The column is cast to a date, which Eloquent hands back as a UTC

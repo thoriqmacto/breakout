@@ -114,12 +114,13 @@ return [
 
         'automation:ohlcv-daily' => [
             'label' => 'Daily OHLCV sync',
-            'description' => 'Scrape and persist today\'s daily bar for every price-synced asset, then mirror the touched CSVs.',
+            'description' => 'Scrape and persist today\'s daily bar for every price-synced asset, recover any recent sessions it missed, then mirror the touched CSVs.',
             'stockbit_bulk' => true,
             'arguments' => [],
             'options' => [
                 'date' => ['type' => 'date', 'label' => 'Trading date (defaults to today in Asia/Jakarta)'],
                 'tickers' => ['type' => 'symbol_list', 'label' => 'Limit to specific tickers'],
+                'backfill-sessions' => ['type' => 'integer', 'min' => 0, 'max' => 120, 'label' => 'Trading sessions before the date checked for missing bars (0 fetches the date only)'],
                 'no-mirror' => ['type' => 'boolean', 'label' => 'Skip the Google Drive mirror'],
                 'disk' => ['type' => 'enum', 'values' => ['gdrive', 'local'], 'label' => 'Mirror disk override'],
             ],
@@ -384,7 +385,7 @@ return [
         [
             'name' => 'Daily OHLCV Sync',
             'slug' => 'daily-ohlcv-sync',
-            'description' => 'Every IDX trading day at 18:00 WIB, scrape that day\'s daily bar for every price-synced asset and mirror the changed CSVs to Google Drive. Runs after the closing bell so the trading calendar has confirmed the day.',
+            'description' => 'Every IDX trading day at 18:00 WIB, scrape that day\'s daily bar for every price-synced asset and mirror the changed CSVs to Google Drive. Any of the previous 20 trading sessions a ticker is missing -- a day lost to an expired Stockbit token, say -- is recovered in the same request. Runs after the closing bell so the trading calendar has confirmed the day.',
             'command' => 'automation:ohlcv-daily',
             'parameters' => ['arguments' => [], 'options' => []],
             'cron_expression' => '0 18 * * *',
