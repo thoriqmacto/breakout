@@ -3,6 +3,7 @@
 namespace Tests\Feature\Automation;
 
 use App\Models\Asset;
+use App\Models\Price;
 use App\Models\TradingCalendarDay;
 use App\Services\AssetProfileUpdater;
 use App\Services\Automation\RunMetadata;
@@ -129,6 +130,229 @@ class OhlcvDailyAutomationTest extends TestCase
                 'open' => 1000, 'high' => 1100, 'low' => 990, 'close' => 1050, 'volume' => 12345,
             ]],
         ];
+    }
+
+    /**
+     * @param  array<int, string>  $dates
+     * @return array<string, mixed>
+     */
+    private function bars(array $dates): array
+    {
+        return [
+            'result' => array_map(static fn (string $date): array => [
+                'date' => $date,
+                'open' => 1000, 'high' => 1100, 'low' => 990, 'close' => 1050, 'volume' => 12345,
+            ], $dates),
+        ];
+    }
+
+    private function storedBar(Asset $asset, string $date): void
+    {
+        Price::create([
+            'asset_id' => $asset->id,
+            'date' => $date,
+            'open' => 900, 'high' => 950, 'low' => 890, 'close' => 920, 'volume' => 1000,
+        ]);
+    }
+
+    /**
+     * Mon 24 .. Fri 28 August 2026, all traded.
+     */
+    private function tradingWeek(): void
+    {
+        foreach (['2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28'] as $date) {
+            $this->tradingDay($date);
+        }
+    }
+
+    private function hasBar(Asset $asset, string $date): bool
+    {
+        return Price::query()->where('asset_id', $asset->id)->whereDate('date', $date)->exists();
+    }
+
+    /**
+     * The case this recovery exists for.
+     *
+     * The token died after Monday's run. The calendar kept advancing on its
+     * own -- it is built from Yahoo and needs no Stockbit token -- so it knows
+     * Tuesday and Wednesday traded. Thursday's run used to ask for Thursday
+     * alone and leave those two missing for good.
+     */
+    public function test_sessions_missed_while_the_token_was_dead_are_recovered_on_the_next_run(): void
+    {
+        $asset = $this->asset('BBCA');
+        $this->tradingWeek();
+        $this->storedBar($asset, '2026-08-24');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        // One request, widened back to the first missed session.
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-25', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bars(['2026-08-25', '2026-08-26', '2026-08-27'])]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27']);
+
+        $this->assertTrue($this->hasBar($asset, '2026-08-25'));
+        $this->assertTrue($this->hasBar($asset, '2026-08-26'));
+        $this->assertTrue($this->hasBar($asset, '2026-08-27'));
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertSame(1, $metadata['backfilled_ticker_count']);
+        $this->assertSame(['2026-08-25', '2026-08-26'], $metadata['backfill_sessions']);
+        $this->assertSame(0, $metadata['backfill_unrecovered_count']);
+        $this->assertFalse($metadata['partial']);
+    }
+
+    /**
+     * Why this checks a window rather than following the latest bar.
+     *
+     * After an outage somebody fills today by hand with --date. The newest
+     * bar is now current, so a "resume after the latest bar" cursor would
+     * decide nothing is missing and the days before it would never come back.
+     */
+    public function test_a_hole_behind_the_newest_bar_is_still_found(): void
+    {
+        $asset = $this->asset('BBCA');
+        $this->tradingWeek();
+        $this->storedBar($asset, '2026-08-24');
+        $this->storedBar($asset, '2026-08-27');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-25', '2026-08-28', null, 1)
+            ->andReturn(['data' => $this->bars(['2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28'])]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-28']);
+
+        $this->assertTrue($this->hasBar($asset, '2026-08-25'));
+        $this->assertTrue($this->hasBar($asset, '2026-08-26'));
+        $this->assertSame(['2026-08-25', '2026-08-26'], app(RunMetadata::class)->get('backfill_sessions'));
+    }
+
+    public function test_a_weekend_is_not_mistaken_for_a_missed_session(): void
+    {
+        $asset = $this->asset('BBCA');
+        $this->tradingDay('2026-08-21');
+        $this->tradingDay('2026-08-22', false);
+        $this->tradingDay('2026-08-23', false);
+        $this->tradingDay('2026-08-24');
+        $this->storedBar($asset, '2026-08-21');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-24', '2026-08-24', null, 1)
+            ->andReturn(['data' => $this->bar('2026-08-24')]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-24']);
+
+        $this->assertSame(0, app(RunMetadata::class)->get('backfilled_ticker_count'));
+    }
+
+    /**
+     * An asset listed on Wednesday holds no bar for Monday or Tuesday, and
+     * never will. Those are not gaps; re-requesting them every night would be.
+     */
+    public function test_sessions_before_a_tickers_first_bar_are_not_gaps(): void
+    {
+        $asset = $this->asset('NEWCO');
+        $this->tradingWeek();
+        $this->storedBar($asset, '2026-08-26');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('NEWCO', 'HS_PERIOD_DAILY', '2026-08-27', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bar('2026-08-27')]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27']);
+
+        $this->assertSame(0, app(RunMetadata::class)->get('backfilled_ticker_count'));
+    }
+
+    public function test_backfill_sessions_zero_fetches_the_target_date_only(): void
+    {
+        $asset = $this->asset('BBCA');
+        $this->tradingWeek();
+        $this->storedBar($asset, '2026-08-24');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-27', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bar('2026-08-27')]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27', '--backfill-sessions' => 0]);
+
+        $this->assertFalse($this->hasBar($asset, '2026-08-25'));
+    }
+
+    /**
+     * A current ticker is not dragged into a behind ticker's wider range:
+     * each starting date is its own request.
+     */
+    public function test_tickers_are_grouped_by_where_their_range_starts(): void
+    {
+        $current = $this->asset('BBCA');
+        $behind = $this->asset('BBRI');
+        $this->tradingWeek();
+        $this->storedBar($current, '2026-08-24');
+        $this->storedBar($current, '2026-08-25');
+        $this->storedBar($current, '2026-08-26');
+        $this->storedBar($behind, '2026-08-24');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-27', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bar('2026-08-27')]);
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBRI', 'HS_PERIOD_DAILY', '2026-08-25', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bars(['2026-08-25', '2026-08-26', '2026-08-27'])]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27']);
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertSame(1, $metadata['backfilled_ticker_count']);
+        $this->assertSame(2, $metadata['success_ticker_count']);
+    }
+
+    /**
+     * A recovered session that is still empty came back from the same request
+     * that did deliver today's bar, so it is a day the ticker did not trade --
+     * a suspension -- not a failed fetch. Reported, but not a partial run:
+     * otherwise one suspended stock would flag every run for weeks.
+     */
+    public function test_a_session_that_stays_empty_is_reported_without_marking_the_run_partial(): void
+    {
+        $asset = $this->asset('BBCA');
+        $this->tradingWeek();
+        $this->storedBar($asset, '2026-08-24');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        // Tuesday never comes back: suspended.
+        $mock->shouldReceive('historicalSummary')
+            ->once()
+            ->with('BBCA', 'HS_PERIOD_DAILY', '2026-08-25', '2026-08-27', null, 1)
+            ->andReturn(['data' => $this->bars(['2026-08-26', '2026-08-27'])]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27']);
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertSame(1, $metadata['backfill_unrecovered_count']);
+        $this->assertSame(['BBCA 2026-08-25'], $metadata['backfill_unrecovered']);
+        $this->assertFalse($metadata['partial'], 'Today landed; an untraded earlier day is not a failed run.');
+        $this->assertTrue($this->hasBar($asset, '2026-08-26'));
     }
 
     public function test_a_non_trading_day_never_calls_stockbit(): void
