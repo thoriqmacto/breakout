@@ -5,6 +5,7 @@ namespace Tests\Feature\Indexes;
 use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\Metric;
+use App\Models\Price;
 use App\Models\User;
 use App\Services\Indexes\IndexMembershipSync;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -192,8 +193,10 @@ class MarketIndexApiTest extends TestCase
 
         app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
 
-        // One already tracked, so the request covers both branches at once.
-        Asset::create(['symbol' => 'AA01', 'name' => 'Beta', 'sync_price' => false, 'sync_broker_summary' => false]);
+        // One already tracked, with history, so the request covers both
+        // branches at once.
+        $tracked = Asset::create(['symbol' => 'AA01', 'name' => 'Beta', 'sync_price' => false, 'sync_broker_summary' => false]);
+        Price::create(['asset_id' => $tracked->id, 'date' => '2026-08-03', 'open' => 1, 'high' => 1, 'low' => 1, 'close' => 1, 'volume' => 1]);
 
         $this->postJson('/api/v1/indexes/TEST70/track', [
             'symbols' => ['AA00', 'AA01', 'GOTO'],
@@ -207,12 +210,36 @@ class MarketIndexApiTest extends TestCase
             static fn (BackfillAssetHistoryJob $job): bool => $job->symbol === 'AA00',
         );
 
-        // An asset that already existed is not re-scraped from its IPO date,
-        // and a symbol that was refused was never created to scrape.
+        // An asset that already has history is not re-scraped from its IPO
+        // date, and a symbol that was refused was never created to scrape.
         Queue::assertNotPushed(
             BackfillAssetHistoryJob::class,
             static fn (BackfillAssetHistoryJob $job): bool => in_array($job->symbol, ['AA01', 'GOTO'], true),
         );
+    }
+
+    /**
+     * Existing but empty -- created muted, or by an import that brought no
+     * prices. Switching it on starts nightly collection, but the nightly
+     * recovery only looks back to a ticker's first bar, so without this it
+     * would grow forward from tonight and never get the years before.
+     */
+    public function test_tracking_an_existing_asset_with_no_bars_queues_its_history(): void
+    {
+        $this->signIn();
+        Queue::fake();
+
+        app(IndexMembershipSync::class)->apply('TEST70', $this->members(45), 'browser', Carbon::now());
+
+        Asset::create(['symbol' => 'AA01', 'name' => 'Beta', 'sync_price' => false, 'sync_broker_summary' => false]);
+
+        $this->postJson('/api/v1/indexes/TEST70/track', ['symbols' => ['AA01']])->assertOk();
+
+        Queue::assertPushed(
+            BackfillAssetHistoryJob::class,
+            static fn (BackfillAssetHistoryJob $job): bool => $job->symbol === 'AA01',
+        );
+        $this->assertTrue((bool) Asset::query()->where('symbol', 'AA01')->value('sync_price'));
     }
 
     public function test_tracking_refuses_a_symbol_that_is_not_a_member(): void

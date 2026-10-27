@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Asset;
 use App\Services\Automation\StockbitTokenHealth;
+use App\Services\Automation\TradingWeekResolver;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -26,6 +27,12 @@ use Symfony\Component\Console\Output\BufferedOutput;
  * from there a year at a time. That is how the assets this installation
  * already holds were built, so a symbol added through the index panel ends up
  * with the same history rather than a shorter one of its own kind.
+ *
+ * Dispatched from every place a price-synced asset can start with no bars:
+ * the index panel, the Add Asset form, and -- as the net under both -- the
+ * daily OHLCV job, which queues one for any ticker it finds with no stored
+ * bar at all. Being unique per symbol, a second dispatch while one is queued
+ * is dropped rather than doubled.
  *
  * Queued because it is minutes of API calls, not milliseconds, and an HTTP
  * request must not hold that open.
@@ -123,6 +130,24 @@ class BackfillAssetHistoryJob implements ShouldBeUnique, ShouldQueue
 
         $output = new BufferedOutput;
 
+        // Up to the last session the calendar confirms as traded, not "now".
+        //
+        // Left open, the scraper's --to defaults to the clock, and a backfill
+        // that runs mid-session stores today's bar as it stands at that
+        // moment. The evening collector normally overwrites it -- the write is
+        // an upsert -- but if that run misses the ticker (an expired token,
+        // say) the half-day bar stays, and nothing later notices: the daily
+        // job's recovery looks for sessions with *no* bar, and this one has
+        // one. Stopping at the confirmed session leaves today to the collector
+        // that runs after the close.
+        //
+        // The calendar trails Yahoo's publication, so on a trading afternoon
+        // this is yesterday and in the evening it is today. A calendar with
+        // nothing in the last month is broken rather than early; falling back
+        // to the scraper's own default keeps the history coming regardless.
+        $calendar = app(TradingWeekResolver::class);
+        $to = $calendar->latestTradingDayOnOrBefore($calendar->today(), 30);
+
         try {
             // No --from on purpose: that is what makes the scraper sync the
             // profile, read the IPO date off it and start there.
@@ -135,14 +160,15 @@ class BackfillAssetHistoryJob implements ShouldBeUnique, ShouldQueue
             // asset with no history at all. The profile still reaches the
             // database; only the file is skipped, and the output below names
             // the symbol so it can be committed from a development checkout.
-            $exitCode = Artisan::call('stockbit:scrape', [
+            $exitCode = Artisan::call('stockbit:scrape', array_merge([
                 'tickers' => [$symbol],
                 '--historical' => true,
                 '--no-seeder-sync' => true,
-            ], $output);
+            ], $to !== null ? ['--to' => $to->toDateString()] : []), $output);
 
             Log::info('Backfilled price history.', [
                 'symbol' => $symbol,
+                'to' => $to?->toDateString(),
                 'exit_code' => $exitCode,
                 'bars' => Asset::query()->where('symbol', $symbol)->first()?->prices()->count(),
             ]);

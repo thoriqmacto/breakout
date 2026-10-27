@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Automation;
 
+use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\Price;
 use App\Services\Automation\RunMetadata;
@@ -48,9 +49,14 @@ use Illuminate\Support\Facades\Config;
  * range is one historical request per ticker that returns every daily bar in
  * it, so recovering a fortnight costs what fetching today costs.
  *
- * A ticker with no bars at all is not backfilled here. That is a new asset,
- * and its history is BackfillAssetHistoryJob's to fetch -- from its IPO, not
- * from the edge of a window.
+ * A ticker with no bars at all is not backfilled by the window. That is a new
+ * asset, and its history belongs to BackfillAssetHistoryJob -- from its IPO,
+ * not from the edge of a window. This job makes sure one is queued: an asset
+ * can reach the price-synced list without the job ever having been dispatched
+ * for it (created by a CLI import, or before the Add Asset form queued one),
+ * and once today's bar landed the window would treat that as its first day
+ * and the years before it would never be anyone's to fetch. The job is unique
+ * per symbol, so this is a no-op for one already queued.
  */
 class OhlcvDailyCommand extends Command
 {
@@ -144,6 +150,10 @@ class OhlcvDailyCommand extends Command
 
         $plan = $this->plan($calendar, $tickers, $date);
 
+        // Read before the scrape: once today's bar lands, a ticker that had
+        // nothing looks like one whose history simply starts today.
+        $withoutHistory = array_values(array_diff($tickers, array_keys($this->firstBars($tickers))));
+
         if ($plan['backfill_sessions'] !== []) {
             $this->line(sprintf(
                 '  Recovering %d missed session(s) for %d ticker(s): %s',
@@ -170,7 +180,25 @@ class OhlcvDailyCommand extends Command
         $outcome = $this->verifyPersistence($tickers, $date);
         $unrecovered = $this->unrecoveredSessions($plan['due']);
 
+        // Queued after the scrape, not before: this run holds the shared
+        // Stockbit lock, so the backfill would only be put back until it is
+        // free. Unique per symbol, so a ticker already queued -- by the index
+        // panel or the Add Asset form -- is not queued twice.
+        foreach ($withoutHistory as $ticker) {
+            BackfillAssetHistoryJob::dispatch($ticker);
+        }
+
+        if ($withoutHistory !== []) {
+            $this->line(sprintf(
+                '  %d ticker(s) had no stored history; a full backfill from the IPO date is queued: %s',
+                count($withoutHistory),
+                implode(', ', array_slice($withoutHistory, 0, 20)),
+            ));
+        }
+
         $metadata->merge([
+            'history_backfill_queued_count' => count($withoutHistory),
+            'history_backfill_queued' => array_slice($withoutHistory, 0, self::MAX_REPORTED_FAILURES),
             'success_ticker_count' => count($outcome['persisted']),
             'failed_ticker_count' => count($outcome['missing']),
             'failed_tickers' => array_slice($outcome['missing'], 0, self::MAX_REPORTED_FAILURES),
