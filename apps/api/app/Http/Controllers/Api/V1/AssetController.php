@@ -6,6 +6,7 @@ use App\Http\Resources\ApiResponse;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AtrResource;
 use App\Http\Resources\PriceResource;
+use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\Metric;
 use App\Services\Analysis\AssetMetricProjector;
@@ -235,11 +236,25 @@ class AssetController extends ApiController
             }
         }
 
-        $asset = Asset::create($data);
+        $asset = Asset::create($data)->fresh();
+
+        // The same history the index panel queues. Without it an asset added
+        // here got one bar an evening from the daily collector and nothing
+        // before its first one -- the collector's recovery only looks back
+        // from a ticker's earliest bar, so the years before it were never
+        // anyone's to fetch. sync_price off means the operator does not want
+        // prices collected, history included.
+        $backfillQueued = (bool) $asset->sync_price;
+
+        if ($backfillQueued) {
+            BackfillAssetHistoryJob::dispatch($asset->symbol);
+        }
 
         return ApiResponse::success(
             AssetResource::make($asset),
-            'Asset created successfully',
+            $backfillQueued
+                ? 'Asset created. Its price history from the IPO date is being fetched in the background.'
+                : 'Asset created successfully',
             201
         );
     }

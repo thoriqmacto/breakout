@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Automation;
 
+use App\Jobs\BackfillAssetHistoryJob;
 use App\Models\Asset;
 use App\Models\Price;
 use App\Models\TradingCalendarDay;
@@ -12,6 +13,7 @@ use App\Services\StockbitExodusClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
@@ -35,6 +37,12 @@ class OhlcvDailyAutomationTest extends TestCase
 
         Storage::fake('local');
         Storage::fake('gdrive');
+
+        // A ticker with no stored bars now has its full history queued. The
+        // test queue is `sync`, which would run that backfill inline against
+        // the strict Stockbit mocks below; these tests are about the daily
+        // fetch, and the ones about the backfill assert the dispatch itself.
+        Queue::fake();
 
         $this->seedDir = sys_get_temp_dir().'/breakout-ohlcv-daily-'.bin2hex(random_bytes(4));
         mkdir($this->seedDir, 0755, true);
@@ -353,6 +361,42 @@ class OhlcvDailyAutomationTest extends TestCase
         $this->assertSame(['BBCA 2026-08-25'], $metadata['backfill_unrecovered']);
         $this->assertFalse($metadata['partial'], 'Today landed; an untraded earlier day is not a failed run.');
         $this->assertTrue($this->hasBar($asset, '2026-08-26'));
+    }
+
+    /**
+     * The net under every way an asset can be created. Whatever path brought
+     * a price-synced ticker here with no bars, its history is queued -- once
+     * today's bar lands, the window would take today as its first day and the
+     * years before would be nobody's to fetch.
+     */
+    public function test_a_ticker_with_no_history_has_its_full_backfill_queued(): void
+    {
+        $this->asset('FRESH');
+        $current = $this->asset('BBCA');
+        $this->tradingWeek();
+        $this->storedBar($current, '2026-08-24');
+        $this->storedBar($current, '2026-08-25');
+        $this->storedBar($current, '2026-08-26');
+        $this->stubProfileUpdater();
+
+        $mock = $this->stockbit();
+        $mock->shouldReceive('historicalSummary')
+            ->andReturnUsing(fn (string $symbol, $period, string $from, string $to) => ['data' => $this->bar($to)]);
+
+        Artisan::call('automation:ohlcv-daily', ['--date' => '2026-08-27']);
+
+        Queue::assertPushed(
+            BackfillAssetHistoryJob::class,
+            static fn (BackfillAssetHistoryJob $job): bool => $job->symbol === 'FRESH',
+        );
+        Queue::assertNotPushed(
+            BackfillAssetHistoryJob::class,
+            static fn (BackfillAssetHistoryJob $job): bool => $job->symbol === 'BBCA',
+        );
+
+        $metadata = app(RunMetadata::class)->all();
+        $this->assertSame(1, $metadata['history_backfill_queued_count']);
+        $this->assertSame(['FRESH'], $metadata['history_backfill_queued']);
     }
 
     public function test_a_non_trading_day_never_calls_stockbit(): void

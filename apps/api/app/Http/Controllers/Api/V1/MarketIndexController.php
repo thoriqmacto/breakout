@@ -256,6 +256,15 @@ class MarketIndexController extends ApiController
                     $asset->save();
                 }
 
+                // Switched back on, it is collected from tonight -- but an
+                // asset that never got a bar (created muted, or by an import
+                // that brought no prices) has no history to collect forward
+                // from, and the nightly recovery only looks back to a ticker's
+                // first bar. Same backfill a brand-new symbol gets.
+                if (! $asset->prices()->exists()) {
+                    BackfillAssetHistoryJob::dispatch($symbol);
+                }
+
                 $existing[] = $symbol;
 
                 continue;
